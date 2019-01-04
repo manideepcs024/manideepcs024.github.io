@@ -1,0 +1,49 @@
+1. background gradient for slider top:: along with change timeout and the icons shinig.
+// gradient done... icon part left (skipping for now as not required. )...
+
+aa. style map little more. / will remove 
+
+social manideep (added)
+
+quora linkedin github codepen etc.  ..added
+
+2. flare text as scroll.... // due
+
+3. githb facebook fiver profile integration  
+
+4. facebook posts last  // no will make dirty
+
+5. pic replace of bill gates by my own pic.  //done
+
+6. contact card above map  ..started // will remove
+
+7. form  // will remove // done
+
+8. my qualities  // will remove not required.  // done
+
+9. link to fb  // due // done
+
+10. click me scale  // done
+  
+11.  blogs  // due
+
+12. little portfolio.  // not required
+
+13. work experience  // done
+
+14. history  + education..  // done
+
+15. three js model in right of contact  // done
+
+16. navigation  // due
+
+17. mobile responsive // due
+
+18. build bundle //due
+
+19. buy domain  // due
+
+20. host on a space or buy one..  // due
+
+21. my skill and what i want to have in circles when clicked it should flip with some more info. //done in other way
+
