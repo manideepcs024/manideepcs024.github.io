@@ -1,548 +1,958 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title> Manideep Mittal </title>
-  <meta name="" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <link rel="canonical" href="" />
-  <meta itemprop="name" content="" />
-  <meta itemprop="description" content="" />
-  <meta itemprop="founder" content="" />
-  <meta itemprop="logo" content="" />
-  <meta itemprop="url" content="" />
-  <meta itemprop="telephone" content="" />
-  <meta property="og:url" content="" />
-  <meta property="og:type" content="" />
-  <meta property="og:title" content=" " />
-  <meta property="og:description" content=" " />
-  <meta property="og:site_name" content="" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manideep Mittal — Developer · Trader · Analyst</title>
+<meta name="description" content="Manideep Mittal — software developer at Syne, Pune. Stock market trader, investor, and lover of analysis and technical tests." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a;
+    --fg: #eef0f6;
+    --muted: #8a90a2;
+    --line: rgba(255,255,255,.08);
+    --glass: rgba(255,255,255,.04);
+    --a1: #7c5cff;
+    --a2: #00e0b8;
+    --a3: #ff4d8d;
+    --up: #22d39a;
+    --down: #ff5470;
+    --radius: 22px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Inter, system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--a1); color: #fff; }
 
-  <link rel="apple-touch-icon" sizes="57x57" href="./assets/images/favicon/apple-icon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="./assets/images/favicon/apple-icon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="./assets/images/favicon/apple-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="./assets/images/favicon/apple-icon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="./assets/images/favicon/apple-icon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="./assets/images/favicon/apple-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="./assets/images/favicon/apple-icon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="./assets/images/favicon/apple-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="./assets/images/favicon/apple-icon-180x180.png">
-<link rel="icon" type="image/png" sizes="192x192"  href="./assets/images/favicon/android-icon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="./assets/images/favicon/favicon-96x96.png">
-<link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon/favicon-16x16.png">
-<link rel="manifest" href="./assets/images/favicon/manifest.json">
-<meta name="msapplication-TileColor" content="#ffffff">
-<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-<meta name="theme-color" content="#ffffff">
-  <!--inject:css -->
-  <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="../assets/styles/css/style.css" />
-  <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+  /* ---------- 3D canvas + overlays ---------- */
+  #webgl { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .grain {
+    position: fixed; inset: -50%; z-index: 1; pointer-events: none; opacity: .06;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: grain 1s steps(6) infinite;
+  }
+  @keyframes grain { 0%{transform:translate(0,0)} 50%{transform:translate(-3%,2%)} 100%{transform:translate(2%,-3%)} }
+
+  /* ---------- cursor ---------- */
+  .cursor, .cursor-dot { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; border-radius: 50%; transform: translate(-50%,-50%); }
+  .cursor { width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.5); transition: width .25s, height .25s, background .25s, border-color .25s; mix-blend-mode: difference; }
+  .cursor.hover { width: 70px; height: 70px; background: #fff; border-color: #fff; }
+  .cursor-dot { width: 5px; height: 5px; background: #fff; }
+  @media (hover: none) { body { cursor: auto; } .cursor, .cursor-dot { display: none; } }
+
+  /* ---------- loader ---------- */
+  .loader { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: grid; place-items: center; transition: clip-path 1s cubic-bezier(.77,0,.18,1); clip-path: inset(0 0 0 0); }
+  .loader.done { clip-path: inset(0 0 100% 0); }
+  .loader span { font: 700 clamp(2rem,6vw,4rem) "Space Grotesk"; letter-spacing: -.03em; }
+  .loader i { display:block; height:2px; margin-top:14px; background: linear-gradient(90deg,var(--a1),var(--a2)); width:0; animation: load 1.1s ease forwards; }
+  @keyframes load { to { width: 100%; } }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 50;
+    display: flex; gap: 4px; padding: 6px; border-radius: 999px;
+    background: rgba(10,12,20,.55); border: 1px solid var(--line);
+    backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  }
+  nav a { padding: 8px 16px; border-radius: 999px; font-size: .86rem; color: var(--muted); transition: color .3s, background .3s; }
+  nav a:hover, nav a.active { color: var(--fg); background: rgba(255,255,255,.07); }
+  nav .logo { color: var(--fg); font-family: "Space Grotesk"; font-weight: 700; }
+  @media (max-width: 900px){ nav a[href="#quotes"], nav a[href="#journey"] { display:none; } }
+  @media (max-width: 640px){ nav a:not(.logo):not(.cta) { display:none; } }
+
+  /* ---------- layout ---------- */
+  main { position: relative; z-index: 2; }
+  section { padding: 120px clamp(20px, 6vw, 90px); max-width: 1320px; margin: 0 auto; }
+  .eyebrow { font: 500 .78rem "JetBrains Mono", monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--a2); display: inline-flex; gap: 10px; align-items: center; }
+  .eyebrow::before { content:""; width: 28px; height: 1px; background: currentColor; }
+  h2 { font: 700 clamp(2.2rem, 5vw, 4rem) "Space Grotesk"; letter-spacing: -.04em; line-height: 1.02; margin: 18px 0 40px; }
+  .grad { background: linear-gradient(100deg, var(--a1), var(--a2) 50%, var(--a3)); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 200% auto; animation: shine 6s linear infinite; }
+  @keyframes shine { to { background-position: 200% center; } }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-top: 140px; }
+  .status { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(10px); font-size: .85rem; width: fit-content; }
+  .status b { width: 8px; height: 8px; border-radius: 50%; background: var(--up); box-shadow: 0 0 0 0 var(--up); animation: ping 2s infinite; }
+  @keyframes ping { 0%{box-shadow:0 0 0 0 rgba(34,211,154,.7)} 100%{box-shadow:0 0 0 12px rgba(34,211,154,0)} }
+  .hero h1 { font: 700 clamp(3.2rem, 11vw, 9.5rem) "Space Grotesk"; letter-spacing: -.06em; line-height: .9; margin: 28px 0 26px; }
+  .hero h1 .line { display: block; overflow: hidden; }
+  .hero h1 .line > span { display: inline-block; transform: translateY(110%); transition: transform 1.1s cubic-bezier(.2,.8,.2,1); }
+  .ready .hero h1 .line > span { transform: none; }
+  .hero h1 .line:nth-child(2) > span { transition-delay: .12s; }
+  .hero .roles { font: 500 clamp(1.05rem, 2vw, 1.4rem) "Space Grotesk"; color: var(--muted); max-width: 680px; }
+  .typed { color: var(--fg); border-right: 2px solid var(--a2); padding-right: 4px; animation: caret 1s step-end infinite; }
+  @keyframes caret { 50% { border-color: transparent; } }
+  .hero-actions { display: flex; gap: 14px; margin-top: 40px; flex-wrap: wrap; }
+  .btn { position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 15px 26px; border-radius: 999px; font-weight: 600; font-size: .95rem; border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(10px); overflow: hidden; transition: transform .2s; }
+  .btn.primary { background: var(--fg); color: #000; border-color: transparent; }
+  .btn.primary::after { content:""; position:absolute; inset:0; background: linear-gradient(100deg,transparent 30%,rgba(124,92,255,.45),transparent 70%); transform: translateX(-100%); transition: transform .7s; }
+  .btn.primary:hover::after { transform: translateX(100%); }
+  .scroll-hint { position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); font: .72rem "JetBrains Mono"; color: var(--muted); letter-spacing: .2em; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .scroll-hint i { width: 1px; height: 50px; background: linear-gradient(var(--fg), transparent); animation: drip 2s infinite; transform-origin: top; }
+  @keyframes drip { 0%{transform:scaleY(0)} 50%{transform:scaleY(1)} 100%{transform:scaleY(1);opacity:0} }
+
+  /* ---------- marquee ---------- */
+  .marquee { position: relative; z-index: 2; border-block: 1px solid var(--line); background: rgba(5,6,10,.6); backdrop-filter: blur(8px); overflow: hidden; padding: 22px 0; transform: rotate(-1.5deg) scale(1.03); }
+  .marquee-track { display: flex; gap: 48px; width: max-content; animation: marq 32s linear infinite; font: 700 clamp(1.4rem, 3vw, 2.4rem) "Space Grotesk"; letter-spacing: -.02em; white-space: nowrap; }
+  .marquee-track span:nth-child(even) { -webkit-text-stroke: 1px rgba(255,255,255,.4); color: transparent; }
+  .marquee-track em { font-style: normal; color: var(--a2); }
+  @keyframes marq { to { transform: translateX(-50%); } }
+
+  /* ---------- reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(40px); filter: blur(8px); transition: opacity 1s, transform 1s cubic-bezier(.2,.8,.2,1), filter 1s; }
+  .reveal.in { opacity: 1; transform: none; filter: none; }
+
+  /* ---------- bento ---------- */
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .card {
+    position: relative; border-radius: var(--radius); padding: 28px; overflow: hidden;
+    background: linear-gradient(160deg, rgba(22,24,36,.82), rgba(10,11,18,.78));
+    border: 1px solid var(--line); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    transform-style: preserve-3d; transition: transform .25s ease, border-color .3s;
+    --mx: 50%; --my: 50%;
+  }
+  .card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(500px circle at var(--mx) var(--my), rgba(124,92,255,.16), transparent 40%); opacity: 0; transition: opacity .3s; }
+  .card:hover::before { opacity: 1; }
+  .card:hover { border-color: rgba(255,255,255,.18); }
+  .card h3 { font: 700 1.35rem "Space Grotesk"; letter-spacing: -.02em; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: .95rem; }
+  .card .tag { font: .72rem "JetBrains Mono"; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 18px; display: block; }
+  .c-intro { grid-column: span 4; grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; min-height: 340px; }
+  .c-intro p.big { font: 500 clamp(1.3rem, 2.4vw, 1.9rem) "Space Grotesk"; line-height: 1.3; color: var(--fg); letter-spacing: -.02em; }
+  .c-intro p.big span { color: var(--muted); }
+  .c-loc { grid-column: span 2; }
+  .c-time { grid-column: span 2; }
+  .c-chart { grid-column: span 3; min-height: 300px; }
+  .c-tests { grid-column: span 3; }
+  .c-dev { grid-column: span 2; }
+  .c-invest { grid-column: span 2; }
+  .c-analysis { grid-column: span 2; }
+  @media (max-width: 960px) { .bento { grid-template-columns: 1fr 1fr; } .bento > * { grid-column: span 2 !important; } }
+
+  .pin { display: flex; align-items: center; gap: 10px; font: 700 2rem "Space Grotesk"; letter-spacing: -.03em; }
+  .pin svg { color: var(--a3); }
+  .company { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 10px; background: rgba(0,224,184,.08); border: 1px solid rgba(0,224,184,.25); color: var(--a2); font: 600 .85rem "JetBrains Mono"; }
+  .clock { font: 600 2.4rem "JetBrains Mono"; letter-spacing: -.04em; }
+  .market { margin-top: 6px; font-size: .85rem; display: flex; align-items: center; gap: 8px; }
+  .market b { width: 7px; height: 7px; border-radius: 50%; }
+
+  .chart-head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .chart-price { font: 600 1.6rem "JetBrains Mono"; }
+  .chart-chg { font: 600 .85rem "JetBrains Mono"; }
+  #candles { width: 100%; height: 190px; display: block; margin-top: 16px; }
+  .note { font-size: .7rem !important; color: #5a6072 !important; margin-top: 8px; font-family: "JetBrains Mono"; }
+
+  .terminal { font: .85rem/1.8 "JetBrains Mono", monospace; background: rgba(0,0,0,.45); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin-top: 14px; min-height: 178px; }
+  .terminal .ok { color: var(--up); }
+  .terminal .dim { color: #5a6072; }
+  .terminal .bar { display: inline-block; width: 70px; height: 6px; background: #1b1e29; border-radius: 3px; vertical-align: middle; overflow: hidden; margin: 0 8px; }
+  .terminal .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--a1), var(--a2)); transition: width .9s ease; }
+
+  .icon-badge { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; margin-bottom: 22px; background: rgba(124,92,255,.12); border: 1px solid rgba(124,92,255,.3); color: #b6a6ff; }
+  .c-invest .icon-badge { background: rgba(34,211,154,.1); border-color: rgba(34,211,154,.3); color: var(--up); }
+  .c-analysis .icon-badge { background: rgba(255,77,141,.1); border-color: rgba(255,77,141,.3); color: var(--a3); }
+
+  /* ---------- stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
+  .stat { padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(12px); }
+  .stat strong { font: 700 clamp(2.2rem, 4vw, 3.2rem) "Space Grotesk"; letter-spacing: -.04em; display: block; }
+  .stat span { color: var(--muted); font-size: .88rem; }
+  @media (max-width: 760px) { .stats { grid-template-columns: 1fr 1fr; } }
+
+  /* ---------- timeline ---------- */
+  .timeline { position: relative; padding-left: 36px; }
+  .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+  .timeline .progress { position: absolute; left: 7px; top: 8px; width: 2px; height: 0; background: linear-gradient(var(--a1), var(--a2)); box-shadow: 0 0 14px var(--a1); }
+  .t-item { position: relative; padding: 0 0 54px; }
+  .t-item::before { content: ""; position: absolute; left: -36px; top: 8px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 2px solid var(--muted); transition: border-color .4s, box-shadow .4s; }
+  .t-item.in::before { border-color: var(--a2); box-shadow: 0 0 0 5px rgba(0,224,184,.12); }
+  .t-item.now::before { background: var(--a2); }
+  .t-date { font: .78rem "JetBrains Mono"; color: var(--a2); letter-spacing: .08em; }
+  .t-item h3 { font: 700 clamp(1.4rem, 2.6vw, 2rem) "Space Grotesk"; letter-spacing: -.03em; margin: 4px 0 4px; }
+  .t-item h3 small { font-size: .55em; color: var(--muted); font-weight: 500; letter-spacing: 0; }
+  .t-item p { color: var(--muted); max-width: 640px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .chip { font: .75rem "JetBrains Mono"; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); color: #c7cbd8; background: rgba(255,255,255,.03); }
+
+  /* ---------- skills ---------- */
+  .skills { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .skill { padding: 22px; border-radius: 18px; border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(12px); }
+  .skill-top { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 14px; }
+  .skill-top span:last-child { font-family: "JetBrains Mono"; color: var(--muted); font-size: .85rem; }
+  .meter { height: 6px; border-radius: 3px; background: #161925; overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--a1), var(--a2)); transition: width 1.4s cubic-bezier(.2,.8,.2,1); }
 
 
+  /* ---------- projects ---------- */
+  .project { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; padding: 40px; align-items: center; }
+  .proj-title { font-size: clamp(1.8rem, 3.4vw, 2.6rem) !important; letter-spacing: -.04em !important; margin-bottom: 14px !important; }
+  .project p strong { color: var(--fg); }
+  .feat { list-style: none; margin: 22px 0 18px; display: grid; gap: 12px; }
+  .feat li { display: flex; gap: 12px; color: var(--muted); font-size: .93rem; }
+  .feat li b { flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: rgba(255,255,255,.05); border: 1px solid var(--line); font-size: .85rem; }
+  .feat strong { color: var(--fg); }
+  .screener { background: rgba(0,0,0,.5); border: 1px solid var(--line); border-radius: 18px; padding: 16px; font-family: "JetBrains Mono", monospace; font-size: .8rem; }
+  .scr-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+  .scr-dots { display: flex; gap: 6px; } .scr-dots i { width: 10px; height: 10px; border-radius: 50%; background: #2a2e3c; }
+  .scr-dots i:first-child { background: #ff5f57; } .scr-dots i:nth-child(2) { background: #febc2e; } .scr-dots i:last-child { background: #28c840; }
+  .scr-tabs { display: flex; padding: 3px; border-radius: 10px; background: #12141d; border: 1px solid var(--line); }
+  .scr-tabs button { all: unset; cursor: none; padding: 5px 12px; border-radius: 7px; color: var(--muted); transition: background .3s, color .3s; }
+  .scr-tabs button.on { background: var(--fg); color: #000; }
+  .scr-live { display: flex; align-items: center; gap: 6px; color: var(--up); font-size: .72rem; }
+  .scr-live b { width: 6px; height: 6px; border-radius: 50%; background: var(--up); animation: ping 1.6s infinite; }
+  .scr-row { display: grid; grid-template-columns: 1.1fr 1.5fr .9fr .8fr; gap: 8px; padding: 10px; border-radius: 10px; align-items: center; animation: rowIn .5s cubic-bezier(.2,.8,.2,1) both; }
+  .scr-row:not(.scr-cols):hover { background: rgba(255,255,255,.04); }
+  .scr-cols { color: #5a6072; font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; border-bottom: 1px solid var(--line); border-radius: 0; animation: none; }
+  .scr-row .sym { color: var(--fg); font-weight: 600; }
+  .scr-row .setup { color: var(--muted); }
+  .sig { padding: 3px 8px; border-radius: 6px; font-size: .7rem; font-weight: 600; width: fit-content; }
+  .sig.long { background: rgba(34,211,154,.12); color: var(--up); } .sig.short { background: rgba(255,84,112,.12); color: var(--down); }
+  .score { display: flex; align-items: center; gap: 6px; } .score i { flex: 1; height: 4px; border-radius: 2px; background: #1b1e29; overflow: hidden; position: relative; }
+  .score i::after { content: ""; position: absolute; inset: 0; width: var(--w); background: linear-gradient(90deg, var(--a1), var(--a2)); }
+  @keyframes rowIn { from { opacity: 0; transform: translateX(16px); filter: blur(4px); } }
+  .scr-foot { display: flex; align-items: center; gap: 12px; justify-content: space-between; margin-top: 12px; color: var(--muted); font-size: .72rem; }
+  .scan-bar { flex: 1; max-width: 160px; height: 3px; background: #1b1e29; border-radius: 2px; overflow: hidden; }
+  .scan-bar i { display: block; height: 100%; width: 0; background: var(--a2); }
+  .social.tv { border-color: rgba(0,224,184,.35); }
+  @media (max-width: 960px) { .project { grid-template-columns: 1fr; padding: 26px; } }
 
+  .contact-lines { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .mail.phone { border-bottom-color: var(--a2); }
+  .social.wa { border-color: rgba(37,211,102,.35); }
+  /* ---------- quotes ---------- */
+  .q-feature { padding: clamp(28px, 5vw, 64px); min-height: 360px; display: flex; flex-direction: column; justify-content: space-between; }
+  .q-mark { position: absolute; top: -30px; right: 30px; font: 700 16rem/1 "Space Grotesk"; color: rgba(124,92,255,.12); pointer-events: none; }
+  .q-feature blockquote { font: 600 clamp(1.6rem, 3.6vw, 3rem)/1.18 "Space Grotesk"; letter-spacing: -.035em; max-width: 1000px; position: relative; }
+  .q-feature blockquote .w { display: inline-block; opacity: 0; transform: translateY(.5em) rotate(4deg); filter: blur(6px); animation: wIn .7s cubic-bezier(.2,.8,.2,1) forwards; }
+  .q-feature blockquote .w.hl { background: linear-gradient(100deg, var(--a1), var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  @keyframes wIn { to { opacity: 1; transform: none; filter: none; } }
+  .q-feature.out blockquote { opacity: 0; transform: translateY(-14px); filter: blur(6px); transition: all .4s; }
+  .q-meta { display: flex; align-items: center; gap: 16px; margin-top: 40px; flex-wrap: wrap; }
+  .q-avatar { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font: 700 1.05rem "Space Grotesk"; color: #000; background: linear-gradient(135deg, var(--a2), var(--a1)); }
+  .q-name { font: 700 1.1rem "Space Grotesk"; }
+  .q-src { font: .78rem "JetBrains Mono"; color: var(--muted); }
+  .q-nav { margin-left: auto; display: flex; align-items: center; gap: 12px; font: .8rem "JetBrains Mono"; color: var(--muted); }
+  .q-nav button { all: unset; cursor: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); background: var(--glass); color: var(--fg); transition: background .3s; }
+  .q-nav button:hover { background: rgba(255,255,255,.1); }
+  .q-progress { height: 2px; background: var(--line); border-radius: 2px; margin-top: 28px; overflow: hidden; }
+  .q-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--a1), var(--a2)); }
+  .q-rail { overflow: hidden; margin-top: 18px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .q-track { display: flex; gap: 16px; width: max-content; animation: marq 70s linear infinite; }
+  .q-track.rev { animation-direction: reverse; animation-duration: 85s; }
+  .q-rail:hover .q-track { animation-play-state: paused; }
+  .q-chip { width: 340px; flex: none; padding: 20px 22px; border-radius: 18px; border: 1px solid var(--line); background: rgba(14,16,24,.75); backdrop-filter: blur(12px); cursor: none; transition: border-color .3s, transform .3s; }
+  .q-chip:hover { border-color: rgba(0,224,184,.4); transform: translateY(-4px); }
+  .q-chip p { font-size: .95rem; color: #d5d8e3; margin-bottom: 12px; }
+  .q-chip span { font: .72rem "JetBrains Mono"; color: var(--a2); }
+  .q-chip span em { font-style: normal; color: var(--muted); }
+
+  /* ---------- contact ---------- */
+  .contact { text-align: center; padding-bottom: 60px; }
+  .contact h2 { font-size: clamp(3rem, 10vw, 8.5rem); margin-bottom: 30px; }
+  .mail { display: inline-block; font: 600 clamp(1.1rem, 3vw, 2rem) "Space Grotesk"; padding-bottom: 6px; border-bottom: 2px solid var(--a1); transition: color .3s; }
+  .mail:hover { color: var(--a2); }
+  .socials { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 54px 0 20px; }
+  .social { display: inline-flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 16px; border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(12px); font-weight: 500; transition: border-color .3s, background .3s; }
+  .social:hover { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.07); }
+  .social svg { width: 18px; height: 18px; }
+  footer { position: relative; z-index: 2; text-align: center; padding: 40px 20px 50px; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line); }
+  footer q { display: block; font-style: italic; margin-bottom: 8px; color: #6c7285; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; filter: none; }
+    .hero h1 .line > span { transform: none; }
+  }
+</style>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
 </head>
-
-
 <body>
-  <!-- Big slider / carousel / intro section-->
+  <div class="loader" id="loader"><div><span>Manideep<span class="grad">.</span></span><i></i></div></div>
+  <canvas id="webgl"></canvas>
+  <div class="grain"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
 
-  <header>
-    <div class="row">
-      <div class="">
+  <nav id="nav">
+    <a href="#top" class="logo magnetic">MM.</a>
+    <a href="#about" class="magnetic">About</a>
+    <a href="#journey" class="magnetic">Journey</a>
+    <a href="#projects" class="magnetic">Projects</a>
+    <a href="#skills" class="magnetic">Skills</a>
+    <a href="#quotes" class="magnetic">Quotes</a>
+    <a href="#contact" class="magnetic cta">Contact</a>
+  </nav>
 
-
-        <div class="col-md-2 col-md-offset-10">
-          <nav>
-            <a href="#" id="menu-bar">
-              <img src="./assets/images/menu.svg" alt="" class="menu-icon">
-            </a>
-          </nav>
-
-
-        </div>
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="status"><b></b> Currently building at <strong>&nbsp;Syne</strong>&nbsp;· Pune, India</div>
+      <h1>
+        <span class="line"><span>Manideep</span></span>
+        <span class="line"><span class="grad">Mittal.</span></span>
+      </h1>
+      <p class="roles">Software developer &amp; <span class="typed" id="typed"></span></p>
+      <div class="hero-actions">
+        <a class="btn primary magnetic" href="#about">Explore my world ↓</a>
+        <a class="btn magnetic" href="https://www.tradingview.com/u/manideepcs024/" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2 6h9v3H8v9H5V9H2zM13.5 6h3.4l2.6 8 2.6-8H22l-4 12h-2.7z"/></svg>TradingView ↗</a>
       </div>
-    </div>
-  </header>
-  <!--open menu bar div starts-->
-  <div class="main-menu">
-    <div class="homepage-hero-module">
-      <div class="video-container">
-        <div class="video-real-overlay"></div>
-        <div class="filter"></div>
-        <video autoplay loop class="fillWidth">
-          <source src="./assets/images/Words.mp4" type="video/mp4" />Your browser does not support the video tag. I suggest you upgrade your browser.
-          <source src="./assets/images/Words.webm" type="video/webm" />Your browser does not support the video tag. I suggest you upgrade your browser.
-        </video>
-        <div class="poster hidden">
-          <img src="./assets/images/Words.jpg" alt="">
-        </div>
-      </div>
-    </div>
+      <div class="scroll-hint">SCROLL<i></i></div>
+    </section>
 
-    <div class="overlay overlay-menu">
-      <div class="cross">
-        <a href="#" id="cross-me"><img src="./assets/images/multiply.svg" alt=""></a>
-      </div>
-      <div class="content-section">
-        <h3>“ Code is like humor. When you have to explain it, it’s bad.” – Cory House</h3>
-
-
-
-
-        <ul class="cl-effect-5">
-          <li><a class="link-scroll" id="about"><span data-hover="About Me">About Me</span></a></li>
-          <li><a class="link-scroll" id="skill"><span data-hover="Skills">Skills</span></a></li>
-          <li><a href="Manideep_resume.pdf" target="_blank"><span data-hover="Resume">Resume</span></a></li>
-          <li><a class="link-scroll" id="blog"><span data-hover="Blog">Blog</span></a></li>
-          <li><a class="link-scroll" id="reachme"><span data-hover="Reach Me">Reach Me</span></a></li>
-          <!--<li><a>About Us</a></li>
-        <li><a>About Us</a></li>-->
-        </ul>
-        <div class="row">
-          <div class="container">
-            <div class="col-md-8 col-md-offset-2">
-              <div class="footer-social-icons">
-                <ul class="list-inline socials">
-                  <li><a href="https://www.facebook.com/manideep.mittal" target="_blank"><img src="./assets/images/facebook-circular-logo.svg" alt=""></a></li>
-                  <li><a href="https://www.fiverr.com/manideepcs024" target="_blank"><img src="./assets/images/fiverr.svg" alt=""></a></li>
-                  <li><a href="https://github.com/manideepcs024" target="_blank"><img src="./assets/images/github.svg" alt=""></a></li>
-                  <li><a href="https://www.linkedin.com/in/manideep-mittal-80516683/" target="_blank"><img src="./assets/images/linked-in-square-button.svg" alt=""></a></li>
-                  <li><a href="https://twitter.com/manideepmittal" target="_blank"><img src="./assets/images/twitter.svg" alt=""></a></li>
-                </ul>
-              </div>
-
-
-            </div>
-            <div class="col-md-2"></div>
-          </div>
-        </div>
-
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="closing-off-content">
-                <p>Designed & Developed by Manideep Mittal with <span class="show-off">Love and Passion </span> Keyborad :)</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
+    <div class="marquee">
+      <div class="marquee-track" id="marquee"></div>
     </div>
 
-  </div>
-  <!--div ends for the menu bar-->
-  <div class="">
-    <div class="row main-section" data-section-name="home">
-      <div class="col-md-12" style="padding: 0">
-        <div class="intro-container">
-          <div class="content-container">
-            <h3 id="typed"></h3>
+    <!-- ABOUT / BENTO -->
+    <section id="about">
+      <span class="eyebrow reveal">About me</span>
+      <h2 class="reveal">Code by day.<br/><span class="grad">Charts</span> by heart.</h2>
+
+      <div class="bento">
+        <div class="card c-intro reveal tilt">
+          <span class="tag">// whoami</span>
+          <p class="big">I'm a <strong>software developer</strong> who builds fast, polished web experiences — <span>and a stock market trader &amp; investor who reads price action the way I read code: looking for patterns, edge cases, and the story behind the numbers.</span></p>
+          <p style="margin-top:24px">I love deep <strong style="color:var(--fg)">analysis</strong> and taking on <strong style="color:var(--fg)">technical tests</strong> — every problem is a puzzle, every chart a dataset waiting to be understood.</p>
+        </div>
+
+        <div class="card c-loc reveal tilt">
+          <span class="tag">Based in</span>
+          <div class="pin">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            Pune, IN
           </div>
-          <div class="click-me-button">
-            <!--<p>CLICK ME!!!</p>-->
-            <span class="scroll-btn">
-	<a href="#">
-		<span class="mouse">
-			<span>
-			</span>
-            </span>
-            </a>
+          <div class="company">● Working @ Syne</div>
+        </div>
 
+        <div class="card c-time reveal tilt">
+          <span class="tag">Local time · IST</span>
+          <div class="clock" id="clock">--:--:--</div>
+          <div class="market" id="market"><b></b><span>—</span></div>
+        </div>
 
-            </span>
-
+        <div class="card c-chart reveal tilt">
+          <div class="chart-head">
+            <div>
+              <span class="tag">Trader mode</span>
+              <h3>Reading the tape</h3>
+            </div>
+            <div style="text-align:right">
+              <div class="chart-price" id="cPrice">—</div>
+              <div class="chart-chg" id="cChg">—</div>
+            </div>
           </div>
-
+          <canvas id="candles"></canvas>
+          <p class="note">* simulated live candles — decorative, not market data · <a href="https://www.tradingview.com/u/manideepcs024/" target="_blank" rel="noopener" style="color:var(--a2)">see my real ideas on TradingView ↗</a></p>
         </div>
-      </div>
-    </div>
-    <div class="row main-section about-section" data-section-name="about">
-      <div class="col-md-12">
-        <div class="padding-container">
-          <h3 class="text-center  main-title">About me </h3>
+
+        <div class="card c-tests reveal tilt">
+          <span class="tag">Technical tests</span>
+          <h3>Love a good challenge</h3>
+          <div class="terminal" id="term"></div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-2 col-md-offset-3">
-          <img src="./assets/images/myAvatar (2).png" alt="" class="img-responsive img-center manideep">
+
+        <div class="card c-dev reveal tilt">
+          <div class="icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg></div>
+          <h3>Software Developer</h3>
+          <p>Building scalable, delightful products with modern JavaScript, React, Angular and Node.</p>
         </div>
-        <div class="col-md-4">
-          <p class="quote">“Java is to JavaScript what car is to Carpet.” – Chris Heilmann</p>
-          <!--<h4> Hey!! How are you all!!! </h4>-->
-          <p>I am a UI Developer from India. I use angular, react, knockout for building web Apps. I have interest in learning
-            node js, seo technologies etc. I aspire to become a full stack developer. I am currently working in Gurgaon based
-            MNC as a UI developer.
-
-
-
-          </p>
-          <!--<p>
-            I am not a born and very talented programmer, but I aspire to be one. I am still learning and I have a long way to go. I
-            belive in doing things, taking up challenges. I belive success only comes through Hard work and there is no short
-            cut to it.
-
-          </p>-->
-
-
-
-          <!--<h4>My Hobbies</h4>
-          <p>I love to watch movies, listen songs, watch web series, short films. I am a explorer. I would always go and visit
-            hostoric monuments, parks, natural beauties rather visiting a Mall for shopping.
-
-
-          </p>-->
-
+        <div class="card c-invest reveal tilt">
+          <div class="icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
+          <h3>Trader &amp; Investor</h3>
+          <p>Active in the Indian stock market — technicals for timing, fundamentals for conviction.</p>
         </div>
-        <div class="col-md-3"></div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <section id="cd-timeline" class="cd-container">
-            <div class="cd-timeline-block">
-              <div class="cd-timeline-img cd-picture">
-              </div>
-
-              <div class="cd-timeline-content">
-                <h2>Gurgaon based MNC</h2>
-                <div class="timeline-content-info">
-                  <span class="timeline-content-info-title">
-            <i class="fa fa-certificate" aria-hidden="true"></i>
-            Front End / UI Developer
-          </span>
-                  <span class="timeline-content-info-date">
-            <i class="fa fa-calendar-o" aria-hidden="true"></i>
-            Jan 2018 - Present
-          </span>
-                </div>
-                <p>Worked with React js for a exciting web Application.</p>
-                <ul class="content-skills">
-                  <li>HTML5</li>
-                  <li>CSS3</li>
-                  <li>JavaScript</li>
-                  <li>jQuery</li>
-                  <li>React</li>
-                </ul>
-              </div>
-              <!-- cd-timeline-content -->
-            </div>
-            <!-- cd-timeline-block -->
-
-            <div class="cd-timeline-block">
-              <div class="cd-timeline-img cd-picture">
-              </div>
-
-              <div class="cd-timeline-content">
-                <h2>CodeMyMobile</h2>
-                <div class="timeline-content-info">
-                  <span class="timeline-content-info-title">
-            <i class="fa fa-certificate" aria-hidden="true"></i>
-           UI Guru
-          </span>
-                  <span class="timeline-content-info-date">
-            <i class="fa fa-calendar-o" aria-hidden="true"></i>
-            May 2016 - Dec 2017
-          </span>
-                </div>
-                <p>Worked with Several Frameworks for various projects.</p>
-                <ul class="content-skills">
-                  <li>HTML5</li>
-                  <li>CSS3</li>
-                  <li>JavaScript</li>
-                  <li>jQuery</li>
-                  <li>React</li>
-                  <li>Angular</li>
-                </ul>
-              </div>
-              <!-- cd-timeline-content -->
-            </div>
-            <!-- cd-timeline-block -->
-            <div class="cd-timeline-block">
-              <div class="cd-timeline-img cd-picture">
-              </div>
-              <!-- cd-timeline-img -->
-
-              <div class="cd-timeline-content">
-                <h2>Geekshastra Technologies</h2>
-                <div class="timeline-content-info">
-                  <span class="timeline-content-info-title">
-            <i class="fa fa-certificate" aria-hidden="true"></i>
-           UI Guru
-          </span>
-                  <span class="timeline-content-info-date">
-            <i class="fa fa-calendar-o" aria-hidden="true"></i>
-            Sep 2015 - May 2016
-          </span>
-                </div>
-                <p>Worked with Several Frameworks for various projects like Drupal, Wordpress etc.</p>
-                <ul class="content-skills">
-                  <li>HTML5</li>
-                  <li>CSS3</li>
-                  <li>JavaScript</li>
-                  <li>jQuery</li>
-                  <li>React</li>
-                  <li>Angular</li>
-                  <li>Drupal</li>
-                  <li>Wordpress</li>
-                  <li>ExtJs</li>
-                </ul>
-              </div>
-              <!-- cd-timeline-content -->
-            </div>
-            <!-- cd-timeline-block -->
-
-
-
-            <div class="cd-timeline-block">
-              <div class="cd-timeline-img cd-location">
-              </div>
-              <!-- cd-timeline-img -->
-
-              <div class="cd-timeline-content">
-                <h2>Learnt a lot doing some Freelance</h2>
-                <p>After Bangalore experience did some freelance stuff over fiverr and several other frameworks and worked over
-                  50 gigs on HTML5, CSS3, JAVASCRIPT etc.
-                </p>
-                <span class="cd-date">Sep 14 to Sep 15</span>
-              </div>
-              <!-- cd-timeline-content -->
-            </div>
-            <!-- cd-timeline-block -->
-
-            <div class="cd-timeline-block">
-              <div class="cd-timeline-img cd-location">
-              </div>
-
-              <div class="cd-timeline-content">
-                <h2>Some Crazy place to begin My carrer</h2>
-                <p>A nightmare to begin your carrer. worst way to start your carrer. Learnt life is not easy, you have to work
-                  hard and there is no one "I repeat" no one whom you should trust.
-                </p>
-                <span class="cd-date">Sep 13 to Sep 14</span>
-              </div>
-              <!-- cd-timeline-content -->
-            </div>
-            <!-- cd-timeline-block -->
-
-            <div class="cd-timeline-block">
-              <div class="cd-timeline-img cd-movie">
-              </div>
-              <!-- cd-timeline-img -->
-
-              <div class="cd-timeline-content">
-                <h2>Got a piece of paper </h2>
-                <p>Just finished college and moved to Silicon valley of India to earn some bread and butter.
-                </p>
-                <span class="cd-date">July 13</span>
-              </div>
-              <!-- cd-timeline-content -->
-            </div>
-            <!-- cd-timeline-block -->
-          </section>
-          <!-- cd-timeline -->
-
+        <div class="card c-analysis reveal tilt">
+          <div class="icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6M11 8v6"/></svg></div>
+          <h3>Analyst at Heart</h3>
+          <p>Breaking down data, systems and charts until the signal separates from the noise.</p>
         </div>
       </div>
 
-
-    </div>
-
-    <!--Blog-->
-
-    <div class="row main-section blog-section" data-section-name="blog">
-      <h3 class="text-center"> Blogs </h3>
-      <div class="col-md-12 blog-center-section">
-
-        <div>
-          <p class="coming-soon">Coming soon...</p>
-
-        </div>
-
-
+      <div class="stats">
+        <div class="stat reveal"><strong data-count="10" data-suffix="+">0</strong><span>Years writing code</span></div>
+        <div class="stat reveal"><strong data-count="50" data-suffix="+">0</strong><span>Freelance gigs delivered</span></div>
+        <div class="stat reveal"><strong data-count="4">0</strong><span>Companies shipped for</span></div>
+        <div class="stat reveal"><strong data-count="1000" data-suffix="+">0</strong><span>Charts analysed</span></div>
       </div>
-    </div>
-    <!--Skills section-->
-    <div class="row main-section skill-class" data-section-name="skill">
-      <div class="col-md-12">
-        <div class="skills-container">
-          <h3 class="text-center"> My Skills </h3>
+    </section>
 
-
-
-          <div class="skillbar clearfix " data-percent="80%">
-            <div class="skillbar-title" style="background: #d35400;"><span>HTML5</span></div>
-            <div class="skillbar-bar" style="background: #e67e22;"></div>
-            <div class="skill-bar-percent">80%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-          <div class="skillbar clearfix " data-percent="82%">
-            <div class="skillbar-title" style="background: #2980b9;"><span>CSS3</span></div>
-            <div class="skillbar-bar" style="background: #3498db;"></div>
-            <div class="skill-bar-percent">82%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-          <div class="skillbar clearfix " data-percent="50%">
-            <div class="skillbar-title" style="background: #2c3e50;"><span>jQuery</span></div>
-            <div class="skillbar-bar" style="background: #2c3e50;"></div>
-            <div class="skill-bar-percent">50%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-          <div class="skillbar clearfix " data-percent="50%">
-            <div class="skillbar-title" style="background: #8892be;"><span>PHP</span></div>
-            <div class="skillbar-bar" style="background: #99cc99;"></div>
-            <div class="skill-bar-percent">50%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-          <div class="skillbar clearfix " data-percent="65%">
-            <div class="skillbar-title" style="background: #333333;"><span>JAVASCRIPT</span></div>
-            <div class="skillbar-bar" style="background: #f7df1e;"></div>
-            <div class="skill-bar-percent">65%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-          <div class="skillbar clearfix " data-percent="70%">
-            <div class="skillbar-title" style="background: #000000;"><span>Angular</span></div>
-            <div class="skillbar-bar" style="background: #b52e31;"></div>
-            <div class="skill-bar-percent">70%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-          <div class="skillbar clearfix " data-percent="45%">
-            <div class="skillbar-title" style="background: #215732;"><span>Node</span></div>
-            <div class="skillbar-bar" style="background: #6cc24a;"></div>
-            <div class="skill-bar-percent">45%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-
-          <div class="skillbar clearfix " data-percent="66%">
-            <div class="skillbar-title" style="background: #0097b3;"><span>React</span></div>
-            <div class="skillbar-bar" style="background: #00d8ff;"></div>
-            <div class="skill-bar-percent">66%</div>
-          </div>
-          <!-- End Skill Bar -->
-
-
-
+    <!-- JOURNEY -->
+    <section id="journey">
+      <span class="eyebrow reveal">The journey</span>
+      <h2 class="reveal">From first commit<br/>to <span class="grad">Syne.</span></h2>
+      <div class="timeline" id="timeline">
+        <div class="progress" id="tProgress"></div>
+        <div class="t-item now reveal">
+          <div class="t-date">PRESENT · PUNE</div>
+          <h3>Software Developer <small>@ Syne</small></h3>
+          <p>Currently building software at Syne in Pune — writing clean, well-tested code and bringing an analytical mindset to every problem.</p>
+          <div class="chips"><span class="chip">Software Engineering</span><span class="chip">Analysis</span><span class="chip">Problem Solving</span></div>
         </div>
-
-        <div class="skill-para">
-           <p>“ Code is like humor. When you have to explain it, it’s bad.” – Cory House</p>
-  <p> I have worked with HTML5, css3, javascript and jquery for building mobile img-responsive
-    websites. I have worked on several applications which used Angular 1 as a MVC framework.
-   </p>
+        <div class="t-item reveal">
+          <div class="t-date">JAN 2018 → · GURGAON</div>
+          <h3>Front End / UI Developer <small>@ MNC</small></h3>
+          <p>Built production interfaces with React.js for a Gurgaon-based multinational.</p>
+          <div class="chips"><span class="chip">React</span><span class="chip">JavaScript</span><span class="chip">UI Architecture</span></div>
         </div>
-
-       
-
+        <div class="t-item reveal">
+          <div class="t-date">MAY 2016 – DEC 2017</div>
+          <h3>UI Guru <small>@ CodeMyMobile</small></h3>
+          <p>Crafted responsive web apps across HTML5, CSS3, JavaScript, jQuery, React and Angular.</p>
+          <div class="chips"><span class="chip">Angular</span><span class="chip">React</span><span class="chip">jQuery</span></div>
+        </div>
+        <div class="t-item reveal">
+          <div class="t-date">SEP 2015 – MAY 2016</div>
+          <h3>UI Guru <small>@ Geekshastra Technologies</small></h3>
+          <p>Worked on Drupal, WordPress and ExtJS projects on top of the core web stack.</p>
+          <div class="chips"><span class="chip">Drupal</span><span class="chip">WordPress</span><span class="chip">ExtJS</span></div>
+        </div>
+        <div class="t-item reveal">
+          <div class="t-date">FREELANCE</div>
+          <h3>Freelancer <small>@ Fiverr &amp; more</small></h3>
+          <p>Completed 50+ gigs on HTML5, CSS3 and JavaScript for clients around the world.</p>
+        </div>
       </div>
-    </div>
-    <!--Contact-->
-    <div class="row main-section" data-section-name="reachme">
-      <div class="col-md-12">
-        <h3 class="text-center main-title">Let's get in touch!!!!</h3>
+    </section>
 
-        <div class="contact-card-container">
-          <!--<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224564.31619236027!2d76.84969319325756!3d28.42476495777172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d19d582e38859%3A0x2cf5fe8e5c64b1e!2sGurugram%2C+Haryana!5e0!3m2!1sen!2sin!4v1519318031202"
-            width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>-->
-          <div class="contact-card">
-            <!--<a href="mailto:manideepcs024@gmail.com">
-            manideepcs024@gmail.com
-            </a>-->
-            <!--<h3>Hello!!</h3>-->
-            <p> I will be happy to help you out if you ever need me for a short term project, for a development of a web page
-              or anything where I am a good fit. Please reach me out on my whatsapp 9887818001
-              <br> or feel free to drop me a mail on <a href="mailto:manideepcs024@gmail.com">manideepcs024@gmail.com
-
-              </a>
-            </p>
-            <p>
-              <a href="Manideep_Resume.pdf" target="_blank" class="btn download-btn common-btn ">Download Resume</a>
-            </p>
-
-
-            <div class="row">
-              <div class="container">
-                <div class="col-md-8 col-md-offset-2">
-                  <div class="footer-social-icons text-center">
-                    <ul class="list-inline socials">
-                      <li><a href="https://www.facebook.com/manideep.mittal" target="_blank"><img src="./assets/images/facebook-circular-logo.svg" alt=""></a></li>
-                      <li><a href="https://www.fiverr.com/manideepcs024" target="_blank"><img src="./assets/images/fiverr.svg" alt=""></a></li>
-                      <li><a href="https://github.com/manideepcs024" target="_blank"><img src="./assets/images/github.svg" alt=""></a></li>
-                      <li><a href="https://www.linkedin.com/in/manideep-mittal-80516683/" target="_blank"><img src="./assets/images/linked-in-square-button.svg" alt=""></a></li>
-                      <li><a href="https://twitter.com/manideepmittal" target="_blank"><img src="./assets/images/twitter.svg" alt=""></a></li>
-                    </ul>
-                  </div>
-
-
-                </div>
-                <div class="col-md-2"></div>
-              </div>
-            </div>
-
-
-            <!--<h3>Address</h3>
-            <ul style="list-style-type: none">
-              <li> Gurgaon (Delhi)</li>
-              <li>9887818001</li>
-              <li><i class="fa fa-envelope"></i> manideepcs024@gmail.com</li>
-            </ul>-->
-
+    <!-- PROJECTS -->
+    <section id="projects">
+      <span class="eyebrow reveal">Personal projects</span>
+      <h2 class="reveal">Built for <span class="grad">my own edge.</span></h2>
+      <div class="project card reveal tilt">
+        <div class="proj-info">
+          <span class="tag">01 · Trading tool · Personal project</span>
+          <h3 class="proj-title">Custom Multi-Trade Screener</h3>
+          <p>A custom stock screener I built to surface <strong>multiple trade setups at once</strong>, for both <strong>intraday</strong> and <strong>positional</strong> trading. Instead of scanning charts one by one, it filters the market with my own technical rules and shortlists the stocks worth a closer look.</p>
+          <ul class="feat">
+            <li><b>⚡</b><span><strong>Intraday mode</strong>: quick scans for short-term momentum and breakout setups during market hours.</span></li>
+            <li><b>📈</b><span><strong>Positional mode</strong>: finds swing and positional setups on higher timeframes.</span></li>
+            <li><b>🎯</b><span><strong>Multi-trade output</strong>: many candidates in one run, ranked so the best setups come first.</span></li>
+          </ul>
+          <div class="chips"><span class="chip">Screener</span><span class="chip">Technical Analysis</span><span class="chip">Intraday</span><span class="chip">Positional</span><span class="chip">Automation</span></div>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="btn magnetic" href="https://www.tradingview.com/u/manideepcs024/" target="_blank" rel="noopener">My TradingView ↗</a>
           </div>
         </div>
-        <div class="footer padding-container">
-          <div class="row">
-            <div class="col-md-2">
-
-            </div>
-            <div class="col-md-8">
-              <p class="disclaimer-story">This site was build with great tools like <span class="bold"> Visual Studio Code </span> etc. Several frameworks,
-                libraries like <span class="bold">Scrollify, typedJs </span> several contributions from some rockstar developers
-                over codepen, github were used and inspiration for design were also inspired from work of some great developers
-                around the world!!!!!
-              </p>
-              <p class="text-center"> Designed and Developed by Manideep Mittal</p>
-
-            </div>
-
-            <div class="col-md-2">
-
-            </div>
-
-
+        <div class="screener">
+          <div class="scr-head">
+            <div class="scr-dots"><i></i><i></i><i></i></div>
+            <div class="scr-tabs"><button class="on" data-mode="intraday">Intraday</button><button data-mode="positional">Positional</button></div>
+            <span class="scr-live"><b></b>scanning</span>
           </div>
+          <div class="scr-row scr-cols"><span>Symbol</span><span>Setup</span><span>Signal</span><span>Score</span></div>
+          <div id="scrBody"></div>
+          <div class="scr-foot"><span id="scrCount">—</span><span class="scan-bar"><i id="scanBar"></i></span></div>
+          <p class="note">* illustrative sample output, not real signals or advice</p>
         </div>
-
       </div>
-    </div>
+    </section>
 
-    <div class="scroll-to-top">
-      <div class="bar">
-        <a class="link-scroll-top"> <img src="./assets/images/up-arrow.svg" alt=""></a>
+    <!-- SKILLS -->
+    <section id="skills">
+      <span class="eyebrow reveal">Toolkit</span>
+      <h2 class="reveal">Skills &amp; <span class="grad">edge.</span></h2>
+      <div class="skills" id="skillGrid"></div>
+    </section>
 
+    <!-- QUOTES -->
+    <section id="quotes">
+      <span class="eyebrow reveal">Wisdom of the markets</span>
+      <h2 class="reveal">Words I <span class="grad">trade by.</span></h2>
+
+      <div class="q-feature card reveal" id="qFeature">
+        <span class="q-mark">&ldquo;</span>
+        <blockquote id="qText"></blockquote>
+        <div class="q-meta">
+          <div class="q-avatar" id="qAvatar"></div>
+          <div>
+            <div class="q-name" id="qName"></div>
+            <div class="q-src" id="qSrc"></div>
+          </div>
+          <div class="q-nav">
+            <button class="magnetic" id="qPrev" aria-label="Previous quote">←</button>
+            <span id="qIdx">01 / 12</span>
+            <button class="magnetic" id="qNext" aria-label="Next quote">→</button>
+          </div>
+        </div>
+        <div class="q-progress"><i id="qBar"></i></div>
       </div>
 
-    </div>
+      <div class="q-rail"><div class="q-track" id="qTrackA"></div></div>
+      <div class="q-rail"><div class="q-track rev" id="qTrackB"></div></div>
+      <p class="note" style="text-align:center;margin-top:18px">Dates are approximate; “c.” = circa, “attrib.” = widely attributed but not found in their own writing.</p>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="contact">
+      <span class="eyebrow reveal">Reach me</span>
+      <h2 class="reveal">Let's <span class="grad">talk.</span></h2>
+      <div class="contact-lines reveal">
+        <a class="mail magnetic" href="mailto:manideepcs024@gmail.com">manideepcs024@gmail.com ↗</a>
+        <a class="mail phone magnetic" href="tel:+919887818001">+91 98878 18001 ↗</a>
+      </div>
+      <div class="socials reveal">
+        <a class="social magnetic wa" href="https://wa.me/919887818001" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a>
+        <a class="social magnetic tv" href="https://www.tradingview.com/u/manideepcs024/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 6h9v3H8v9H5V9H2zM13.5 6h3.4l2.6 8 2.6-8H22l-4 12h-2.7z"/></svg>TradingView</a>
+        <a class="social magnetic" href="https://github.com/manideepcs024" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0C17.3 4.6 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>GitHub</a>
+        <a class="social magnetic" href="https://www.linkedin.com/in/manideep-mittal-80516683/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2zM7.1 20.5H3.5V9h3.6v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></svg>LinkedIn</a>
+        <a class="social magnetic" href="https://twitter.com/manideepmittal" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.2 2.3h3.4l-7.4 8.4 8.7 11.5h-6.8l-5.3-7-6.1 7H1.3l7.9-9L.9 2.3h7l4.8 6.4 5.5-6.4zm-1.2 17.9h1.9L7.1 4.2H5.1L17 20.2z"/></svg>X / Twitter</a>
+        <a class="social magnetic" href="https://www.fiverr.com/manideepcs024" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16.5" font-size="11" font-weight="700" text-anchor="middle" font-family="Arial">fi</text></svg>Fiverr</a>
+        <a class="social magnetic" href="https://www.facebook.com/manideep.mittal" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>Facebook</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <q>Code is like humor. When you have to explain it, it's bad. — Cory House</q>
+    Designed &amp; developed by Manideep Mittal · Pune · <span id="year"></span>
+  </footer>
+
+<!-- ================= Three.js scene ================= -->
+<script type="module">
+import * as THREE from "three";
+
+const canvas = document.getElementById("webgl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x05060a, 0.045);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 0, 9);
+
+// --- Noise-displaced iridescent blob ---
+const noise = `
+vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x,289.0);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+float snoise(vec3 v){
+  const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1.0,2.0);
+  vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);
+  vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.0-g;vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);
+  vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+2.0*C.xxx;vec3 x3=x0-1.0+3.0*C.xxx;
+  i=mod(i,289.0);
+  vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+  float n_=1.0/7.0;vec3 ns=n_*D.wyz-D.xzx;
+  vec4 j=p-49.0*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.0*x_);
+  vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.0-abs(x)-abs(y);
+  vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
+  vec4 s0=floor(b0)*2.0+1.0;vec4 s1=floor(b1)*2.0+1.0;vec4 sh=-step(h,vec4(0.0));
+  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+  vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
+  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+  vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);m=m*m;
+  return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}`;
+
+const blobMat = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 }, uAmp: { value: 0.45 }, uMouse: { value: new THREE.Vector2() }, uFade: { value: 1 } },
+  vertexShader: noise + `
+    uniform float uTime; uniform float uAmp; uniform vec2 uMouse;
+    varying vec3 vN; varying vec3 vP; varying float vD;
+    void main(){
+      float d = snoise(normal*1.2 + vec3(uTime*.25, uTime*.18, uMouse.x*.6)) * uAmp;
+      d += snoise(normal*3.5 + uTime*.4) * .08;
+      vD = d;
+      vec3 pos = position + normal * d;
+      vN = normalize(normalMatrix * normal);
+      vec4 mv = modelViewMatrix * vec4(pos,1.0);
+      vP = -mv.xyz;
+      gl_Position = projectionMatrix * mv;
+    }`,
+  fragmentShader: `
+    varying vec3 vN; varying vec3 vP; varying float vD; uniform float uTime; uniform float uFade;
+    void main(){
+      vec3 v = normalize(vP);
+      float fres = pow(1.0 - max(dot(vN, v), 0.0), 2.2);
+      vec3 a = vec3(.486,.361,1.0), b = vec3(0.0,.878,.722), c = vec3(1.0,.302,.553);
+      vec3 col = mix(a, b, smoothstep(-.3,.4,vD + sin(uTime*.3)*.2));
+      col = mix(col, c, fres*.7);
+      col *= .25 + fres*1.4;
+      gl_FragColor = vec4(col * uFade, .95 * uFade);
+    }`,
+  transparent: true,
+});
+const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(1.9, 96), blobMat);
+scene.add(blob);
+
+// Wireframe shell
+const shell = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(2.9, 2),
+  new THREE.MeshBasicMaterial({ color: 0x7c5cff, wireframe: true, transparent: true, opacity: 0.08 })
+);
+scene.add(shell);
+
+// --- Orbiting candlesticks ring (the trader touch) ---
+const candles = new THREE.Group();
+const N = 46;
+let price = 0;
+for (let i = 0; i < N; i++) {
+  const ch = (Math.random() - 0.48) * 0.6; price += ch;
+  const up = ch >= 0;
+  const h = 0.15 + Math.abs(ch) * 1.2;
+  const color = up ? 0x22d39a : 0xff5470;
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.09, h, 0.09),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.85 }));
+  const wick = new THREE.Mesh(new THREE.BoxGeometry(0.015, h + 0.25 + Math.random()*0.2, 0.015),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5 }));
+  const g = new THREE.Group(); g.add(body, wick);
+  const a = (i / N) * Math.PI * 2;
+  g.position.set(Math.cos(a) * 4.1, Math.sin(i * 0.5) * 0.25 + price * 0.05, Math.sin(a) * 4.1);
+  g.userData.base = g.position.y; g.userData.i = i;
+  candles.add(g);
+}
+candles.rotation.x = 0.35;
+scene.add(candles);
+
+// --- Particle starfield ---
+const PCOUNT = 2200;
+const pGeo = new THREE.BufferGeometry();
+const pos = new Float32Array(PCOUNT * 3);
+for (let i = 0; i < PCOUNT; i++) {
+  const r = 6 + Math.random() * 22;
+  const t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1);
+  pos[i*3] = r * Math.sin(p) * Math.cos(t);
+  pos[i*3+1] = r * Math.sin(p) * Math.sin(t);
+  pos[i*3+2] = r * Math.cos(p);
+}
+pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+const stars = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.045, color: 0xb9c1ff, transparent: true, opacity: 0.7, depthWrite: false }));
+scene.add(stars);
+
+// --- interaction ---
+const mouse = new THREE.Vector2(), smooth = new THREE.Vector2();
+addEventListener("pointermove", e => {
+  mouse.x = (e.clientX / innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+});
+let scrollP = 0;
+addEventListener("scroll", () => { scrollP = scrollY / (document.body.scrollHeight - innerHeight); }, { passive: true });
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); place();
+});
+function place() {
+  const wide = innerWidth > 900;
+  blob.position.x = shell.position.x = candles.position.x = wide ? 2.4 : 0;
+  blob.scale.setScalar(wide ? 1 : 0.75);
+}
+place();
+
+const clock = new THREE.Clock();
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function tick() {
+  const t = reduce ? 0 : clock.getElapsedTime();
+  smooth.lerp(mouse, 0.05);
+  blobMat.uniforms.uTime.value = t;
+  blobMat.uniforms.uMouse.value.copy(smooth);
+  const fade = 1 - Math.min(scrollY / innerHeight, 1) * 0.75;
+  blobMat.uniforms.uFade.value = fade;
+  candles.children.forEach(c => c.children.forEach(m => m.material.opacity = (m.geometry.parameters.width > .05 ? .85 : .5) * (0.35 + 0.65 * fade)));
+  blobMat.uniforms.uAmp.value = 0.35 + Math.abs(smooth.x) * 0.25 + scrollP * 0.4;
+
+  blob.rotation.y = t * 0.12 + smooth.x * 0.4;
+  blob.rotation.x = smooth.y * 0.3;
+  shell.rotation.y = -t * 0.05; shell.rotation.z = t * 0.03;
+  candles.rotation.y = t * 0.08 + scrollP * Math.PI * 2;
+  candles.children.forEach(c => { c.position.y = c.userData.base + Math.sin(t * 1.4 + c.userData.i * 0.4) * 0.08; });
+  stars.rotation.y = t * 0.01 + smooth.x * 0.05;
+  stars.rotation.x = smooth.y * 0.05;
+
+  // camera drifts with scroll
+  camera.position.y = -scrollP * 3;
+  camera.position.z = 9 - Math.sin(scrollP * Math.PI) * 2;
+  camera.lookAt(blob.position.x * 0.5, camera.position.y * 0.6, 0);
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+
+<!-- ================= UI interactions ================= -->
+<script>
+// Loader
+addEventListener("load", () => setTimeout(() => {
+  document.getElementById("loader").classList.add("done");
+  document.body.classList.add("ready");
+}, 1100));
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// Typed roles
+const roles = ["stock market trader.", "long-term investor.", "chart analyst.", "technical-test enthusiast.", "builder at Syne."];
+const typed = document.getElementById("typed");
+let ri = 0, ci = 0, del = false;
+(function type() {
+  const w = roles[ri];
+  typed.textContent = w.slice(0, ci);
+  if (!del && ci < w.length) ci++;
+  else if (del && ci > 0) ci--;
+  else if (!del) { del = true; return setTimeout(type, 1600); }
+  else { del = false; ri = (ri + 1) % roles.length; }
+  setTimeout(type, del ? 35 : 70);
+})();
+
+// Marquee
+const words = ["Software Developer", "Stock Trader", "Investor", "Analyst", "Technical Tests", "Pune", "Syne", "React", "Price Action", "Custom Screener", "TradingView"];
+const mq = document.getElementById("marquee");
+const row = words.map(w => `<span>${w}</span><em>✦</em>`).join("");
+mq.innerHTML = row + row;
+
+// Custom cursor + magnetic
+const cur = document.getElementById("cursor"), dot = document.getElementById("cursorDot");
+let cx = innerWidth/2, cy = innerHeight/2, tx = cx, ty = cy;
+addEventListener("pointermove", e => { tx = e.clientX; ty = e.clientY; dot.style.transform = `translate(${tx}px,${ty}px) translate(-50%,-50%)`; });
+(function loop(){ cx += (tx-cx)*.18; cy += (ty-cy)*.18; cur.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`; requestAnimationFrame(loop); })();
+document.querySelectorAll("a, .card").forEach(el => {
+  el.addEventListener("pointerenter", () => el.tagName === "A" && cur.classList.add("hover"));
+  el.addEventListener("pointerleave", () => cur.classList.remove("hover"));
+});
+document.querySelectorAll(".magnetic").forEach(el => {
+  el.addEventListener("pointermove", e => {
+    const r = el.getBoundingClientRect();
+    el.style.transform = `translate(${(e.clientX - r.left - r.width/2) * .25}px, ${(e.clientY - r.top - r.height/2) * .35}px)`;
+  });
+  el.addEventListener("pointerleave", () => el.style.transform = "");
+});
+
+// 3D tilt + spotlight cards
+document.querySelectorAll(".tilt").forEach(card => {
+  card.addEventListener("pointermove", e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    card.style.setProperty("--mx", x*100 + "%"); card.style.setProperty("--my", y*100 + "%");
+    card.style.transform = `perspective(900px) rotateX(${(0.5-y)*6}deg) rotateY(${(x-0.5)*6}deg)`;
+  });
+  card.addEventListener("pointerleave", () => card.style.transform = "");
+});
+
+// Reveal on scroll
+const io = new IntersectionObserver(entries => entries.forEach(en => {
+  if (!en.isIntersecting) return;
+  en.target.classList.add("in");
+  en.target.querySelectorAll?.(".meter i").forEach(m => m.style.width = m.dataset.w + "%");
+  const n = en.target.querySelector("[data-count]");
+  if (n) countUp(n);
+  if (en.target.id === "term-card") runTerminal();
+  io.unobserve(en.target);
+}), { threshold: 0.18 });
+document.querySelectorAll(".reveal, .t-item").forEach((el, i) => { el.style.transitionDelay = (i % 4) * 0.07 + "s"; io.observe(el); });
+
+function countUp(el) {
+  const end = +el.dataset.count, suf = el.dataset.suffix || "", t0 = performance.now();
+  (function step(now){
+    const p = Math.min((now - t0) / 1600, 1), e = 1 - Math.pow(1 - p, 4);
+    el.textContent = Math.round(end * e).toLocaleString() + suf;
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+// Skills
+const skills = [["JavaScript",85],["React",82],["Angular",75],["HTML5 / CSS3",90],["Node.js",65],["Technical Analysis",85],["Fundamental Analysis",75],["Problem Solving",90]];
+document.getElementById("skillGrid").innerHTML = skills.map(([n,v]) =>
+  `<div class="skill reveal"><div class="skill-top"><span>${n}</span><span>${v}%</span></div><div class="meter"><i data-w="${v}"></i></div></div>`).join("");
+document.querySelectorAll("#skillGrid .reveal").forEach(el => io.observe(el));
+
+// Timeline progress
+const tl = document.getElementById("timeline"), tp = document.getElementById("tProgress");
+addEventListener("scroll", () => {
+  const r = tl.getBoundingClientRect();
+  const p = Math.min(Math.max((innerHeight * 0.6 - r.top) / r.height, 0), 1);
+  tp.style.height = (p * (r.height - 16)) + "px";
+}, { passive: true });
+
+// Active nav
+const links = [...document.querySelectorAll("nav a[href^='#']")];
+addEventListener("scroll", () => {
+  let cur = "";
+  document.querySelectorAll("section[id]").forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; });
+  links.forEach(l => l.classList.toggle("active", l.getAttribute("href") === "#" + cur));
+}, { passive: true });
+
+// IST clock + NSE market status
+function tickClock() {
+  const now = new Date();
+  const ist = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  document.getElementById("clock").textContent = ist.toLocaleTimeString("en-GB");
+  const d = ist.getDay(), m = ist.getHours() * 60 + ist.getMinutes();
+  const open = d > 0 && d < 6 && m >= 555 && m < 930; // 9:15–15:30 IST
+  const mk = document.getElementById("market");
+  mk.querySelector("b").style.background = open ? "var(--up)" : "var(--down)";
+  mk.querySelector("span").textContent = open ? "NSE market hours — probably watching charts 📈" : "NSE closed — probably writing code 💻";
+}
+tickClock(); setInterval(tickClock, 1000);
+
+// Simulated candles (2D)
+const cv = document.getElementById("candles"), cx2 = cv.getContext("2d");
+let data = [], last = 22000;
+for (let i = 0; i < 40; i++) data.push(nextCandle());
+function nextCandle() {
+  const o = last, c = o + (Math.random() - 0.48) * 60;
+  const h = Math.max(o, c) + Math.random() * 25, l = Math.min(o, c) - Math.random() * 25;
+  last = c; return { o, c, h, l };
+}
+function drawCandles() {
+  const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr; cx2.setTransform(dpr,0,0,dpr,0,0);
+  cx2.clearRect(0,0,W,H);
+  const hi = Math.max(...data.map(d => d.h)), lo = Math.min(...data.map(d => d.l));
+  const y = v => H - ((v - lo) / (hi - lo || 1)) * (H - 10) - 5;
+  const step = W / data.length;
+  // grid
+  cx2.strokeStyle = "rgba(255,255,255,.05)"; cx2.lineWidth = 1;
+  for (let i = 1; i < 4; i++) { cx2.beginPath(); cx2.moveTo(0, H*i/4); cx2.lineTo(W, H*i/4); cx2.stroke(); }
+  // moving average
+  cx2.beginPath(); cx2.strokeStyle = "rgba(124,92,255,.9)"; cx2.lineWidth = 1.5;
+  data.forEach((d, i) => {
+    const s = data.slice(Math.max(0, i - 7), i + 1); const ma = s.reduce((a, b) => a + b.c, 0) / s.length;
+    i ? cx2.lineTo(i*step + step/2, y(ma)) : cx2.moveTo(step/2, y(ma));
+  }); cx2.stroke();
+  data.forEach((d, i) => {
+    const x = i * step + step / 2, up = d.c >= d.o;
+    cx2.strokeStyle = cx2.fillStyle = up ? "#22d39a" : "#ff5470";
+    cx2.beginPath(); cx2.moveTo(x, y(d.h)); cx2.lineTo(x, y(d.l)); cx2.stroke();
+    const top = y(Math.max(d.o, d.c)), bh = Math.max(2, Math.abs(y(d.o) - y(d.c)));
+    cx2.fillRect(x - step * 0.3, top, step * 0.6, bh);
+  });
+  const first = data[0].o, lc = data[data.length - 1].c, chg = (lc - first) / first * 100;
+  document.getElementById("cPrice").textContent = lc.toFixed(2);
+  const ce = document.getElementById("cChg");
+  ce.textContent = (chg >= 0 ? "▲ +" : "▼ ") + chg.toFixed(2) + "%";
+  ce.style.color = chg >= 0 ? "var(--up)" : "var(--down)";
+}
+drawCandles();
+setInterval(() => {
+  const d = data[data.length - 1];
+  d.c += (Math.random() - 0.5) * 18; d.h = Math.max(d.h, d.c); d.l = Math.min(d.l, d.c); last = d.c;
+  if (Math.random() < 0.15) { data.shift(); data.push(nextCandle()); }
+  drawCandles();
+}, 600);
+addEventListener("resize", drawCandles);
 
 
+// Screener demo (illustrative sample rows)
+const SCR = {
+  intraday: [["SYMBOL-A","ORB breakout","LONG",92],["SYMBOL-B","VWAP reclaim","LONG",87],["SYMBOL-C","Opening range breakdown","SHORT",84],["SYMBOL-D","Volume spike + momentum","LONG",81],["SYMBOL-E","Inside bar break","LONG",76]],
+  positional: [["SYMBOL-F","52W high breakout","LONG",94],["SYMBOL-G","50 EMA pullback","LONG",89],["SYMBOL-H","Cup & handle","LONG",85],["SYMBOL-I","Lower-high rejection","SHORT",79],["SYMBOL-J","Range consolidation break","LONG",74]]
+};
+let scrMode = "intraday", scrTimer;
+function renderScreener() {
+  const body = document.getElementById("scrBody"), bar = document.getElementById("scanBar");
+  body.innerHTML = ""; bar.style.transition = "none"; bar.style.width = "0";
+  document.getElementById("scrCount").textContent = "scanning universe…";
+  requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.transition = "width 1.1s ease"; bar.style.width = "100%"; }));
+  clearTimeout(scrTimer);
+  scrTimer = setTimeout(() => {
+    const rows = SCR[scrMode].map(([s,setup,sig,sc]) => [s,setup,sig,Math.max(55, Math.min(99, sc + Math.round((Math.random()-.5)*6)))]).sort((a,b)=>b[3]-a[3]);
+    body.innerHTML = rows.map(([s,setup,sig,sc],i) => `<div class="scr-row" style="animation-delay:${i*.09}s"><span class="sym">${s}</span><span class="setup">${setup}</span><span class="sig ${sig.toLowerCase()}">${sig}</span><span class="score"><i style="--w:${sc}%"></i>${sc}</span></div>`).join("");
+    document.getElementById("scrCount").textContent = `${rows.length} setups found · ${scrMode}`;
+  }, 1100);
+}
+document.querySelectorAll(".scr-tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".scr-tabs button").forEach(x => x.classList.toggle("on", x === b));
+  scrMode = b.dataset.mode; renderScreener();
+}));
+renderScreener();
+setInterval(renderScreener, 7000);
 
-  </div>
-  <script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
-  <script type="text/javascript" src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="./bower_components/typed.js/lib/typed.js"></script>
-  <script type="text/javascript" src="./bower_components/Scrollify/jquery.scrollify.js"></script>
-  <script type="text/javascript" src="./js/main.js"></script>
+// Quotes (dates approximate)
+const QUOTES = [
+  { q: "Be fearful when others are greedy and greedy when others are fearful.", a: "Warren Buffett", s: "Berkshire Hathaway shareholder letter", d: "1986", hl: ["fearful","greedy"] },
+  { q: "Price is what you pay. Value is what you get.", a: "Warren Buffett", s: "Berkshire Hathaway shareholder letter", d: "2008", hl: ["Price","Value"] },
+  { q: "Growth comes at the expense of comfort.", a: "Mark Minervini", s: "Trade Like a Stock Market Wizard", d: "2013", hl: ["Growth","comfort."] },
+  { q: "In the short run, the market is a voting machine but in the long run, it is a weighing machine.", a: "Benjamin Graham", s: "as relayed by Warren Buffett", d: "c. 1949", hl: ["voting","weighing"] },
+  { q: "Our favorite holding period is forever.", a: "Warren Buffett", s: "Berkshire Hathaway shareholder letter", d: "1988", hl: ["forever."] },
+  { q: "Your first loss is your best loss.", a: "Mark Minervini", s: "Trade Like a Stock Market Wizard", d: "2013", hl: ["first","best"] },
+  { q: "The investor's chief problem, and even his worst enemy, is likely to be himself.", a: "Benjamin Graham", s: "The Intelligent Investor", d: "1949", hl: ["himself."] },
+  { q: "It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.", a: "Warren Buffett", s: "Berkshire Hathaway shareholder letter", d: "1989", hl: ["wonderful"] },
+  { q: "In the long run we are all dead.", a: "John Maynard Keynes", s: "A Tract on Monetary Reform", d: "1923", hl: ["long","run"] },
+  { q: "The market can stay irrational longer than you can stay solvent.", a: "John Maynard Keynes", s: "attrib.", d: "c. 1930s", hl: ["irrational","solvent."] },
+  { q: "Know what you own, and know why you own it.", a: "Peter Lynch", s: "One Up on Wall Street", d: "1989", hl: ["what","why"] },
+  { q: "There is nothing new in Wall Street. There can't be because speculation is as old as the hills.", a: "Jesse Livermore", s: "Reminiscences of a Stock Operator (Edwin Lefèvre)", d: "1923", hl: ["nothing","new"] },
+];
+const initials = n => n.split(" ").filter(w => /^[A-Z]/.test(w)).map(w => w[0]).slice(0, 2).join("");
+let qi = 0, qTimer, qStart;
+const QDUR = 8000;
+function showQuote(i) {
+  qi = (i + QUOTES.length) % QUOTES.length;
+  const q = QUOTES[qi], f = document.getElementById("qFeature");
+  f.classList.add("out");
+  setTimeout(() => {
+    const hl = q.hl.map(h => h.toLowerCase());
+    document.getElementById("qText").innerHTML = q.q.split(" ").map((w, k) =>
+      `<span class="w${hl.includes(w.toLowerCase()) ? " hl" : ""}" style="animation-delay:${k * 0.045}s">${w}</span>`).join(" ");
+    document.getElementById("qAvatar").textContent = initials(q.a);
+    document.getElementById("qName").textContent = q.a;
+    document.getElementById("qSrc").textContent = `${q.s} · ${q.d}`;
+    document.getElementById("qIdx").textContent = `${String(qi + 1).padStart(2, "0")} / ${QUOTES.length}`;
+    f.classList.remove("out");
+  }, 380);
+  qStart = performance.now();
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => showQuote(qi + 1), QDUR);
+}
+(function qProgress() {
+  const bar = document.getElementById("qBar");
+  if (qStart) bar.style.width = Math.min((performance.now() - qStart) / QDUR, 1) * 100 + "%";
+  requestAnimationFrame(qProgress);
+})();
+document.getElementById("qPrev").onclick = () => showQuote(qi - 1);
+document.getElementById("qNext").onclick = () => showQuote(qi + 1);
+const chip = (q, i) => `<div class="q-chip" data-i="${i}"><p>&ldquo;${q.q}&rdquo;</p><span>${q.a} <em>· ${q.d}</em></span></div>`;
+const half = Math.ceil(QUOTES.length / 2);
+const A = QUOTES.map((q, i) => [q, i]).slice(0, half), B = QUOTES.map((q, i) => [q, i]).slice(half);
+document.getElementById("qTrackA").innerHTML = [...A, ...A].map(([q, i]) => chip(q, i)).join("");
+document.getElementById("qTrackB").innerHTML = [...B, ...B].map(([q, i]) => chip(q, i)).join("");
+document.querySelectorAll(".q-chip").forEach(c => c.addEventListener("click", () => {
+  showQuote(+c.dataset.i);
+  document.getElementById("qFeature").scrollIntoView({ behavior: "smooth", block: "center" });
+}));
+showQuote(0);
 
+// Technical test terminal
+const testCard = document.querySelector(".c-tests"); testCard.id = "term-card";
+const lines = [
+  ["$ run technical-test --candidate manideep", "dim"],
+  ["✓ algorithms & data structures", "ok", 96],
+  ["✓ system design reasoning", "ok", 88],
+  ["✓ debugging under pressure", "ok", 92],
+  ["✓ chart pattern recognition", "ok", 94],
+  ["→ all checks passed. ready for the next one.", ""]
+];
+let termRan = false;
+function runTerminal() {
+  if (termRan) return; termRan = true;
+  const t = document.getElementById("term");
+  lines.forEach(([txt, cls, pct], i) => setTimeout(() => {
+    const div = document.createElement("div");
+    div.className = cls;
+    div.innerHTML = pct ? `${txt}<span class="bar"><i></i></span><span class="dim">${pct}%</span>` : txt;
+    t.appendChild(div);
+    if (pct) requestAnimationFrame(() => setTimeout(() => div.querySelector(".bar i").style.width = pct + "%", 50));
+  }, i * 550));
+}
+</script>
 </body>
-
 </html>
