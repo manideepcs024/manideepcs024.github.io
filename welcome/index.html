@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Welcome &amp; Member Spotlight Cards — MANIMINDSMONEY</title>
+<meta name="description" content="Welcome new members to your WhatsApp community with what they'll get, the house rules and an icebreaker, and celebrate active members with a spotlight card." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #ff4d8d; --acc2: #febc2e; }
+  .list { display: grid; gap: 6px; }
+  .li { display: grid; grid-template-columns: 30px minmax(0, 1fr) 40px; gap: 6px; align-items: center; }
+  .li .chk { width: 26px; height: 26px; border-radius: 8px; border: 1.5px solid var(--line); background: none; color: #00140c; cursor: pointer; font-size: .8rem; }
+  .li .chk.on { background: var(--up); border-color: var(--up); }
+  .li .field { padding: 0 10px; border-radius: 12px; }
+  .li .field input { font: 500 .88rem Inter; padding: 9px 0; }
+  .li.off .field { opacity: .45; }
+  .mini-add { margin-top: 6px; border: 1px dashed var(--line); background: none; color: var(--muted); border-radius: 12px; padding: 8px; font: 500 .8rem Inter; cursor: pointer; width: 100%; }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .photo { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 16px; background: rgba(0,0,0,.22); }
+  .photo .av { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--a1), var(--acc)); display: grid; place-items: center; font: 700 1.4rem "Space Grotesk"; overflow: hidden; }
+  .photo .av img { width: 100%; height: 100%; object-fit: cover; }
+  .photo p { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+  .photo label.btn, .photo button { padding: 9px 12px; font-size: .8rem; }
+  .stat-row { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) 40px; gap: 6px; margin-top: 6px; }
+  .stat-row .field { padding: 0 10px; border-radius: 12px; }
+  .stat-row .field input { font: 600 .88rem Inter; padding: 9px 0; }
+  .loadc { margin-top: 10px; width: 100%; padding: 10px; border-radius: 14px; border: 1px dashed rgba(254,188,46,.5); background: rgba(254,188,46,.07); color: #ffd98a; font: 600 .82rem Inter; cursor: pointer; }
+  .imgprev { display: block; width: 100%; border-radius: 18px; border: 1px solid var(--line); margin-top: 12px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Make people feel <span class="grad">part of it.</span></h1>
+    <p class="sub">A warm welcome turns a new joiner into an active member, and a public thank-you keeps your best members coming back. Make both in a minute.</p>
+
+    <div class="seg mb" id="modeSeg" style="max-width:560px"><div class="pill"></div><button data-v="welcome">👋 Welcome card<small>for new joiners</small></button><button data-v="spot">🌟 Member spotlight<small>celebrate someone</small></button></div>
+
+    <div class="layout">
+      <section class="card">
+        <!-- WELCOME -->
+        <div id="wPane">
+          <div class="q">New members <span class="opt">optional · one name per line</span></div>
+          <textarea id="names" maxlength="400" placeholder="Ravi&#10;Priya&#10;Amit"></textarea>
+          <p class="hint">Leave empty for a general welcome. With names it says “Welcome Ravi, Priya and Amit”. In WhatsApp you can then type @ to tag them.</p>
+
+          <div class="q">What you'll get here <span class="opt">tap ✓ to show or hide</span></div>
+          <div class="list" id="gets"></div>
+          <button class="mini-add" data-add="gets">＋ Add a line</button>
+
+          <div class="q">House rules</div>
+          <div class="list" id="rules"></div>
+          <button class="mini-add" data-add="rules">＋ Add a rule</button>
+
+          <div class="q">Icebreaker question <span class="opt">gets newcomers talking</span></div>
+          <div class="chips-in" id="ice"></div>
+          <textarea id="icebreaker" maxlength="160" style="margin-top:8px"></textarea>
+        </div>
+
+        <!-- SPOTLIGHT -->
+        <div id="sPane" hidden>
+          <button class="loadc" id="loadChamp">🏆 Load the contest season leader</button>
+          <div class="q">Award</div>
+          <div class="badges chips-in" id="badges"></div>
+          <div class="cols2">
+            <div><div class="q">Member name</div><label class="field sm"><input id="who" class="txt" type="text" maxlength="30" placeholder="e.g. Priya Sharma" /></label></div>
+            <div><div class="q">For</div><label class="field sm"><input id="period" class="txt" type="text" maxlength="24" /></label></div>
+          </div>
+          <div class="q">Photo <span class="opt">optional</span></div>
+          <div class="photo">
+            <div class="av" id="av"></div>
+            <p>Stays on this phone and is never uploaded. <b>Ask the member before posting their photo.</b></p>
+            <div style="display:grid;gap:6px"><label class="btn" for="pic">📷 Add</label><button class="btn" id="noPic" hidden>Remove</button></div>
+            <input id="pic" type="file" accept="image/*" hidden />
+          </div>
+          <div class="q">Why they're in the spotlight</div>
+          <textarea id="why" maxlength="220" placeholder="e.g. Answered every quiz this month and always explains the reasoning for newer members."></textarea>
+          <div class="q">Highlights <span class="opt">up to 3 · optional</span></div>
+          <div id="stats"></div>
+          <div class="q">Their words <span class="opt">optional quote from the member</span></div>
+          <textarea id="quote" maxlength="160" placeholder="e.g. Learning the stop-loss rule here saved my account."></textarea>
+          <label class="toggle"><span>First name only<small>Shows “Priya S.” instead of the full name</small></span><input type="checkbox" id="optShort" /><span class="sw"></span></label>
+        </div>
+
+        <div id="inviteBox"></div>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2 id="pvTitle">Preview</h2><span id="meta"></span></div>
+        <div class="chat"><div class="bubble" id="bubble"></div></div>
+        <img class="imgprev" id="imgPrevLive" alt="Card preview" />
+        <div class="share-row" id="shareRow"></div>
+        <div class="tip" id="tip"></div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This community is for <b>learning and educational purposes only</b>. Spotlights recognise participation and helpfulness, never trading profits or returns.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const GETS = ["📊 Daily levels every morning (8:45 AM)", "🔔 Market close wrap every evening", "📖 Term of the day & 🧠 weekly quiz", "🎯 Guess the Close contest every week", "📅 Week-ahead results & events calendar", "🔍 Honest trade reviews: lessons, not tips"];
+const RULES = ["🤝 Be respectful. Everyone was a beginner once", "🚫 No buy/sell tips, paid calls or 'sure-shot' trades", "🔗 No spam, forwards or promotional links", "💬 Keep it about markets and learning", "📚 Everything here is for learning, not investment advice"];
+const ICE = ["Introduce yourself: your name, city and how long you've been in the markets 👋", "What's one thing you want to learn here this month? 🎯", "Investor, swing trader or intraday? Tell us your style 📈", "What's the best (or worst) trading lesson you've learned so far? 💡"];
+const BADGES = [["🌟", "Member of the Month"], ["🧠", "Quiz Champ"], ["🏆", "Contest Champ"], ["🤝", "Most Helpful"], ["🚀", "Rising Learner"], ["❓", "Best Question"], ["🔥", "Consistency Star"]];
+const month = () => K.istNow().toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+const S = K.store("welcome_v1", {
+  mode: "welcome", names: "",
+  gets: GETS.map(t => ({ t, on: true })), rules: RULES.map(t => ({ t, on: true })), icebreaker: ICE[0],
+  badge: 0, who: "", period: month(), why: "", stats: [{ k: "", v: "" }, { k: "", v: "" }, { k: "", v: "" }], quote: "", short: false,
+});
+let photo = null; // Image object, kept in memory only
+
+/* ---------- mode ---------- */
+const placeMode = K.seg("#modeSeg", () => S.mode, v => { S.mode = v; show(); upd(); });
+function show() {
+  $("#wPane").hidden = S.mode !== "welcome"; $("#sPane").hidden = S.mode !== "spot";
+  $("#pvTitle").textContent = S.mode === "welcome" ? "Welcome message" : "Spotlight";
+  $("#tip").innerHTML = S.mode === "welcome"
+    ? "<b>Tip:</b> post a welcome once or twice a week for everyone who joined, pin the latest one, and reply to each introduction. People who post in their first week are far more likely to stay active."
+    : "<b>Tip:</b> do one spotlight a month and rotate the awards (quiz, contest, most helpful, best question) so different people get recognised. Always ask the member before posting their photo.";
+}
+K.inviteField("#inviteBox", () => upd());
+
+/* ---------- welcome inputs ---------- */
+function drawList(id) {
+  $("#" + id).innerHTML = S[id].map((r, i) => `<div class="li ${r.on ? "" : "off"}" data-i="${i}"><button class="chk ${r.on ? "on" : ""}" data-op="tog">${r.on ? "✓" : ""}</button><label class="field"><input type="text" maxlength="70" value="${K.esc(r.t)}" /></label><button class="rm" data-op="rm">✕</button></div>`).join("");
+}
+["gets", "rules"].forEach(id => {
+  $("#" + id).addEventListener("input", e => { const r = e.target.closest(".li"); if (r) { S[id][+r.dataset.i].t = e.target.value; upd(); } });
+  $("#" + id).addEventListener("click", e => {
+    const b = e.target.closest("[data-op]"); if (!b) return; const i = +b.closest(".li").dataset.i;
+    if (b.dataset.op === "tog") S[id][i].on = !S[id][i].on; else S[id].splice(i, 1);
+    drawList(id); upd();
+  });
+});
+document.querySelectorAll("[data-add]").forEach(b => b.addEventListener("click", () => {
+  const id = b.dataset.add; if (S[id].length >= 8) { K.toast("Up to 8 lines"); return; }
+  S[id].push({ t: "", on: true }); drawList(id); upd(); $("#" + id).lastElementChild.querySelector("input").focus();
+}));
+$("#ice").innerHTML = ICE.map((q, i) => `<button data-i="${i}">${["👋 Intro", "🎯 Goal", "📈 Style", "💡 Lesson"][i]}</button>`).join("");
+$("#ice").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) { S.icebreaker = ICE[+b.dataset.i]; $("#icebreaker").value = S.icebreaker; upd(); } });
+$("#names").value = S.names; $("#names").addEventListener("input", e => { S.names = e.target.value; upd(); });
+$("#icebreaker").value = S.icebreaker; $("#icebreaker").addEventListener("input", e => { S.icebreaker = e.target.value; upd(); });
+
+/* ---------- spotlight inputs ---------- */
+$("#badges").innerHTML = BADGES.map(([e, n], i) => `<button data-i="${i}">${e} ${n}</button>`).join("");
+$("#badges").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) { S.badge = +b.dataset.i; upd(); } });
+["who", "period", "why", "quote"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { S[k] = e.target.value; upd(); }); });
+$("#optShort").checked = S.short; $("#optShort").addEventListener("change", e => { S.short = e.target.checked; upd(); });
+function drawStats() {
+  $("#stats").innerHTML = S.stats.map((r, i) => `<div class="stat-row" data-i="${i}"><label class="field"><input data-f="v" type="text" maxlength="10" value="${K.esc(r.v)}" placeholder="${["12", "3", "100%"][i]}" /></label><label class="field"><input data-f="k" type="text" maxlength="24" value="${K.esc(r.k)}" placeholder="${["quiz answers", "contest wins", "attendance"][i]}" /></label><span></span></div>`).join("");
+}
+$("#stats").addEventListener("input", e => { const r = e.target.closest(".stat-row"); if (r) { S.stats[+r.dataset.i][e.target.dataset.f] = e.target.value; upd(); } });
+$("#loadChamp").addEventListener("click", () => {
+  let c = null; try { c = JSON.parse(localStorage.getItem("contest_v1") || "null"); } catch {}
+  const L = Object.values(c?.season || {}).filter(e => e.pts > 0).sort((a, b) => b.pts - a.pts || b.wins - a.wins);
+  if (!L.length) { K.toast("No contest season points yet"); return; }
+  const top = L[0], n = (c.recorded || []).length;
+  Object.assign(S, { badge: 2, who: top.name, why: `Top of the Guess the Close leaderboard after ${n} contest${n === 1 ? "" : "s"}. Sharp reading of the market, week after week!` });
+  S.stats = [{ v: String(top.pts), k: "season points" }, { v: String(top.wins || 0), k: `win${top.wins === 1 ? "" : "s"}` }, { v: String(top.played || n), k: "contests played" }];
+  ["who", "why"].forEach(k => $("#" + k).value = S[k]); drawStats(); upd(); K.toast("🏆 Loaded " + top.name);
+});
+$("#pic").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const img = new Image(); img.onload = () => { photo = img; drawAv(); upd(); }; img.src = URL.createObjectURL(f);
+});
+$("#noPic").addEventListener("click", () => { photo = null; $("#pic").value = ""; drawAv(); upd(); });
+const initials = n => (n || "?").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+function drawAv() { $("#av").innerHTML = photo ? `<img src="${photo.src}" alt="" />` : K.esc(initials(S.who)); $("#noPic").hidden = !photo; }
+const disp = n => { n = (n || "").trim(); if (!S.short) return n; const p = n.split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length - 1][0]}.` : n; };
+
+/* ---------- text ---------- */
+const nameList = () => S.names.split(/\n|,/).map(s => s.trim()).filter(Boolean).slice(0, 20);
+const joinNames = a => a.length <= 1 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+const on = id => S[id].filter(r => r.on && r.t.trim()).map(r => r.t.trim());
+function textWelcome() {
+  const n = nameList(), out = [n.length ? `👋 *Welcome ${joinNames(n)}!*` : "👋 *Welcome to the MANIMINDSMONEY Community!*", ""];
+  out.push(n.length > 1 ? `Glad to have all ${n.length} of you here. This is a friendly space to learn the Indian stock market together.` : "Glad to have you here. This is a friendly space to learn the Indian stock market together.");
+  if (on("gets").length) out.push("", "*What you'll get here*", ...on("gets"));
+  if (on("rules").length) out.push("", "*House rules*", ...on("rules"));
+  if (S.icebreaker.trim()) out.push("", `💬 *Say hi!* ${K.clean(S.icebreaker)}`);
+  return out.concat(K.signoff("welcome", "Community tools", "")).join("\n").replace(/\n+$/, "");
+}
+function textSpot() {
+  const [e, b] = BADGES[S.badge] || BADGES[0], out = [`${e} *${b.toUpperCase()}* · ${S.period}`, "", `Huge shout-out to *${disp(S.who) || "—"}*! 👏`];
+  if (S.why.trim()) out.push("", K.clean(S.why));
+  const st = S.stats.filter(r => r.v.trim() && r.k.trim()); if (st.length) out.push("", st.map(r => `✅ ${r.v.trim()} ${r.k.trim()}`).join("\n"));
+  if (S.quote.trim()) out.push("", `💬 _“${K.clean(S.quote)}”_`);
+  out.push("", "Who should we spotlight next month? Reply with a name 👇");
+  return out.concat(K.signoff("welcome", "Community tools", "")).join("\n").replace(/\n+$/, "");
+}
+const text = () => S.mode === "welcome" ? textWelcome() : textSpot();
+
+/* ---------- image ---------- */
+const W = 1080;
+async function draw() { await K.loadFonts(); await document.fonts.load(`800 90px ${K.F.INTER}`).catch(() => {}); return S.mode === "welcome" ? drawWelcome() : drawSpot(); }
+function listBlock(ctx, y, title, items, col) {
+  const h = 72 + items.length * 56 + 18;
+  K.panel(ctx, 70, y, W - 140, h, 28, col + "10", col + "55");
+  K.txt(ctx, title, 104, y + 50, `700 22px ${K.F.MONO}`, col);
+  items.forEach((t, i) => { ctx.font = K.fit(ctx, t, 500, K.F.INTER, 30, W - 220); ctx.fillStyle = "#e3e6ee"; ctx.textAlign = "left"; ctx.fillText(t, 104, y + 104 + i * 56); });
+  return y + h + 22;
+}
+function drawWelcome() {
+  const n = nameList(), m = K.measure();
+  const head = n.length ? `Welcome ${joinNames(n.slice(0, 6))}${n.length > 6 ? ` +${n.length - 6}` : ""}!` : "Welcome to the community!";
+  let hs = 76, hl; do { m.font = `800 ${hs}px ${K.F.INTER}`; hl = K.wrap(m, head, W - 140); hs -= 4; } while (hl.length > 3 && hs > 44); hs += 4; hl = K.cap(hl, 3);
+  m.font = `500 30px ${K.F.INTER}`; const ice = S.icebreaker.trim() ? K.cap(K.wrap(m, K.clean(S.icebreaker), W - 220), 3) : [];
+  const G = on("gets"), R = on("rules");
+  const top = 230 + hl.length * hs * 1.1 + 30;
+  const H = top + (G.length ? 72 + G.length * 56 + 40 : 0) + (R.length ? 72 + R.length * 56 + 40 : 0) + (ice.length ? 90 + ice.length * 42 + 30 : 0) + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [["rgba(255,77,141,0.24)", .9, .08, .6], ["rgba(124,92,255,0.32)", .05, .05, .6], ["rgba(254,188,46,0.12)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, "👋  NEW MEMBERS", 70, 200, `600 26px ${K.F.MONO}`, "#ff8fb5");
+  hl.forEach((l, i) => K.txt(ctx, l, 70, 230 + (i + 1) * hs * 1.1 - hs * .15, `800 ${hs}px ${K.F.INTER}`, "#ffffff"));
+  let y = top;
+  if (G.length) y = listBlock(ctx, y, "WHAT YOU'LL GET HERE", G, "#22d39a");
+  if (R.length) y = listBlock(ctx, y, "HOUSE RULES", R, "#febc2e");
+  if (ice.length) {
+    const h = 90 + ice.length * 42; K.rr(ctx, 70, y, W - 140, h, 28);
+    const g = ctx.createLinearGradient(70, y, W - 70, y + h); g.addColorStop(0, "rgba(255,77,141,0.22)"); g.addColorStop(1, "rgba(124,92,255,0.22)"); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = "rgba(255,77,141,0.6)"; ctx.lineWidth = 2; ctx.stroke();
+    K.txt(ctx, "💬 SAY HI!", 104, y + 50, `700 24px ${K.F.MONO}`, "#ff8fb5");
+    ice.forEach((l, i) => K.txt(ctx, l, 104, y + 94 + i * 42, `500 30px ${K.F.INTER}`, "#ffffff"));
+  }
+  K.footer(ctx, W, H, K.toolUrl("tools"), "For learning only · Not investment advice · Not SEBI registered", true);
+  return c;
+}
+function drawSpot() {
+  const [emo, badge] = BADGES[S.badge] || BADGES[0], name = disp(S.who) || "Member", m = K.measure();
+  m.font = `400 32px ${K.F.INTER}`; const why = S.why.trim() ? K.cap(K.wrap(m, K.clean(S.why), W - 220), 5) : [];
+  m.font = `italic 500 32px ${K.F.INTER}`; const qt = S.quote.trim() ? K.cap(K.wrap(m, `“${K.clean(S.quote)}”`, W - 240), 4) : [];
+  const st = S.stats.filter(r => r.v.trim() && r.k.trim()).slice(0, 3);
+  const avY = 240, avR = 150, nameY = avY + avR * 2 + 125;
+  let H = nameY + 150 + (why.length ? why.length * 46 + 40 : 0) + (st.length ? 190 : 0) + (qt.length ? 80 + qt.length * 44 + 30 : 0) + 110 + K.footerH(true);
+  H = Math.max(H, 1350);
+  const { c, ctx } = K.canvas(W, H, [["rgba(254,188,46,0.30)", .5, .15, .7], ["rgba(255,77,141,0.20)", .05, .4, .6], ["rgba(124,92,255,0.25)", .95, .9, .6]]);
+  K.brand(ctx, (W - 470) / 2, 52);
+  // confetti
+  const rnd = (s => () => (s = (s * 9301 + 49297) % 233280) / 233280)(name.length * 7 + S.badge);
+  for (let i = 0; i < 40; i++) { ctx.save(); ctx.translate(rnd() * W, 150 + rnd() * 480); ctx.rotate(rnd() * 6); ctx.fillStyle = ["#febc2e", "#ff4d8d", "#00e0b8", "#7c5cff", "#ffffff"][i % 5] + "cc"; ctx.fillRect(-6, -3, 12, 6); ctx.restore(); }
+  // avatar with gradient ring
+  const cx = W / 2, cy = avY + avR;
+  const ring = ctx.createLinearGradient(cx - avR, cy - avR, cx + avR, cy + avR); ring.addColorStop(0, "#febc2e"); ring.addColorStop(.5, "#ff4d8d"); ring.addColorStop(1, "#7c5cff");
+  ctx.beginPath(); ctx.arc(cx, cy, avR + 12, 0, 7); ctx.fillStyle = ring; ctx.fill();
+  ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, avR, 0, 7); ctx.clip();
+  if (photo) { const s = Math.max(avR * 2 / photo.width, avR * 2 / photo.height), w = photo.width * s, h = photo.height * s; ctx.drawImage(photo, cx - w / 2, cy - h / 2, w, h); }
+  else { const g = ctx.createLinearGradient(cx - avR, cy - avR, cx + avR, cy + avR); g.addColorStop(0, "#2a2350"); g.addColorStop(1, "#4b1e3a"); ctx.fillStyle = g; ctx.fillRect(cx - avR, cy - avR, avR * 2, avR * 2); K.txt(ctx, initials(S.who), cx, cy + 40, `700 120px ${K.F.GROT}`, "#ffffff", "center"); }
+  ctx.restore();
+  // badge medallion
+  ctx.beginPath(); ctx.arc(cx + avR * .72, cy + avR * .72, 54, 0, 7); ctx.fillStyle = "#14121f"; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = "#febc2e"; ctx.stroke();
+  K.txt(ctx, emo, cx + avR * .72, cy + avR * .72 + 20, `400 54px ${K.F.INTER}`, "#fff", "center");
+  // award + name
+  K.pill(ctx, `${badge.toUpperCase()} · ${S.period.toUpperCase()}`, cx, nameY - 60, "#febc2e", 24, "center");
+  ctx.font = K.fit(ctx, name, 800, K.F.INTER, 96, W - 140); ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.fillText(name, cx, nameY + 80);
+  let y = nameY + 150;
+  if (why.length) { why.forEach((l, i) => K.txt(ctx, l, cx, y + i * 46, `400 32px ${K.F.INTER}`, "#d5d8e3", "center")); y += why.length * 46 + 40; }
+  if (st.length) {
+    const gap = 18, bw = (W - 140 - gap * (st.length - 1)) / st.length;
+    st.forEach((r, i) => { const bx = 70 + i * (bw + gap); K.panel(ctx, bx, y, bw, 160, 26, "rgba(254,188,46,0.08)", "rgba(254,188,46,0.45)"); ctx.font = K.fit(ctx, r.v.trim(), 800, K.F.INTER, 64, bw - 30); ctx.fillStyle = "#febc2e"; ctx.textAlign = "center"; ctx.fillText(r.v.trim(), bx + bw / 2, y + 82); ctx.font = K.fit(ctx, r.k.trim(), 500, K.F.INTER, 26, bw - 30); ctx.fillStyle = "#c9cfdb"; ctx.fillText(r.k.trim(), bx + bw / 2, y + 128); });
+    y += 190;
+  }
+  if (qt.length) {
+    const h = 50 + qt.length * 44; K.panel(ctx, 100, y, W - 200, h, 26, "rgba(255,255,255,0.05)", "rgba(255,255,255,0.12)");
+    qt.forEach((l, i) => K.txt(ctx, l, cx, y + 56 + i * 44, `italic 500 32px ${K.F.INTER}`, "#ffffff", "center")); y += h + 30;
+  }
+  K.txt(ctx, "Who should we spotlight next? Reply with a name 👇", cx, y + 40, `600 30px ${K.F.INTER}`, "#ff8fb5", "center");
+  K.footer(ctx, W, H, K.toolUrl("tools"), "Recognising participation & learning · Not SEBI registered", true);
+  return c;
+}
+
+/* ---------- preview + share ---------- */
+let tmr;
+function upd() {
+  document.querySelectorAll("#badges button").forEach((b, i) => b.classList.toggle("on", i === S.badge));
+  drawAv();
+  $("#meta").textContent = S.mode === "welcome" ? (nameList().length ? `${nameList().length} new` : "general") : (BADGES[S.badge] || BADGES[0])[1];
+  const t = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  $("#bubble").innerHTML = K.waHtml(text()) + `<span class="time">${t}</span>`;
+  S.save(); clearTimeout(tmr);
+  tmr = setTimeout(async () => { if (!valid(true)) { $("#imgPrevLive").removeAttribute("src"); return; } $("#imgPrevLive").src = (await draw()).toDataURL("image/jpeg", .8); }, 200);
+}
+function valid(quiet) {
+  if (S.mode === "spot" && !S.who.trim()) { if (!quiet) { K.shake($("#who").closest(".field")); K.toast("Add the member's name"); } return false; }
+  if (S.mode === "welcome" && !on("gets").length && !on("rules").length && !S.icebreaker.trim()) { if (!quiet) K.toast("Add at least one line"); return false; }
+  return true;
+}
+K.share({ text, valid: () => valid(false), draw, file: () => S.mode === "welcome" ? `welcome-${K.iso(K.istNow())}` : `spotlight-${(S.who || "member").toLowerCase().replace(/[^a-z0-9]+/g, "-")}` });
+
+drawList("gets"); drawList("rules"); drawStats(); show(); upd();
+</script>
+</body>
+</html>
