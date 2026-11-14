@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Results &amp; Events Calendar — MANIMINDSMONEY</title>
+<meta name="description" content="Build a weekly market calendar of quarterly results, dividends, bonus and splits, IPOs, RBI and Fed meetings, expiry and holidays, and share it on WhatsApp as text or an image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--a1); top: -25vmax; left: -15vmax; opacity: .22; }
+  .blob.b2 { background: var(--warn); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .10; }
+  .blob.b3 { background: var(--a2); top: 35%; left: 50%; width: 30vmax; height: 30vmax; animation-delay: -12s; opacity: .12; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  h1 { font: 700 clamp(1.9rem, 6vw, 2.8rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--warn), #ff9a5c 40%, var(--a3) 70%, var(--a1)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 22px; font-size: .95rem; max-width: 680px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .layout > * { min-width: 0; }
+  @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(18px, 4.5vw, 28px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); }
+  .sticky { position: sticky; top: 16px; }
+  @media (max-width: 920px) { .sticky { position: static; } }
+
+  .q { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 600 .74rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--a2); margin: 20px 0 8px; }
+  .q:first-child { margin-top: 0; }
+  .q .opt { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; font-family: Inter; }
+
+  .field { display: flex; align-items: center; gap: 8px; padding: 2px 14px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; min-width: 0; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 .9rem "JetBrains Mono"; color: var(--muted); }
+  .field input, .field select { width: 100%; flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 600 .98rem Inter; padding: 11px 0; color-scheme: dark; }
+  .field select option { background: #12141e; }
+  .field input::placeholder { color: #4a5064; font-weight: 500; }
+  .week-row { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; }
+  .icon-btn { width: 44px; height: 44px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--fg); cursor: pointer; font-size: 1rem; }
+  .icon-btn:hover { background: rgba(255,255,255,.08); }
+  .week-lbl { text-align: center; font: 700 1.05rem "Space Grotesk"; }
+  .week-lbl small { display: block; font: 500 .72rem "JetBrains Mono"; color: var(--muted); margin-top: 2px; }
+
+  .quick { display: flex; gap: 6px; flex-wrap: wrap; }
+  .quick button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 7px 11px; border-radius: 999px; font: 500 .76rem Inter; cursor: pointer; }
+  .quick button:hover { color: var(--fg); border-color: rgba(255,255,255,.22); }
+
+  .ev { border: 1px solid var(--line); border-left: 3px solid var(--c, var(--line)); border-radius: 18px; padding: 12px; background: rgba(0,0,0,.22); margin-top: 10px; animation: pop .35s cubic-bezier(.2,.8,.2,1); display: grid; gap: 8px; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px); } }
+  .ev-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) 40px; gap: 8px; }
+  .ev-row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .ev .field { padding: 0 10px; border-radius: 12px; }
+  .ev .field input, .ev .field select { font-size: .9rem; padding: 9px 0; }
+  .ev .nm { text-transform: uppercase; font-family: "Space Grotesk"; font-weight: 700; letter-spacing: .02em; }
+  .ev .nm::placeholder { text-transform: none; font-family: Inter; letter-spacing: 0; }
+  @media (max-width: 480px) { .ev-row2 { grid-template-columns: 1fr; } }
+  .rm { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); cursor: pointer; font-size: 1rem; }
+  .rm:hover { color: var(--down); border-color: rgba(255,84,112,.4); }
+  .add { width: 100%; margin-top: 12px; padding: 13px; border-radius: 16px; border: 1px dashed rgba(0,224,184,.45); background: rgba(0,224,184,.05); color: var(--a2); font: 600 .9rem Inter; cursor: pointer; }
+  .add:hover { background: rgba(0,224,184,.1); }
+  .add[hidden] { display: none; }
+  .empty-in { text-align: center; color: var(--muted); font-size: .85rem; padding: 18px; border: 1px dashed var(--line); border-radius: 16px; margin-top: 10px; }
+
+  textarea { width: 100%; resize: vertical; min-height: 76px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); border-radius: 16px; color: var(--fg); font: 400 .95rem/1.5 Inter, sans-serif; padding: 12px 14px; outline: 0; }
+  textarea:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,.28); border: 1px solid var(--line); font-size: .9rem; cursor: pointer; margin-top: 10px; }
+  .toggle small { display: block; color: var(--muted); font-size: .74rem; }
+  .toggle input { display: none; }
+  .sw { flex: none; width: 44px; height: 26px; border-radius: 13px; background: rgba(255,255,255,.12); position: relative; transition: background .25s; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  .toggle input:checked + .sw { background: var(--a2); }
+  .toggle input:checked + .sw::after { transform: translateX(18px); }
+
+  /* preview */
+  .res-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+  .res-head h2 { font: 700 1.1rem "Space Grotesk"; }
+  .res-head span { font: .72rem "JetBrains Mono"; color: var(--muted); }
+  .days { display: grid; gap: 10px; }
+  .day { border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,.3); overflow: hidden; animation: pop .35s cubic-bezier(.2,.8,.2,1); }
+  .day-h { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,.04); border-bottom: 1px solid var(--line); font: 700 .8rem "JetBrains Mono"; letter-spacing: .08em; }
+  .day-h span { color: var(--muted); font-weight: 500; letter-spacing: 0; }
+  .day-h.today { background: rgba(124,92,255,.14); }
+  .item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px 14px; }
+  .item + .item { border-top: 1px solid rgba(255,255,255,.05); }
+  .pill-t { font: 700 .62rem "JetBrains Mono"; letter-spacing: .06em; padding: 4px 8px; border-radius: 7px; color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); white-space: nowrap; min-width: 84px; text-align: center; }
+  .item b { font: 700 .95rem "Space Grotesk"; letter-spacing: .01em; display: block; overflow-wrap: anywhere; }
+  .item small { color: #a9aec0; font-size: .8rem; display: block; overflow-wrap: anywhere; }
+  .placeholder { text-align: center; color: var(--muted); padding: 30px 10px; font-size: .9rem; border: 1px dashed var(--line); border-radius: 18px; }
+  .note-prev { margin-top: 10px; padding: 12px 14px; border-radius: 16px; background: rgba(124,92,255,.08); border: 1px solid rgba(124,92,255,.3); font-size: .86rem; color: #d5d8e3; white-space: pre-wrap; }
+
+  .share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 16px; font: 600 .98rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.img { grid-column: 1 / -1; background: linear-gradient(100deg, rgba(124,92,255,.22), rgba(0,224,184,.16)); border: 1px solid rgba(124,92,255,.5); font-weight: 700; }
+  .btn.img[disabled] { opacity: .6; pointer-events: none; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; font-weight: 700; }
+  .btn.wa svg { width: 18px; height: 18px; }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+  .btn.ghost { grid-column: 1 / -1; padding: 10px; font-size: .84rem; color: var(--muted); background: none; }
+  .learn { margin-top: 16px; font-size: .8rem; color: var(--muted); line-height: 1.55; border-top: 1px solid var(--line); padding-top: 14px; }
+  .learn b { color: #cfd3df; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 140px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 30; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); }
+  .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .modal[hidden] { display: none; }
+  .modal-card { width: 100%; max-width: 440px; max-height: 100%; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px; }
+  .modal-card img { display: block; max-width: 100%; max-height: min(62vh, 560px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); }
+  .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
+  .modal-card .row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 14px; }
+  .disclaimer { margin: 26px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>The week ahead, <span class="grad">on one card.</span></h1>
+    <p class="sub">List this week's quarterly results, dividends, bonus and splits, IPOs, RBI or Fed meetings, expiry days and holidays. The card groups them by day so your community knows what's coming.</p>
+
+    <div class="layout">
+      <!-- INPUT -->
+      <section class="card">
+        <div class="q">Week</div>
+        <div class="week-row">
+          <button class="icon-btn" id="prevWk" title="Previous week">‹</button>
+          <div class="week-lbl" id="weekLbl"></div>
+          <button class="icon-btn" id="nextWk" title="Next week">›</button>
+        </div>
+
+        <div class="q">Quick add</div>
+        <div class="quick" id="quick"></div>
+
+        <div class="q">Events <span class="opt" id="evCount"></span></div>
+        <div id="events"></div>
+        <button class="add" id="addBtn">＋ Add event</button>
+
+        <div class="q">Notes <span class="opt">optional</span></div>
+        <textarea id="notes" maxlength="300" placeholder="e.g. Heavy results week for IT and banks. Expect stock-specific moves."></textarea>
+
+        <label class="toggle"><span>Add disclaimer<small>Not SEBI registered · verify dates with the exchange</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
+      </section>
+
+      <!-- PREVIEW -->
+      <section class="card sticky">
+        <div class="res-head"><h2>This week</h2><span id="resMeta">updates as you type</span></div>
+        <div class="days" id="days"></div>
+        <div id="notePrev"></div>
+
+        <div class="share-row">
+          <button class="btn img" id="imgBtn">📸 Share as image</button>
+          <button class="btn" id="copyBtn">📋 Copy text</button>
+          <button class="btn wa" id="waBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg> WhatsApp</button>
+          <button class="btn ghost" id="clearBtn">Clear all events</button>
+        </div>
+
+        <div class="learn">
+          <b>Where to check dates:</b> results and board meetings are on the NSE and BSE "corporate announcements" and "event calendar" pages. Dividend, bonus and split <b>record dates</b> are under "corporate actions". Remember that you must hold the shares <b>before the ex-date</b> to be eligible. Always check against the exchange before posting, because companies can change dates.
+        </div>
+      </section>
+    </div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This calendar lists the events you enter, for <b>information and educational purposes only</b>. Dates can change; always confirm them with NSE, BSE or the company. Nothing here is investment advice or a recommendation to buy or sell any security.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+  <div class="toast" id="toast">Copied ✓</div>
+  <div class="modal" id="imgModal" hidden>
+    <div class="modal-card">
+      <img id="imgPrev" alt="Weekly events calendar" />
+      <p id="imgMsg"></p>
+      <div class="row">
+        <a class="btn" id="imgDl" download="week-calendar.png">⬇ Download</a>
+        <button class="btn primary" id="imgClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const MAX = 30;
+const TYPES = {
+  results:  { l: "Results",     e: "📊", c: "#9b82ff", ph: "Q2 FY27 results" },
+  dividend: { l: "Dividend",    e: "💰", c: "#22d39a", ph: "₹5/share · record date" },
+  bonus:    { l: "Bonus/Split", e: "✂️", c: "#00e0b8", ph: "1:1 bonus · record date" },
+  ipo:      { l: "IPO",         e: "🚀", c: "#ff4d8d", ph: "Opens · ₹100–105 band" },
+  board:    { l: "Board meet",  e: "🏛️", c: "#5b8cff", ph: "Fund raising" },
+  macro:    { l: "Macro",       e: "🏦", c: "#febc2e", ph: "Policy decision 10 AM" },
+  expiry:   { l: "Expiry",      e: "⏳", c: "#ff9a5c", ph: "Weekly expiry" },
+  holiday:  { l: "Holiday",     e: "🏖️", c: "#ff5470", ph: "Market closed" },
+  other:    { l: "Other",       e: "📌", c: "#b4b9c8", ph: "Details" },
+};
+const QUICK = [
+  { t: "results", n: "", d: "" , l: "📊 Results" },
+  { t: "dividend", n: "", d: "", l: "💰 Dividend" },
+  { t: "ipo", n: "", d: "", l: "🚀 IPO" },
+  { t: "macro", n: "RBI MPC", d: "Policy decision", l: "🏦 RBI policy" },
+  { t: "macro", n: "US FED", d: "FOMC decision (IST night)", l: "🇺🇸 Fed meeting" },
+  { t: "macro", n: "INDIA CPI", d: "Inflation data, 4 PM", l: "📈 CPI data" },
+  { t: "expiry", n: "NIFTY", d: "Weekly expiry", l: "⏳ Nifty expiry", day: 1 },
+  { t: "expiry", n: "SENSEX", d: "Weekly expiry", l: "⏳ Sensex expiry", day: 3 },
+  { t: "holiday", n: "MARKET HOLIDAY", d: "NSE & BSE closed", l: "🏖️ Holiday" },
+];
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/* ---------- dates ---------- */
+const istNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const mondayOf = d => addDays(new Date(d.getFullYear(), d.getMonth(), d.getDate()), -((d.getDay() + 6) % 7));
+function defaultWeek() {
+  const n = istNow(), wd = n.getDay(), mins = n.getHours() * 60 + n.getMinutes();
+  // Weekend, or Friday after the close → plan the coming week
+  return iso(wd === 0 || wd === 6 || (wd === 5 && mins >= 930) ? mondayOf(addDays(n, 7)) : mondayOf(n));
+}
+const dayDate = i => addDays(parse(S.week), i);
+const fmtD = (d, o) => d.toLocaleDateString("en-IN", o);
+function weekRange() {
+  const usesWeekend = S.events.some(e => e.d >= 5 && (e.n || e.x));
+  const a = dayDate(0), b = dayDate(usesWeekend ? 6 : 4);
+  const sameM = a.getMonth() === b.getMonth();
+  return `${a.getDate()}${sameM ? "" : " " + fmtD(a, { month: "short" })} – ${fmtD(b, { day: "numeric", month: "short", year: "numeric" })}`;
+}
+
+/* ---------- state ---------- */
+const saved = JSON.parse(localStorage.getItem("cal_form") || "{}");
+const S = Object.assign({ week: defaultWeek(), events: [], notes: "", disc: true }, saved);
+if (saved.week && saved.week < iso(mondayOf(istNow()))) S.week = defaultWeek();   // stale week → jump to current
+$("#notes").value = S.notes; $("#optDisc").checked = S.disc;
+function save() { S.notes = $("#notes").value; S.disc = $("#optDisc").checked; localStorage.setItem("cal_form", JSON.stringify(S)); }
+
+/* ---------- inputs ---------- */
+function drawWeek() {
+  const a = dayDate(0);
+  $("#weekLbl").innerHTML = `${weekRange()}<small>Week ${fmtD(a, { day: "numeric", month: "short" })} (Mon) onward</small>`;
+}
+function dayOpts(sel) {
+  return DAYS.map((d, i) => `<option value="${i}" ${i === sel ? "selected" : ""}>${d} ${dayDate(i).getDate()}</option>`).join("");
+}
+const typeOpts = sel => Object.entries(TYPES).map(([k, t]) => `<option value="${k}" ${k === sel ? "selected" : ""}>${t.e} ${t.l}</option>`).join("");
+const attr = s => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+function drawEvents() {
+  $("#events").innerHTML = S.events.length ? S.events.map((e, i) => `
+    <div class="ev" data-i="${i}" style="--c:${TYPES[e.t].c}">
+      <div class="ev-row">
+        <label class="field"><select class="dy">${dayOpts(e.d)}</select></label>
+        <label class="field"><select class="ty">${typeOpts(e.t)}</select></label>
+        <button class="rm" title="Remove">✕</button>
+      </div>
+      <div class="ev-row2">
+        <label class="field"><input class="nm" type="text" maxlength="28" value="${attr(e.n)}" placeholder="Company or event" autocomplete="off" /></label>
+        <label class="field"><input class="dt" type="text" maxlength="48" value="${attr(e.x)}" placeholder="${attr(TYPES[e.t].ph)}" autocomplete="off" /></label>
+      </div>
+    </div>`).join("") : `<div class="empty-in">No events yet. Use <b>Quick add</b> or <b>Add event</b>.</div>`;
+  $("#addBtn").hidden = S.events.length >= MAX;
+  $("#evCount").textContent = `${S.events.length} / ${MAX}`;
+}
+function addEvent(ev) {
+  if (S.events.length >= MAX) { toast(`Up to ${MAX} events`); return; }
+  const last = S.events[S.events.length - 1];
+  const today = istNow(), off = Math.round((mondayOf(today) - parse(S.week)) / 864e5) === 0 ? Math.min((today.getDay() + 6) % 7, 4) : 0;
+  S.events.push({ d: ev.day ?? (last ? last.d : off), t: ev.t || "results", n: ev.n || "", x: ev.d || "" });
+  drawEvents(); render();
+  const box = $("#events").lastElementChild; box.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  const inp = box.querySelector(ev.n ? ".dt" : ".nm"); inp.focus({ preventScroll: true });
+}
+$("#quick").innerHTML = QUICK.map((q, i) => `<button data-q="${i}">${q.l}</button>`).join("");
+$("#quick").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (b) addEvent(QUICK[+b.dataset.q]); });
+$("#addBtn").addEventListener("click", () => addEvent({}));
+$("#events").addEventListener("input", e => {
+  const box = e.target.closest(".ev"); if (!box) return; const ev = S.events[+box.dataset.i];
+  if (e.target.classList.contains("nm")) ev.n = e.target.value.toUpperCase();
+  if (e.target.classList.contains("dt")) ev.x = e.target.value;
+  e.target.closest(".field").classList.remove("err");
+  render();
+});
+$("#events").addEventListener("change", e => {
+  const box = e.target.closest(".ev"); if (!box) return; const ev = S.events[+box.dataset.i];
+  if (e.target.classList.contains("dy")) ev.d = +e.target.value;
+  if (e.target.classList.contains("ty")) { ev.t = e.target.value; box.style.setProperty("--c", TYPES[ev.t].c); box.querySelector(".dt").placeholder = TYPES[ev.t].ph; }
+  render();
+});
+$("#events").addEventListener("click", e => {
+  const box = e.target.closest(".ev"); if (!box || !e.target.closest(".rm")) return;
+  S.events.splice(+box.dataset.i, 1); drawEvents(); render();
+});
+const shiftWeek = n => { S.week = iso(addDays(parse(S.week), 7 * n)); drawWeek(); drawEvents(); render(); };
+$("#prevWk").addEventListener("click", () => shiftWeek(-1));
+$("#nextWk").addEventListener("click", () => shiftWeek(1));
+$("#notes").addEventListener("input", render);
+$("#optDisc").addEventListener("change", render);
+$("#clearBtn").addEventListener("click", () => {
+  if (!S.events.length || !confirm("Remove all events for this week?")) return;
+  S.events = []; drawEvents(); render();
+});
+
+/* ---------- grouping ---------- */
+const filled = () => S.events.filter(e => e.n.trim() || e.x.trim());
+function byDay() {
+  const order = Object.keys(TYPES), out = [];
+  for (let d = 0; d < 7; d++) {
+    const list = filled().filter(e => e.d === d).sort((a, b) => order.indexOf(a.t) - order.indexOf(b.t));
+    if (list.length) out.push({ d, date: dayDate(d), list });
+  }
+  return out;
+}
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const isToday = d => iso(d) === iso(istNow());
+
+function render() {
+  drawWeek();
+  const days = byDay(), n = filled().length;
+  $("#resMeta").textContent = n ? `${n} event${n > 1 ? "s" : ""} · ${days.length} day${days.length > 1 ? "s" : ""}` : "updates as you type";
+  $("#days").innerHTML = days.length ? days.map(g => `
+    <div class="day">
+      <div class="day-h${isToday(g.date) ? " today" : ""}">${fmtD(g.date, { weekday: "long" }).toUpperCase()}<span>${fmtD(g.date, { day: "numeric", month: "short" })}${isToday(g.date) ? " · today" : ""}</span></div>
+      ${g.list.map(e => `<div class="item"><span class="pill-t" style="--c:${TYPES[e.t].c}">${TYPES[e.t].l.toUpperCase()}</span><div><b>${esc(e.n.trim() || TYPES[e.t].l)}</b>${e.x.trim() ? `<small>${esc(e.x.trim())}</small>` : ""}</div></div>`).join("")}
+    </div>`).join("") : `<div class="placeholder">Add events to build the week's calendar.</div>`;
+  const note = $("#notes").value.trim();
+  $("#notePrev").innerHTML = note ? `<div class="note-prev">📝 ${esc(note)}</div>` : "";
+  save();
+}
+
+/* ---------- text ---------- */
+const TOOL_URL = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host)
+  ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/calendar/";
+const DISCL = "⚠️ _Disclaimer: Not SEBI registered. For information only, not investment advice. Dates can change, so confirm with NSE/BSE._";
+function buildText() {
+  const out = [`📅 *WEEK AHEAD* · ${weekRange()}`, "_Results, corporate actions & key events_"];
+  byDay().forEach(g => {
+    out.push("", `*${fmtD(g.date, { weekday: "short", day: "numeric", month: "short" })}*`);
+    g.list.forEach(e => out.push(`${TYPES[e.t].e} ${e.n.trim() || TYPES[e.t].l}${e.x.trim() ? " — " + e.x.trim() : ""}`));
+  });
+  const note = $("#notes").value.trim(); if (note) out.push("", `📝 ${note}`);
+  out.push("", "— MANIMINDSMONEY Community", `_Calendar via ${TOOL_URL}_`);
+  if ($("#optDisc").checked) out.push(DISCL);
+  return out.join("\n");
+}
+
+/* ---------- share ---------- */
+function valid() {
+  if (filled().length) return true;
+  const first = $("#events .nm");
+  if (first) { const fl = first.closest(".field"); fl.classList.remove("err"); void fl.offsetWidth; fl.classList.add("err"); }
+  toast("Add at least one event first"); return false;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch { const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;opacity:0;top:0"; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok; }
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1900); }
+$("#copyBtn").addEventListener("click", async () => { if (!valid()) return; toast(await copyText(buildText()) ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy"); });
+$("#waBtn").addEventListener("click", () => { if (!valid()) return; window.open("https://wa.me/?text=" + encodeURIComponent(buildText()), "_blank", "noopener"); });
+
+/* ---------- image ---------- */
+const CW = 1080;
+const GROT = '"Space Grotesk", sans-serif', MONO = '"JetBrains Mono", monospace', INTER = 'Inter, sans-serif';
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(ctx, x, y, w, h, r = 28, fill = "rgba(255,255,255,0.045)", stroke = "rgba(255,255,255,0.10)") { rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); }
+function txt(ctx, s, x, y, font, color, align = "left") { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); }
+function fit(ctx, s, weight, fam, size, maxW) { do { ctx.font = `${weight} ${size}px ${fam}`; if (ctx.measureText(s).width <= maxW) break; size -= 2; } while (size > 14); return ctx.font; }
+function clip(ctx, s, maxW) { if (ctx.measureText(s).width <= maxW) return s; while (s.length > 1 && ctx.measureText(s + "…").width > maxW) s = s.slice(0, -1); return s + "…"; }
+function wrapLines(ctx, text, maxW) { const out = []; let line = ""; text.split(/\s+/).forEach(w => { const t = line ? line + " " + w : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; }
+
+async function drawCal() {
+  await Promise.all([`700 80px ${GROT}`, `700 34px ${GROT}`, `600 24px ${MONO}`, `700 20px ${MONO}`, `400 26px ${INTER}`, `600 28px ${INTER}`].map(fn => document.fonts.load(fn).catch(() => {})));
+  const days = byDay(), total = filled().length;
+  const dense = total > 14, rowH = dense ? 66 : 84, headH = 64;
+  const m = document.createElement("canvas").getContext("2d"); m.font = `400 28px ${INTER}`;
+  const note = $("#notes").value.trim();
+  let nLines = note ? wrapLines(m, note, CW - 200) : []; if (nLines.length > 4) { nLines = nLines.slice(0, 4); nLines[3] += "…"; }
+  const notesH = nLines.length ? 52 + nLines.length * 40 + 30 : 0;
+  const listY = 330;
+  const listH = days.reduce((a, g) => a + headH + g.list.length * rowH + 18, 0);
+  const H = listY + listH + (notesH ? notesH + 12 : 0) + 190;
+
+  const c = document.createElement("canvas"); c.width = CW; c.height = H; const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, r, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 650, "rgba(124,92,255,0.32)"); glow(CW - 30, 300, 520, "rgba(254,188,46,0.10)"); glow(CW - 40, H - 60, 620, "rgba(0,224,184,0.12)");
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+  // brand
+  const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
+  rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
+  txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+  // title
+  txt(ctx, "WEEK AHEAD · RESULTS & EVENTS", 70, 205, `600 26px ${MONO}`, "#febc2e");
+  ctx.font = fit(ctx, weekRange(), 700, GROT, 80, CW - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(weekRange(), 70, 290);
+
+  // days
+  let y = listY;
+  const pillW = 190, nameX = 70 + 28 + pillW + 22, right = CW - 70 - 28;
+  days.forEach(gp => {
+    const h = headH + gp.list.length * rowH;
+    panel(ctx, 70, y, CW - 140, h, 24, "rgba(0,0,0,0.40)");
+    rr(ctx, 70, y, CW - 140, headH, 24); ctx.save(); ctx.clip(); ctx.fillStyle = "rgba(255,255,255,0.06)"; ctx.fillRect(70, y, CW - 140, headH); ctx.restore();
+    txt(ctx, fmtD(gp.date, { weekday: "long" }).toUpperCase(), 98, y + 42, `700 24px ${MONO}`, "#eef0f6");
+    txt(ctx, fmtD(gp.date, { day: "numeric", month: "short" }), right, y + 42, `500 24px ${MONO}`, "#8a90a2", "right");
+    gp.list.forEach((e, j) => {
+      const ry = y + headH + j * rowH, T = TYPES[e.t], mid = ry + rowH / 2;
+      if (j) { ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(98, ry); ctx.lineTo(CW - 98, ry); ctx.stroke(); }
+      rr(ctx, 98, mid - 19, pillW, 38, 10); ctx.fillStyle = T.c + "29"; ctx.fill();
+      txt(ctx, T.l.toUpperCase(), 98 + pillW / 2, mid + 7, `700 ${T.l.length > 9 ? 17 : 19}px ${MONO}`, T.c, "center");
+      const name = e.n.trim() || T.l, det = e.x.trim();
+      if (dense || !det) {
+        ctx.font = `700 ${dense ? 28 : 32}px ${GROT}`; const nm = clip(ctx, name, det ? (right - nameX) * .5 : right - nameX);
+        ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(nm, nameX, mid + 10);
+        if (det) { ctx.font = `400 24px ${INTER}`; ctx.fillStyle = "#a9aec0"; ctx.textAlign = "right"; ctx.fillText(clip(ctx, det, right - nameX - ctx.measureText(nm).width - 30), right, mid + 9); }
+      } else {
+        ctx.font = `700 30px ${GROT}`; ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(clip(ctx, name, right - nameX), nameX, mid - 4);
+        ctx.font = `400 23px ${INTER}`; ctx.fillStyle = "#a9aec0"; ctx.fillText(clip(ctx, det, right - nameX), nameX, mid + 26);
+      }
+    });
+    y += h + 18;
+  });
+
+  if (notesH) {
+    panel(ctx, 70, y, CW - 140, notesH, 28, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
+    txt(ctx, "NOTES", 100, y + 48, `600 22px ${MONO}`, "#b6a6ff");
+    nLines.forEach((l, k) => txt(ctx, l, 100, y + 50 + (k + 1) * 40 + 2, `400 28px ${INTER}`, "#d5d8e3"));
+  }
+  txt(ctx, "— MANIMINDSMONEY Community", 70, H - 118, `600 28px ${INTER}`, "#b6a6ff");
+  txt(ctx, TOOL_URL.replace(/\/$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  if ($("#optDisc").checked) txt(ctx, "Not SEBI registered · For information only · Confirm dates with NSE/BSE", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
+  return c;
+}
+$("#imgBtn").addEventListener("click", async e => {
+  if (!valid()) return;
+  const btn = e.currentTarget, label = btn.textContent; btn.disabled = true; btn.textContent = "Creating image…";
+  try {
+    const canvas = await drawCal();
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const name = `week-ahead-${S.week}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+    if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === "AbortError") return; }
+    }
+    let copied = false;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+    const url = URL.createObjectURL(blob);
+    $("#imgPrev").src = url; $("#imgDl").href = url; $("#imgDl").download = name;
+    $("#imgMsg").innerHTML = copied
+      ? "✅ <b>Image copied.</b> Open WhatsApp, pick your community chat and press <b>Ctrl+V</b> to paste it. Or download it below."
+      : "Tap <b>Download</b>, or long-press the image to save or share it on WhatsApp.";
+    $("#imgModal").hidden = false;
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+$("#imgClose").addEventListener("click", () => $("#imgModal").hidden = true);
+$("#imgModal").addEventListener("click", e => { if (e.target.id === "imgModal") $("#imgModal").hidden = true; });
+
+/* ---------- init ---------- */
+drawEvents(); render();
+</script>
+</body>
+</html>

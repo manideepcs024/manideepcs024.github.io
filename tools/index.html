@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Free Trading Tools — MANIMINDSMONEY</title>
+<meta name="description" content="All MANIMINDSMONEY tools in one place: stop-loss and average price calculators, plus daily levels, quiz, IPO, events calendar and message cards for WhatsApp communities." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--a1); top: -25vmax; left: -15vmax; opacity: .24; }
+  .blob.b2 { background: var(--a2); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .14; }
+  .blob.b3 { background: var(--a3); top: 40%; left: 55%; width: 28vmax; height: 28vmax; animation-delay: -12s; opacity: .10; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 34px; gap: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  .eyebrow { font: 600 .74rem "JetBrains Mono"; letter-spacing: .14em; text-transform: uppercase; color: var(--a2); }
+  h1 { font: 700 clamp(2.1rem, 7vw, 3.4rem)/1.02 "Space Grotesk"; letter-spacing: -.04em; margin: 10px 0 12px; }
+  .grad { background: linear-gradient(100deg, var(--a1), #5b8cff 45%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); font-size: 1rem; max-width: 640px; line-height: 1.55; }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 26px 0 8px; }
+  .filters button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--muted); padding: 9px 15px; border-radius: 999px; font: 600 .84rem Inter; cursor: pointer; transition: color .2s, background .2s, border-color .2s; }
+  .filters button:hover { color: var(--fg); }
+  .filters button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .filters button b { font: 600 .72rem "JetBrains Mono"; opacity: .6; margin-left: 4px; }
+
+  .group { margin-top: 26px; }
+  .group h2 { font: 700 1.25rem "Space Grotesk"; display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .group h2 span { font: .74rem "JetBrains Mono"; color: var(--muted); font-weight: 500; }
+  .group p { color: var(--muted); font-size: .88rem; margin-bottom: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+
+  .tool { position: relative; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 22px; backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); transition: transform .25s cubic-bezier(.2,.8,.2,1), border-color .25s, box-shadow .25s; overflow: hidden; animation: pop .45s cubic-bezier(.2,.8,.2,1) backwards; }
+  @keyframes pop { from { opacity: 0; transform: translateY(12px); } }
+  .tool::before { content: ""; position: absolute; inset: 0; background: radial-gradient(400px circle at 0 0, var(--c), transparent 60%); opacity: .12; transition: opacity .3s; pointer-events: none; }
+  .tool:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.2); box-shadow: 0 24px 60px -30px var(--c); }
+  .tool:hover::before { opacity: .22; }
+  .tool .top { display: flex; align-items: center; justify-content: space-between; }
+  .ico { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.35rem; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+  .badge { font: 600 .66rem "JetBrains Mono"; letter-spacing: .06em; padding: 4px 9px; border-radius: 999px; color: var(--up); background: rgba(34,211,154,.1); border: 1px solid rgba(34,211,154,.35); }
+  .badge.new { color: var(--warn); background: rgba(254,188,46,.08); border-color: rgba(254,188,46,.4); }
+  .tool h3 { font: 700 1.2rem "Space Grotesk"; letter-spacing: -.01em; }
+  .tool .desc { color: #b4b9c8; font-size: .88rem; line-height: 1.5; flex: 1; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chips span { font: 500 .7rem "JetBrains Mono"; color: var(--muted); padding: 4px 8px; border-radius: 999px; border: 1px solid var(--line); }
+  .open { font: 600 .86rem Inter; color: var(--fg); display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .open i { font-style: normal; transition: transform .25s; }
+  .tool:hover .open i { transform: translate(3px, -3px); }
+
+  .disclaimer { margin: 34px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <span class="eyebrow">Free · No sign-up · Works on mobile</span>
+    <h1>Every tool, <span class="grad">one place.</span></h1>
+    <p class="sub">Calculators that help you size and manage trades, plus the cards I use to run the MANIMINDSMONEY WhatsApp community. Each one shares as text or an image in one tap.</p>
+
+    <div class="filters" id="filters"></div>
+    <div id="groups"></div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. These tools do calculations on the numbers you enter and help you format content, for <b>educational purposes only</b>. Nothing here is investment advice or a recommendation to buy or sell any security. Trading involves risk, including loss of capital.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script>
+/* Add new tools here: this list drives the whole page. */
+const GROUPS = {
+  calc: { name: "Calculators", blurb: "Do the maths before you place the trade." },
+  card: { name: "Community cards", blurb: "Ready-to-post updates for WhatsApp groups and communities." },
+};
+const TOOLS = [
+  { href: "../sl-calculator/", g: "calc", ico: "🎯", c: "#7c5cff", name: "Stop-Loss Position Size", desc: "Tell it how much you can lose, the price and your stop-loss. It tells you how many shares to buy, the capital needed and 1:1 to 1:3 targets. Includes a Real Return tab versus FD or index funds.", tags: ["Risk", "Position size", "Targets"] },
+  { href: "../average/", g: "calc", ico: "🧮", c: "#00e0b8", name: "Average Price Calculator", desc: "Add every buy to get your average price, total shares and P&L. Or set a target average to see how many shares to buy to reach it.", tags: ["Averaging", "Break-even", "P&L"] },
+  { href: "../levels/", g: "card", ico: "📊", c: "#22d39a", name: "Daily Levels Card", desc: "Previous day's high, low and close in, then Classic or Fibonacci pivots, support, resistance and CPR out, for up to 3 indices or stocks.", tags: ["Pivots", "CPR", "Morning post"] },
+  { href: "../calendar/", g: "card", ico: "📅", c: "#febc2e", name: "Results & Events Calendar", desc: "The week ahead in one card: quarterly results, dividends, bonus and splits, IPOs, RBI or Fed meetings, expiry and market holidays.", tags: ["Earnings", "Corporate actions", "Weekly post"], fresh: true },
+  { href: "../ipo/", g: "card", ico: "🚀", c: "#ff4d8d", name: "IPO Share Card", desc: "SME or Mainboard, money required, shareholder quota, allotment and profit chances, as a neat message or picture.", tags: ["IPO", "Allotment"] },
+  { href: "../quiz/", g: "card", ico: "🧠", c: "#b18cff", name: "Quiz Card", desc: "Post a question today and the answer reveal tomorrow. Comes with a built-in bank of questions on candles, patterns, indicators and risk.", tags: ["Learning", "Engagement"] },
+  { href: "../message/", g: "card", ico: "💬", c: "#5b8cff", name: "Community Message Card", desc: "Market updates, alerts, news and lessons from ready templates, with WhatsApp formatting, as text or a branded image.", tags: ["Templates", "Announcements"] },
+];
+
+const $ = s => document.querySelector(s);
+let filter = "all";
+function drawFilters() {
+  const opts = [["all", "All", TOOLS.length], ...Object.entries(GROUPS).map(([k, g]) => [k, g.name, TOOLS.filter(t => t.g === k).length])];
+  $("#filters").innerHTML = opts.map(([k, n, c]) => `<button data-f="${k}" class="${k === filter ? "on" : ""}">${n}<b>${c}</b></button>`).join("");
+}
+function drawTools() {
+  let i = 0;
+  $("#groups").innerHTML = Object.entries(GROUPS).filter(([k]) => filter === "all" || filter === k).map(([k, g]) => {
+    const list = TOOLS.filter(t => t.g === k);
+    return `<section class="group"><h2>${g.name}<span>${list.length} tools</span></h2><p>${g.blurb}</p><div class="grid">${list.map(t => `
+      <a class="tool" href="${t.href}" style="--c:${t.c};animation-delay:${i++ * 50}ms">
+        <div class="top"><span class="ico">${t.ico}</span><span class="badge${t.fresh ? " new" : ""}">${t.fresh ? "NEW" : "LIVE"}</span></div>
+        <h3>${t.name}</h3>
+        <div class="desc">${t.desc}</div>
+        <div class="chips">${t.tags.map(x => `<span>${x}</span>`).join("")}</div>
+        <span class="open">Open tool <i>↗</i></span>
+      </a>`).join("")}</div></section>`;
+  }).join("");
+}
+$("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; filter = b.dataset.f; drawFilters(); drawTools(); });
+drawFilters(); drawTools();
+</script>
+</body>
+</html>
