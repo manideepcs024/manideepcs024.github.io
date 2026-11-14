@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Term of the Day Card — MANIMINDSMONEY</title>
+<meta name="description" content="Post a market term of the day to your community: simple meaning, an example and a common mistake, from a built-in glossary of 100+ stock market terms. Share as text or an image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --gl: #5ec8ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--a1); top: -25vmax; left: -15vmax; opacity: .22; }
+  .blob.b2 { background: var(--gl); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .13; }
+  .blob.b3 { background: var(--a2); top: 35%; left: 50%; width: 30vmax; height: 30vmax; animation-delay: -12s; opacity: .10; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  h1 { font: 700 clamp(1.9rem, 6vw, 2.8rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--gl), var(--a2) 45%, var(--a1)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 22px; font-size: .95rem; max-width: 680px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .layout > * { min-width: 0; }
+  @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(18px, 4.5vw, 28px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); }
+  .sticky { position: sticky; top: 16px; }
+  @media (max-width: 920px) { .sticky { position: static; } }
+
+  .q { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 600 .74rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--a2); margin: 18px 0 8px; }
+  .q .opt { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; font-family: Inter; }
+
+  /* bank */
+  .bank { padding: 14px; border-radius: 18px; border: 1px dashed rgba(94,200,255,.45); background: rgba(94,200,255,.06); }
+  .bank-top { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+  .bank p { font-size: .84rem; color: #cfe6f5; }
+  .bank p b { color: var(--gl); }
+  .roll { border: 0; border-radius: 14px; padding: 12px 16px; font: 700 .92rem Inter; cursor: pointer; color: #001826; background: linear-gradient(100deg, #a6e3ff, var(--gl)); white-space: nowrap; }
+  .roll:active { transform: scale(.97); }
+  .bank-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-top: 10px; }
+  .bank select, .bank input { width: 100%; background: rgba(0,0,0,.35); border: 1px solid var(--line); color: var(--fg); border-radius: 12px; padding: 10px 12px; font: 500 .86rem Inter; color-scheme: dark; outline: 0; min-width: 0; }
+  .bank input:focus, .bank select:focus { border-color: var(--gl); }
+  .terms { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; max-height: 148px; overflow: auto; padding-right: 2px; }
+  .terms button { border: 1px solid var(--line); background: rgba(0,0,0,.25); color: #c9d2de; padding: 6px 10px; border-radius: 999px; font: 500 .76rem Inter; cursor: pointer; }
+  .terms button:hover { color: var(--fg); border-color: rgba(94,200,255,.5); }
+  .terms button.done { color: #6e7588; text-decoration: line-through; text-decoration-color: rgba(255,255,255,.25); }
+  .terms button.cur { background: var(--gl); color: #001826; border-color: var(--gl); text-decoration: none; }
+  .terms .none { font-size: .8rem; color: var(--muted); padding: 6px 2px; }
+  .bank-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font: .74rem "JetBrains Mono"; color: var(--muted); }
+  .bank-foot button { background: none; border: 0; color: var(--muted); font: .74rem "JetBrains Mono"; text-decoration: underline; cursor: pointer; }
+  .bar { height: 4px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; flex: 1; max-width: 160px; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gl), var(--a2)); transition: width .4s; }
+
+  .row2 { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; }
+  .field { display: flex; align-items: center; gap: 8px; padding: 2px 14px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; min-width: 0; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err, textarea.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 .9rem "JetBrains Mono"; color: var(--muted); }
+  .field input, .field select { width: 100%; flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 600 1rem Inter; padding: 11px 0; color-scheme: dark; }
+  .field select option { background: #12141e; }
+  .field input::placeholder { color: #4a5064; font-weight: 500; }
+  #term { font-family: "Space Grotesk"; font-weight: 700; font-size: 1.1rem; }
+  textarea { width: 100%; resize: vertical; min-height: 78px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); border-radius: 16px; color: var(--fg); font: 400 .95rem/1.5 Inter, sans-serif; padding: 12px 14px; outline: 0; }
+  textarea:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  textarea::placeholder, .field input::placeholder { color: #4a5064; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,.28); border: 1px solid var(--line); font-size: .9rem; cursor: pointer; margin-top: 14px; }
+  .toggle small { display: block; color: var(--muted); font-size: .74rem; }
+  .toggle input { display: none; }
+  .sw { flex: none; width: 44px; height: 26px; border-radius: 13px; background: rgba(255,255,255,.12); position: relative; transition: background .25s; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  .toggle input:checked + .sw { background: var(--a2); }
+  .toggle input:checked + .sw::after { transform: translateX(18px); }
+
+  /* preview */
+  .res-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+  .res-head h2 { font: 700 1.1rem "Space Grotesk"; }
+  .res-head span { font: .72rem "JetBrains Mono"; color: var(--muted); }
+  .chat { border-radius: 20px; padding: 18px 14px; background: #0b141a url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='2' cy='2' r='1' fill='%23ffffff10'/></svg>"); border: 1px solid var(--line); max-height: 540px; overflow: auto; }
+  .bubble { position: relative; margin-left: auto; max-width: 94%; background: #005c4b; color: #e9edef; border-radius: 12px 0 12px 12px; padding: 10px 12px 20px; font: 400 .9rem/1.45 Inter, sans-serif; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,.3); white-space: pre-wrap; }
+  .bubble::after { content: ""; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: #005c4b; border-left-color: #005c4b; }
+  .bubble .time { position: absolute; right: 10px; bottom: 4px; font-size: .66rem; color: #ffffff99; }
+  .empty { color: #8696a0; font-style: italic; }
+
+  .share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 16px; font: 600 .98rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.img { grid-column: 1 / -1; background: linear-gradient(100deg, rgba(124,92,255,.22), rgba(0,224,184,.16)); border: 1px solid rgba(124,92,255,.5); font-weight: 700; }
+  .btn.img[disabled] { opacity: .6; pointer-events: none; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; font-weight: 700; }
+  .btn.wa svg { width: 18px; height: 18px; }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+  .btn.ghost { grid-column: 1 / -1; font-size: .88rem; padding: 12px; border-color: rgba(94,200,255,.4); color: var(--gl); background: rgba(94,200,255,.06); }
+  .tip { margin-top: 12px; font-size: .78rem; color: var(--muted); line-height: 1.5; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid var(--line); }
+  .tip b { color: #cfd3df; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 140px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 30; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); }
+  .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .modal[hidden] { display: none; }
+  .modal-card { width: 100%; max-width: 440px; max-height: 100%; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px; }
+  .modal-card img { display: block; max-width: 100%; max-height: min(62vh, 560px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); }
+  .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
+  .modal-card .row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 14px; }
+  .disclaimer { margin: 26px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>One term a day, <span class="grad">explained simply.</span></h1>
+    <p class="sub">Pick a market term from the built-in glossary or write your own. Each card has a simple meaning, an example and a common mistake, so your community learns something useful every day.</p>
+
+    <div class="layout">
+      <!-- EDITOR -->
+      <section class="card">
+        <div class="bank">
+          <div class="bank-top">
+            <p><b>Glossary bank:</b> <span id="bankCount"></span> ready terms. Random skips the ones you've already posted.</p>
+            <button class="roll" id="rollBtn">🎲 Random</button>
+          </div>
+          <div class="bank-tools">
+            <select id="bankCat" aria-label="Glossary category"></select>
+            <input id="search" type="search" placeholder="🔍 Search a term" autocomplete="off" />
+          </div>
+          <div class="terms" id="terms"></div>
+          <div class="bank-foot"><span id="postedLbl"></span><span class="bar"><i id="postedBar"></i></span><button id="resetPosted">reset</button></div>
+        </div>
+
+        <div class="row2" style="margin-top:6px">
+          <div><div class="q">Day #</div><label class="field"><span class="unit">#</span><input id="num" type="text" inputmode="numeric" maxlength="4" placeholder="1" /></label></div>
+          <div><div class="q">Category</div><label class="field"><select id="cat"></select></label></div>
+        </div>
+
+        <div class="q"><label for="term">Term</label></div>
+        <label class="field"><input id="term" type="text" maxlength="40" placeholder="e.g. Ex-dividend date" autocomplete="off" /></label>
+
+        <div class="q"><label for="meaning">💡 Simple meaning</label><span class="opt"><span id="mCount">0</span>/280</span></div>
+        <textarea id="meaning" maxlength="280" placeholder="Explain it the way you'd explain it to a friend, in 1–2 lines."></textarea>
+
+        <div class="q"><label for="example">🧾 Example</label><span class="opt">optional</span></div>
+        <textarea id="example" maxlength="260" placeholder="A quick example with numbers."></textarea>
+
+        <div class="q"><label for="watch">⚠️ Watch out</label><span class="opt">optional · common mistake</span></div>
+        <textarea id="watch" maxlength="220" placeholder="What do beginners get wrong about this?"></textarea>
+
+        <div class="q"><label for="related">🔗 Related terms</label><span class="opt">optional</span></div>
+        <label class="field"><input id="related" type="text" maxlength="80" placeholder="e.g. Record date, Dividend yield" autocomplete="off" /></label>
+
+        <label class="toggle"><span>Add disclaimer<small>Educational purpose only · not investment advice</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
+      </section>
+
+      <!-- PREVIEW -->
+      <section class="card sticky">
+        <div class="res-head"><h2>Preview</h2><span id="resMeta">WhatsApp message</span></div>
+        <div class="chat"><div class="bubble" id="bubble"></div></div>
+
+        <div class="share-row">
+          <button class="btn img" id="imgBtn">📸 Share as image</button>
+          <button class="btn" id="copyBtn">📋 Copy text</button>
+          <button class="btn wa" id="waBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg> WhatsApp</button>
+          <button class="btn ghost" id="nextBtn">✅ Mark as posted &amp; load next term</button>
+        </div>
+        <div class="tip"><b>Tip:</b> after you post, tap <b>Mark as posted</b>. The day number goes up, the term is crossed out in the bank, and a new random term you haven't posted yet is loaded. Pair it with the <a href="../quiz/" style="color:inherit">quiz card</a> a few days later to check what people remember.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. Glossary terms, examples and explanations are simplified for <b>learning and educational purposes only</b>. Examples use made-up or illustrative numbers. Rules, rates and limits set by SEBI, the exchanges or the government can change, so always check the latest. Nothing here is investment advice.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+  <div class="toast" id="toast">Copied ✓</div>
+  <div class="modal" id="imgModal" hidden>
+    <div class="modal-card">
+      <img id="imgPrev" alt="Term of the day snapshot" />
+      <p id="imgMsg"></p>
+      <div class="row">
+        <a class="btn" id="imgDl" download="term-of-the-day.png">⬇ Download</a>
+        <button class="btn primary" id="imgClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const CATS = {
+  "Basics": "#7c5cff", "Orders & trading": "#5b8cff", "Technical analysis": "#22d39a", "F&O": "#ff9a5c",
+  "IPO": "#ff4d8d", "Corporate actions": "#00e0b8", "Fundamentals": "#febc2e", "Investing": "#5ec8ff", "Taxes & charges": "#ff5470",
+};
+
+/* ---------- glossary bank: t term · c category · m meaning · e example · w watch out · r related ---------- */
+const BANK = [
+  // Basics
+  { c: "Basics", t: "Bull market", m: "A long period when prices rise across most of the market and investors are optimistic. Often defined as a rise of 20% or more from a recent low.", e: "Nifty climbs month after month and most stocks keep making higher highs.", w: "Rising markets make everyone feel like an expert. Keep your position sizes and stop-losses the same.", r: "Bear market, Correction" },
+  { c: "Basics", t: "Bear market", m: "A long period of falling prices and pessimism, often defined as a fall of 20% or more from a recent high.", e: "An index falls from 20,000 to 15,500 over several months.", w: "Bear markets have sharp rallies that fade quickly. Don't assume every bounce is the bottom.", r: "Bull market, Correction" },
+  { c: "Basics", t: "Correction", m: "A fall of roughly 10–20% from a recent high, usually inside a bigger uptrend.", e: "A stock in an uptrend drops from ₹1,000 to ₹870 before resuming its rise.", w: "Corrections are normal and healthy. Panic-selling every dip locks in losses.", r: "Bull market, Support" },
+  { c: "Basics", t: "Market capitalisation", m: "The total market value of a company: share price × total number of shares.", e: "100 crore shares × ₹500 = ₹50,000 crore market cap.", w: "A low share price doesn't make a stock cheap. Compare market cap and earnings, not price per share.", r: "Large cap, P/E ratio" },
+  { c: "Basics", t: "Large, mid and small cap", m: "SEBI's size groups by market cap: the top 100 companies are large cap, 101–250 are mid cap, and 251 onward are small cap.", e: "A company ranked 180th by market cap is a mid cap.", w: "Small caps can rise faster but also fall much harder and are harder to sell in a panic.", r: "Market capitalisation, Liquidity" },
+  { c: "Basics", t: "Blue-chip stock", m: "Shares of a large, well-established company with strong finances and a long track record.", e: "Market leaders in banking, IT or consumer goods that have been profitable for decades.", w: "Blue-chip doesn't mean risk-free. Even big companies can fall 40–50% in bad times.", r: "Large cap, Diversification" },
+  { c: "Basics", t: "Penny stock", m: "A very low-priced share, usually of a tiny company with little trading volume.", e: "A ₹3 stock trading only a few thousand shares a day.", w: "Easy to manipulate. 'Operator tips' and pump-and-dump schemes often target penny stocks.", r: "Liquidity, Circuit limit" },
+  { c: "Basics", t: "Index", m: "A basket of stocks that tracks a part of the market. Nifty 50 tracks 50 large NSE companies; Sensex tracks 30 large BSE companies.", e: "'Nifty up 1%' means the weighted value of those 50 stocks rose 1%.", w: "The index can rise while many of your stocks fall, because a few heavyweights move it the most.", r: "Index fund, Market capitalisation" },
+  { c: "Basics", t: "Liquidity", m: "How easily you can buy or sell a stock quickly without moving its price much.", e: "A large cap trades crores of shares a day; a tiny small cap may trade only a few thousand.", w: "In illiquid stocks you may not be able to exit when you want, especially in a lower circuit.", r: "Bid-ask spread, Volume" },
+  { c: "Basics", t: "Bid-ask spread", m: "The gap between the highest price a buyer will pay (bid) and the lowest price a seller will accept (ask).", e: "Bid ₹100.00, ask ₹100.20: the spread is ₹0.20.", w: "Wide spreads are a hidden cost, especially with market orders in illiquid stocks or options.", r: "Liquidity, Market order" },
+  { c: "Basics", t: "Volatility", m: "How much and how quickly a price moves up and down.", e: "A stock that swings 4% a day is more volatile than one that moves 0.5%.", w: "Higher volatility needs a wider stop-loss, so you should buy fewer shares for the same risk.", r: "ATR, India VIX" },
+  { c: "Basics", t: "Demat account", m: "An account that holds your shares electronically. You place orders through a trading account; the shares sit in your demat account.", e: "You buy 10 shares; after settlement they appear in your demat account with CDSL or NSDL.", w: "Never share your login, TPIN or OTP. Nobody genuine needs them.", r: "T+1 settlement, DP charges" },
+  { c: "Basics", t: "T+1 settlement", m: "Trades on Indian exchanges settle one working day after the trade date.", e: "Buy on Monday and the shares reach your demat account on Tuesday.", w: "Selling shares before they reach your demat (BTST) carries a small risk if the seller fails to deliver.", r: "BTST, Demat account" },
+  { c: "Basics", t: "Circuit limit", m: "The most a stock is allowed to move in one day, such as 2%, 5%, 10% or 20%. At the limit, trading continues only on one side.", e: "A ₹100 stock in a 5% band can't trade above ₹105 or below ₹95 that day.", w: "In a lower circuit there may be no buyers at all, so you can't exit. Avoid big positions in stocks that hit circuits often.", r: "Liquidity, Penny stock" },
+
+  // Orders & trading
+  { c: "Orders & trading", t: "Market order", m: "An order to buy or sell immediately at the best price available right now.", e: "You place a market buy when the ask is ₹250, and it fills at ₹250.05.", w: "In fast or thin markets the fill can be much worse than the price you saw.", r: "Limit order, Slippage" },
+  { c: "Orders & trading", t: "Limit order", m: "An order to buy or sell only at your chosen price or better.", e: "A limit buy at ₹500 when the stock is ₹505 fills only if it comes down to ₹500 or lower.", w: "Your order may never fill if the price doesn't reach it.", r: "Market order, Stop-loss order" },
+  { c: "Orders & trading", t: "Stop-loss order", m: "An order that triggers automatically when price hits your trigger level, to limit a loss.", e: "Bought at ₹500, stop-loss trigger at ₹480: if price falls to ₹480, the sell order is sent.", w: "In a gap down your stop may fill far below the trigger, or a stop-limit may not fill at all.", r: "Trailing stop-loss, Position sizing" },
+  { c: "Orders & trading", t: "Intraday trading", m: "Buying and selling within the same day. Positions must be closed before the market shuts, or the broker squares them off.", e: "Buy at 10 AM at ₹200, sell at 2 PM at ₹204.", w: "Brokers give leverage for intraday, which makes losses grow just as fast as profits.", r: "Leverage, Delivery" },
+  { c: "Orders & trading", t: "Delivery", m: "Buying shares and holding them in your demat account beyond the day, for as long as you like.", e: "You buy 20 shares today and hold them for two years.", w: "No leverage means no forced exit, but a bad stock can still keep falling. Review your holdings.", r: "Intraday trading, Demat account" },
+  { c: "Orders & trading", t: "BTST", m: "Buy Today, Sell Tomorrow: selling shares the next day before they reach your demat account.", e: "Buy on Monday, sell on Tuesday morning before settlement.", w: "If the shares you bought aren't delivered, your sale fails too and you may face an auction penalty.", r: "T+1 settlement, Delivery" },
+  { c: "Orders & trading", t: "Short selling", m: "Selling first and buying back later, hoping to profit from a fall. In India's cash market, retail short sales must be closed the same day.", e: "Sell at ₹300, buy back at ₹290: ₹10 profit per share.", w: "Losses on a short have no upper limit if the price keeps rising. Always use a stop-loss.", r: "Futures contract, Intraday trading" },
+  { c: "Orders & trading", t: "Slippage", m: "The difference between the price you expected and the price you actually got.", e: "Your stop triggers at ₹480 but the sale fills at ₹476: ₹4 of slippage.", w: "Slippage adds up. Include it, along with charges, when you judge whether a strategy works.", r: "Market order, Liquidity" },
+  { c: "Orders & trading", t: "Position sizing", m: "Deciding how many shares to buy based on how much you're willing to lose, not on how confident you feel.", e: "Risk ₹2,000 with a stop-loss ₹10 below entry → buy 200 shares.", w: "Most blow-ups come from one oversized position, not from a bad strategy.", r: "Stop-loss order, Risk-reward ratio" },
+  { c: "Orders & trading", t: "Risk-reward ratio", m: "How much you could gain compared with how much you could lose on a trade.", e: "Entry ₹100, stop-loss ₹95, target ₹115: risk ₹5 to make ₹15, so 1:3.", w: "A great ratio means nothing if the target is unrealistic. Win rate matters too.", r: "Position sizing, Target" },
+  { c: "Orders & trading", t: "Trailing stop-loss", m: "A stop-loss you move up as the price moves in your favour, to lock in profit.", e: "Bought at ₹100 with SL ₹95. Price reaches ₹120, so you raise the SL to ₹112.", w: "Trailing too tightly gets you stopped out by normal noise.", r: "Stop-loss order, ATR" },
+  { c: "Orders & trading", t: "Averaging down", m: "Buying more of a stock after it falls, to lower your average buy price.", e: "100 shares at ₹800 plus 100 more at ₹600 gives an average of ₹700.", w: "It puts more money into a falling stock. Only do it if you'd buy the stock fresh today.", r: "Average price, Stop-loss order" },
+  { c: "Orders & trading", t: "Gap up / gap down", m: "When a stock opens noticeably above (gap up) or below (gap down) the previous day's close.", e: "Closes at ₹500, opens at ₹530 after strong results: a gap up.", w: "Stop-losses can't protect you overnight. A gap down can open far below your stop.", r: "Stop-loss order, Slippage" },
+  { c: "Orders & trading", t: "Margin", m: "The money you must keep with your broker to hold a leveraged position, especially in futures and options.", e: "A futures position worth ₹10 lakh may need around ₹1.5 lakh of margin.", w: "If losses eat into your margin, you must add money or the broker closes your position.", r: "Leverage, Futures contract" },
+  { c: "Orders & trading", t: "Leverage", m: "Controlling a position bigger than your own capital by using borrowed money or margin.", e: "₹1 lakh controls a ₹5 lakh position: a 2% move becomes 10% of your capital.", w: "Leverage multiplies losses just as much as profits.", r: "Margin, Intraday trading" },
+
+  // Technical analysis
+  { c: "Technical analysis", t: "Support", m: "A price level where buying has tended to stop a fall.", e: "A stock bounced from ₹450 three times in the past two months.", w: "Support isn't a guarantee. Once it breaks, it often turns into resistance.", r: "Resistance, Breakout" },
+  { c: "Technical analysis", t: "Resistance", m: "A price level where selling has tended to stop a rise.", e: "A stock has failed to go above ₹620 four times.", w: "The more obvious a level is, the more likely you'll see false moves around it.", r: "Support, Breakout" },
+  { c: "Technical analysis", t: "Breakout", m: "When price moves decisively above resistance (or below support), ideally with strong volume.", e: "After weeks under ₹620, the stock closes at ₹640 on twice its usual volume.", w: "Many breakouts fail. Waiting for a close above the level filters some false ones.", r: "Resistance, Volume" },
+  { c: "Technical analysis", t: "Trend", m: "The overall direction of price. An uptrend makes higher highs and higher lows; a downtrend makes lower highs and lower lows.", e: "Highs of 100, 110, 120 and lows of 90, 98, 105: an uptrend.", w: "Buying a stock just because it 'fell a lot' is fighting the trend.", r: "Moving average, Support" },
+  { c: "Technical analysis", t: "Moving average", m: "The average closing price over a set number of days, plotted as a line to smooth out the noise. EMA gives more weight to recent days than SMA.", e: "The 50-day average of a stock is ₹480 while it trades at ₹520.", w: "Moving averages lag. They confirm trends; they don't predict them.", r: "Golden cross, Trend" },
+  { c: "Technical analysis", t: "Golden cross", m: "When the 50-day moving average crosses above the 200-day moving average, often read as a bullish sign. The opposite is a death cross.", e: "The 50-DMA rises from ₹470 to ₹505 and crosses the 200-DMA at ₹500.", w: "It comes late, often after a big part of the move has already happened.", r: "Moving average, Death cross" },
+  { c: "Technical analysis", t: "RSI", m: "Relative Strength Index: a 0–100 momentum indicator. Above 70 is called overbought, below 30 oversold.", e: "After a 6-day rally, RSI(14) reads 78.", w: "Strong stocks can stay 'overbought' for weeks. RSI alone isn't a sell signal.", r: "Divergence, MACD" },
+  { c: "Technical analysis", t: "MACD", m: "A momentum indicator: the 12-day EMA minus the 26-day EMA, with a 9-day signal line. A cross above the signal line is read as bullish.", e: "MACD crosses above its signal line as a stock turns up from a low.", w: "It gives many false signals in sideways markets.", r: "Moving average, RSI" },
+  { c: "Technical analysis", t: "VWAP", m: "Volume-Weighted Average Price: the average price of the day weighted by volume. Intraday traders use it as a fair-value line.", e: "A stock trading above VWAP all morning shows buyers are in control.", w: "VWAP resets every day, so it's mainly an intraday tool.", r: "Volume, Intraday trading" },
+  { c: "Technical analysis", t: "Bollinger Bands", m: "A 20-day moving average with bands 2 standard deviations above and below it. Bands widen when volatility rises.", e: "The bands squeeze tight for two weeks, then price breaks out sharply.", w: "Touching the upper band isn't automatically a sell. In strong trends price 'walks the band'.", r: "Volatility, Moving average" },
+  { c: "Technical analysis", t: "ATR", m: "Average True Range: the average daily price range over a period (usually 14 days). It measures volatility in rupees.", e: "ATR of ₹12 means the stock typically moves about ₹12 a day.", w: "A stop-loss tighter than one ATR is often hit by normal daily noise.", r: "Volatility, Trailing stop-loss" },
+  { c: "Technical analysis", t: "Volume", m: "The number of shares traded in a period. It shows how much participation is behind a move.", e: "A stock usually trades 5 lakh shares but traded 25 lakh on breakout day.", w: "Price moves on very low volume are less reliable.", r: "Breakout, Liquidity" },
+  { c: "Technical analysis", t: "Pivot point", m: "A level calculated from the previous day's high, low and close: (H + L + C) ÷ 3. Support and resistance levels are built around it.", e: "H 24,600, L 24,380, C 24,500 → pivot ≈ 24,493.", w: "Pivots are reference levels, not predictions. Use them with price action.", r: "CPR, Support" },
+  { c: "Technical analysis", t: "CPR", m: "Central Pivot Range: three levels (pivot, top and bottom central) from yesterday's prices. Bottom = (H + L) ÷ 2; top = 2 × pivot − bottom.", e: "A CPR only 0.1% wide is called a narrow CPR.", w: "'Narrow CPR means a trending day' is a tendency, not a rule.", r: "Pivot point, VWAP" },
+  { c: "Technical analysis", t: "Candlestick", m: "A chart bar showing open, high, low and close. The body spans open to close; the wicks show the high and low.", e: "A green candle: opened ₹100, closed ₹106, high ₹108, low ₹99.", w: "One candle means little on its own. Context (trend, level, volume) matters.", r: "Doji, Hammer" },
+  { c: "Technical analysis", t: "Doji", m: "A candle where the open and close are almost equal, showing indecision between buyers and sellers.", e: "Opens ₹250, trades between ₹244 and ₹257, closes ₹250.20.", w: "A doji is a pause, not a reversal signal by itself. Wait for the next candle.", r: "Candlestick, Hammer" },
+  { c: "Technical analysis", t: "Hammer", m: "A candle with a small body near the top and a long lower wick, after a fall. It shows sellers pushed down but buyers pushed back.", e: "After a 5-day fall, a stock dips to ₹180 intraday but closes at ₹196.", w: "It needs confirmation, like a strong next day, and works best at support.", r: "Candlestick, Support" },
+  { c: "Technical analysis", t: "Engulfing pattern", m: "A two-candle pattern where the second candle's body fully covers the first one's body. Bullish engulfing appears after a fall.", e: "A small red candle followed by a big green candle that opens lower and closes above the red candle's open.", w: "Engulfing candles in the middle of a range mean much less than at key levels.", r: "Candlestick, Support" },
+  { c: "Technical analysis", t: "Divergence", m: "When price and an indicator disagree, such as price making a higher high while RSI makes a lower high. It can warn that momentum is fading.", e: "A stock hits a new high at ₹540 but RSI peaks lower than at the ₹520 high.", w: "Divergence can last a long time before price reacts, or never lead to a reversal.", r: "RSI, MACD" },
+  { c: "Technical analysis", t: "Fibonacci retracement", m: "Levels at 38.2%, 50% and 61.8% of a previous move, where traders watch for a pullback to end.", e: "A stock rises ₹100 → ₹200. The 61.8% retracement is at ₹138.", w: "With many levels to choose from, it's easy to 'see' them after the fact.", r: "Support, Trend" },
+  { c: "Technical analysis", t: "Double top", m: "A bearish pattern where price fails twice at about the same high. It's confirmed when price breaks below the low between the two tops.", e: "Peaks at ₹720 and ₹718 with a ₹660 dip between; a close below ₹660 confirms it.", w: "Until the neckline breaks, it's just two highs, not a pattern.", r: "Resistance, Head and shoulders" },
+  { c: "Technical analysis", t: "Head and shoulders", m: "A reversal pattern with three peaks, the middle one highest. A break below the 'neckline' joining the dips confirms it.", e: "Peaks at ₹480, ₹520 and ₹482 with a neckline near ₹450.", w: "Many failed head-and-shoulders patterns turn into strong rallies. Wait for the break.", r: "Double top, Breakout" },
+
+  // F&O
+  { c: "F&O", t: "Futures contract", m: "An agreement to buy or sell an asset at a set price on a future date. You put up margin instead of the full value.", e: "One Nifty futures lot moves by lot size × points, so a 100-point move changes P&L by 100 × lot size.", w: "Futures are leveraged. A small move against you can wipe out your margin.", r: "Margin, Lot size" },
+  { c: "F&O", t: "Call option", m: "The right, but not the obligation, to buy at a fixed price (strike) before expiry. Buyers profit if the price rises above the strike plus the premium.", e: "Buy a 24,500 call for ₹120. At expiry Nifty is 24,800: the call is worth ₹300.", w: "Most options that are far from the price expire worthless. Time works against buyers.", r: "Put option, Premium" },
+  { c: "F&O", t: "Put option", m: "The right, but not the obligation, to sell at a fixed price (strike) before expiry. Buyers profit if the price falls below the strike minus the premium.", e: "Buy a 24,500 put for ₹100. At expiry Nifty is 24,200: the put is worth ₹300.", w: "Puts can protect a portfolio, but that protection costs premium every time.", r: "Call option, Hedging" },
+  { c: "F&O", t: "Strike price", m: "The fixed price at which an option lets you buy (call) or sell (put).", e: "Nifty 24,500 CE: 24,500 is the strike.", w: "Cheap, far-away strikes look tempting but rarely pay off.", r: "ITM / ATM / OTM, Premium" },
+  { c: "F&O", t: "Premium", m: "The price of an option: what the buyer pays and the seller receives.", e: "A call trading at ₹85 × lot size is the total you pay for one lot.", w: "Premium includes time value, which shrinks every day toward zero at expiry.", r: "Theta, Implied volatility" },
+  { c: "F&O", t: "Lot size", m: "The fixed number of units in one F&O contract. You can only trade in multiples of a lot.", e: "If the lot size is 75, a ₹10 move is ₹750 profit or loss per lot.", w: "Exchanges revise lot sizes from time to time. Check before you trade.", r: "Futures contract, Margin" },
+  { c: "F&O", t: "Expiry", m: "The last day an F&O contract trades. After that it settles and stops existing.", e: "A weekly index option expires on its set weekday; monthly ones on the last such day of the month.", w: "Expiry days are very volatile and option prices can collapse to zero within hours.", r: "Theta, Premium" },
+  { c: "F&O", t: "ITM / ATM / OTM", m: "In the money (has value if exercised now), at the money (strike ≈ current price), out of the money (no value if exercised now).", e: "Nifty at 24,500: the 24,300 call is ITM, the 24,500 call is ATM, the 24,800 call is OTM.", w: "OTM options are cheap for a reason: they need a big move just to break even.", r: "Strike price, Delta" },
+  { c: "F&O", t: "Open interest", m: "The number of F&O contracts that are open (not yet closed or settled).", e: "OI in the 25,000 call rises sharply: many new positions are being opened there.", w: "OI shows activity, not direction. Every contract has a buyer and a seller.", r: "PCR, Option writing" },
+  { c: "F&O", t: "PCR", m: "Put-Call Ratio: total put open interest divided by total call open interest.", e: "Put OI 1.2 crore ÷ call OI 1 crore = PCR 1.2.", w: "Traders read PCR differently, and extremes are often treated as contrarian. Don't trade on it alone.", r: "Open interest, Put option" },
+  { c: "F&O", t: "Theta", m: "How much an option's premium loses each day just from time passing, all else equal.", e: "Theta of −8 means the option loses about ₹8 a day from time decay.", w: "Time decay speeds up near expiry. Option buyers fight it every day.", r: "Premium, Expiry" },
+  { c: "F&O", t: "Delta", m: "How much an option's price changes for a ₹1 move in the underlying. Calls range from 0 to 1; puts from 0 to −1.", e: "Delta 0.5: if Nifty rises 10 points, the call rises about 5.", w: "Delta changes as price moves, so a position's risk shifts during the day.", r: "ITM / ATM / OTM, Hedging" },
+  { c: "F&O", t: "Implied volatility", m: "The volatility the options market is pricing in. Higher IV means more expensive options.", e: "Before results, a stock's option IV jumps from 25% to 45%.", w: "After the event, IV often collapses ('IV crush') and options lose value even if you guessed the direction right.", r: "India VIX, Premium" },
+  { c: "F&O", t: "India VIX", m: "A 'fear index' that measures the volatility the market expects in Nifty over the next 30 days, based on option prices.", e: "VIX rising from 12 to 20 means traders expect bigger swings.", w: "VIX tells you the expected size of moves, not their direction.", r: "Implied volatility, Volatility" },
+  { c: "F&O", t: "Option writing", m: "Selling an option to collect its premium. The writer keeps the premium if the option expires worthless.", e: "Sell a 25,000 call for ₹60; if Nifty stays below 25,000 at expiry, keep ₹60 per unit.", w: "Gains are capped at the premium but losses can be very large. Needs big margin and strict risk control.", r: "Premium, Margin" },
+  { c: "F&O", t: "Hedging", m: "Taking a position to reduce the risk of another one, like insurance.", e: "Holding a stock portfolio and buying Nifty puts before a risky event.", w: "Hedges cost money. Over-hedging can remove most of your profit.", r: "Put option, Diversification" },
+
+  // IPO
+  { c: "IPO", t: "IPO", m: "Initial Public Offering: when a company sells shares to the public for the first time and lists on a stock exchange.", e: "A company offers shares at ₹100–105 for three days, then lists on NSE and BSE.", w: "Read why the company is raising money: for growth, or so existing owners can sell?", r: "Price band, Listing gain" },
+  { c: "IPO", t: "Price band", m: "The range within which you can bid for IPO shares. The final price is usually set at the top of the band.", e: "Price band ₹100–105: retail investors often bid at ₹105 or at cut-off.", w: "Bidding at the bottom of the band usually means no allotment if the issue is popular.", r: "Cut-off price, Lot" },
+  { c: "IPO", t: "Cut-off price", m: "An option for retail investors to bid at whatever final price is decided, which is usually the top of the band.", e: "Ticking 'cut-off' in a ₹100–105 IPO means your bid counts at ₹105.", w: "Your bank blocks money for the upper price even if you bid at cut-off.", r: "Price band, ASBA" },
+  { c: "IPO", t: "GMP", m: "Grey Market Premium: an unofficial price at which IPO shares are said to trade before listing.", e: "IPO price ₹100, GMP ₹30: the grey market expects around ₹130 at listing.", w: "GMP is unregulated and easy to manipulate. It often changes sharply just before listing.", r: "Listing gain, Subscription" },
+  { c: "IPO", t: "Subscription", m: "How many times the shares on offer were applied for. Shown overall and for each category.", e: "Retail portion subscribed 40 times: 40 applications for every share available.", w: "Heavy subscription means low chances of allotment and doesn't guarantee a listing gain.", r: "Allotment, QIB / NII / Retail" },
+  { c: "IPO", t: "Allotment", m: "The process of deciding who receives IPO shares. When retail is oversubscribed, lots are given out by lottery.", e: "With 40× retail subscription, roughly 1 in 40 applicants gets one lot.", w: "Applying with many lots in retail doesn't raise your chances. Each applicant can get at most one lot in a lottery.", r: "Subscription, Lot" },
+  { c: "IPO", t: "Listing gain", m: "The profit (or loss) from the IPO price to the price on listing day.", e: "Allotted at ₹105, lists at ₹140: a 33% listing gain.", w: "Plenty of IPOs list below their issue price. Don't apply just for 'free money'.", r: "GMP, Subscription" },
+  { c: "IPO", t: "QIB / NII / Retail", m: "IPO investor categories: Qualified Institutional Buyers (funds, banks), Non-Institutional Investors (bids above ₹2 lakh) and Retail (up to ₹2 lakh).", e: "An issue may reserve 50% for QIBs, 15% for NIIs and 35% for retail.", w: "Strong QIB demand is often watched closely, but it's not a promise of returns.", r: "Subscription, Anchor investors" },
+  { c: "IPO", t: "Anchor investors", m: "Large institutions that get shares a day before the IPO opens. Part of their shares are locked in for 30 days and the rest for 90 days.", e: "Several mutual funds buy anchor shares worth ₹300 crore.", w: "Watch the lock-in end dates. Selling by anchors can pressure the price.", r: "QIB / NII / Retail, Lock-in" },
+  { c: "IPO", t: "SME IPO", m: "An IPO by a small or medium company that lists on a separate SME platform, like NSE Emerge or BSE SME.", e: "A small manufacturer raises ₹25 crore through an SME IPO.", w: "Higher minimum investment, lower liquidity and lighter disclosure. Risks are higher.", r: "IPO, Liquidity" },
+  { c: "IPO", t: "Shareholder quota", m: "A part of an IPO reserved for existing shareholders of a listed parent or group company.", e: "Holding even one share of the listed parent on the eligibility date lets you apply in the shareholder category.", w: "Check the exact eligibility date in the offer document. Buying after it doesn't count.", r: "Allotment, Subscription" },
+  { c: "IPO", t: "ASBA", m: "Application Supported by Blocked Amount: your IPO money stays in your bank and is only blocked, not debited, until allotment.", e: "₹15,000 is blocked via UPI mandate; if you get no shares it's released.", w: "Approve the UPI mandate before the deadline, or your application isn't valid.", r: "Allotment, Cut-off price" },
+
+  // Corporate actions
+  { c: "Corporate actions", t: "Dividend", m: "A part of a company's profit paid to shareholders, declared as rupees per share.", e: "A ₹5 dividend on 200 shares = ₹1,000 (before tax).", w: "On the ex-date the share price usually drops by about the dividend amount. It isn't free money.", r: "Ex-dividend date, Dividend yield" },
+  { c: "Corporate actions", t: "Ex-dividend date", m: "The date from which a buyer won't get the upcoming dividend. Under T+1 settlement it's usually the same day as the record date.", e: "Ex-date 18 Nov: buy by 17 Nov to get the dividend; buy on 18 Nov and you don't.", w: "Buying just before the ex-date only for the dividend rarely works, because the price adjusts.", r: "Record date, Dividend" },
+  { c: "Corporate actions", t: "Record date", m: "The date on which the company checks its register to decide who gets a dividend, bonus or split.", e: "Record date 18 Nov: you must be in the register on that date.", w: "With T+1 settlement, you must buy at least one trading day before the record date.", r: "Ex-dividend date, Bonus issue" },
+  { c: "Corporate actions", t: "Bonus issue", m: "Free extra shares given to existing shareholders in a fixed ratio. The share price adjusts down to match.", e: "A 1:1 bonus: 100 shares at ₹1,000 become 200 shares at about ₹500.", w: "Your total value doesn't change on the day. A bonus doesn't make you richer by itself.", r: "Stock split, Record date" },
+  { c: "Corporate actions", t: "Stock split", m: "Dividing each share into smaller units with a lower face value. Shares go up, price goes down, total value stays the same.", e: "A 1:5 split: 10 shares at ₹2,500 become 50 shares at ₹500.", w: "A split makes shares look cheaper but doesn't change the company's value.", r: "Bonus issue, Face value" },
+  { c: "Corporate actions", t: "Buyback", m: "A company buying back its own shares, often at a premium, which reduces the number of shares outstanding.", e: "A company offers to buy back shares at ₹1,500 when the market price is ₹1,300.", w: "In a tender buyback, only part of your shares may be accepted, so the gain is smaller than it looks.", r: "Record date, EPS" },
+  { c: "Corporate actions", t: "Rights issue", m: "An offer to existing shareholders to buy new shares, usually at a discount, in proportion to what they already hold.", e: "A 1:4 rights issue at ₹200: holders of 400 shares can buy 100 new shares.", w: "If you don't take up or sell your rights, your share of the company gets diluted.", r: "Record date, Dilution" },
+  { c: "Corporate actions", t: "Dividend yield", m: "Yearly dividend per share divided by the share price, as a percentage.", e: "₹20 yearly dividend on a ₹500 share = 4% yield.", w: "A very high yield can mean the price has crashed because the business is in trouble.", r: "Dividend, P/E ratio" },
+  { c: "Corporate actions", t: "Face value", m: "The nominal value of a share written in the company's books, often ₹1, ₹2, ₹5 or ₹10. Dividends are sometimes quoted as % of face value.", e: "A 200% dividend on ₹1 face value = ₹2 per share.", w: "Face value has nothing to do with market price. Don't confuse '200% dividend' with a big payout.", r: "Dividend, Stock split" },
+
+  // Fundamentals
+  { c: "Fundamentals", t: "EPS", m: "Earnings Per Share: net profit divided by the number of shares.", e: "Profit ₹500 crore ÷ 50 crore shares = EPS of ₹10.", w: "EPS can rise through buybacks or one-off gains even when the business isn't growing.", r: "P/E ratio, Net profit" },
+  { c: "Fundamentals", t: "P/E ratio", m: "Price-to-Earnings: share price divided by EPS. It shows how many rupees investors pay for ₹1 of yearly profit.", e: "Price ₹300, EPS ₹15 → P/E of 20.", w: "Low P/E isn't always cheap and high P/E isn't always expensive. Compare with growth and the industry.", r: "EPS, P/B ratio" },
+  { c: "Fundamentals", t: "P/B ratio", m: "Price-to-Book: share price divided by book value per share. Often used for banks and asset-heavy firms.", e: "Price ₹400, book value ₹200 per share → P/B of 2.", w: "For tech and brand-driven companies, book value says little about real value.", r: "Book value, ROE" },
+  { c: "Fundamentals", t: "Book value", m: "What would be left for shareholders if the company sold all its assets and paid all its debts, at accounting values.", e: "Assets ₹1,000 crore − liabilities ₹600 crore = ₹400 crore book value.", w: "Accounting values can be very different from what assets would actually sell for.", r: "P/B ratio, Debt-to-equity" },
+  { c: "Fundamentals", t: "ROE", m: "Return on Equity: net profit as a percentage of shareholders' equity. It shows how well the company uses owners' money.", e: "Profit ₹200 crore ÷ equity ₹1,000 crore = 20% ROE.", w: "High ROE driven by heavy debt is riskier than it looks. Check debt too.", r: "Debt-to-equity, ROCE" },
+  { c: "Fundamentals", t: "ROCE", m: "Return on Capital Employed: operating profit as a percentage of all capital used (equity plus debt).", e: "Operating profit ₹300 crore ÷ capital ₹1,500 crore = 20% ROCE.", w: "Compare ROCE within the same industry. Capital-heavy sectors naturally show lower numbers.", r: "ROE, EBITDA" },
+  { c: "Fundamentals", t: "Debt-to-equity", m: "Total debt divided by shareholders' equity. It shows how much the company relies on borrowing.", e: "Debt ₹500 crore, equity ₹1,000 crore → D/E of 0.5.", w: "High debt is dangerous when interest rates rise or sales slow down.", r: "ROE, Book value" },
+  { c: "Fundamentals", t: "EBITDA", m: "Earnings before interest, tax, depreciation and amortisation: a rough measure of operating profit.", e: "Revenue ₹1,000 crore, operating costs ₹800 crore → EBITDA ₹200 crore.", w: "EBITDA ignores debt costs and asset wear. A company can show good EBITDA and still lose money.", r: "Operating margin, Net profit" },
+  { c: "Fundamentals", t: "Operating margin", m: "Operating profit as a percentage of revenue. It shows how much of each ₹100 of sales is left after running costs.", e: "Operating profit ₹150 crore on revenue ₹1,000 crore = 15%.", w: "A falling margin while sales grow can signal rising costs or price pressure.", r: "EBITDA, Revenue" },
+  { c: "Fundamentals", t: "Revenue vs net profit", m: "Revenue (top line) is total sales. Net profit (bottom line) is what's left after all costs, interest and tax.", e: "Revenue ₹1,000 crore, net profit ₹80 crore: an 8% net margin.", w: "Fast revenue growth with no profit growth isn't always a good sign.", r: "EPS, Operating margin" },
+  { c: "Fundamentals", t: "YoY vs QoQ", m: "Year-on-year compares with the same quarter last year; quarter-on-quarter compares with the previous quarter.", e: "Q2 profit vs Q2 last year is YoY; Q2 vs Q1 is QoQ.", w: "For seasonal businesses, QoQ can mislead. YoY is usually the fairer comparison.", r: "Revenue vs net profit, EPS" },
+  { c: "Fundamentals", t: "Promoter holding & pledge", m: "Promoter holding is the share owned by the founders or controlling group. A pledge means they've borrowed money against those shares.", e: "Promoters own 55%, and 40% of that is pledged.", w: "If the price falls sharply, lenders may sell pledged shares, pushing the price down further.", r: "Free float, Debt-to-equity" },
+  { c: "Fundamentals", t: "Free float", m: "The shares available for public trading, excluding those held by promoters and locked-in holders.", e: "Promoters hold 75%, so the free float is 25%.", w: "Low free float can make a stock jumpy and easier to move.", r: "Promoter holding & pledge, Liquidity" },
+
+  // Investing
+  { c: "Investing", t: "SIP", m: "Systematic Investment Plan: investing a fixed amount at regular intervals, usually monthly, into a mutual fund.", e: "₹5,000 every month on the 5th into an index fund.", w: "Stopping your SIP when markets fall means missing the cheapest buying months.", r: "Rupee cost averaging, Compounding" },
+  { c: "Investing", t: "Rupee cost averaging", m: "With a fixed regular investment you automatically buy more units when prices are low and fewer when they're high.", e: "₹5,000 buys 50 units at ₹100 and 62.5 units at ₹80.", w: "It smooths your entry price; it doesn't guarantee a profit.", r: "SIP, Averaging down" },
+  { c: "Investing", t: "Compounding", m: "Earning returns on your past returns as well as on your original money. Growth speeds up over time.", e: "₹1 lakh at 12% a year becomes about ₹3.1 lakh in 10 years and about ₹9.6 lakh in 20.", w: "The biggest gains come in the later years, so starting early and staying invested matters most.", r: "CAGR, SIP" },
+  { c: "Investing", t: "CAGR", m: "Compound Annual Growth Rate: the steady yearly growth rate that would take a value from its start to its end.", e: "₹1 lakh growing to ₹2 lakh in 6 years ≈ 12.2% CAGR.", w: "CAGR hides the ups and downs along the way.", r: "Compounding, XIRR" },
+  { c: "Investing", t: "XIRR", m: "A return rate for investments made at different times, like SIPs. It accounts for when each rupee went in.", e: "Twelve monthly SIPs and today's value give an XIRR of 14%.", w: "Don't compare an SIP's absolute return with a lump sum's CAGR. Use XIRR.", r: "CAGR, SIP" },
+  { c: "Investing", t: "Index fund", m: "A mutual fund or ETF that simply copies an index, like the Nifty 50, at a low cost.", e: "A Nifty 50 index fund holds the same 50 stocks in the same weights.", w: "It will never beat the index. That's the point: low cost and no fund-manager risk.", r: "ETF, Expense ratio" },
+  { c: "Investing", t: "ETF", m: "Exchange Traded Fund: a fund you buy and sell on the stock exchange like a share, usually tracking an index, gold or another asset.", e: "Buying a Nifty ETF through your trading account during market hours.", w: "Check volume and how close the price is to its NAV. Thin ETFs can trade at a premium or discount.", r: "Index fund, NAV" },
+  { c: "Investing", t: "NAV", m: "Net Asset Value: the per-unit value of a mutual fund, worked out from its holdings each day.", e: "A fund worth ₹1,000 crore with 50 crore units has an NAV of ₹20.", w: "A low NAV doesn't make a fund cheap. Returns are what matter.", r: "Expense ratio, Index fund" },
+  { c: "Investing", t: "Expense ratio", m: "The yearly fee a mutual fund charges, as a percentage of your investment. It's taken from the fund's value.", e: "1.5% expense ratio on ₹1 lakh ≈ ₹1,500 a year.", w: "A 1% difference in fees adds up to a big gap over 20 years of compounding.", r: "Index fund, NAV" },
+  { c: "Investing", t: "Diversification", m: "Spreading money across different stocks, sectors and asset types so one bad bet can't sink you.", e: "Holding 15 stocks across 7 sectors plus some debt and gold.", w: "Owning 40 stocks you don't track isn't diversification. It's clutter.", r: "Asset allocation, Hedging" },
+  { c: "Investing", t: "Asset allocation", m: "How you split your money between equity, debt, gold, cash and other assets, based on goals and risk.", e: "60% equity, 30% debt, 10% gold, rebalanced once a year.", w: "Your allocation matters more for long-term results than picking the perfect stock.", r: "Diversification, Emergency fund" },
+  { c: "Investing", t: "Emergency fund", m: "Money kept aside in a safe, easy-to-access place for unexpected expenses. Commonly 6 months of expenses.", e: "Monthly expenses ₹40,000 → emergency fund ₹2.4 lakh.", w: "Without one, you may be forced to sell investments at the worst time.", r: "Asset allocation, Liquidity" },
+  { c: "Investing", t: "Real return", m: "Your return after taking away inflation. It shows how much your buying power actually grew.", e: "Investment return 10%, inflation 6% → real return about 4%.", w: "An FD at 7% with 6% inflation and tax can leave almost no real return.", r: "Inflation, CAGR" },
+  { c: "Investing", t: "Inflation", m: "The general rise in prices over time, which reduces what your money can buy.", e: "With 6% inflation, ₹100 of groceries costs about ₹106 next year.", w: "Keeping savings idle in a low-interest account loses value every year.", r: "Real return, Compounding" },
+
+  // Taxes & charges
+  { c: "Taxes & charges", t: "STT", m: "Securities Transaction Tax: a tax charged on buying and selling securities on Indian exchanges.", e: "It's automatically deducted in your contract note on each trade.", w: "STT is charged whether you make a profit or a loss. Rates differ for delivery, intraday and F&O.", r: "Brokerage, Contract note" },
+  { c: "Taxes & charges", t: "STCG vs LTCG", m: "Short-term vs long-term capital gains. For listed shares and equity funds, gains on holdings sold within 12 months are short term; after 12 months, long term.", e: "Buy in January, sell in October: short term. Sell after the next January: long term.", w: "Tax rates and exemption limits are set in the Budget and can change. Check the current rules.", r: "Tax-loss harvesting, STT" },
+  { c: "Taxes & charges", t: "Tax-loss harvesting", m: "Selling investments at a loss to offset taxable gains, often near the end of the financial year.", e: "₹40,000 gain on one stock and ₹15,000 loss on another: booking the loss reduces taxable gain to ₹25,000.", w: "Make sure the loss is real and follows the set-off rules. When in doubt, ask a tax adviser.", r: "STCG vs LTCG" },
+  { c: "Taxes & charges", t: "Brokerage", m: "The fee your broker charges for each order, either flat per order or a percentage of trade value.", e: "₹20 per executed order, buying and selling = ₹40 per round trip.", w: "Brokerage is only part of the cost. Add STT, exchange fees, GST, stamp duty and DP charges.", r: "STT, DP charges" },
+  { c: "Taxes & charges", t: "DP charges", m: "A fee from the depository participant each time shares are debited from your demat account when you sell delivery holdings.", e: "Selling one stock from your demat in a day attracts one DP charge.", w: "Selling small quantities often can make DP charges a big share of your profit.", r: "Demat account, Brokerage" },
+  { c: "Taxes & charges", t: "Contract note", m: "The official record your broker sends for every trading day, listing each trade, price and all charges.", e: "Check it the same evening for quantity, price, brokerage, STT and taxes.", w: "If you see a trade you didn't place, complain to your broker and the exchange right away.", r: "STT, Brokerage" },
+];
+
+/* ---------- state ---------- */
+const saved = JSON.parse(localStorage.getItem("gloss_form") || "{}");
+const S = Object.assign({ num: "1", cat: "Basics", term: "", m: "", e: "", w: "", r: "", disc: true, posted: [] }, saved);
+const key = t => t.trim().toLowerCase();
+function save() { localStorage.setItem("gloss_form", JSON.stringify(S)); }
+
+$("#cat").innerHTML = Object.keys(CATS).map(c => `<option>${c}</option>`).join("");
+$("#bankCat").innerHTML = `<option value="">All categories (${BANK.length})</option>` + Object.keys(CATS).map(c => `<option value="${c}">${c} (${BANK.filter(b => b.c === c).length})</option>`).join("");
+$("#bankCount").textContent = BANK.length;
+
+function fillForm() {
+  $("#num").value = S.num; $("#cat").value = S.cat; $("#term").value = S.term;
+  $("#meaning").value = S.m; $("#example").value = S.e; $("#watch").value = S.w; $("#related").value = S.r;
+  $("#optDisc").checked = S.disc; update();
+}
+function loadTerm(b) { Object.assign(S, { cat: b.c, term: b.t, m: b.m, e: b.e, w: b.w, r: b.r }); fillForm(); }
+
+/* ---------- bank list ---------- */
+function drawTerms() {
+  const c = $("#bankCat").value, q = $("#search").value.trim().toLowerCase();
+  const list = BANK.filter(b => (!c || b.c === c) && (!q || b.t.toLowerCase().includes(q) || b.m.toLowerCase().includes(q)));
+  const posted = new Set(S.posted), cur = key(S.term);
+  $("#terms").innerHTML = list.length ? list.map(b => `<button data-t="${b.t}" class="${key(b.t) === cur ? "cur" : posted.has(key(b.t)) ? "done" : ""}" title="${posted.has(key(b.t)) ? "Already posted" : b.c}">${b.t}</button>`).join("")
+    : `<span class="none">No terms match. You can still type your own below.</span>`;
+  const done = BANK.filter(b => posted.has(key(b.t))).length;
+  $("#postedLbl").textContent = `${done} of ${BANK.length} posted`;
+  $("#postedBar").style.width = (done / BANK.length * 100) + "%";
+}
+$("#terms").addEventListener("click", e => {
+  const b = e.target.closest("[data-t]"); if (!b) return;
+  if (dirty() && !confirm(`Replace the current card with “${b.dataset.t}”?`)) return;
+  loadTerm(BANK.find(x => x.t === b.dataset.t));
+});
+$("#bankCat").addEventListener("change", drawTerms);
+$("#search").addEventListener("input", drawTerms);
+const dirty = () => S.term.trim() && !BANK.some(b => b.t === S.term && b.m === S.m && b.e === S.e && b.w === S.w && b.r === S.r);
+
+function randomTerm() {
+  const c = $("#bankCat").value, posted = new Set(S.posted);
+  let pool = BANK.filter(b => (!c || b.c === c) && !posted.has(key(b.t)) && key(b.t) !== key(S.term));
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+$("#rollBtn").addEventListener("click", () => {
+  if (dirty() && !confirm("Replace your edited card with a random term?")) return;
+  const b = randomTerm();
+  if (!b) { toast($("#bankCat").value ? "All terms in this category are posted" : "You've posted every term 🎉"); return; }
+  loadTerm(b); toast("🎲 " + b.t);
+});
+$("#resetPosted").addEventListener("click", () => {
+  if (!S.posted.length || !confirm("Clear your posted history? Every term becomes available for Random again.")) return;
+  S.posted = []; update();
+});
+$("#nextBtn").addEventListener("click", () => {
+  if (!S.term.trim()) { toast("Nothing to mark yet"); return; }
+  if (!S.posted.includes(key(S.term))) S.posted.push(key(S.term));
+  S.num = String((+S.num || 0) + 1);
+  const b = randomTerm();
+  if (b) { loadTerm(b); toast(`✅ Posted · Day #${S.num}: ${b.t}`); }
+  else { Object.assign(S, { term: "", m: "", e: "", w: "", r: "" }); fillForm(); toast("✅ Posted · no unposted terms left"); }
+});
+
+/* ---------- inputs ---------- */
+$("#num").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, ""); S.num = e.target.value; update(); });
+$("#cat").addEventListener("change", e => { S.cat = e.target.value; update(); });
+[["term", "term"], ["meaning", "m"], ["example", "e"], ["watch", "w"], ["related", "r"]].forEach(([id, k]) =>
+  $("#" + id).addEventListener("input", ev => { S[k] = ev.target.value; ev.target.classList.remove("err"); ev.target.closest(".field")?.classList.remove("err"); update(); }));
+$("#optDisc").addEventListener("change", e => { S.disc = e.target.checked; update(); });
+
+/* ---------- text ---------- */
+const TOOL_URL = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host)
+  ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/glossary/";
+const DISCL = "⚠️ _For learning and educational purposes only. Not investment advice. Not SEBI registered._";
+const clean = s => s.trim().replace(/\s*\n\s*/g, " ");
+function buildText() {
+  const out = [`📖 *TERM OF THE DAY${S.num ? " #" + S.num : ""}* · ${S.cat}`, "", `*${clean(S.term).toUpperCase()}*`, "", `💡 *Meaning:* ${clean(S.m)}`];
+  if (S.e.trim()) out.push("", `🧾 *Example:* ${clean(S.e)}`);
+  if (S.w.trim()) out.push("", `⚠️ *Watch out:* ${clean(S.w)}`);
+  if (S.r.trim()) out.push("", `🔗 _Related: ${clean(S.r)}_`);
+  out.push("", "— MANIMINDSMONEY Community", `_Learn a term a day: ${TOOL_URL}_`);
+  if (S.disc) out.push(DISCL);
+  return out.join("\n");
+}
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const waHtml = s => esc(s).replace(/\*([^*\n]+)\*/g, "<b>$1</b>").replace(/(^|\s)_([^_\n]+)_/g, "$1<i>$2</i>");
+
+function update() {
+  const ready = S.term.trim() && S.m.trim();
+  const t = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  $("#bubble").innerHTML = ready ? waHtml(buildText()) + `<span class="time">${t}</span>`
+    : `<span class="empty">Tap 🎲 Random or pick a term from the bank, or type your own term and meaning.</span><span class="time">${t}</span>`;
+  $("#mCount").textContent = S.m.length;
+  $("#resMeta").textContent = ready ? `Day #${S.num || "–"} · ${S.cat}` : "WhatsApp message";
+  drawTerms(); save();
+}
+
+/* ---------- share ---------- */
+function valid() {
+  if (S.term.trim() && S.m.trim()) return true;
+  const shake = el => { el.classList.remove("err"); void el.offsetWidth; el.classList.add("err"); };
+  if (!S.term.trim()) shake($("#term").closest(".field"));
+  if (!S.m.trim()) shake($("#meaning"));
+  toast("Add a term and its meaning first"); return false;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch { const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;opacity:0;top:0"; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok; }
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2100); }
+$("#copyBtn").addEventListener("click", async () => { if (!valid()) return; toast(await copyText(buildText()) ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy"); });
+$("#waBtn").addEventListener("click", () => { if (!valid()) return; window.open("https://wa.me/?text=" + encodeURIComponent(buildText()), "_blank", "noopener"); });
+
+/* ---------- image ---------- */
+const CW = 1080;
+const GROT = '"Space Grotesk", sans-serif', MONO = '"JetBrains Mono", monospace', INTER = 'Inter, sans-serif';
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(ctx, x, y, w, h, r = 28, fill = "rgba(255,255,255,0.045)", stroke = "rgba(255,255,255,0.10)") { rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); }
+function txt(ctx, s, x, y, font, color, align = "left") { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); }
+function wrapLines(ctx, text, maxW) { const out = []; let line = ""; text.split(/\s+/).forEach(w => { const t = line ? line + " " + w : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; }
+const capLines = (l, n) => { if (l.length <= n) return l; l = l.slice(0, n); l[n - 1] = l[n - 1].replace(/\s*\S*$/, "") + "…"; return l; };
+
+async function drawCard() {
+  await Promise.all([`700 84px ${GROT}`, `600 26px ${MONO}`, `700 22px ${MONO}`, `400 32px ${INTER}`, `500 30px ${INTER}`, `600 28px ${INTER}`].map(fn => document.fonts.load(fn).catch(() => {})));
+  const m = document.createElement("canvas").getContext("2d");
+  const term = clean(S.term), col = CATS[S.cat] || "#5ec8ff";
+  // title: shrink until it fits in 2 lines
+  let tSize = 92, tLines;
+  do { m.font = `700 ${tSize}px ${GROT}`; tLines = wrapLines(m, term, CW - 140); tSize -= 4; } while (tLines.length > 2 && tSize > 48);
+  tSize += 4; tLines = capLines(tLines, 2);
+  const tLH = tSize * 1.08;
+  const secs = [["MEANING", clean(S.m), "#5ec8ff", 7], ["EXAMPLE", clean(S.e), "#22d39a", 5], ["WATCH OUT", clean(S.w), "#febc2e", 4]].filter(s => s[1]);
+  const bodyFont = `400 32px ${INTER}`, LH = 46, inner = CW - 140 - 64;
+  m.font = bodyFont;
+  const blocks = secs.map(([lab, t, c, max]) => ({ lab, c, lines: capLines(wrapLines(m, t, inner), max) }));
+  const blockH = b => 66 + b.lines.length * LH + 28;
+  const rel = clean(S.r);
+  const top = 330 + tLines.length * tLH;
+  const H = top + 30 + blocks.reduce((a, b) => a + blockH(b) + 20, 0) + (rel ? 64 : 0) + 190;
+
+  const c = document.createElement("canvas"); c.width = CW; c.height = H; const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, r, cc) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, cc); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 650, "rgba(124,92,255,0.32)"); glow(CW - 30, 360, 560, "rgba(94,200,255,0.13)"); glow(CW - 40, H - 60, 620, "rgba(0,224,184,0.12)");
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+  // brand
+  const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
+  rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
+  txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+  // eyebrow + category pill
+  txt(ctx, `TERM OF THE DAY${S.num ? " · #" + S.num : ""}`, 70, 205, `600 26px ${MONO}`, "#5ec8ff");
+  const cat = S.cat.toUpperCase(); ctx.font = `700 22px ${MONO}`; const cw = ctx.measureText(cat).width + 36;
+  rr(ctx, 70, 228, cw, 42, 21); ctx.fillStyle = col + "26"; ctx.fill(); ctx.strokeStyle = col + "99"; ctx.lineWidth = 2; ctx.stroke();
+  txt(ctx, cat, 70 + cw / 2, 256, `700 22px ${MONO}`, col, "center");
+
+  // term
+  tLines.forEach((l, i) => txt(ctx, l, 70, 290 + (i + 1) * tLH - tSize * .12, `700 ${tSize}px ${GROT}`, "#ffffff"));
+
+  // sections
+  let y = top + 30;
+  blocks.forEach(b => {
+    const h = blockH(b);
+    panel(ctx, 70, y, CW - 140, h, 26, b.c + "12", b.c + "55");
+    rr(ctx, 70, y + 24, 6, h - 48, 3); ctx.fillStyle = b.c; ctx.fill();
+    txt(ctx, b.lab, 102, y + 52, `700 22px ${MONO}`, b.c);
+    b.lines.forEach((l, k) => txt(ctx, l, 102, y + 66 + (k + 1) * LH - 12, bodyFont, "#e3e6ee"));
+    y += h + 20;
+  });
+  if (rel) {
+    ctx.font = `500 28px ${INTER}`; const label = "RELATED  ";
+    txt(ctx, label, 70, y + 36, `700 22px ${MONO}`, "#8a90a2");
+    ctx.font = `700 22px ${MONO}`; const lw = ctx.measureText(label).width;
+    ctx.font = `500 28px ${INTER}`; let r2 = rel; while (r2.length > 1 && ctx.measureText(r2).width > CW - 140 - lw) r2 = r2.slice(0, -2);
+    txt(ctx, r2 === rel ? rel : r2 + "…", 70 + lw, y + 37, `500 28px ${INTER}`, "#c9cfdb");
+  }
+
+  txt(ctx, "— MANIMINDSMONEY Community", 70, H - 118, `600 28px ${INTER}`, "#b6a6ff");
+  txt(ctx, TOOL_URL.replace(/\/$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  if (S.disc) txt(ctx, "For learning & educational purposes only · Not investment advice · Not SEBI registered", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
+  return c;
+}
+$("#imgBtn").addEventListener("click", async e => {
+  if (!valid()) return;
+  const btn = e.currentTarget, label = btn.textContent; btn.disabled = true; btn.textContent = "Creating image…";
+  try {
+    const canvas = await drawCard();
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const name = `term-${S.num || "day"}-${key(S.term).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+    if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === "AbortError") return; }
+    }
+    let copied = false;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+    const url = URL.createObjectURL(blob);
+    $("#imgPrev").src = url; $("#imgDl").href = url; $("#imgDl").download = name;
+    $("#imgMsg").innerHTML = copied
+      ? "✅ <b>Image copied.</b> Open WhatsApp, pick your community chat and press <b>Ctrl+V</b> to paste it. Or download it below."
+      : "Tap <b>Download</b>, or long-press the image to save or share it on WhatsApp.";
+    $("#imgModal").hidden = false;
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+$("#imgClose").addEventListener("click", () => $("#imgModal").hidden = true);
+$("#imgModal").addEventListener("click", e => { if (e.target.id === "imgModal") $("#imgModal").hidden = true; });
+
+/* ---------- init ---------- */
+if (!S.term.trim()) { const b = BANK.find(x => x.t === "Ex-dividend date"); Object.assign(S, { cat: b.c, term: b.t, m: b.m, e: b.e, w: b.w, r: b.r }); }
+fillForm();
+</script>
+</body>
+</html>
