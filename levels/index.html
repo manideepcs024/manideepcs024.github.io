@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Daily Levels Card — MANIMINDSMONEY</title>
+<meta name="description" content="Calculate pivot points, support, resistance and CPR from yesterday's high, low and close, and share them on WhatsApp as text or an image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --cpr: #b18cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .22; animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--up); top: -25vmax; left: -15vmax; opacity: .14; }
+  .blob.b2 { background: var(--down); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .12; }
+  .blob.b3 { background: var(--a1); top: 30%; left: 40%; width: 34vmax; height: 34vmax; animation-delay: -12s; opacity: .16; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  h1 { font: 700 clamp(1.9rem, 6vw, 2.8rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--up), var(--a2) 45%, var(--cpr) 70%, var(--down)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 22px; font-size: .95rem; max-width: 660px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .layout > * { min-width: 0; }
+  @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(18px, 4.5vw, 28px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); }
+  .sticky { position: sticky; top: 16px; }
+  @media (max-width: 920px) { .sticky { position: static; } }
+
+  .q { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 600 .74rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--a2); margin: 20px 0 8px; }
+  .q:first-child { margin-top: 0; }
+  .q .opt { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; font-family: Inter; }
+
+  .field { display: flex; align-items: center; gap: 8px; padding: 2px 14px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 .9rem "JetBrains Mono"; color: var(--muted); }
+  .field input, .field select { width: 100%; flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 600 1.05rem "JetBrains Mono"; padding: 11px 0; color-scheme: dark; }
+  .field input::placeholder { color: #3f4558; }
+
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 16px; background: rgba(0,0,0,.35); border: 1px solid var(--line); position: relative; }
+  .seg button { position: relative; z-index: 1; border: 0; background: none; color: var(--muted); padding: 10px 6px; border-radius: 12px; font: 600 .86rem Inter; cursor: pointer; transition: color .25s; line-height: 1.2; }
+  .seg button small { display: block; font-weight: 400; font-size: .7rem; opacity: .75; margin-top: 2px; }
+  .seg button.on { color: #000; }
+  .seg .pill { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 12px; background: var(--fg); transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s; }
+
+  .inst { position: relative; border: 1px solid var(--line); border-radius: 20px; padding: 16px; background: rgba(0,0,0,.22); margin-top: 12px; animation: pop .4s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.98); } }
+  .inst-top { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .inst-top .field { flex: 1; }
+  .inst-top .field input { font-family: "Space Grotesk"; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+  .rm { width: 40px; height: 40px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); cursor: pointer; font-size: 1rem; }
+  .rm:hover { color: var(--down); border-color: rgba(255,84,112,.4); }
+  .presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .presets button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 6px 10px; border-radius: 999px; font: 500 .72rem "JetBrains Mono"; cursor: pointer; }
+  .presets button:hover { color: var(--fg); border-color: rgba(255,255,255,.2); }
+  .hlc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .hlc .mini { display: block; font: 600 .68rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); margin-bottom: 5px; }
+  .hlc .mini.hi { color: var(--up); } .hlc .mini.lo { color: var(--down); }
+  .hlc .field { padding: 0 10px; }
+  .hlc .field input { font-size: .98rem; padding: 10px 0; }
+  .ierr { font-size: .76rem; color: #ff9aab; margin-top: 8px; min-height: 0; }
+  .add { width: 100%; margin-top: 12px; padding: 13px; border-radius: 16px; border: 1px dashed rgba(0,224,184,.45); background: rgba(0,224,184,.05); color: var(--a2); font: 600 .9rem Inter; cursor: pointer; }
+  .add:hover { background: rgba(0,224,184,.1); }
+  .add[hidden] { display: none; }
+
+  textarea { width: 100%; resize: vertical; min-height: 80px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); border-radius: 16px; color: var(--fg); font: 400 .95rem/1.5 Inter, sans-serif; padding: 12px 14px; outline: 0; }
+  textarea:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,.28); border: 1px solid var(--line); font-size: .9rem; cursor: pointer; margin-top: 10px; }
+  .toggle small { display: block; color: var(--muted); font-size: .74rem; }
+  .toggle input { display: none; }
+  .sw { flex: none; width: 44px; height: 26px; border-radius: 13px; background: rgba(255,255,255,.12); position: relative; transition: background .25s; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  .toggle input:checked + .sw { background: var(--a2); }
+  .toggle input:checked + .sw::after { transform: translateX(18px); }
+
+  /* results ladder */
+  .res-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+  .res-head h2 { font: 700 1.1rem "Space Grotesk"; }
+  .res-head span { font: .72rem "JetBrains Mono"; color: var(--muted); }
+  .boards { display: grid; gap: 12px; }
+  .board { border: 1px solid var(--line); border-radius: 20px; background: rgba(0,0,0,.3); padding: 14px; animation: pop .4s cubic-bezier(.2,.8,.2,1); }
+  .board-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .board-top b { font: 700 1.05rem "Space Grotesk"; letter-spacing: .02em; }
+  .tag { font: 600 .68rem "JetBrains Mono"; padding: 4px 9px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+  .tag.narrow { color: var(--up); border-color: rgba(34,211,154,.4); background: rgba(34,211,154,.1); }
+  .tag.normal { color: var(--warn); border-color: rgba(254,188,46,.4); background: rgba(254,188,46,.08); }
+  .tag.wide { color: var(--down); border-color: rgba(255,84,112,.4); background: rgba(255,84,112,.08); }
+  .rung { display: grid; grid-template-columns: 58px 1fr auto; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 10px; font: 600 .95rem "JetBrains Mono"; }
+  .rung .k { font-size: .72rem; padding: 3px 0; border-radius: 7px; text-align: center; }
+  .rung .d { font-size: .72rem; color: var(--muted); font-weight: 500; }
+  .rung.r .k { background: rgba(255,84,112,.14); color: var(--down); }
+  .rung.s .k { background: rgba(34,211,154,.14); color: var(--up); }
+  .rung.p { background: rgba(255,255,255,.05); }
+  .rung.p .k { background: rgba(255,255,255,.1); color: var(--fg); }
+  .rung.c { background: rgba(177,140,255,.08); }
+  .rung.c .k { background: rgba(177,140,255,.18); color: var(--cpr); }
+  .prev { margin-top: 8px; font: .72rem "JetBrains Mono"; color: var(--muted); text-align: center; }
+  .placeholder { text-align: center; color: var(--muted); padding: 30px 10px; font-size: .9rem; border: 1px dashed var(--line); border-radius: 18px; }
+
+  .share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 16px; font: 600 .98rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.img { grid-column: 1 / -1; background: linear-gradient(100deg, rgba(124,92,255,.22), rgba(0,224,184,.16)); border: 1px solid rgba(124,92,255,.5); font-weight: 700; }
+  .btn.img[disabled] { opacity: .6; pointer-events: none; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; font-weight: 700; }
+  .btn.wa svg { width: 18px; height: 18px; }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+  .learn { margin-top: 16px; font-size: .8rem; color: var(--muted); line-height: 1.55; border-top: 1px solid var(--line); padding-top: 14px; }
+  .learn b { color: #cfd3df; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 140px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 30; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); }
+  .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .modal[hidden] { display: none; }
+  .modal-card { width: 100%; max-width: 440px; max-height: 100%; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px; }
+  .modal-card img { display: block; max-width: 100%; max-height: min(62vh, 560px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); }
+  .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
+  .modal-card .row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 14px; }
+  .disclaimer { margin: 26px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../quiz/">Quiz</a><a href="../message/">Message</a><a href="../ipo/">IPO card</a><a href="../sl-calculator/">SL Calculator</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Daily <span class="grad">levels</span>, ready to post.</h1>
+    <p class="sub">Enter yesterday's high, low and close. Get pivot, support, resistance and CPR levels for up to 3 indices or stocks, and send them to your community as text or an image.</p>
+
+    <div class="layout">
+      <!-- INPUT -->
+      <section class="card">
+        <div class="two" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div class="q">Levels for</div>
+            <label class="field"><span class="unit">📅</span><input id="date" type="date" /></label>
+          </div>
+          <div>
+            <div class="q">Rounding</div>
+            <div class="seg" id="round">
+              <div class="pill"></div>
+              <button data-v="0" class="on">Whole</button>
+              <button data-v="2">2 dec</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="q">Method</div>
+        <div class="seg" id="method">
+          <div class="pill"></div>
+          <button data-v="classic" class="on">Classic<small>floor pivots</small></button>
+          <button data-v="fib">Fibonacci<small>0.382 · 0.618 · 1</small></button>
+        </div>
+
+        <div class="q">Previous day data <span class="opt">high · low · close</span></div>
+        <div id="insts"></div>
+        <button class="add" id="addBtn">＋ Add another index or stock</button>
+
+        <div class="q">Notes <span class="opt">optional</span></div>
+        <textarea id="notes" maxlength="300" placeholder="e.g. Narrow CPR on Nifty, so watch for a trending move. Global cues positive."></textarea>
+
+        <label class="toggle"><span>Add disclaimer<small>Not SEBI registered · educational purpose only</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
+      </section>
+
+      <!-- RESULTS -->
+      <section class="card sticky">
+        <div class="res-head"><h2>Levels</h2><span id="resMeta">updates as you type</span></div>
+        <div class="boards" id="boards"></div>
+
+        <div class="share-row">
+          <button class="btn img" id="imgBtn">📸 Share as image</button>
+          <button class="btn" id="copyBtn">📋 Copy text</button>
+          <button class="btn wa" id="waBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg> WhatsApp</button>
+        </div>
+
+        <div class="learn">
+          <b>How it's calculated:</b> Pivot (P) = (H + L + C) ÷ 3.
+          <b>Classic:</b> R1 = 2P − L, S1 = 2P − H, R2 = P + (H − L), S2 = P − (H − L), R3 = H + 2(P − L), S3 = L − 2(H − P).
+          <b>Fibonacci:</b> R/S = P ± 0.382, 0.618 and 1.0 × (H − L).
+          <b>CPR:</b> BC = (H + L) ÷ 2, TC = 2P − BC. A <b>narrow CPR</b> (under 0.2% of price) often comes before a trending day; a <b>wide CPR</b> (over 0.5%) often comes before a sideways day. These are general observations, not predictions.
+        </div>
+      </section>
+    </div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. Pivot, support, resistance and CPR levels are calculated mechanically from the previous day's prices you enter and are shared for <b>educational purposes only</b>. They are not predictions, investment advice or a recommendation to buy or sell any security. Markets can move past any level. Trading involves risk, including loss of capital. Do your own research or consult a SEBI-registered adviser before trading.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+  <div class="toast" id="toast">Copied ✓</div>
+  <div class="modal" id="imgModal" hidden>
+    <div class="modal-card">
+      <img id="imgPrev" alt="Daily levels snapshot" />
+      <p id="imgMsg"></p>
+      <div class="row">
+        <a class="btn" id="imgDl" download="daily-levels.png">⬇ Download</a>
+        <button class="btn primary" id="imgClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const PRESETS = ["NIFTY 50", "BANK NIFTY", "SENSEX", "FIN NIFTY", "MIDCAP NIFTY"];
+const MAX = 3;
+const num = s => parseFloat(String(s).replace(/[,₹\s]/g, ""));
+const fmtNum = el => {
+  const raw = el.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+  if (raw === "") { el.value = ""; return; }
+  const [i, d] = raw.split(".");
+  el.value = (i ? Number(i).toLocaleString("en-IN") : "0") + (d !== undefined ? "." + d.slice(0, 2) : "");
+};
+function nextTradingDay() {
+  const d = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  const mins = d.getHours() * 60 + d.getMinutes();
+  if (mins >= 930) d.setDate(d.getDate() + 1);           // after 3:30 PM → next day
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+  return d;
+}
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const niceDate = (long = true) => {
+  const v = $("#date").value; if (!v) return "";
+  const [y, m, dd] = v.split("-").map(Number);
+  return new Date(y, m - 1, dd).toLocaleDateString("en-IN", long ? { weekday: "short", day: "numeric", month: "short", year: "numeric" } : { weekday: "short", day: "numeric", month: "short" });
+};
+
+/* ---------- state ---------- */
+const saved = JSON.parse(localStorage.getItem("levels_form") || "{}");
+const S = Object.assign({ method: "classic", round: "0", disc: true, notes: "", rows: [{ name: "NIFTY 50", h: "", l: "", c: "" }, { name: "BANK NIFTY", h: "", l: "", c: "" }] }, saved);
+$("#date").value = iso(nextTradingDay());   // always default to the next trading session
+$("#notes").value = S.notes; $("#optDisc").checked = S.disc;
+function save() { S.notes = $("#notes").value; S.disc = $("#optDisc").checked; localStorage.setItem("levels_form", JSON.stringify(S)); }
+
+/* ---------- segmented ---------- */
+function setupSeg(id, key) {
+  const seg = $(id), pill = seg.querySelector(".pill"), btns = [...seg.querySelectorAll("button")];
+  const place = () => {
+    const on = btns.find(b => b.dataset.v === S[key]) || btns[0];
+    btns.forEach(b => b.classList.toggle("on", b === on));
+    pill.style.width = on.offsetWidth + "px"; pill.style.transform = `translateX(${on.offsetLeft - 4}px)`;
+  };
+  btns.forEach(b => b.addEventListener("click", () => { S[key] = b.dataset.v; place(); render(); }));
+  addEventListener("resize", place); return place;
+}
+const placers = [setupSeg("#method", "method"), setupSeg("#round", "round")];
+
+/* ---------- instrument rows ---------- */
+function drawInputs() {
+  $("#insts").innerHTML = S.rows.map((r, i) => `
+    <div class="inst" data-i="${i}">
+      <div class="inst-top">
+        <label class="field"><span class="unit">${i + 1}</span><input class="nm" type="text" maxlength="24" value="${r.name.replace(/"/g, "&quot;")}" placeholder="Index or stock name" autocomplete="off" /></label>
+        ${S.rows.length > 1 ? `<button class="rm" title="Remove">✕</button>` : ""}
+      </div>
+      <div class="presets">${PRESETS.map(p => `<button data-p="${p}">${p}</button>`).join("")}</div>
+      <div class="hlc">
+        <div><span class="mini hi">PREV HIGH</span><label class="field"><input class="h" type="text" inputmode="decimal" value="${r.h}" placeholder="24,600" /></label></div>
+        <div><span class="mini lo">PREV LOW</span><label class="field"><input class="l" type="text" inputmode="decimal" value="${r.l}" placeholder="24,380" /></label></div>
+        <div><span class="mini">PREV CLOSE</span><label class="field"><input class="c" type="text" inputmode="decimal" value="${r.c}" placeholder="24,500" /></label></div>
+      </div>
+      <div class="ierr"></div>
+    </div>`).join("");
+  $("#addBtn").hidden = S.rows.length >= MAX;
+}
+$("#insts").addEventListener("input", e => {
+  const box = e.target.closest(".inst"); if (!box) return; const r = S.rows[+box.dataset.i];
+  if (e.target.classList.contains("nm")) r.name = e.target.value.toUpperCase();
+  else if (e.target.matches("input.h, input.l, input.c")) { fmtNum(e.target); r[e.target.classList[0]] = e.target.value; e.target.closest(".field").classList.remove("err"); }
+  render();
+});
+$("#insts").addEventListener("click", e => {
+  const box = e.target.closest(".inst"); if (!box) return; const i = +box.dataset.i;
+  if (e.target.closest(".rm")) { S.rows.splice(i, 1); drawInputs(); render(); return; }
+  const p = e.target.closest("[data-p]"); if (p) { S.rows[i].name = p.dataset.p; box.querySelector(".nm").value = p.dataset.p; render(); }
+});
+$("#addBtn").addEventListener("click", () => {
+  if (S.rows.length >= MAX) return;
+  const used = S.rows.map(r => r.name);
+  S.rows.push({ name: PRESETS.find(p => !used.includes(p)) || "", h: "", l: "", c: "" });
+  drawInputs(); render(); $("#insts").lastElementChild.querySelector(".h").focus();
+});
+["notes"].forEach(id => $("#" + id).addEventListener("input", render));
+$("#optDisc").addEventListener("change", render);
+$("#date").addEventListener("change", render);
+
+/* ---------- maths ---------- */
+function calc(r) {
+  const H = num(r.h), L = num(r.l), C = num(r.c);
+  if (!(H > 0 && L > 0 && C > 0)) return { empty: !(r.h || r.l || r.c) };
+  if (L > H) return { err: "High must be above low." };
+  if (C > H || C < L) return { err: "Close must be between the low and the high." };
+  const P = (H + L + C) / 3, R = H - L;
+  let lv;
+  if (S.method === "fib") lv = { R3: P + R, R2: P + .618 * R, R1: P + .382 * R, S1: P - .382 * R, S2: P - .618 * R, S3: P - R };
+  else lv = { R3: H + 2 * (P - L), R2: P + R, R1: 2 * P - L, S1: 2 * P - H, S2: P - R, S3: L - 2 * (H - P) };
+  let BC = (H + L) / 2, TC = 2 * P - BC; if (TC < BC) [TC, BC] = [BC, TC];
+  const w = (TC - BC) / P * 100;
+  const cpr = { TC, BC, w, kind: w < .2 ? "narrow" : w > .5 ? "wide" : "normal" };
+  return { H, L, C, P, lv, cpr };
+}
+const dp = () => +S.round;
+const f = n => n.toLocaleString("en-IN", { minimumFractionDigits: dp(), maximumFractionDigits: dp() });
+const CPR_TXT = { narrow: "Narrow CPR", normal: "Normal CPR", wide: "Wide CPR" };
+const CPR_HINT = { narrow: "trending day possible", normal: "", wide: "range-bound day possible" };
+
+function results() { return S.rows.map(r => ({ name: (r.name || "").trim() || "Untitled", ...calc(r) })); }
+function ready() { return results().filter(x => x.lv); }
+
+function render() {
+  const res = results();
+  // inline errors
+  document.querySelectorAll(".inst").forEach((box, i) => { box.querySelector(".ierr").textContent = res[i]?.err || ""; });
+  const ok = res.filter(x => x.lv);
+  $("#resMeta").textContent = `${S.method === "fib" ? "Fibonacci" : "Classic"} · ${niceDate(false)}`;
+  $("#boards").innerHTML = ok.length ? ok.map(x => `
+    <div class="board">
+      <div class="board-top"><b>${x.name.replace(/</g, "&lt;")}</b><span class="tag ${x.cpr.kind}">${CPR_TXT[x.cpr.kind]} · ${x.cpr.w.toFixed(2)}%</span></div>
+      ${["R3", "R2", "R1"].map(k => `<div class="rung r"><span class="k">${k}</span><span>${f(x.lv[k])}</span><span class="d">${pct(x.lv[k], x.C)}</span></div>`).join("")}
+      <div class="rung c"><span class="k">CPR</span><span>${f(x.cpr.BC)} – ${f(x.cpr.TC)}</span><span class="d">TC/BC</span></div>
+      <div class="rung p"><span class="k">PIVOT</span><span>${f(x.P)}</span><span class="d">${pct(x.P, x.C)}</span></div>
+      ${["S1", "S2", "S3"].map(k => `<div class="rung s"><span class="k">${k}</span><span>${f(x.lv[k])}</span><span class="d">${pct(x.lv[k], x.C)}</span></div>`).join("")}
+      <div class="prev">Prev H ${f(x.H)} · L ${f(x.L)} · C ${f(x.C)}</div>
+    </div>`).join("") : `<div class="placeholder">Enter the previous day's high, low and close to see the levels.</div>`;
+  save();
+}
+const pct = (v, c) => { const p = (v - c) / c * 100; return (p >= 0 ? "+" : "") + p.toFixed(2) + "%"; };
+
+/* ---------- text ---------- */
+const TOOL_URL = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host)
+  ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/levels/";
+const DISCL = "⚠️ _Disclaimer: Not SEBI registered. Levels are calculated from previous-day prices for educational purposes only. Not investment advice._";
+function buildText() {
+  const out = [`📊 *DAILY LEVELS* · ${niceDate()}`, `_${S.method === "fib" ? "Fibonacci" : "Classic"} pivots from the previous day's high, low and close_`];
+  ready().forEach(x => {
+    out.push("", `*${x.name}*`,
+      `🔴 R3: ${f(x.lv.R3)}`, `🔴 R2: ${f(x.lv.R2)}`, `🔴 R1: ${f(x.lv.R1)}`,
+      `⚪ *Pivot: ${f(x.P)}*`,
+      `🟣 CPR: ${f(x.cpr.BC)} – ${f(x.cpr.TC)} (${CPR_TXT[x.cpr.kind].replace(" CPR", "")}${CPR_HINT[x.cpr.kind] ? ", " + CPR_HINT[x.cpr.kind] : ""})`,
+      `🟢 S1: ${f(x.lv.S1)}`, `🟢 S2: ${f(x.lv.S2)}`, `🟢 S3: ${f(x.lv.S3)}`,
+      `_Prev H ${f(x.H)} · L ${f(x.L)} · C ${f(x.C)}_`);
+  });
+  const n = $("#notes").value.trim(); if (n) out.push("", `📝 ${n}`);
+  out.push("", "— MANIMINDSMONEY Community", `_Levels via ${TOOL_URL}_`);
+  if ($("#optDisc").checked) out.push(DISCL);
+  return out.join("\n");
+}
+
+/* ---------- share ---------- */
+function valid() {
+  const res = results();
+  if (ready().length && !res.some(x => x.err)) return true;
+  document.querySelectorAll(".inst").forEach((box, i) => {
+    if (res[i].lv) return;
+    ["h", "l", "c"].forEach(k => { const inp = box.querySelector("input." + k); if (!(num(inp.value) > 0) || res[i].err) { const fl = inp.closest(".field"); fl.classList.remove("err"); void fl.offsetWidth; fl.classList.add("err"); } });
+  });
+  toast(res.some(x => x.err) ? "Check the highlighted values" : "Enter high, low and close first");
+  return false;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch { const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;opacity:0;top:0"; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok; }
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1900); }
+$("#copyBtn").addEventListener("click", async () => { if (!valid()) return; toast(await copyText(buildText()) ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy"); });
+$("#waBtn").addEventListener("click", () => { if (!valid()) return; window.open("https://wa.me/?text=" + encodeURIComponent(buildText()), "_blank", "noopener"); });
+
+/* ---------- image ---------- */
+const CW = 1080;
+const GROT = '"Space Grotesk", sans-serif', MONO = '"JetBrains Mono", monospace', INTER = 'Inter, sans-serif';
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(ctx, x, y, w, h, r = 28, fill = "rgba(255,255,255,0.045)", stroke = "rgba(255,255,255,0.10)") { rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); }
+function txt(ctx, s, x, y, font, color, align = "left") { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); }
+function fit(ctx, s, weight, fam, size, maxW) { do { ctx.font = `${weight} ${size}px ${fam}`; if (ctx.measureText(s).width <= maxW) break; size -= 2; } while (size > 14); return ctx.font; }
+function wrapLines(ctx, text, maxW) { const out = []; let line = ""; text.split(/\s+/).forEach(w => { const t = line ? line + " " + w : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; }
+const CPR_COL = { narrow: "#22d39a", normal: "#febc2e", wide: "#ff5470" };
+
+async function drawLevels() {
+  await Promise.all([`700 80px ${GROT}`, `600 30px ${MONO}`, `700 30px ${MONO}`, `500 26px ${MONO}`, `400 28px ${INTER}`].map(fn => document.fonts.load(fn).catch(() => {})));
+  const list = ready(), n = list.length;
+  const m = document.createElement("canvas").getContext("2d"); m.font = `400 28px ${INTER}`;
+  const note = $("#notes").value.trim();
+  let nLines = note ? wrapLines(m, note, CW - 200) : []; if (nLines.length > 5) { nLines = nLines.slice(0, 5); nLines[4] += "…"; }
+  const notesH = nLines.length ? 52 + nLines.length * 40 + 30 : 0;
+  const rowH = 70, boardH = 120 + 8 * rowH + 60;
+  const H = 400 + boardH + (notesH ? notesH + 24 : 0) + 170;
+
+  const c = document.createElement("canvas"); c.width = CW; c.height = H; const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, r, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 650, "rgba(124,92,255,0.34)"); glow(CW - 30, 340, 520, "rgba(34,211,154,0.12)"); glow(CW - 40, H - 60, 620, "rgba(255,84,112,0.12)");
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+  // brand
+  const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
+  rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
+  txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+  // title
+  txt(ctx, "DAILY LEVELS", 70, 205, `600 26px ${MONO}`, "#00e0b8");
+  ctx.font = fit(ctx, niceDate(), 700, GROT, 80, CW - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(niceDate(), 70, 292);
+  const meth = (S.method === "fib" ? "FIBONACCI" : "CLASSIC") + " PIVOTS";
+  ctx.font = `600 24px ${MONO}`; const mw = ctx.measureText(meth).width + 44;
+  rr(ctx, 70, 322, mw, 48, 24); ctx.fillStyle = "rgba(124,92,255,0.16)"; ctx.fill(); ctx.strokeStyle = "rgba(124,92,255,0.55)"; ctx.lineWidth = 2; ctx.stroke();
+  txt(ctx, meth, 92, 354, `600 24px ${MONO}`, "#c9bcff");
+
+  // boards
+  const gap = 20, bwid = (CW - 140 - gap * (n - 1)) / n, by = 400;
+  const priceSize = n === 1 ? 40 : n === 2 ? 34 : 28;
+  list.forEach((x, i) => {
+    const bx = 70 + i * (bwid + gap);
+    panel(ctx, bx, by, bwid, boardH, 28, "rgba(0,0,0,0.40)");
+    ctx.font = fit(ctx, x.name, 700, GROT, n === 3 ? 34 : 40, bwid - 48); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(x.name, bx + 24, by + 56);
+    const cc = CPR_COL[x.cpr.kind], ct = `${CPR_TXT[x.cpr.kind].toUpperCase()} ${x.cpr.w.toFixed(2)}%`;
+    ctx.font = fit(ctx, ct, 600, MONO, 20, bwid - 48);
+    const tw = ctx.measureText(ct).width + 28;
+    rr(ctx, bx + 24, by + 74, tw, 34, 17); ctx.fillStyle = cc + "22"; ctx.fill(); ctx.strokeStyle = cc + "88"; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = cc; ctx.fillText(ct, bx + 38, by + 98);
+
+    const rows = [["R3", x.lv.R3, "r"], ["R2", x.lv.R2, "r"], ["R1", x.lv.R1, "r"], ["CPR", null, "c"], ["PIVOT", x.P, "p"], ["S1", x.lv.S1, "s"], ["S2", x.lv.S2, "s"], ["S3", x.lv.S3, "s"]];
+    rows.forEach(([k, v, t], j) => {
+      const ry = by + 128 + j * rowH;
+      const col = t === "r" ? "#ff5470" : t === "s" ? "#22d39a" : t === "c" ? "#b18cff" : "#eef0f6";
+      if (t === "p" || t === "c") { rr(ctx, bx + 12, ry, bwid - 24, rowH - 10, 14); ctx.fillStyle = t === "c" ? "rgba(177,140,255,0.10)" : "rgba(255,255,255,0.06)"; ctx.fill(); }
+      const kw = n === 3 ? 74 : 92;
+      rr(ctx, bx + 24, ry + 14, kw, 32, 9); ctx.fillStyle = col + (t === "p" ? "22" : "26"); ctx.fill();
+      txt(ctx, k, bx + 24 + kw / 2, ry + 37, `700 ${n === 3 ? 17 : 19}px ${MONO}`, col, "center");
+      const val = v == null ? `${f(x.cpr.BC)}–${f(x.cpr.TC)}` : f(v);
+      ctx.font = fit(ctx, val, t === "p" ? 700 : 600, MONO, v == null ? priceSize - 6 : priceSize, bwid - kw - 64);
+      ctx.fillStyle = t === "p" ? "#ffffff" : (v == null ? "#d9cbff" : "#e6e8f0"); ctx.textAlign = "right"; ctx.fillText(val, bx + bwid - 24, ry + 42);
+    });
+    const prev = `H ${f(x.H)} · L ${f(x.L)} · C ${f(x.C)}`;
+    ctx.font = fit(ctx, prev, 500, MONO, 20, bwid - 40); ctx.fillStyle = "#8a90a2"; ctx.textAlign = "center"; ctx.fillText(prev, bx + bwid / 2, by + boardH - 26);
+  });
+
+  let y = by + boardH + 24;
+  if (notesH) {
+    panel(ctx, 70, y, CW - 140, notesH, 28, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
+    txt(ctx, "NOTES", 100, y + 48, `600 22px ${MONO}`, "#b6a6ff");
+    nLines.forEach((l, k) => txt(ctx, l, 100, y + 50 + (k + 1) * 40 + 2, `400 28px ${INTER}`, "#d5d8e3"));
+    y += notesH + 24;
+  }
+  txt(ctx, "— MANIMINDSMONEY Community", 70, y + 36, `600 28px ${INTER}`, "#b6a6ff");
+  txt(ctx, TOOL_URL.replace(/\/$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  if ($("#optDisc").checked) txt(ctx, "Not SEBI registered · Calculated from previous-day prices · Educational purpose only", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
+  return c;
+}
+$("#imgBtn").addEventListener("click", async e => {
+  if (!valid()) return;
+  const btn = e.currentTarget, label = btn.textContent; btn.disabled = true; btn.textContent = "Creating image…";
+  try {
+    const canvas = await drawLevels();
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const name = `daily-levels-${$("#date").value || "today"}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+    if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === "AbortError") return; }
+    }
+    let copied = false;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+    const url = URL.createObjectURL(blob);
+    $("#imgPrev").src = url; $("#imgDl").href = url; $("#imgDl").download = name;
+    $("#imgMsg").innerHTML = copied
+      ? "✅ <b>Image copied.</b> Open WhatsApp, pick your community chat and press <b>Ctrl+V</b> to paste it. Or download it below."
+      : "Tap <b>Download</b>, or long-press the image to save or share it on WhatsApp.";
+    $("#imgModal").hidden = false;
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+$("#imgClose").addEventListener("click", () => $("#imgModal").hidden = true);
+$("#imgModal").addEventListener("click", e => { if (e.target.id === "imgModal") $("#imgModal").hidden = true; });
+
+/* ---------- init ---------- */
+drawInputs(); placers.forEach(p => p()); document.fonts.ready.then(() => placers.forEach(p => p())); render();
+</script>
+</body>
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Quiz Card — MANIMINDSMONEY</title>
+<meta name="description" content="Create trading and investing quiz questions for your WhatsApp community, then share the question and the answer reveal as text or an image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --qz: #ffb020;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .2; animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--qz); top: -25vmax; left: -15vmax; opacity: .16; }
+  .blob.b2 { background: var(--a1); bottom: -30vmax; right: -20vmax; animation-delay: -6s; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  h1 { font: 700 clamp(1.9rem, 6vw, 2.8rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--qz), var(--a3) 50%, var(--a1)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 22px; font-size: .95rem; max-width: 660px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 20px; align-items: start; }
+  .layout > * { min-width: 0; }
+  @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(18px, 4.5vw, 28px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); }
+  .sticky { position: sticky; top: 16px; }
+  @media (max-width: 920px) { .sticky { position: static; } }
+
+  .q { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 600 .74rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--a2); margin: 20px 0 8px; }
+  .q:first-child { margin-top: 0; }
+  .q .opt { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; font-family: Inter; }
+
+  .bank { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 14px; border-radius: 18px; border: 1px dashed rgba(255,176,32,.45); background: rgba(255,176,32,.06); }
+  .bank p { font-size: .84rem; color: #e8d6b0; }
+  .bank p b { color: #ffd27a; }
+  .bank select { grid-column: 1 / -1; width: 100%; background: rgba(0,0,0,.35); border: 1px solid var(--line); color: var(--fg); border-radius: 12px; padding: 10px 12px; font: 500 .86rem Inter; color-scheme: dark; outline: 0; }
+  .roll { border: 0; border-radius: 14px; padding: 12px 16px; font: 700 .92rem Inter; cursor: pointer; color: #1a1200; background: linear-gradient(100deg, #ffd27a, var(--qz)); white-space: nowrap; }
+  .roll:active { transform: scale(.97); }
+
+  .row2 { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; }
+  .field { display: flex; align-items: center; gap: 8px; padding: 2px 14px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err, textarea.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 .95rem "JetBrains Mono"; color: var(--muted); }
+  .field input, .field select { width: 100%; flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 600 1rem Inter; padding: 11px 0; color-scheme: dark; }
+  .field input::placeholder, textarea::placeholder { color: #3f4558; }
+
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 16px; background: rgba(0,0,0,.35); border: 1px solid var(--line); position: relative; }
+  .seg button { position: relative; z-index: 1; border: 0; background: none; color: var(--muted); padding: 10px 6px; border-radius: 12px; font: 600 .86rem Inter; cursor: pointer; transition: color .25s; line-height: 1.2; }
+  .seg button small { display: block; font-weight: 400; font-size: .7rem; opacity: .75; margin-top: 2px; }
+  .seg button.on { color: #000; }
+  .seg .pill { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 12px; background: var(--fg); transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s, background .35s; }
+
+  textarea { width: 100%; resize: vertical; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); border-radius: 16px; color: var(--fg); font: 400 .95rem/1.5 Inter, sans-serif; padding: 12px 14px; outline: 0; transition: border-color .25s, box-shadow .25s; }
+  textarea:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  #question { min-height: 86px; font: 600 1.05rem/1.45 "Space Grotesk"; }
+  #expl { min-height: 86px; }
+
+  .opts { display: grid; gap: 8px; }
+  .optrow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+  .letter { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font: 700 .95rem "JetBrains Mono"; background: rgba(255,255,255,.06); border: 1.5px solid var(--line); color: #cfd3df; cursor: pointer; transition: all .2s; }
+  .optrow.correct .letter { background: var(--up); border-color: var(--up); color: #032015; }
+  .optrow.correct .field { border-color: rgba(34,211,154,.55); background: rgba(34,211,154,.07); }
+  .mark { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); border-radius: 10px; padding: 9px 10px; font: 600 .74rem Inter; cursor: pointer; white-space: nowrap; }
+  .optrow.correct .mark { color: var(--up); border-color: rgba(34,211,154,.5); }
+  .optbar { display: flex; gap: 8px; margin-top: 8px; }
+  .optbar button { flex: 1; border: 1px dashed rgba(255,255,255,.18); background: none; color: var(--muted); border-radius: 12px; padding: 9px; font: 600 .8rem Inter; cursor: pointer; }
+  .optbar button:hover { color: var(--fg); border-color: rgba(255,255,255,.3); }
+  .optbar button[disabled] { opacity: .35; pointer-events: none; }
+  .note { font-size: .74rem; color: var(--muted); margin-top: 6px; }
+
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,.28); border: 1px solid var(--line); font-size: .9rem; cursor: pointer; margin-top: 10px; }
+  .toggle small { display: block; color: var(--muted); font-size: .74rem; }
+  .toggle input { display: none; }
+  .sw { flex: none; width: 44px; height: 26px; border-radius: 13px; background: rgba(255,255,255,.12); position: relative; transition: background .25s; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  .toggle input:checked + .sw { background: var(--a2); }
+  .toggle input:checked + .sw::after { transform: translateX(18px); }
+
+  .mode { margin-bottom: 14px; }
+  .chat { border-radius: 20px; padding: 18px 14px; background: #0b141a url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='2' cy='2' r='1' fill='%23ffffff10'/></svg>"); border: 1px solid var(--line); max-height: 520px; overflow: auto; }
+  .bubble { position: relative; margin-left: auto; max-width: 94%; background: #005c4b; color: #e9edef; border-radius: 12px 0 12px 12px; padding: 10px 12px 20px; font: 400 .9rem/1.45 Inter, sans-serif; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,.3); }
+  .bubble::after { content: ""; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: #005c4b; border-left-color: #005c4b; }
+  .bubble .time { position: absolute; right: 10px; bottom: 4px; font-size: .66rem; color: #ffffff99; }
+  .empty { color: #8696a0; font-style: italic; }
+  .tip { margin-top: 12px; font-size: .78rem; color: var(--muted); line-height: 1.5; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid var(--line); }
+  .tip b { color: #cfd3df; }
+
+  .share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 16px; font: 600 .98rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.img { grid-column: 1 / -1; background: linear-gradient(100deg, rgba(255,176,32,.2), rgba(124,92,255,.2)); border: 1px solid rgba(255,176,32,.5); font-weight: 700; }
+  .btn.img[disabled] { opacity: .6; pointer-events: none; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; font-weight: 700; }
+  .btn.wa svg { width: 18px; height: 18px; }
+  .btn.ghost { grid-column: 1 / -1; font-size: .85rem; padding: 11px; color: var(--muted); }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 140px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 30; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); }
+  .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .modal[hidden] { display: none; }
+  .modal-card { width: 100%; max-width: 420px; max-height: 100%; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px; }
+  .modal-card img { display: block; max-width: 100%; max-height: min(62vh, 560px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); }
+  .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
+  .modal-card .row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 14px; }
+  .disclaimer { margin: 26px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../levels/">Levels</a><a href="../message/">Message</a><a href="../ipo/">IPO card</a><a href="../sl-calculator/">SL Calculator</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Quiz your <span class="grad">community.</span></h1>
+    <p class="sub">Post a question today and reveal the answer tomorrow. Pick a ready question or write your own, then share it as text or an image.</p>
+
+    <div class="layout">
+      <!-- EDITOR -->
+      <section class="card">
+        <div class="bank">
+          <p><b>Question bank:</b> ready questions on candles, patterns, indicators, risk, options and investing basics.</p>
+          <button class="roll" id="rollBtn">🎲 Random</button>
+          <select id="bankTopic" aria-label="Question bank topic"></select>
+        </div>
+
+        <div class="row2" style="margin-top:18px">
+          <div><div class="q">Quiz #</div><label class="field"><span class="unit">#</span><input id="num" type="text" inputmode="numeric" maxlength="4" placeholder="1" /></label></div>
+          <div><div class="q">Topic</div><label class="field"><select id="topic"></select></label></div>
+        </div>
+
+        <div class="q">Difficulty</div>
+        <div class="seg" id="diff">
+          <div class="pill"></div>
+          <button data-v="easy" class="on">🟢 Easy</button>
+          <button data-v="medium">🟡 Medium</button>
+          <button data-v="hard">🔴 Hard</button>
+        </div>
+
+        <div class="q"><label for="question">Question</label><span class="opt"><span id="qCount">0</span>/220</span></div>
+        <textarea id="question" maxlength="220" placeholder="e.g. A candle with a small body near the top and a long lower shadow, after a downtrend, is called…?"></textarea>
+
+        <div class="q">Options <span class="opt">tap a letter to mark the correct answer</span></div>
+        <div class="opts" id="opts"></div>
+        <div class="optbar"><button id="addOpt">＋ Add option</button><button id="rmOpt">− Remove last</button></div>
+
+        <div class="q"><label for="expl">Explanation</label><span class="opt">shown with the answer</span></div>
+        <textarea id="expl" maxlength="320" placeholder="Why is this the right answer? 1–3 short lines."></textarea>
+
+        <label class="toggle"><span>Add disclaimer<small>Educational purpose only · not investment advice</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
+      </section>
+
+      <!-- PREVIEW -->
+      <section class="card sticky">
+        <div class="seg mode" id="mode">
+          <div class="pill"></div>
+          <button data-v="q" class="on">❓ Question<small>post today</small></button>
+          <button data-v="a">✅ Answer reveal<small>post later</small></button>
+        </div>
+        <div class="chat"><div class="bubble" id="bubble"></div></div>
+
+        <div class="share-row">
+          <button class="btn img" id="imgBtn">📸 Share as image</button>
+          <button class="btn" id="copyBtn">📋 Copy text</button>
+          <button class="btn wa" id="waBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg> WhatsApp</button>
+          <button class="btn ghost" id="nextBtn"><span>➡️ Next quiz (#<span id="nextNum">2</span>)</span></button>
+        </div>
+        <div class="tip"><b>Tip:</b> post the <b>Question</b> today, then switch to <b>Answer reveal</b> and post it tomorrow. Your quiz stays saved on this device until you tap <b>Next quiz</b>.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. Quiz questions, answers and explanations are for <b>learning and educational purposes only</b> and are based on general concepts and personal research. They are not investment advice or a recommendation to buy or sell any security. Trading and investing involve risk.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+  <div class="toast" id="toast">Copied ✓</div>
+  <div class="modal" id="imgModal" hidden>
+    <div class="modal-card">
+      <img id="imgPrev" alt="Quiz snapshot" />
+      <p id="imgMsg"></p>
+      <div class="row">
+        <a class="btn" id="imgDl" download="quiz.png">⬇ Download</a>
+        <button class="btn primary" id="imgClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const LETTERS = ["A", "B", "C", "D"];
+const TOPICS = ["Basics", "Candlesticks", "Chart patterns", "Indicators", "Risk management", "Options", "Investing", "IPO", "Personal finance", "General"];
+const DIFF = { easy: { t: "Easy", e: "🟢", c: "#22d39a" }, medium: { t: "Medium", e: "🟡", c: "#febc2e" }, hard: { t: "Hard", e: "🔴", c: "#ff5470" } };
+
+/* ---------- question bank (answer index is 0-based) ---------- */
+const BANK = [
+  { t: "Basics", d: "easy", q: "What does IPO stand for?", o: ["Initial Public Offering", "Indian Profit Order", "Internal Price Option", "Initial Purchase Order"], a: 0, x: "An IPO is when a company sells its shares to the public for the first time and gets listed on a stock exchange." },
+  { t: "Basics", d: "easy", q: "How many stocks are in the BSE Sensex?", o: ["50", "30", "100", "20"], a: 1, x: "The Sensex tracks 30 large, well-established companies listed on the BSE. The Nifty 50 tracks 50 companies on the NSE." },
+  { t: "Basics", d: "medium", q: "Under India's T+1 settlement, when do bought shares reach your demat account?", o: ["The same day", "One working day after the trade", "Two working days after the trade", "One week later"], a: 1, x: "India moved to T+1 settlement in 2023, so shares are credited one working day after the trade day." },
+  { t: "Basics", d: "medium", q: "Market capitalisation of a company is…", o: ["Its yearly profit", "Share price × total shares outstanding", "Its total debt", "Its yearly revenue"], a: 1, x: "Market cap = current share price × total number of shares. It shows how much the market values the whole company." },
+  { t: "Candlesticks", d: "easy", q: "A candle where the open and close are almost the same price is called a…", o: ["Marubozu", "Hammer", "Doji", "Engulfing"], a: 2, x: "A doji has a tiny or no body because the open and close are nearly equal. It shows indecision between buyers and sellers." },
+  { t: "Candlesticks", d: "medium", q: "After a downtrend, a candle with a small body near the top and a long lower shadow is called a…", o: ["Shooting star", "Hammer", "Doji", "Marubozu"], a: 1, x: "A hammer shows sellers pushed the price down but buyers brought it back up. It can signal a bullish reversal if the next candle confirms it." },
+  { t: "Candlesticks", d: "medium", q: "In a bullish engulfing pattern, the second candle is…", o: ["A small red candle", "A green candle whose body fully covers the previous red body", "A doji", "A gap-down red candle"], a: 1, x: "Bullish engulfing: a big green body completely engulfs the previous red body, showing buyers took control." },
+  { t: "Candlesticks", d: "hard", q: "A shooting star candle usually appears…", o: ["At the bottom of a downtrend", "At the top of an uptrend", "Only in sideways markets", "Only on gap-up days"], a: 1, x: "A shooting star has a small body near the low and a long upper shadow, appearing after an uptrend. It can warn of a bearish reversal." },
+  { t: "Chart patterns", d: "medium", q: "A head and shoulders pattern at the top of an uptrend is usually…", o: ["A bullish continuation", "A bearish reversal", "A sign of low volume", "Meaningless"], a: 1, x: "Head and shoulders at a top often marks a trend reversal from up to down, confirmed when price breaks below the neckline." },
+  { t: "Chart patterns", d: "medium", q: "The cup and handle pattern is generally considered…", o: ["Bearish reversal", "Bullish continuation", "Neutral", "A volume indicator"], a: 1, x: "Cup and handle is a bullish continuation pattern. A breakout above the handle's high, ideally on strong volume, is the usual trigger." },
+  { t: "Chart patterns", d: "easy", q: "When a strong support level breaks, it often acts as…", o: ["Stronger support", "Resistance", "A gap", "Nothing at all"], a: 1, x: "This is called role reversal: broken support often turns into resistance, and broken resistance often turns into support." },
+  { t: "Chart patterns", d: "easy", q: "A breakout on high volume is generally considered…", o: ["Less reliable", "More reliable", "A sign to short", "The same as low volume"], a: 1, x: "High volume shows strong participation behind the move, so the breakout is more likely to hold than one on thin volume." },
+  { t: "Indicators", d: "easy", q: "An RSI reading above 70 is generally called…", o: ["Oversold", "Overbought", "Neutral", "A guaranteed sell signal"], a: 1, x: "RSI above 70 = overbought, below 30 = oversold. In strong trends RSI can stay overbought for a long time, so it is not a sell signal on its own." },
+  { t: "Indicators", d: "medium", q: "A 'golden cross' happens when…", o: ["The 50-day moving average crosses above the 200-day", "The 200-day crosses above the 50-day", "RSI crosses 50", "Price touches the 200-day"], a: 0, x: "A golden cross is the 50-day MA crossing above the 200-day MA, often seen as a long-term bullish sign. The opposite is a death cross." },
+  { t: "Indicators", d: "medium", q: "The classic pivot point is calculated as…", o: ["(High + Low) ÷ 2", "(High + Low + Close) ÷ 3", "(Open + Close) ÷ 2", "High − Low"], a: 1, x: "Pivot = (previous High + Low + Close) ÷ 3. Support and resistance levels are then built around this pivot." },
+  { t: "Indicators", d: "hard", q: "A narrow CPR (Central Pivot Range) often suggests…", o: ["A sideways day", "A possible trending day", "A market holiday", "Low volume for the week"], a: 1, x: "A narrow CPR means yesterday's range was balanced and tight, which often comes before a trending move. A wide CPR often comes before a sideways day." },
+  { t: "Risk management", d: "easy", q: "What is the main purpose of a stop-loss?", o: ["To guarantee profit", "To limit the loss on a trade", "To increase leverage", "To avoid brokerage"], a: 1, x: "A stop-loss exits the trade at a pre-decided price so a wrong trade can't become a huge loss." },
+  { t: "Risk management", d: "medium", q: "You can risk ₹2,000 on a trade and your stop-loss is ₹20 per share. How many shares can you buy?", o: ["10", "50", "100", "200"], a: 2, x: "Quantity = risk ÷ stop-loss per share = ₹2,000 ÷ ₹20 = 100 shares." },
+  { t: "Risk management", d: "easy", q: "A risk-reward ratio of 1:3 means…", o: ["Risk ₹3 to make ₹1", "Risk ₹1 to make ₹3", "Win 3 trades out of 4", "Use 3x leverage"], a: 1, x: "1:3 means the target is three times the stop-loss distance. Even winning 1 trade in 3 can break even." },
+  { t: "Risk management", d: "hard", q: "With a 1:2 risk-reward on every trade, roughly what win rate do you need to break even (before costs)?", o: ["About 25%", "About 33%", "About 50%", "About 66%"], a: 1, x: "Break-even win rate = 1 ÷ (1 + 2) ≈ 33%. One win of 2R covers two losses of 1R." },
+  { t: "Options", d: "easy", q: "What is the maximum loss for an option buyer?", o: ["Unlimited", "The premium paid", "The strike price", "Twice the premium"], a: 1, x: "An option buyer can lose at most the premium paid. Option sellers can face much larger losses." },
+  { t: "Options", d: "medium", q: "At expiry, a call option buyer makes a profit when the price is above…", o: ["The strike price", "The strike price + premium paid", "The strike price − premium paid", "The previous close"], a: 1, x: "Break-even for a call buyer = strike + premium. Above that level the trade is in profit at expiry." },
+  { t: "Investing", d: "easy", q: "The P/E ratio is calculated as…", o: ["Price ÷ earnings per share", "Profit ÷ equity", "Price × earnings", "Earnings ÷ price"], a: 0, x: "P/E = share price ÷ earnings per share (EPS). It shows how much investors pay for each ₹1 of earnings." },
+  { t: "Investing", d: "medium", q: "Dividend yield is…", o: ["Dividend ÷ face value", "Annual dividend per share ÷ share price", "Dividend × number of shares", "Profit ÷ dividend"], a: 1, x: "Dividend yield = annual dividend per share ÷ current share price, shown as a percentage." },
+  { t: "Personal finance", d: "easy", q: "By the Rule of 72, money growing at 12% a year doubles in about…", o: ["3 years", "6 years", "9 years", "12 years"], a: 1, x: "Rule of 72: years to double ≈ 72 ÷ interest rate = 72 ÷ 12 = 6 years." },
+  { t: "IPO", d: "medium", q: "In an Indian IPO, the 'shareholder quota' is for…", o: ["Any retail investor", "Existing shareholders of the listed parent company", "Only employees", "Foreign investors"], a: 1, x: "Some IPOs reserve a portion for shareholders of the listed parent company. You usually need to hold its shares before the RHP date." },
+];
+
+/* ---------- state ---------- */
+const S = Object.assign({ num: "1", topic: "Candlesticks", diff: "medium", q: "", opts: ["", "", "", ""], correct: 0, expl: "", mode: "q", disc: true }, JSON.parse(localStorage.getItem("quiz_form") || "{}"));
+function save() { localStorage.setItem("quiz_form", JSON.stringify(S)); }
+
+$("#topic").innerHTML = TOPICS.map(t => `<option>${t}</option>`).join("");
+$("#bankTopic").innerHTML = `<option value="">All topics (${BANK.length} questions)</option>` + TOPICS.filter(t => BANK.some(b => b.t === t)).map(t => `<option value="${t}">${t} (${BANK.filter(b => b.t === t).length})</option>`).join("");
+
+function fillForm() {
+  $("#num").value = S.num; $("#topic").value = S.topic; $("#question").value = S.q; $("#expl").value = S.expl; $("#optDisc").checked = S.disc;
+  drawOpts(); placers.forEach(p => p()); update();
+}
+function drawOpts() {
+  $("#opts").innerHTML = S.opts.map((o, i) => `
+    <div class="optrow ${i === S.correct ? "correct" : ""}" data-i="${i}">
+      <button class="letter" title="Mark ${LETTERS[i]} as correct">${LETTERS[i]}</button>
+      <label class="field"><input type="text" maxlength="90" value="${o.replace(/"/g, "&quot;")}" placeholder="Option ${LETTERS[i]}" /></label>
+      <button class="mark">${i === S.correct ? "✓ Correct" : "Mark"}</button>
+    </div>`).join("");
+  $("#addOpt").disabled = S.opts.length >= 4; $("#rmOpt").disabled = S.opts.length <= 2;
+}
+$("#opts").addEventListener("input", e => { const r = e.target.closest(".optrow"); S.opts[+r.dataset.i] = e.target.value; e.target.closest(".field").classList.remove("err"); update(); });
+$("#opts").addEventListener("click", e => { const b = e.target.closest(".letter, .mark"); if (!b) return; S.correct = +b.closest(".optrow").dataset.i; drawOpts(); update(); });
+$("#addOpt").addEventListener("click", () => { if (S.opts.length < 4) { S.opts.push(""); drawOpts(); update(); $("#opts").lastElementChild.querySelector("input").focus(); } });
+$("#rmOpt").addEventListener("click", () => { if (S.opts.length > 2) { S.opts.pop(); if (S.correct >= S.opts.length) S.correct = 0; drawOpts(); update(); } });
+
+$("#num").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, ""); S.num = e.target.value; update(); });
+$("#topic").addEventListener("change", e => { S.topic = e.target.value; update(); });
+$("#question").addEventListener("input", e => { S.q = e.target.value; e.target.classList.remove("err"); update(); });
+$("#expl").addEventListener("input", e => { S.expl = e.target.value; update(); });
+$("#optDisc").addEventListener("change", e => { S.disc = e.target.checked; update(); });
+
+let lastPick = -1;
+$("#rollBtn").addEventListener("click", () => {
+  if (S.q.trim() && !confirm("Replace the current question with one from the bank?")) return;
+  const t = $("#bankTopic").value, pool = BANK.map((b, i) => ({ b, i })).filter(x => !t || x.b.t === t);
+  let pick; do { pick = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && pick.i === lastPick);
+  lastPick = pick.i; const b = pick.b;
+  Object.assign(S, { topic: b.t, diff: b.d, q: b.q, opts: [...b.o], correct: b.a, expl: b.x, mode: "q" });
+  fillForm(); toast("🎲 Question loaded");
+});
+$("#nextBtn").addEventListener("click", () => {
+  if (!confirm(`Start quiz #${(+S.num || 0) + 1}? The current quiz will be cleared.`)) return;
+  Object.assign(S, { num: String((+S.num || 0) + 1), q: "", opts: ["", "", "", ""], correct: 0, expl: "", mode: "q" });
+  fillForm(); $("#question").focus();
+});
+
+/* ---------- segmented ---------- */
+function setupSeg(id, key, color) {
+  const seg = $(id), pill = seg.querySelector(".pill"), btns = [...seg.querySelectorAll("button")];
+  const place = () => {
+    const on = btns.find(b => b.dataset.v === S[key]) || btns[0];
+    btns.forEach(b => b.classList.toggle("on", b === on));
+    pill.style.width = on.offsetWidth + "px"; pill.style.transform = `translateX(${on.offsetLeft - 4}px)`;
+    if (color) pill.style.background = color(S[key]);
+  };
+  btns.forEach(b => b.addEventListener("click", () => { S[key] = b.dataset.v; place(); update(); }));
+  addEventListener("resize", place); return place;
+}
+const placers = [setupSeg("#diff", "diff", v => DIFF[v].c), setupSeg("#mode", "mode", v => v === "a" ? "#22d39a" : "#ffd27a")];
+
+/* ---------- text ---------- */
+const TOOL_URL = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host)
+  ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/quiz/";
+const DISCL = "⚠️ _For learning and educational purposes only. Not investment advice. Not SEBI registered._";
+const opts = () => S.opts.map((o, i) => ({ L: LETTERS[i], o: o.trim(), ok: i === S.correct })).filter(x => x.o);
+const head = () => `#${S.num || "1"} · ${S.topic}`;
+function buildText() {
+  const d = DIFF[S.diff], q = S.q.trim(), list = opts(), right = list.find(x => x.ok);
+  const out = [];
+  if (S.mode === "q") {
+    out.push(`🧠 *QUIZ ${head()}*  ${d.e} ${d.t}`, "", `*${q}*`, "");
+    list.forEach(x => out.push(`*${x.L})* ${x.o}`));
+    out.push("", `👇 Reply with ${list.map(x => x.L).join(", ").replace(/, ([^,]*)$/, " or $1")}. Answer coming soon!`);
+  } else {
+    out.push(`✅ *QUIZ ${head()} · ANSWER*`, "", `*Q: ${q}*`, "");
+    list.forEach(x => out.push(x.ok ? `✅ *${x.L}) ${x.o}*` : `▫️ ~${x.L}) ${x.o}~`));
+    if (S.expl.trim()) out.push("", `💡 *Why:* ${S.expl.trim()}`);
+    out.push("", "Did you get it right? Reply with ✅ or ❌ 🙌");
+  }
+  out.push("", "— MANIMINDSMONEY Community");
+  if (S.disc) out.push(DISCL);
+  return out.join("\n");
+}
+const esc = s => s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+function waFormat(t) {
+  return esc(t)
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?:;]|$)/gm, "$1<b>$2</b>")
+    .replace(/(^|[\s(])_([^_\n]+)_(?=[\s).,!?:;]|$)/gm, "$1<i>$2</i>")
+    .replace(/(^|[\s(])~([^~\n]+)~(?=[\s).,!?:;]|$)/gm, "$1<s>$2</s>")
+    .replace(/\n/g, "<br>");
+}
+function update() {
+  $("#qCount").textContent = S.q.length;
+  $("#nextNum").textContent = (+S.num || 0) + 1;
+  const time = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  $("#bubble").innerHTML = (S.q.trim() ? waFormat(buildText()) : '<span class="empty">Tap 🎲 Random or type a question…</span>') + `<span class="time">${time} ✓✓</span>`;
+  save();
+}
+
+/* ---------- validation + share ---------- */
+function valid() {
+  const shake = el => { el.classList.remove("err"); void el.offsetWidth; el.classList.add("err"); };
+  if (!S.q.trim()) { shake($("#question")); toast("Write a question first"); $("#question").focus(); return false; }
+  const filled = opts();
+  if (filled.length < 2) { document.querySelectorAll(".optrow .field").forEach((f, i) => { if (!S.opts[i].trim()) shake(f); }); toast("Add at least 2 options"); return false; }
+  if (!S.opts[S.correct]?.trim()) { shake(document.querySelectorAll(".optrow .field")[S.correct]); toast("The correct option is empty"); return false; }
+  return true;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch { const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;opacity:0;top:0"; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok; }
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1900); }
+$("#copyBtn").addEventListener("click", async () => { if (!valid()) return; toast(await copyText(buildText()) ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy"); });
+$("#waBtn").addEventListener("click", () => { if (!valid()) return; window.open("https://wa.me/?text=" + encodeURIComponent(buildText()), "_blank", "noopener"); });
+
+/* ---------- image ---------- */
+const CW = 1080;
+const GROT = '"Space Grotesk", sans-serif', MONO = '"JetBrains Mono", monospace', INTER = 'Inter, sans-serif';
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(ctx, x, y, w, h, r = 28, fill = "rgba(255,255,255,0.045)", stroke = "rgba(255,255,255,0.10)", lw = 2) { rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke(); }
+function txt(ctx, s, x, y, font, color, align = "left") { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); }
+function wrap(ctx, text, maxW, font) { ctx.font = font; const out = []; let line = ""; text.split(/\s+/).forEach(w => { const t = line ? line + " " + w : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; }
+function pill(ctx, s, x, y, color, h = 50) { ctx.font = `600 24px ${MONO}`; const w = ctx.measureText(s).width + 44; rr(ctx, x, y, w, h, h / 2); ctx.fillStyle = color + "26"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color + "99"; ctx.stroke(); txt(ctx, s, x + 22, y + h / 2 + 8, `600 24px ${MONO}`, color); return w; }
+
+async function drawQuiz() {
+  await Promise.all([`700 80px ${GROT}`, `700 52px ${GROT}`, `600 30px ${MONO}`, `500 34px ${INTER}`, `700 34px ${INTER}`, `400 30px ${INTER}`].map(fn => document.fonts.load(fn).catch(() => {})));
+  const reveal = S.mode === "a", d = DIFF[S.diff], list = opts();
+  const m = document.createElement("canvas").getContext("2d");
+  let qLines = wrap(m, S.q.trim(), CW - 140, `700 52px ${GROT}`); if (qLines.length > 6) { qLines = qLines.slice(0, 6); qLines[5] += "…"; }
+  const optFont = `500 34px ${INTER}`;
+  const oLay = list.map(x => { let l = wrap(m, x.o, CW - 140 - 140, x.ok && reveal ? `700 34px ${INTER}` : optFont); if (l.length > 2) { l = l.slice(0, 2); l[1] += "…"; } return { ...x, lines: l, h: 40 + l.length * 44 + 20 }; });
+  const ex = reveal && S.expl.trim() ? wrap(m, S.expl.trim(), CW - 200, `400 30px ${INTER}`).slice(0, 6) : [];
+  const exH = ex.length ? 56 + ex.length * 42 + 30 : 0;
+  const ctaH = 90;
+  let H = 330 + qLines.length * 64 + 40 + oLay.reduce((s, o) => s + o.h + 16, 0) + (exH ? exH + 20 : 0) + ctaH + 170;
+
+  const c = document.createElement("canvas"); c.width = CW; c.height = H; const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, r, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 650, reveal ? "rgba(34,211,154,0.28)" : "rgba(255,176,32,0.26)"); glow(CW - 40, H - 60, 680, "rgba(124,92,255,0.24)");
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+  // brand
+  const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
+  rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
+  txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  txt(ctx, new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), CW - 70, 96, `500 26px ${MONO}`, "#8a90a2", "right");
+
+  // big label
+  const big = reveal ? "ANSWER" : "QUIZ TIME";
+  const lgr = ctx.createLinearGradient(70, 0, 600, 0);
+  if (reveal) { lgr.addColorStop(0, "#22d39a"); lgr.addColorStop(1, "#00e0b8"); } else { lgr.addColorStop(0, "#ffd27a"); lgr.addColorStop(1, "#ff8a3d"); }
+  ctx.font = `700 72px ${GROT}`; ctx.fillStyle = lgr; ctx.textAlign = "left"; ctx.fillText(big, 70, 222);
+  let px = 70;
+  px += pill(ctx, `#${S.num || "1"} · ${S.topic.toUpperCase()}`, px, 250, "#c9bcff") + 12;
+  pill(ctx, d.t.toUpperCase(), px, 250, d.c);
+
+  // question
+  let y = 330;
+  qLines.forEach((l, i) => txt(ctx, l, 70, y + 52 + i * 64, `700 52px ${GROT}`, "#eef0f6"));
+  y += qLines.length * 64 + 40;
+
+  // options
+  oLay.forEach(o => {
+    const win = reveal && o.ok, dim = reveal && !o.ok;
+    panel(ctx, 70, y, CW - 140, o.h, 24, win ? "rgba(34,211,154,0.14)" : "rgba(0,0,0,0.38)", win ? "rgba(34,211,154,0.85)" : "rgba(255,255,255,0.10)", win ? 3 : 2);
+    const cx = 70 + 54, cy = y + o.h / 2;
+    ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+    ctx.fillStyle = win ? "#22d39a" : dim ? "rgba(255,255,255,0.05)" : "rgba(255,176,32,0.16)"; ctx.fill();
+    if (!win) { ctx.lineWidth = 2; ctx.strokeStyle = dim ? "rgba(255,255,255,0.12)" : "rgba(255,176,32,0.6)"; ctx.stroke(); }
+    txt(ctx, win ? "✓" : o.L, cx, cy + 11, `700 30px ${win ? INTER : MONO}`, win ? "#032015" : dim ? "#5a6072" : "#ffd27a", "center");
+    const ty = cy - (o.lines.length - 1) * 22 + 12;
+    o.lines.forEach((l, k) => txt(ctx, l, 70 + 110, ty + k * 44, win ? `700 34px ${INTER}` : optFont, win ? "#ffffff" : dim ? "#6c7285" : "#e6e8f0"));
+    y += o.h + 16;
+  });
+
+  // explanation
+  if (exH) {
+    y += 4;
+    panel(ctx, 70, y, CW - 140, exH, 26, "rgba(124,92,255,0.10)", "rgba(124,92,255,0.40)");
+    txt(ctx, "WHY", 100, y + 48, `700 22px ${MONO}`, "#b6a6ff");
+    ex.forEach((l, k) => txt(ctx, l, 100, y + 52 + (k + 1) * 42, `400 30px ${INTER}`, "#dfe1ea"));
+    y += exH + 20;
+  }
+
+  // CTA
+  const cta = reveal ? "Did you get it right? Reply with ✅ or ❌" : `Reply with ${list.map(x => x.L).join(", ").replace(/, ([^,]*)$/, " or $1")} · Answer coming soon!`;
+  rr(ctx, 70, y + 10, CW - 140, 70, 35);
+  const cg = ctx.createLinearGradient(70, 0, CW - 70, 0);
+  if (reveal) { cg.addColorStop(0, "rgba(34,211,154,0.22)"); cg.addColorStop(1, "rgba(0,224,184,0.12)"); } else { cg.addColorStop(0, "rgba(255,176,32,0.22)"); cg.addColorStop(1, "rgba(255,138,61,0.12)"); }
+  ctx.fillStyle = cg; ctx.fill();
+  txt(ctx, cta, CW / 2, y + 56, `600 28px ${INTER}`, reveal ? "#9ff0cf" : "#ffe1a6", "center");
+  y += ctaH;
+
+  txt(ctx, "— MANIMINDSMONEY Community", 70, y + 50, `600 28px ${INTER}`, "#b6a6ff");
+  txt(ctx, TOOL_URL.replace(/\/$/, "").replace(/\/quiz$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  if (S.disc) txt(ctx, "For learning & educational purposes only · Not investment advice · Not SEBI registered", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
+  return c;
+}
+$("#imgBtn").addEventListener("click", async e => {
+  if (!valid()) return;
+  const btn = e.currentTarget, label = btn.textContent; btn.disabled = true; btn.textContent = "Creating image…";
+  try {
+    const canvas = await drawQuiz();
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const name = `quiz-${S.num || 1}-${S.mode === "a" ? "answer" : "question"}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+    if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === "AbortError") return; }
+    }
+    let copied = false;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+    const url = URL.createObjectURL(blob);
+    $("#imgPrev").src = url; $("#imgDl").href = url; $("#imgDl").download = name;
+    $("#imgMsg").innerHTML = copied
+      ? "✅ <b>Image copied.</b> Open WhatsApp, pick your community chat and press <b>Ctrl+V</b> to paste it. Or download it below."
+      : "Tap <b>Download</b>, or long-press the image to save or share it on WhatsApp.";
+    $("#imgModal").hidden = false;
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+$("#imgClose").addEventListener("click", () => $("#imgModal").hidden = true);
+$("#imgModal").addEventListener("click", e => { if (e.target.id === "imgModal") $("#imgModal").hidden = true; });
+
+/* ---------- init ---------- */
+fillForm(); document.fonts.ready.then(() => placers.forEach(p => p()));
+</script>
+</body>
+</html>

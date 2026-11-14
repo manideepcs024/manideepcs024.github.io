@@ -232,6 +232,22 @@
   .cd-row b { color: var(--fg); font-weight: 600; transition: opacity .3s; }
   .cd-res { text-align: center; padding-top: 18px; }
   .ipo-demo .cd-row b { display: inline-flex; align-items: center; gap: 4px; }
+  .lv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .lv-head b { font: 700 1.1rem "Space Grotesk"; color: var(--fg); }
+  .lv-head span { font-size: .66rem; padding: 3px 9px; border-radius: 999px; color: var(--up); border: 1px solid rgba(34,211,154,.4); background: rgba(34,211,154,.1); }
+  .lv-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-radius: 9px; font-size: .86rem; }
+  .lv-row i { font-style: normal; font-size: .68rem; width: 52px; text-align: center; padding: 3px 0; border-radius: 6px; }
+  .lv-row b { color: var(--fg); font-weight: 600; }
+  .lv-row.r i { background: rgba(255,84,112,.15); color: var(--down); }
+  .lv-row.s i { background: rgba(34,211,154,.15); color: var(--up); }
+  .lv-row.c { background: rgba(177,140,255,.08); } .lv-row.c i { background: rgba(177,140,255,.2); color: #b18cff; }
+  .lv-row.p { background: rgba(255,255,255,.05); } .lv-row.p i { background: rgba(255,255,255,.1); color: var(--fg); }
+  .qz-title { font: 700 1.6rem "Space Grotesk"; background: linear-gradient(100deg, #ffd27a, #ff8a3d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .qz-q { font: 600 .98rem/1.4 "Space Grotesk"; color: var(--fg); margin: 8px 0 12px; }
+  .qz-o { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); margin-top: 6px; font-family: Inter, sans-serif; font-size: .86rem; color: #9aa0b2; }
+  .qz-o i { font-style: normal; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; background: rgba(255,255,255,.06); }
+  .qz-o.ok { border-color: rgba(34,211,154,.7); background: rgba(34,211,154,.12); color: #fff; font-weight: 700; }
+  .qz-o.ok i { background: var(--up); color: #032015; }
   .msg-tag { display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: .72rem; color: #b6a6ff; border: 1px solid rgba(124,92,255,.5); background: rgba(124,92,255,.14); }
   .msg-title { font: 700 1.4rem "Space Grotesk"; letter-spacing: -.02em; color: var(--fg); margin: 14px 0 12px; }
   .msg-body { border-left: 3px solid var(--a1); padding: 6px 0 6px 14px; display: grid; gap: 8px; font-family: Inter, sans-serif; font-size: .88rem; color: #d5d8e3; }
@@ -543,6 +559,46 @@
             <span><i></i>Bank Nifty: support / resistance</span>
             <em>— MANIMINDSMONEY Community</em>
           </div>
+        </a>
+      </div>
+
+      <div class="project card reveal tilt" style="margin-top:16px">
+        <div class="proj-info">
+          <span class="tag">05 · Community tool · Live</span>
+          <h3 class="proj-title">Daily Levels Card</h3>
+          <p>Enter the previous day's <strong>high, low and close</strong> for up to 3 indices or stocks and get <strong>Classic or Fibonacci pivots</strong>, R1–R3, S1–S3 and <strong>CPR</strong> with a narrow/wide tag, ready to post every morning as text or an image.</p>
+          <div class="chips" style="margin-top:18px"><span class="chip">Pivot points</span><span class="chip">CPR</span><span class="chip">Morning post</span></div>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="btn primary magnetic" href="./levels/">Open levels card ↗</a>
+          </div>
+        </div>
+        <a class="calc-demo lv-demo" href="./levels/" aria-label="Open the daily levels card">
+          <div class="lv-head"><b>NIFTY 50</b><span>NARROW CPR</span></div>
+          <div class="lv-row r"><i>R2</i><b>24,713</b></div>
+          <div class="lv-row r"><i>R1</i><b>24,607</b></div>
+          <div class="lv-row c"><i>CPR</i><b>24,490 – 24,497</b></div>
+          <div class="lv-row p"><i>PIVOT</i><b>24,493</b></div>
+          <div class="lv-row s"><i>S1</i><b>24,387</b></div>
+          <div class="lv-row s"><i>S2</i><b>24,273</b></div>
+        </a>
+      </div>
+
+      <div class="project card reveal tilt" style="margin-top:16px">
+        <div class="proj-info">
+          <span class="tag">06 · Community tool · Live</span>
+          <h3 class="proj-title">Quiz Card</h3>
+          <p>Keep the community learning: post a <strong>quiz question today</strong> and the <strong>answer reveal tomorrow</strong>, with the right option highlighted and a short explanation. Comes with a <strong>built-in bank of ready questions</strong> on candles, patterns, indicators, risk and more.</p>
+          <div class="chips" style="margin-top:18px"><span class="chip">Question bank</span><span class="chip">Answer reveal</span><span class="chip">Engagement</span></div>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="btn primary magnetic" href="./quiz/">Open quiz card ↗</a>
+          </div>
+        </div>
+        <a class="calc-demo qz-demo" href="./quiz/" aria-label="Open the quiz card">
+          <div class="qz-title">QUIZ TIME</div>
+          <div class="qz-q">A candle with a small body near the top and a long lower shadow is called a…</div>
+          <div class="qz-o"><i>A</i>Shooting star</div>
+          <div class="qz-o ok"><i>✓</i>Hammer</div>
+          <div class="qz-o"><i>C</i>Doji</div>
         </a>
       </div>
     </section>
