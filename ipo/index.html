@@ -29,11 +29,11 @@
   .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
 
   .wrap { max-width: 1100px; margin: 0 auto; }
-  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; flex-wrap: wrap; }
   .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
   .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
   .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .nav { display: flex; gap: 8px; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
   .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
   .nav a:hover { color: var(--fg); }
 
@@ -127,7 +127,7 @@
   <div class="wrap">
     <header>
       <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
-      <nav class="nav"><a href="../sl-calculator/">SL Calculator</a><a href="../">← Manideep.</a></nav>
+      <nav class="nav"><a href="../message/">Message</a><a href="../sl-calculator/">SL Calculator</a><a href="../">← Manideep.</a></nav>
     </header>
 
     <h1>Share an <span class="grad">IPO</span> in seconds.</h1>

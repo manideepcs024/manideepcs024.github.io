@@ -232,6 +232,13 @@
   .cd-row b { color: var(--fg); font-weight: 600; transition: opacity .3s; }
   .cd-res { text-align: center; padding-top: 18px; }
   .ipo-demo .cd-row b { display: inline-flex; align-items: center; gap: 4px; }
+  .msg-tag { display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: .72rem; color: #b6a6ff; border: 1px solid rgba(124,92,255,.5); background: rgba(124,92,255,.14); }
+  .msg-title { font: 700 1.4rem "Space Grotesk"; letter-spacing: -.02em; color: var(--fg); margin: 14px 0 12px; }
+  .msg-body { border-left: 3px solid var(--a1); padding: 6px 0 6px 14px; display: grid; gap: 8px; font-family: Inter, sans-serif; font-size: .88rem; color: #d5d8e3; }
+  .msg-body b { color: #fff; }
+  .msg-body span { display: flex; align-items: center; gap: 8px; }
+  .msg-body span i { width: 6px; height: 6px; border-radius: 50%; background: var(--a1); flex: none; }
+  .msg-body em { font-style: normal; color: #b6a6ff; font-weight: 600; margin-top: 4px; }
   .lv { display: inline-block; width: 16px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); }
   .lv.lv1 { background: var(--down); } .lv.lv3 { background: var(--up); }
   .ipo-demo .cd-res strong { font-size: 2.4rem; background: linear-gradient(100deg, #25d366, var(--a2)); -webkit-background-clip: text; background-clip: text; }
@@ -514,6 +521,28 @@
           <div class="cd-row"><span>Allotment chances</span><b><span class="lv lv1"></span><span class="lv"></span><span class="lv"></span> Low</b></div>
           <div class="cd-row"><span>Profit chances</span><b><span class="lv lv3"></span><span class="lv lv3"></span><span class="lv lv3"></span> High</b></div>
           <div class="cd-res"><span>Share to</span><strong>WhatsApp</strong><em>as text or image</em></div>
+        </a>
+      </div>
+
+      <div class="project card reveal tilt" style="margin-top:16px">
+        <div class="proj-info">
+          <span class="tag">04 · Community tool · Live</span>
+          <h3 class="proj-title">Community Message Card</h3>
+          <p>The tool I use to run my <strong>WhatsApp community</strong>. Write a <strong>market update, alert, news or lesson</strong> once, using ready templates and WhatsApp formatting, and send it as <strong>formatted text or a branded image</strong>.</p>
+          <div class="chips" style="margin-top:18px"><span class="chip">Templates</span><span class="chip">WhatsApp formatting</span><span class="chip">Image cards</span></div>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="btn primary magnetic" href="./message/">Open message tool ↗</a>
+          </div>
+        </div>
+        <a class="calc-demo msg-demo" href="./message/" aria-label="Open the community message tool">
+          <span class="msg-tag">● MARKET UPDATE</span>
+          <div class="msg-title">Good morning, traders! ☀️</div>
+          <div class="msg-body">
+            <b>Levels to watch:</b>
+            <span><i></i>Nifty: support / resistance</span>
+            <span><i></i>Bank Nifty: support / resistance</span>
+            <em>— MANIMINDSMONEY Community</em>
+          </div>
         </a>
       </div>
     </section>

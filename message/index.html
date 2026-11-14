@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Community Message Card — MANIMINDSMONEY</title>
+<meta name="description" content="Write a market update, alert, news or lesson once and send it to your WhatsApp community as formatted text or a branded image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --cat: #7c5cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .24; animation: float 18s ease-in-out infinite alternate; transition: background .6s; }
+  .blob.b1 { background: var(--cat); top: -25vmax; left: -15vmax; }
+  .blob.b2 { background: var(--a2); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .15; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  h1 { font: 700 clamp(1.9rem, 6vw, 2.8rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--a1), var(--a2) 55%, var(--a3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 22px; font-size: .95rem; max-width: 640px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 20px; align-items: start; }
+  .layout > * { min-width: 0; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(18px, 4.5vw, 28px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); }
+  .sticky { position: sticky; top: 16px; }
+  @media (max-width: 900px) { .sticky { position: static; } }
+
+  .q { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 600 .74rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--a2); margin: 20px 0 8px; }
+  .q:first-child { margin-top: 0; }
+  .q .opt { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; font-family: Inter; }
+
+  .templates { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .templates::-webkit-scrollbar { display: none; }
+  .tpl { flex: none; border: 1px dashed rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: #cfd3df; padding: 9px 13px; border-radius: 12px; font: 500 .82rem Inter; cursor: pointer; white-space: nowrap; }
+  .tpl:hover { border-color: var(--a2); color: var(--fg); }
+
+  .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+  .cat { border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #cfd3df; padding: 11px 10px; border-radius: 14px; font: 600 .84rem Inter; cursor: pointer; text-align: left; transition: border-color .25s, background .25s, transform .1s; }
+  .cat:active { transform: scale(.97); }
+  .cat.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--fg); }
+
+  .field { display: flex; align-items: center; gap: 10px; padding: 4px 16px; border-radius: 16px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err, textarea.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 1rem "JetBrains Mono"; color: var(--muted); }
+  .field input { width: 100%; flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 500 1rem Inter; padding: 12px 0; }
+  .field.big input { font: 700 clamp(1.2rem, 4.6vw, 1.45rem) "Space Grotesk"; letter-spacing: -.02em; }
+  .field input::placeholder, textarea::placeholder { color: #3f4558; }
+
+  .toolbar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .toolbar button { min-width: 38px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: #cfd3df; cursor: pointer; font: 600 .86rem Inter; }
+  .toolbar button:hover { background: rgba(255,255,255,.09); color: var(--fg); }
+  .toolbar .hint { margin-left: auto; align-self: center; font-size: .7rem; color: var(--muted); font-family: "JetBrains Mono"; }
+  textarea { width: 100%; resize: vertical; min-height: 190px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); border-radius: 16px; color: var(--fg); font: 400 .95rem/1.55 Inter, sans-serif; padding: 12px 14px; outline: 0; transition: border-color .25s, box-shadow .25s; }
+  textarea:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .count { font: .72rem "JetBrains Mono"; color: var(--muted); text-align: right; margin-top: 6px; }
+
+  .opts { display: grid; gap: 10px; margin-top: 6px; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,.28); border: 1px solid var(--line); font-size: .9rem; cursor: pointer; }
+  .toggle small { display: block; color: var(--muted); font-size: .74rem; }
+  .toggle input { display: none; }
+  .sw { flex: none; width: 44px; height: 26px; border-radius: 13px; background: rgba(255,255,255,.12); position: relative; transition: background .25s; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  .toggle input:checked + .sw { background: var(--a2); }
+  .toggle input:checked + .sw::after { transform: translateX(18px); }
+
+  .pv-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .pv-head h2 { font: 700 1.1rem "Space Grotesk"; }
+  .pv-head span { font: .72rem "JetBrains Mono"; color: var(--muted); }
+  .chat { border-radius: 20px; padding: 18px 14px; background: #0b141a url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='2' cy='2' r='1' fill='%23ffffff10'/></svg>"); border: 1px solid var(--line); max-height: 520px; overflow: auto; }
+  .bubble { position: relative; margin-left: auto; max-width: 94%; background: #005c4b; color: #e9edef; border-radius: 12px 0 12px 12px; padding: 10px 12px 20px; font: 400 .9rem/1.45 Inter, sans-serif; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,.3); }
+  .bubble::after { content: ""; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: #005c4b; border-left-color: #005c4b; }
+  .bubble .time { position: absolute; right: 10px; bottom: 4px; font-size: .66rem; color: #ffffff99; }
+  .bubble a { color: #53bdeb; }
+  .empty { color: #8696a0; font-style: italic; }
+
+  .share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 16px; font: 600 .98rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.img { grid-column: 1 / -1; background: linear-gradient(100deg, rgba(124,92,255,.22), rgba(0,224,184,.16)); border: 1px solid rgba(124,92,255,.5); font-weight: 700; }
+  .btn.img[disabled] { opacity: .6; pointer-events: none; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; font-weight: 700; }
+  .btn.wa svg { width: 18px; height: 18px; }
+  .btn.ghost { font-size: .85rem; padding: 11px; color: var(--muted); }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+
+  .recent { margin-top: 18px; }
+  .recent h3 { font: 600 .72rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .recent-list { display: grid; gap: 6px; }
+  .recent-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 1px solid var(--line); background: rgba(0,0,0,.25); color: #cfd3df; border-radius: 12px; padding: 10px 12px; cursor: pointer; font: 500 .84rem Inter; }
+  .recent-item:hover { border-color: rgba(255,255,255,.2); color: var(--fg); }
+  .recent-item b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .recent-item small { color: var(--muted); font: .7rem "JetBrains Mono"; white-space: nowrap; }
+  .recent-item i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 140px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 30; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); }
+  .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .modal[hidden] { display: none; }
+  .modal-card { width: 100%; max-width: 420px; max-height: 100%; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px; }
+  .modal-card img { display: block; max-width: 100%; max-height: min(62vh, 560px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); }
+  .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
+  .modal-card .row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 14px; }
+
+  .disclaimer { margin: 26px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../ipo/">IPO card</a><a href="../sl-calculator/">SL Calculator</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>One message. <span class="grad">Whole community.</span></h1>
+    <p class="sub">Write a market update, alert, news or lesson once, then send it to your WhatsApp community as formatted text or a branded image.</p>
+
+    <div class="layout">
+      <!-- COMPOSER -->
+      <section class="card">
+        <div class="q">Quick start <span class="opt">templates</span></div>
+        <div class="templates" id="templates"></div>
+
+        <div class="q">Category</div>
+        <div class="cats" id="cats"></div>
+
+        <label class="q" for="title">Headline <span class="opt">optional</span></label>
+        <label class="field big" id="f-title"><input id="title" type="text" maxlength="90" placeholder="e.g. Nifty closes at a record high" autocomplete="off" /></label>
+
+        <div class="q"><label for="body">Message</label> <span class="opt">*bold* _italic_ ~strike~ · start a line with - for bullets</span></div>
+        <div class="toolbar">
+          <button data-wrap="*" title="Bold"><b>B</b></button>
+          <button data-wrap="_" title="Italic"><i>I</i></button>
+          <button data-wrap="~" title="Strikethrough"><s>S</s></button>
+          <button data-bullet title="Bullet list">• List</button>
+          <button data-emoji="📈">📈</button><button data-emoji="📉">📉</button><button data-emoji="🔥">🔥</button><button data-emoji="✅">✅</button><button data-emoji="⚠️">⚠️</button><button data-emoji="👉">👉</button>
+        </div>
+        <textarea id="body" maxlength="2000" placeholder="Type your message here…&#10;&#10;- Point one&#10;- Point two&#10;&#10;*Bold* words stand out in WhatsApp."></textarea>
+        <div class="count"><span id="bCount">0</span>/2000</div>
+
+        <label class="q" for="link">Link <span class="opt">optional</span></label>
+        <label class="field" id="f-link"><span class="unit">🔗</span><input id="link" type="url" inputmode="url" maxlength="300" placeholder="https://…" autocomplete="off" /></label>
+
+        <label class="q" for="sign">Signature <span class="opt">optional</span></label>
+        <label class="field"><span class="unit">✍️</span><input id="sign" type="text" maxlength="60" placeholder="— MANIMINDSMONEY Community" autocomplete="off" /></label>
+
+        <div class="q">Options</div>
+        <div class="opts">
+          <label class="toggle"><span>Add today's date<small>Shows the date on the message and image</small></span><input type="checkbox" id="optDate" checked /><span class="sw"></span></label>
+          <label class="toggle"><span>Add disclaimer<small>Not SEBI registered · educational purpose only</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
+        </div>
+      </section>
+
+      <!-- PREVIEW -->
+      <section class="card sticky">
+        <div class="pv-head"><h2>WhatsApp preview</h2><span>updates as you type</span></div>
+        <div class="chat"><div class="bubble" id="bubble"></div></div>
+
+        <div class="share-row">
+          <button class="btn img" id="imgBtn">📸 Share as image</button>
+          <button class="btn" id="copyBtn">📋 Copy text</button>
+          <button class="btn wa" id="waBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg> WhatsApp</button>
+          <button class="btn ghost" id="newBtn" style="grid-column:1/-1">✨ New message</button>
+        </div>
+
+        <div class="recent" id="recentBox" hidden>
+          <h3>Recently sent</h3>
+          <div class="recent-list" id="recentList"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. Messages, market updates, levels, news and views shared from this page and in the community are based on <b>personal research and opinion</b> and are for <b>information and educational purposes only</b>. They are not investment advice or a recommendation to buy or sell any security. Stock market investments are subject to market risks. Do your own research or consult a SEBI-registered adviser before making any decision.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+  <div class="toast" id="toast">Copied ✓</div>
+  <div class="modal" id="imgModal" hidden>
+    <div class="modal-card">
+      <img id="imgPrev" alt="Message snapshot" />
+      <p id="imgMsg"></p>
+      <div class="row">
+        <a class="btn" id="imgDl" download="message.png">⬇ Download</a>
+        <button class="btn primary" id="imgClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const CATS = {
+  update:   { t: "Market Update", e: "📊", c: "#7c5cff" },
+  news:     { t: "News",          e: "📰", c: "#5b8cff" },
+  alert:    { t: "Alert",         e: "🚨", c: "#ff5470" },
+  learn:    { t: "Learning",      e: "📚", c: "#00e0b8" },
+  remind:   { t: "Reminder",      e: "⏰", c: "#febc2e" },
+  announce: { t: "Announcement",  e: "📢", c: "#ff4d8d" },
+  info:     { t: "Info",          e: "💬", c: "#9aa0b2" },
+};
+const today = () => new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+const TEMPLATES = [
+  { n: "🌅 Good morning", cat: "update", title: "Good morning, traders! ☀️", body: "*Global cues:*\n- US markets: \n- Asian markets: \n- GIFT Nifty: \n\n*Levels to watch:*\n- Nifty: support  / resistance \n- Bank Nifty: support  / resistance \n\nTrade with a plan and respect your stop-loss. 🙏" },
+  { n: "🔔 Market close", cat: "update", title: () => "Market wrap · " + new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" }), body: "*Nifty:* \n*Sensex:* \n*Bank Nifty:* \n\n📈 *Top gainers:* \n📉 *Top losers:* \n\n*My take:* " },
+  { n: "🚨 Alert", cat: "alert", title: "Important alert", body: "⚠️ \n\nStay cautious and manage your risk." },
+  { n: "🚀 IPO reminder", cat: "remind", title: "IPO closes today", body: "Last day to apply for *___ IPO*.\n\n- Price band: ₹\n- Min investment: ₹\n- Apply before 5 PM and approve the UPI mandate.\n\nFull details 👇", link: "https://manideepcs024.github.io/ipo/" },
+  { n: "📚 Lesson", cat: "learn", title: "Trading lesson of the day", body: "*Topic:* \n\n- \n- \n- \n\n_Practise on paper before using real money._" },
+  { n: "📰 News", cat: "news", title: "", body: "*Headline:* \n\n*What it means:* \n\n*Stocks in focus:* " },
+];
+
+/* ---------- state ---------- */
+const S = Object.assign({ cat: "update", date: true, disc: true }, JSON.parse(localStorage.getItem("msg_draft") || "{}"));
+const FIELDS = ["title", "body", "link", "sign"];
+FIELDS.forEach(id => { if (S[id] != null) $("#" + id).value = S[id]; });
+$("#optDate").checked = S.date; $("#optDisc").checked = S.disc;
+function save() { FIELDS.forEach(id => S[id] = $("#" + id).value); S.date = $("#optDate").checked; S.disc = $("#optDisc").checked; localStorage.setItem("msg_draft", JSON.stringify(S)); }
+
+/* ---------- categories + templates ---------- */
+$("#cats").innerHTML = Object.entries(CATS).map(([k, v]) => `<button class="cat" data-k="${k}" style="--c:${v.c}">${v.e} ${v.t}</button>`).join("");
+function paintCat() {
+  document.querySelectorAll(".cat").forEach(b => b.classList.toggle("on", b.dataset.k === S.cat));
+  document.documentElement.style.setProperty("--cat", CATS[S.cat].c);
+}
+$("#cats").addEventListener("click", e => { const b = e.target.closest(".cat"); if (!b) return; S.cat = b.dataset.k; paintCat(); update(); });
+
+$("#templates").innerHTML = TEMPLATES.map((t, i) => `<button class="tpl" data-i="${i}">${t.n}</button>`).join("");
+$("#templates").addEventListener("click", e => {
+  const b = e.target.closest(".tpl"); if (!b) return;
+  if (($("#title").value.trim() || $("#body").value.trim()) && !confirm("Replace the current message with this template?")) return;
+  const t = TEMPLATES[+b.dataset.i];
+  S.cat = t.cat; paintCat();
+  $("#title").value = typeof t.title === "function" ? t.title() : t.title;
+  $("#body").value = t.body; $("#link").value = t.link || "";
+  update(); $("#body").focus();
+});
+
+/* ---------- toolbar ---------- */
+const ta = $("#body");
+document.querySelector(".toolbar").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const s = ta.selectionStart, en = ta.selectionEnd, v = ta.value, sel = v.slice(s, en);
+  if (b.dataset.wrap) {
+    const m = b.dataset.wrap, txt = sel || "text";
+    ta.setRangeText(m + txt.trim() + m, s, en, "select");
+    if (!sel) { ta.selectionStart = s + 1; ta.selectionEnd = s + 1 + txt.length; }
+  } else if (b.dataset.bullet !== undefined) {
+    const ls = v.lastIndexOf("\n", s - 1) + 1;
+    const block = v.slice(ls, en) || "";
+    const out = block.split("\n").map(l => l.startsWith("- ") ? l : "- " + l).join("\n");
+    ta.setRangeText(out, ls, en, "end");
+  } else if (b.dataset.emoji) {
+    ta.setRangeText(b.dataset.emoji + " ", s, en, "end");
+  }
+  ta.focus(); update();
+});
+
+/* ---------- inputs ---------- */
+FIELDS.forEach(id => $("#" + id).addEventListener("input", e => { e.target.classList.remove("err"); e.target.closest(".field")?.classList.remove("err"); update(); }));
+["optDate", "optDisc"].forEach(id => $("#" + id).addEventListener("change", update));
+
+/* ---------- text ---------- */
+const TOOL_URL = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host)
+  ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/message/";
+const DISCL = "⚠️ _Disclaimer: Not SEBI registered. Based on personal research, for information and educational purposes only. Not investment advice._";
+const signText = () => $("#sign").value.trim() || "— MANIMINDSMONEY Community";
+function buildText() {
+  const c = CATS[S.cat], title = $("#title").value.trim(), body = $("#body").value.replace(/\s+$/, ""), link = $("#link").value.trim();
+  const out = [`${c.e} *${c.t.toUpperCase()}*${$("#optDate").checked ? `  ·  ${today()}` : ""}`];
+  if (title) out.push(`*${title}*`);
+  if (body) out.push("", body.replace(/^- /gm, "• "));
+  if (link) out.push("", `🔗 ${link}`);
+  out.push("", signText());
+  if ($("#optDisc").checked) out.push("", DISCL);
+  return out.join("\n");
+}
+const esc = s => s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+function waFormat(t) {
+  return esc(t)
+    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?:;]|$)/gm, "$1<b>$2</b>")
+    .replace(/(^|[\s(])_([^_\n]+)_(?=[\s).,!?:;]|$)/gm, "$1<i>$2</i>")
+    .replace(/(^|[\s(])~([^~\n]+)~(?=[\s).,!?:;]|$)/gm, "$1<s>$2</s>")
+    .replace(/\n/g, "<br>");
+}
+function hasContent() { return !!($("#title").value.trim() || $("#body").value.trim()); }
+function update() {
+  $("#bCount").textContent = $("#body").value.length;
+  const time = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  $("#bubble").innerHTML = (hasContent() ? waFormat(buildText()) : '<span class="empty">Pick a template or start typing your message…</span>') + `<span class="time">${time} ✓✓</span>`;
+  save();
+}
+
+/* ---------- recent ---------- */
+function recent() { return JSON.parse(localStorage.getItem("msg_recent") || "[]"); }
+function pushRecent() {
+  const item = { cat: S.cat, title: $("#title").value, body: $("#body").value, link: $("#link").value, ts: Date.now() };
+  const list = recent().filter(r => !(r.title === item.title && r.body === item.body));
+  list.unshift(item); localStorage.setItem("msg_recent", JSON.stringify(list.slice(0, 8))); renderRecent();
+}
+function ago(ts) { const m = Math.round((Date.now() - ts) / 60000); return m < 1 ? "just now" : m < 60 ? m + "m ago" : m < 1440 ? Math.round(m / 60) + "h ago" : Math.round(m / 1440) + "d ago"; }
+function renderRecent() {
+  const list = recent(); $("#recentBox").hidden = !list.length;
+  $("#recentList").innerHTML = list.map((r, i) => `<button class="recent-item" data-i="${i}"><i style="background:${CATS[r.cat]?.c || "#999"}"></i><b>${esc(r.title || r.body.split("\n")[0] || "Message")}</b><small>${ago(r.ts)}</small></button>`).join("");
+}
+$("#recentList").addEventListener("click", e => {
+  const b = e.target.closest(".recent-item"); if (!b) return;
+  if (hasContent() && !confirm("Load this message? Your current draft will be replaced.")) return;
+  const r = recent()[+b.dataset.i]; S.cat = r.cat; paintCat();
+  $("#title").value = r.title; $("#body").value = r.body; $("#link").value = r.link || ""; update();
+  scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ---------- share ---------- */
+function valid() {
+  if (hasContent()) return true;
+  const t = $("#body"); t.classList.remove("err"); void t.offsetWidth; t.classList.add("err");
+  toast("Write a headline or message first"); t.focus(); return false;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch {
+    const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;opacity:0;top:0";
+    document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok;
+  }
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1900); }
+$("#copyBtn").addEventListener("click", async () => { if (!valid()) return; const ok = await copyText(buildText()); toast(ok ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy"); if (ok) pushRecent(); });
+$("#waBtn").addEventListener("click", () => { if (!valid()) return; pushRecent(); window.open("https://wa.me/?text=" + encodeURIComponent(buildText()), "_blank", "noopener"); });
+$("#newBtn").addEventListener("click", () => {
+  if (hasContent() && !confirm("Start a new message? The current draft will be cleared (it stays in Recently sent if you shared it).")) return;
+  ["title", "body", "link"].forEach(id => $("#" + id).value = ""); update(); $("#title").focus();
+});
+
+/* ---------- image ---------- */
+const CW = 1080;
+const GROT = '"Space Grotesk", sans-serif', MONO = '"JetBrains Mono", monospace', INTER = 'Inter, sans-serif';
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(ctx, x, y, w, h, r = 28, fill = "rgba(255,255,255,0.045)", stroke = "rgba(255,255,255,0.10)") { rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); }
+function txt(ctx, s, x, y, font, color, align = "left") { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); }
+function plainWrap(ctx, text, maxW) {
+  const out = []; let line = "";
+  text.split(/\s+/).forEach(w => { const t = line ? line + " " + w : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; });
+  if (line) out.push(line); return out;
+}
+// Rich text: WhatsApp-style *bold* _italic_ ~strike~ and "- " bullets
+const BODY_SIZE = 32, BODY_LH = 48;
+const fontFor = st => `${st.i ? "italic " : ""}${st.b ? 700 : 400} ${BODY_SIZE}px ${INTER}`;
+function tokens(line) {
+  const out = []; const re = /(^|[\s(])([*_~])([^*_~\n]+?)\2(?=[\s).,!?:;]|$)/g; let last = 0, m;
+  const push = (s, st) => s.split(/(\s+)/).forEach(w => { if (w && !/^\s+$/.test(w)) out.push({ w, ...st }); });
+  while ((m = re.exec(line))) {
+    const start = m.index + m[1].length;
+    push(line.slice(last, start), {});
+    push(m[3], { b: m[2] === "*", i: m[2] === "_", s: m[2] === "~" });
+    last = re.lastIndex;
+  }
+  push(line.slice(last), {}); return out;
+}
+function layoutBody(ctx, body, maxW) {
+  const rows = []; // {bullet, words:[{w,b,i,s,x}], blank}
+  body.replace(/\s+$/, "").split("\n").forEach(raw => {
+    if (!raw.trim()) { rows.push({ blank: true }); return; }
+    const bullet = /^\s*[-•]\s+/.test(raw);
+    const line = raw.replace(/^\s*[-•]\s+/, "");
+    const indent = bullet ? 40 : 0, avail = maxW - indent;
+    let cur = [], x = 0, first = true;
+    ctx.font = fontFor({}); const space = ctx.measureText(" ").width;
+    tokens(line).forEach(t => {
+      ctx.font = fontFor(t); const w = ctx.measureText(t.w).width;
+      if (x + w > avail && cur.length) { rows.push({ bullet: bullet && first, indent, words: cur }); first = false; cur = []; x = 0; }
+      cur.push({ ...t, x, width: w }); x += w + space;
+    });
+    if (cur.length) rows.push({ bullet: bullet && first, indent, words: cur });
+  });
+  while (rows.length && rows[rows.length - 1].blank) rows.pop();
+  return rows;
+}
+async function drawMsg() {
+  await Promise.all([`700 80px ${GROT}`, `600 30px ${MONO}`, `400 32px ${INTER}`, `700 32px ${INTER}`, `italic 400 32px ${INTER}`, `500 26px ${MONO}`].map(f => document.fonts.load(f).catch(() => {})));
+  const c0 = CATS[S.cat], title = $("#title").value.trim(), body = $("#body").value, link = $("#link").value.trim();
+  const m = document.createElement("canvas").getContext("2d");
+  m.font = `700 64px ${GROT}`;
+  let tLines = title ? plainWrap(m, title, CW - 140) : [];
+  if (tLines.length > 3) { tLines = tLines.slice(0, 3); tLines[2] += "…"; }
+  let rows = body.trim() ? layoutBody(m, body, CW - 200) : [];
+  if (rows.length > 34) { rows = rows.slice(0, 34); rows.push({ more: true }); }
+  const titleH = tLines.length ? tLines.length * 74 + 20 : 0;
+  const bodyH = rows.length ? rows.length * BODY_LH + 70 : 0;
+  const linkH = link ? 110 : 0;
+  const content = 230 + titleH + (bodyH ? bodyH + 26 : 0) + (linkH ? linkH + 26 : 0) + 70;
+  const H = Math.max(1080, content + 140);
+
+  const cv = document.createElement("canvas"); cv.width = CW; cv.height = H; const ctx = cv.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, r, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 680, c0.c + "66"); glow(CW - 40, H - 60, 680, "rgba(0,224,184,0.18)");
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+  // brand
+  const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
+  rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
+  txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  if ($("#optDate").checked) txt(ctx, new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), CW - 70, 96, `500 26px ${MONO}`, "#8a90a2", "right");
+
+  // category pill
+  let y = 160;
+  ctx.font = `600 26px ${MONO}`; const label = c0.t.toUpperCase(); const pw = ctx.measureText(label).width + 64;
+  rr(ctx, 70, y, pw, 52, 26); ctx.fillStyle = c0.c + "26"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = c0.c + "99"; ctx.stroke();
+  ctx.beginPath(); ctx.arc(96, y + 26, 7, 0, Math.PI * 2); ctx.fillStyle = c0.c; ctx.fill();
+  txt(ctx, label, 114, y + 35, `600 26px ${MONO}`, c0.c);
+  y += 52 + 30;
+
+  // title
+  tLines.forEach((l, i) => txt(ctx, l, 70, y + 58 + i * 74, `700 64px ${GROT}`, "#eef0f6"));
+  if (tLines.length) y += titleH;
+
+  // body
+  if (rows.length) {
+    y += 6;
+    panel(ctx, 70, y, CW - 140, bodyH, 30, "rgba(0,0,0,0.38)");
+    rr(ctx, 70, y + 26, 6, bodyH - 52, 3); ctx.fillStyle = c0.c; ctx.fill();
+    let by = y + 35;
+    rows.forEach(r => {
+      by += BODY_LH;
+      if (r.blank) return;
+      if (r.more) { txt(ctx, "… continued in the message", 100, by - 12, `italic 400 28px ${INTER}`, "#8a90a2"); return; }
+      const x0 = 100 + (r.indent || 0);
+      if (r.bullet) { ctx.beginPath(); ctx.arc(100 + 14, by - 23, 6, 0, Math.PI * 2); ctx.fillStyle = c0.c; ctx.fill(); }
+      r.words.forEach(w => {
+        ctx.font = fontFor(w); ctx.fillStyle = w.b ? "#ffffff" : "#d5d8e3"; ctx.textAlign = "left";
+        ctx.fillText(w.w, x0 + w.x, by - 12);
+        if (w.s) { ctx.fillRect(x0 + w.x, by - 23, w.width, 2.5); }
+      });
+    });
+    y += bodyH + 26;
+  }
+
+  // link
+  if (link) {
+    panel(ctx, 70, y, CW - 140, linkH, 26, "rgba(83,189,235,0.08)", "rgba(83,189,235,0.35)");
+    txt(ctx, "LINK", 100, y + 42, `600 22px ${MONO}`, "#53bdeb");
+    ctx.font = `500 30px ${INTER}`; let ls = link.replace(/^https?:\/\//, "");
+    while (ctx.measureText(ls).width > CW - 200 && ls.length > 8) ls = ls.slice(0, -2);
+    if (ls !== link.replace(/^https?:\/\//, "")) ls += "…";
+    txt(ctx, ls, 100, y + 86, `500 30px ${INTER}`, "#e9edef");
+    y += linkH + 26;
+  }
+
+  // signature
+  txt(ctx, signText(), 70, y + 40, `600 30px ${INTER}`, "#b6a6ff");
+
+  // footer
+  txt(ctx, TOOL_URL.replace(/\/$/, "").replace(/\/message$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  if ($("#optDisc").checked) txt(ctx, "Not SEBI registered · Personal research · Educational purpose only · Not investment advice", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
+  return cv;
+}
+$("#imgBtn").addEventListener("click", async e => {
+  if (!valid()) return;
+  const btn = e.currentTarget, label = btn.textContent; btn.disabled = true; btn.textContent = "Creating image…";
+  try {
+    const canvas = await drawMsg();
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const slug = ($("#title").value || CATS[S.cat].t).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+    const name = `${slug || "message"}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+    pushRecent();
+    if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === "AbortError") return; }
+    }
+    let copied = false;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+    const url = URL.createObjectURL(blob);
+    $("#imgPrev").src = url; $("#imgDl").href = url; $("#imgDl").download = name;
+    $("#imgMsg").innerHTML = copied
+      ? "✅ <b>Image copied.</b> Open WhatsApp, pick your community chat and press <b>Ctrl+V</b> to paste it. Or download it below."
+      : "Tap <b>Download</b>, or long-press the image to save or share it on WhatsApp.";
+    $("#imgModal").hidden = false;
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+$("#imgClose").addEventListener("click", () => $("#imgModal").hidden = true);
+$("#imgModal").addEventListener("click", e => { if (e.target.id === "imgModal") $("#imgModal").hidden = true; });
+
+/* ---------- init ---------- */
+paintCat(); renderRecent(); update();
+</script>
+</body>
+</html>
