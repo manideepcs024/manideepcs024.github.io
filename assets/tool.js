@@ -176,6 +176,23 @@
     return out;
   }
 
+  // Splits text copied from a WhatsApp chat into { name, msg, order } lines.
+  // Handles "[18/11/26, 9:02 AM] Name: msg", "18/11/26, 9:02 am - Name: msg" and "Name - msg".
+  function chatLines(text) {
+    const out = [], skipped = [];
+    String(text || "").split(/\r?\n/).forEach((raw, order) => {
+      let line = raw.trim(); if (!line) return;
+      line = line.replace(/^\[[^\]]*\]\s*/, "")
+        .replace(/^\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4},?\s+\d{1,2}:\d{2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?\s*-\s*/i, "");
+      const m = line.match(/^([^:]{1,40}):\s*(.+)$/) || line.match(/^(.{1,40}?)\s+[-–—]\s+(.+)$/);
+      if (!m) { skipped.push(raw); return; }
+      out.push({ name: m[1].replace(/[~‎‏]/g, "").trim(), msg: m[2].trim(), order, raw });
+    });
+    return { lines: out, skipped };
+  }
+  // "Ravi Kumar" -> "Ravi K.", phone numbers -> "…3210"
+  const shortName = n => { n = String(n || "").trim(); if (/^\+?\d[\d\s-]{6,}$/.test(n)) return "…" + n.replace(/\D/g, "").slice(-4); const p = n.split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length - 1][0]}.` : n; };
+
   // Renders the shared "community invite link" input into `sel`.
   function inviteField(sel, onChange) {
     const box = $(sel); if (!box) return;
@@ -186,7 +203,7 @@
     inp.addEventListener("input", () => { setInvite(inp.value); onChange && onChange(); });
   }
 
-  window.Kit = { inviteField, $, $$, num, fmtNum, money, rs, sgn, srs, qty, pct, nf, esc, clean, waHtml, istNow, iso, parseISO, niceDate,
+  window.Kit = { chatLines, shortName, inviteField, $, $$, num, fmtNum, money, rs, sgn, srs, qty, pct, nf, esc, clean, waHtml, istNow, iso, parseISO, niceDate,
     store, invite, setInvite, shortLink, toast, shake, copyText, seg, WA_SVG, chrome, share, shareCanvas,
     F, loadFonts, rr, panel, txt, fit, clip, wrap, cap, measure, canvas, brand, footer, footerH, pill, toolUrl, signoff };
 })();

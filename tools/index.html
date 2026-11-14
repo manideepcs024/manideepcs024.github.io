@@ -133,6 +133,8 @@ const GROUPS = {
 const TOOLS = [
   { href: "../status/", g: "grow", ico: "📲", c: "#25d366", name: "WhatsApp Status Maker", desc: "Vertical status images that bring people in: join invite with QR code, quiz and term teasers, market mood, quotes, event alerts and milestones. Each ends with your join link.", tags: ["Growth", "Status", "QR code"], fresh: true },
   { href: "../contest/", g: "grow", ico: "🎯", c: "#febc2e", name: "Guess the Close Contest", desc: "A weekly 'where will Nifty close?' contest. Paste replies from WhatsApp, get the closest guesses ranked automatically, post winners and a season leaderboard.", tags: ["Engagement", "Leaderboard", "Weekly"], fresh: true },
+  { href: "../chart-game/", g: "grow", ico: "📈", c: "#5b8cff", name: "Read the Chart Game", desc: "Computer-generated practice charts that stop at a decision point: breakout or fakeout? Members reply A, B or C, then you reveal the pattern and the lesson. Never a real stock, so never a tip.", tags: ["Game", "Patterns", "Daily"], fresh: true },
+  { href: "../quiz-score/", g: "grow", ico: "🏅", c: "#b18cff", name: "Quiz Scoreboard", desc: "Paste quiz or chart-game replies from WhatsApp. See how everyone answered, who was fastest, and keep a monthly leaderboard with streaks.", tags: ["Leaderboard", "Streaks", "Competition"], fresh: true },
   { href: "../welcome/", g: "grow", ico: "👋", c: "#ff4d8d", name: "Welcome & Member Spotlight", desc: "Welcome new joiners with what they'll get, the house rules and an icebreaker. Celebrate a Member of the Month, Quiz Champ or Most Helpful with a photo spotlight card.", tags: ["Onboarding", "Recognition", "Monthly"], fresh: true },
   { href: "../levels/", g: "card", ico: "📊", c: "#22d39a", name: "Daily Levels Card", desc: "Previous day's high, low and close in, then Classic or Fibonacci pivots, support, resistance and CPR out, for up to 3 indices or stocks.", tags: ["Pivots", "CPR", "Morning post"] },
   { href: "../close/", g: "card", ico: "🔔", c: "#00e0b8", name: "Market Close Card", desc: "The evening wrap: index closes, top gainers and losers, sector moves, advance/decline breadth and FII/DII flows, with your one-line view.", tags: ["Evening post", "Breadth", "FII/DII"], fresh: true },
@@ -172,17 +174,17 @@ function drawTools() {
 /* Weekly posting plan: [time, label, tool] */
 const PLAN = [
   ["Mon", [["8:45 AM", "📊 Daily levels", "levels"], ["9:00 AM", "🎯 Announce Guess the Close", "contest"], ["12:30 PM", "👋 Welcome new members", "welcome"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Market mood", "status"]]],
-  ["Tue", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "📖 Term of the day", "glossary"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Term teaser", "status"]]],
-  ["Wed", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "🧠 Quiz question", "quiz"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Quiz teaser", "status"]]],
-  ["Thu", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "🧠 Quiz answer reveal", "quiz"], ["7:00 PM", "🔍 Trade review (a lesson)", "trade-review"], ["Status", "📲 Quote", "status"]]],
+  ["Tue", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "📖 Term of the day", "glossary"], ["7:00 PM", "📈 Read the chart: question", "chart-game"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Term teaser", "status"]]],
+  ["Wed", [["8:45 AM", "📊 Daily levels", "levels"], ["12:30 PM", "📈 Chart answer + scores", "chart-game"], ["1:00 PM", "🧠 Quiz question", "quiz"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Quiz teaser", "status"]]],
+  ["Thu", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "🧠 Quiz answer reveal", "quiz"], ["1:15 PM", "🏅 Quiz results", "quiz-score"], ["7:00 PM", "🔍 Trade review (a lesson)", "trade-review"], ["Status", "📲 Quote", "status"]]],
   ["Fri", [["8:45 AM", "📊 Daily levels", "levels"], ["After 3:30", "🔔 Market close wrap", "close"], ["6:00 PM", "🏆 Contest results", "contest"], ["Status", "📲 Contest winners", "status"]]],
-  ["Sat", [["10:00 AM", "📒 My week in R (journal)", "journal"], ["6:00 PM", "📈 Strategy study (options)", "options"], ["Status", "📲 Join invite", "status"]]],
+  ["Sat", [["10:00 AM", "📒 My week in R (journal)", "journal"], ["Last Sat", "🏅 Monthly quiz leaderboard", "quiz-score"], ["6:00 PM", "📈 Strategy study (options)", "options"], ["Status", "📲 Join invite", "status"]]],
   ["Sun", [["11:00 AM", "📖 Weekend term or tax tip", "glossary"], ["1st Sun", "🌟 Member spotlight", "welcome"], ["7:00 PM", "📅 Week-ahead calendar", "calendar"], ["Status", "📲 Event alert for Monday", "status"]]],
 ];
 const TIPS = [
   ["Every post is an invite", "Add your invite link once in any new tool (Status, Contest, Journal…). Every card you share then ends with “Join free: link”, so each forward can bring someone new."],
   ["Use your Status daily", "Everyone with your number sees your Status, even people not in the group. Post one teaser a day from the <a href='../status/'>Status maker</a> with the join link in the caption."],
-  ["Make it two-way", "Quizzes, the weekly contest and “reply with your view” questions turn readers into members who talk. Reply to the first few answers yourself."],
+  ["Make it two-way", "Quizzes, the <a href='../chart-game/'>chart game</a>, the weekly contest and “reply with your view” questions turn readers into members who talk. Score them with the <a href='../quiz-score/'>scoreboard</a> so every answer counts."],
   ["Recognise people", "Shout out contest winners and great answers by name. A monthly <a href='../welcome/'>spotlight card</a> and a “Contest Champ” mention keep people coming back."],
   ["Welcome every joiner", "Post a <a href='../welcome/'>welcome card</a> with the rules and an icebreaker each week, and reply to every introduction. People who post in week one tend to stay."],
   ["Be consistent, not loud", "Same posts at the same times beats 20 random forwards. Keep the main group for your posts and use a separate chat for discussion so updates don't get buried."],

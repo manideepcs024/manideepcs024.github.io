@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Quiz Scoreboard — MANIMINDSMONEY</title>
+<meta name="description" content="Paste quiz replies from WhatsApp and see who got it right, how the community answered, the fastest correct answers and a monthly quiz leaderboard with streaks." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #b18cff; --acc2: #22d39a; }
+  .src { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .src button { border: 1px dashed rgba(177,140,255,.45); background: rgba(177,140,255,.06); color: #d9cff5; border-radius: 14px; padding: 10px 6px; font: 600 .8rem Inter; cursor: pointer; }
+  .src button:hover { background: rgba(177,140,255,.12); }
+  .keybox { margin-top: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: .84rem; color: #cfd3df; line-height: 1.5; }
+  .keybox b { color: #fff; }
+  .letters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .letters button { width: 44px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.3); color: var(--muted); font: 700 .95rem "JetBrains Mono"; cursor: pointer; }
+  .letters button.on { background: var(--up); border-color: var(--up); color: #00140c; }
+  textarea.paste { min-height: 150px; font: .82rem/1.45 "JetBrains Mono"; }
+  .dist { display: grid; gap: 6px; margin-top: 12px; }
+  .bar { display: grid; grid-template-columns: 26px minmax(0, 1fr) 70px; gap: 8px; align-items: center; font: 600 .82rem "JetBrains Mono"; }
+  .bar .t { height: 22px; border-radius: 7px; background: rgba(255,255,255,.06); overflow: hidden; }
+  .bar .t i { display: block; height: 100%; border-radius: 7px; background: rgba(255,84,112,.55); }
+  .bar.ok .t i { background: var(--up); }
+  .bar small { color: var(--muted); text-align: right; }
+  .reads { margin-top: 12px; max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 14px; }
+  .reads div { display: grid; grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1.4fr); gap: 8px; padding: 7px 12px; font: .76rem "JetBrains Mono"; border-top: 1px solid rgba(255,255,255,.05); align-items: center; }
+  .reads div:first-child { border-top: 0; }
+  .reads b { text-align: center; border-radius: 6px; padding: 2px 0; }
+  .reads .y b { background: rgba(34,211,154,.2); color: var(--up); } .reads .n b { background: rgba(255,84,112,.18); color: var(--down); } .reads .x b { color: var(--muted); }
+  .reads span:last-child { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .board { display: grid; gap: 6px; margin-top: 12px; }
+  .rk { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font: .86rem "JetBrains Mono"; }
+  .rk .m { text-align: center; font-size: 1.1rem; }
+  .rk b { font: 700 .92rem Inter; overflow-wrap: anywhere; }
+  .rk small { color: var(--muted); text-align: right; }
+  .rk.top { border-color: rgba(177,140,255,.5); background: rgba(177,140,255,.08); }
+  .ops { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .ops button, .ops select { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 10px; padding: 8px 12px; font: 500 .8rem Inter; cursor: pointer; color-scheme: dark; }
+  .ops .go { border-color: rgba(34,211,154,.5); color: var(--up); }
+  .ops button[disabled] { opacity: .5; cursor: default; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Who got it <span class="grad">right?</span></h1>
+    <p class="sub">Paste the replies to your quiz or chart game straight from WhatsApp. See how the community answered, who was fastest, and keep a monthly leaderboard with streaks. A little friendly competition keeps people answering every week.</p>
+
+    <div class="seg mb" id="viewSeg" style="max-width:520px"><div class="pill"></div><button data-v="score">① Score a quiz<small>paste replies</small></button><button data-v="board">② Leaderboard<small>this month</small></button></div>
+
+    <div class="layout">
+      <section class="card">
+        <div class="q">Answer key from</div>
+        <div class="src"><button data-src="quiz">🧠 Quiz tool</button><button data-src="chart">📈 Chart game</button><button data-src="manual">✍️ Set manually</button></div>
+        <div class="keybox" id="keybox"></div>
+        <div id="manual" hidden>
+          <div class="cols2">
+            <div><div class="q">Quiz #</div><label class="field sm"><span class="unit">#</span><input id="num" type="text" inputmode="numeric" maxlength="4" /></label></div>
+            <div><div class="q">Number of options</div><label class="field sm"><select id="nopts"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></label></div>
+          </div>
+          <div class="q">Correct answer</div>
+          <div class="letters" id="letters"></div>
+        </div>
+
+        <div class="q">Paste the replies <span class="opt">copied from WhatsApp</span></div>
+        <textarea class="paste" id="paste" placeholder="[19/11/26, 1:05 PM] Ravi Kumar: B&#10;[19/11/26, 1:06 PM] Priya: option c&#10;[19/11/26, 1:06 PM] Amit: Overbought"></textarea>
+        <p class="hint">Reads “B”, “b)”, “option B”, “ans: b” or the option's text (e.g. “Overbought”). Only each person's <b>first</b> reply counts. Check “How each reply was read” on the right and fix any line here if needed.</p>
+        <label class="toggle"><span>First names only on the card<small>Shows “Ravi K.”; phone numbers show only the last 4 digits</small></span><input type="checkbox" id="optShort" checked /><span class="sw"></span></label>
+        <div class="learn"><b>Points:</b> 1 for answering, +2 for a correct answer, and +1 bonus for the first 3 correct answers. <b>Streak</b> counts correct answers in a row across the quizzes you add to the leaderboard.</div>
+        <div id="inviteBox"></div>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2 id="pvTitle">Results</h2><span id="meta"></span></div>
+        <div id="pv"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="ops" id="ops"></div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. Quizzes and chart games are <b>free learning activities</b>; points have no cash value. Nothing here is investment advice.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const L = "ABCDEF", MED = ["🥇", "🥈", "🥉"];
+const pts = n => `${n} pt${n === 1 ? "" : "s"}`;
+const monthKey = () => K.iso(K.istNow()).slice(0, 7);
+const monthName = k => K.parseISO(k + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+const S = K.store("quizscore_v1", { view: "score", src: "manual", label: "Quiz", num: "1", nopts: 4, correct: 1, opts: [], qtext: "", paste: "", short: true, months: {}, recorded: [], idx: 0, showMonth: "" });
+
+/* ---------- answer key ---------- */
+function readLS(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+function loadSrc(src) {
+  if (src === "quiz") {
+    const z = readLS("quiz_form"); const opts = (z?.opts || []).map(o => (o || "").trim()).filter(Boolean);
+    if (!z || !z.q || opts.length < 2) { K.toast("No quiz saved yet. Make one in the Quiz tool"); return; }
+    Object.assign(S, { src, label: "Quiz", num: String(z.num || "1"), opts, nopts: opts.length, correct: Math.min(z.correct || 0, opts.length - 1), qtext: z.q });
+  } else if (src === "chart") {
+    const g = readLS("chart_v1"); if (!g || g.ans == null) { K.toast("Open the Chart game once to create a chart"); return; }
+    const opts = (g.opts || ["📈 Breaks higher", "📉 Falls lower", "↔️ Stays sideways"]).map(o => o.replace(/^\S+\s/, ""));
+    Object.assign(S, { src, label: "Read the Chart", num: String(g.num || "1"), opts, nopts: 3, correct: g.ans, qtext: "What happens next?" });
+  } else Object.assign(S, { src, label: "Quiz", opts: [], qtext: "" });
+  syncInputs(); render(); if (src !== "manual") K.toast("✓ Answer key loaded");
+}
+document.querySelectorAll("[data-src]").forEach(b => b.addEventListener("click", () => loadSrc(b.dataset.src)));
+function syncInputs() { $("#num").value = S.num; $("#nopts").value = String(S.nopts); drawLetters(); }
+function drawLetters() { $("#letters").innerHTML = L.slice(0, S.nopts).split("").map((l, i) => `<button data-i="${i}" class="${i === S.correct ? "on" : ""}">${l}</button>`).join(""); }
+$("#letters").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) { S.correct = +b.dataset.i; drawLetters(); render(); } });
+$("#num").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, ""); S.num = e.target.value; render(); });
+$("#nopts").addEventListener("change", e => { S.nopts = +e.target.value; S.opts = []; if (S.correct >= S.nopts) S.correct = 0; drawLetters(); render(); });
+$("#paste").value = S.paste; $("#paste").addEventListener("input", e => { S.paste = e.target.value; render(); });
+$("#optShort").checked = S.short; $("#optShort").addEventListener("change", e => { S.short = e.target.checked; render(); });
+const placeView = K.seg("#viewSeg", () => S.view, v => { S.view = v; render(); });
+K.inviteField("#inviteBox", () => render());
+
+/* ---------- reading answers ---------- */
+const norm = s => s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[*_~"'“”‘’]/g, "").replace(/[^\p{L}\p{N}\s()./:-]/gu, " ").replace(/\s+/g, " ").trim();
+function readAnswer(msg) {
+  let m = msg.replace(/🅰️?/g, " a ").replace(/🅱️?/g, " b ");
+  const t = norm(m), n = S.nopts;
+  // 1) option text, if it matches exactly one option
+  const hits = S.opts.map((o, i) => [norm(o), i]).filter(([o]) => o.length >= 3 && (` ${t} `).includes(` ${o} `) || (o.length >= 5 && t.includes(o)));
+  const uniq = [...new Set(hits.map(h => h[1]))]; if (uniq.length === 1) return uniq[0];
+  // 2) a letter: at the start, or after "ans/answer/option/opt"
+  let r = t.match(/^\(?([a-f])\)?(?=$|[\s.,):!/-])/) || t.match(/\b(?:ans|answer|option|opt|choice)\s*(?:is\s*)?[:.\-]?\s*\(?([a-f])\)?(?=$|[\s.,):!/-])/);
+  if (r) { const i = r[1].charCodeAt(0) - 97; if (i < n) return i; }
+  // 3) a lone digit 1–n
+  r = t.match(/^([1-6])$/); if (r && +r[1] <= n) return +r[1] - 1;
+  return -1;
+}
+function score() {
+  const { lines, skipped } = K.chatLines(S.paste), seen = new Set(), list = [];
+  lines.forEach(l => { const k = l.name.toLowerCase(); if (seen.has(k)) return; const a = readAnswer(l.msg); if (a < 0) { list.push({ ...l, a, skip: true }); return; } seen.add(k); list.push({ ...l, a }); });
+  const valid = list.filter(x => !x.skip), right = valid.filter(x => x.a === S.correct);
+  const dist = Array.from({ length: S.nopts }, (_, i) => valid.filter(x => x.a === i).length);
+  return { list, skipped, valid, right, dist, fast: right.slice(0, 3), pct: valid.length ? right.length / valid.length * 100 : 0 };
+}
+const nm = n => S.short ? K.shortName(n) : n;
+const optLabel = i => `${L[i]}${S.opts[i] ? ") " + S.opts[i] : ""}`;
+
+/* ---------- leaderboard ---------- */
+const recKey = () => `${S.src === "chart" ? "chart" : "quiz"}-${S.num}`;
+function addToBoard() {
+  const R = score(); if (!R.valid.length) { K.toast("Paste some replies first"); return; }
+  if (S.recorded.includes(recKey())) { K.toast("Already added"); return; }
+  const mk = monthKey(), B = S.months[mk] ||= {}; S.idx++;
+  const fastSet = new Set(R.fast.map(x => x.name.toLowerCase()));
+  R.valid.forEach(x => {
+    const k = x.name.toLowerCase(), e = B[k] ||= { name: x.name, pts: 0, ans: 0, cor: 0, streak: 0, best: 0, last: -1 };
+    e.ans++; e.pts += 1;
+    if (x.a === S.correct) { e.cor++; e.pts += 2 + (fastSet.has(k) ? 1 : 0); e.streak = (e.last === S.idx - 1 ? e.streak : 0) + 1; e.best = Math.max(e.best, e.streak); e.last = S.idx; }
+    else { e.streak = 0; e.last = -1; }
+  });
+  S.recorded.push(recKey()); S.showMonth = mk; K.toast("🏅 Leaderboard updated"); render();
+}
+function boardList(mk) { return Object.values(S.months[mk] || {}).map(e => ({ ...e, live: e.last === S.idx ? e.streak : 0 })).sort((a, b) => b.pts - a.pts || b.cor - a.cor || a.name.localeCompare(b.name)); }
+
+/* ---------- render ---------- */
+function render() {
+  $("#manual").hidden = false;
+  $("#keybox").innerHTML = `<b>${S.label} #${S.num}</b>${S.qtext ? ` · ${K.esc(S.qtext.length > 90 ? S.qtext.slice(0, 90) + "…" : S.qtext)}` : ""}<br>Correct answer: <b style="color:var(--up)">${K.esc(optLabel(S.correct))}</b>${S.src === "manual" ? "" : ` <span style="color:var(--muted)">(loaded from ${S.src === "quiz" ? "Quiz tool" : "Chart game"})</span>`}`;
+  const ops = $("#ops");
+  if (S.view === "score") {
+    const R = score(); $("#pvTitle").textContent = `${S.label} #${S.num}`; $("#meta").textContent = R.valid.length ? `${R.valid.length} answers` : "";
+    let h = "";
+    if (!R.valid.length) h = `<div class="placeholder">Paste the replies on the left to score them.</div>`;
+    else {
+      h = `<div class="hero-res"><span>Got it right</span><strong class="${R.pct >= 50 ? "up" : "warnc"}">${R.pct.toFixed(0)}%</strong><em>${R.right.length} of ${R.valid.length} · answer ${K.esc(optLabel(S.correct))}</em></div>`;
+      h += `<div class="dist">${R.dist.map((d, i) => `<div class="bar ${i === S.correct ? "ok" : ""}"><span>${L[i]}</span><span class="t"><i style="width:${R.valid.length ? d / R.valid.length * 100 : 0}%"></i></span><small>${d} · ${R.valid.length ? (d / R.valid.length * 100).toFixed(0) : 0}%</small></div>`).join("")}</div>`;
+      if (R.fast.length) h += `<div class="stats"><div class="stat wide"><span>⚡ Fastest correct</span><b style="font-family:Inter">${R.fast.map((x, i) => `${MED[i]} ${K.esc(nm(x.name))}`).join("  ")}</b></div></div>`;
+      h += `<div class="q" style="margin-top:14px">How each reply was read</div><div class="reads">${R.list.map(x => `<div class="${x.skip ? "x" : x.a === S.correct ? "y" : "n"}"><span>${K.esc(nm(x.name))}</span><b>${x.skip ? "?" : L[x.a]}</b><span title="${K.esc(x.msg)}">${K.esc(x.msg)}</span></div>`).join("")}</div>`;
+      if (R.skipped.length) h += `<p class="hint">${R.skipped.length} line(s) without a name were skipped.</p>`;
+    }
+    $("#pv").innerHTML = h;
+    const done = S.recorded.includes(recKey());
+    ops.innerHTML = `<button class="go" id="addB" ${done || !R.valid.length ? "disabled" : ""}>${done ? "✓ Added to leaderboard" : "➕ Add to " + monthName(monthKey()) + " leaderboard"}</button><button id="clearB">🧹 Clear replies</button>`;
+    $("#addB").onclick = addToBoard; $("#clearB").onclick = () => { S.paste = ""; $("#paste").value = ""; render(); };
+  } else {
+    const months = Object.keys(S.months).sort().reverse(), mk = S.showMonth && S.months[S.showMonth] ? S.showMonth : months[0] || monthKey(), B = boardList(mk);
+    $("#pvTitle").textContent = "Quiz leaderboard"; $("#meta").textContent = monthName(mk);
+    $("#pv").innerHTML = B.length ? `<div class="board">${B.slice(0, 15).map((e, i) => `<div class="rk ${i < 3 ? "top" : ""}"><span class="m">${MED[i] || i + 1}</span><b>${K.esc(nm(e.name))}${e.live >= 2 ? ` <span title="current streak">🔥${e.live}</span>` : ""}</b><span>${pts(e.pts)}</span><small>${e.cor}/${e.ans} right</small></div>`).join("")}</div>`
+      : `<div class="placeholder">No scores yet this month. Score a quiz and tap <b>Add to leaderboard</b>.</div>`;
+    ops.innerHTML = (months.length > 1 ? `<select id="mSel">${months.map(m => `<option value="${m}" ${m === mk ? "selected" : ""}>${monthName(m)}</option>`).join("")}</select>` : "") + `<button id="resetB">🔄 Clear ${monthName(mk)}</button>`;
+    $("#mSel")?.addEventListener("change", e => { S.showMonth = e.target.value; render(); });
+    $("#resetB").onclick = () => { if (confirm(`Clear the ${monthName(mk)} leaderboard?`)) { delete S.months[mk]; render(); } };
+  }
+  S.save();
+}
+
+/* ---------- share ---------- */
+const DISC = "_Free learning activity. Not investment advice. Not SEBI registered._";
+const curMonth = () => { const m = Object.keys(S.months).sort().reverse(); return S.showMonth && S.months[S.showMonth] ? S.showMonth : m[0] || monthKey(); };
+function text() {
+  if (S.view === "score") {
+    const R = score(), out = [`✅ *${S.label.toUpperCase()} #${S.num}: RESULTS*`, "", `Answer: *${optLabel(S.correct)}*`, `🎯 *${R.pct.toFixed(0)}%* got it right (${R.right.length} of ${R.valid.length})`, ""];
+    R.dist.forEach((d, i) => out.push(`${i === S.correct ? "✅" : "▫️"} ${L[i]}: ${d} (${R.valid.length ? (d / R.valid.length * 100).toFixed(0) : 0}%)`));
+    if (R.fast.length) out.push("", "⚡ *Fastest correct*", ...R.fast.map((x, i) => `${MED[i]} ${nm(x.name)}`));
+    out.push("", "Next one soon. Keep your streak going! 🔥");
+    return out.concat(K.signoff("quiz-score", "Scores by", DISC)).join("\n");
+  }
+  const mk = curMonth(), B = boardList(mk), out = [`🏅 *QUIZ LEADERBOARD* · ${monthName(mk)}`, ""];
+  B.slice(0, 10).forEach((e, i) => out.push(`${MED[i] || (i + 1) + "."} ${nm(e.name)}: *${pts(e.pts)}* (${e.cor}/${e.ans} right${e.live >= 2 ? `, 🔥${e.live} streak` : ""})`));
+  out.push("", "Points: 1 for answering · +2 correct · +1 for the fastest 3.");
+  return out.concat(K.signoff("quiz-score", "Scores by", DISC)).join("\n");
+}
+function valid() {
+  if (S.view === "score" && !score().valid.length) { K.toast("Paste some replies first"); return false; }
+  if (S.view === "board" && !boardList(curMonth()).length) { K.toast("No leaderboard scores yet"); return false; }
+  return true;
+}
+async function draw() {
+  await K.loadFonts(); await document.fonts.load(`800 90px ${K.F.INTER}`).catch(() => {});
+  const W = 1080;
+  if (S.view === "score") {
+    const R = score(), rows = S.nopts, fast = R.fast;
+    const H = 330 + 240 + 30 + rows * 86 + 30 + (fast.length ? 90 + fast.length * 64 + 20 : 0) + K.footerH(true);
+    const { c, ctx } = K.canvas(W, H, [["rgba(177,140,255,0.30)", .9, .08, .6], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(34,211,154,0.12)", .95, .95, .55]]);
+    K.brand(ctx);
+    K.txt(ctx, `${S.label.toUpperCase()} #${S.num} · RESULTS`, 70, 200, `600 26px ${K.F.MONO}`, "#c9b3ff");
+    K.txt(ctx, "Who got it right?", 70, 282, `800 76px ${K.F.INTER}`, "#ffffff");
+    let y = 330;
+    K.panel(ctx, 70, y, W - 140, 240, 32, "rgba(34,211,154,0.10)", "rgba(34,211,154,0.5)");
+    K.txt(ctx, `${R.pct.toFixed(0)}%`, 110, y + 150, `800 120px ${K.F.INTER}`, R.pct >= 50 ? "#22d39a" : "#febc2e");
+    K.txt(ctx, "GOT IT RIGHT", W - 110, y + 80, `700 24px ${K.F.MONO}`, "#9be8c9", "right");
+    K.txt(ctx, `${R.right.length} of ${R.valid.length}`, W - 110, y + 140, `700 44px ${K.F.MONO}`, "#ffffff", "right");
+    ctx.font = `600 28px ${K.F.INTER}`; K.txt(ctx, K.clip(ctx, "Answer: " + optLabel(S.correct), 520), W - 110, y + 195, `600 28px ${K.F.INTER}`, "#c9cfdb", "right");
+    y += 270;
+    R.dist.forEach((d, i) => {
+      const ok = i === S.correct, p = R.valid.length ? d / R.valid.length : 0, bw = W - 140 - 90 - 160;
+      K.txt(ctx, L[i], 96, y + 48, `700 34px ${K.F.MONO}`, ok ? "#22d39a" : "#c9cfdb");
+      K.rr(ctx, 150, y + 14, bw, 46, 14); ctx.fillStyle = "rgba(255,255,255,0.06)"; ctx.fill();
+      if (p > 0) { K.rr(ctx, 150, y + 14, Math.max(28, bw * p), 46, 14); ctx.fillStyle = ok ? "#22d39a" : "rgba(255,84,112,0.6)"; ctx.fill(); }
+      if (S.opts[i]) { ctx.font = `600 24px ${K.F.INTER}`; K.txt(ctx, K.clip(ctx, S.opts[i], bw - 30), 168, y + 46, `600 24px ${K.F.INTER}`, ok ? "#00140c" : "#ffffff"); }
+      K.txt(ctx, `${(p * 100).toFixed(0)}%`, W - 80, y + 48, `700 30px ${K.F.MONO}`, ok ? "#22d39a" : "#c9cfdb", "right");
+      y += 86;
+    });
+    if (fast.length) {
+      y += 20; const h = 80 + fast.length * 64;
+      K.panel(ctx, 70, y, W - 140, h, 28, "rgba(254,188,46,0.08)", "rgba(254,188,46,0.45)");
+      K.txt(ctx, "⚡ FASTEST CORRECT", 104, y + 50, `700 24px ${K.F.MONO}`, "#febc2e");
+      fast.forEach((x, i) => { K.txt(ctx, MED[i], 104, y + 108 + i * 64, `400 40px ${K.F.INTER}`, "#fff"); ctx.font = `700 36px ${K.F.INTER}`; K.txt(ctx, K.clip(ctx, nm(x.name), W - 340), 170, y + 106 + i * 64, `700 36px ${K.F.INTER}`, "#ffffff"); });
+    }
+    K.footer(ctx, W, H, K.toolUrl("quiz-score"), "Free learning activity · Not investment advice · Not SEBI registered", true);
+    return c;
+  }
+  const mk = curMonth(), B = boardList(mk).slice(0, 10), H = 330 + 200 + 30 + B.length * 98 + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [["rgba(177,140,255,0.30)", .9, .08, .6], ["rgba(254,188,46,0.18)", .05, .05, .6], ["rgba(34,211,154,0.10)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, "QUIZ LEADERBOARD", 70, 200, `600 26px ${K.F.MONO}`, "#c9b3ff");
+  K.txt(ctx, monthName(mk), 70, 282, `800 76px ${K.F.INTER}`, "#ffffff");
+  let y = 330;
+  K.panel(ctx, 70, y, W - 140, 200, 32, "rgba(177,140,255,0.10)", "rgba(177,140,255,0.5)");
+  K.txt(ctx, "POINTS", W / 2, y + 62, `700 24px ${K.F.MONO}`, "#c9b3ff", "center");
+  K.txt(ctx, "1 answer · +2 correct · +1 fastest 3", W / 2, y + 130, `700 40px ${K.F.INTER}`, "#ffffff", "center");
+  K.txt(ctx, "🔥 = correct-answer streak", W / 2, y + 176, `500 26px ${K.F.INTER}`, "#a9aec0", "center");
+  y += 230;
+  B.forEach((e, i) => {
+    const top = i < 3; K.panel(ctx, 70, y, W - 140, 84, 24, top ? "rgba(177,140,255,0.10)" : "rgba(0,0,0,0.38)", top ? "rgba(177,140,255,0.5)" : "rgba(255,255,255,0.10)");
+    K.txt(ctx, MED[i] || String(i + 1), 118, y + 56, `${MED[i] ? "400 42px" : "700 32px"} ${MED[i] ? K.F.INTER : K.F.MONO}`, "#c9cfdb", "center");
+    const label = nm(e.name) + (e.live >= 2 ? `  🔥${e.live}` : ""); ctx.font = `700 36px ${K.F.INTER}`; K.txt(ctx, K.clip(ctx, label, 480), 176, y + 55, `700 36px ${K.F.INTER}`, "#ffffff");
+    K.txt(ctx, pts(e.pts), W - 280, y + 55, `700 34px ${K.F.MONO}`, top ? "#d9c7ff" : "#e3e6ee", "right");
+    K.txt(ctx, `${e.cor}/${e.ans} right`, W - 100, y + 53, `500 24px ${K.F.MONO}`, "#8a90a2", "right");
+    y += 98;
+  });
+  K.footer(ctx, W, H, K.toolUrl("quiz-score"), "Free learning activity · Not investment advice · Not SEBI registered", true);
+  return c;
+}
+K.share({ text, valid, draw, file: () => S.view === "score" ? `quiz-${S.num}-results` : `quiz-leaderboard-${curMonth()}` });
+syncInputs(); render();
+</script>
+</body>
+</html>

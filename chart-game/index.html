@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Read the Chart Game — MANIMINDSMONEY</title>
+<meta name="description" content="A 'what happens next?' chart game for your community: computer-generated practice charts for breakouts, fakeouts, flags, double tops and more, with a question card today and the answer and lesson tomorrow." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #5b8cff; --acc2: #22d39a; }
+  .chartbox { border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,.32); overflow: hidden; }
+  #chart { display: block; width: 100%; height: 300px; }
+  .admin { margin-top: 12px; padding: 12px 14px; border-radius: 14px; border: 1px dashed rgba(254,188,46,.4); background: rgba(254,188,46,.05); font-size: .84rem; color: #e8d6a6; line-height: 1.5; }
+  .admin b { color: #ffd98a; }
+  .roll { width: 100%; border: 0; border-radius: 16px; padding: 14px; font: 700 1rem Inter; cursor: pointer; color: #001a33; background: linear-gradient(100deg, #9cc2ff, var(--acc)); }
+  .roll:active { transform: scale(.98); }
+  .opts { display: grid; gap: 6px; margin-top: 12px; }
+  .opts div { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font: 600 .9rem Inter; }
+  .opts div.ok { border-color: rgba(34,211,154,.6); background: rgba(34,211,154,.1); }
+  .opts div i { font-style: normal; font-family: "JetBrains Mono"; color: var(--muted); margin-right: 8px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>What happens <span class="grad">next?</span></h1>
+    <p class="sub">Post a practice chart that stops at a decision point. Members reply A, B or C, and tomorrow you reveal the answer with the pattern and the lesson. The charts are <b>computer-generated</b>, not real stocks, so it's pure learning and never a tip.</p>
+
+    <div class="layout">
+      <section class="card">
+        <button class="roll" id="newBtn">🎲 New random chart</button>
+        <div class="cols2">
+          <div><div class="q">Game #</div><label class="field sm"><span class="unit">#</span><input id="num" type="text" inputmode="numeric" maxlength="4" /></label></div>
+          <div><div class="q">Pattern</div><label class="field sm"><select id="scn"></select></label></div>
+        </div>
+        <label class="toggle"><span>Show the key level on the question<small>Easier: draws the resistance, support or neckline</small></span><input type="checkbox" id="optLevel" checked /><span class="sw"></span></label>
+        <label class="toggle"><span>Show volume bars<small>Volume often holds the clue</small></span><input type="checkbox" id="optVol" checked /><span class="sw"></span></label>
+        <div class="admin" id="admin"></div>
+        <div id="inviteBox"></div>
+      </section>
+
+      <section class="card sticky">
+        <div class="seg mb" id="modeSeg"><div class="pill"></div><button data-v="q">❓ Question<small>post today</small></button><button data-v="a">✅ Answer<small>post tomorrow</small></button></div>
+        <div class="chartbox"><canvas id="chart"></canvas></div>
+        <div class="opts" id="opts"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="tip"><b>Run it like a quiz:</b> post the question, then paste the replies into the <a href="../quiz-score/">Quiz scoreboard</a> (choose “Chart game” as the source) to see who read it right and update the monthly leaderboard. Then post the answer card.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. These charts are <b>randomly generated for practice</b> and do not show any real security. Patterns describe what <i>often</i> happens, not what will happen; real markets are uncertain. For learning only, not investment advice.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const N = 60, CUT = 42;
+const OPTS = ["📈 Breaks higher", "📉 Falls lower", "↔️ Stays sideways"];
+// wp: price waypoints [index, level]; cap/floor: [from, to, level] keep setup candles under/over a level;
+// vol: [from, to, multiplier]; lv: key levels to draw; ans: 0 up, 1 down, 2 sideways
+const SC = {
+  breakout: { n: "Breakout with volume", ans: 0, wp: [[0, .8], [14, .97], [18, .92], [24, .995], [29, .93], [35, 1], [41, .975], [42, .995], [44, 1.04], [52, 1.12], [59, 1.15]], cap: [12, 41, 1], vol: [[35, 41, 1.5], [42, 45, 2.6]], lv: [[1, "Resistance"]],
+    lesson: "Price kept testing resistance with rising volume, then closed above it on a big volume jump. Strong breakouts often run as sellers who were defending the level give up.", watch: "A candle close above resistance with clearly higher volume. Old resistance often becomes support on a retest." },
+  fakeout: { n: "False breakout (bull trap)", ans: 1, wp: [[0, .8], [14, .97], [18, .92], [24, .995], [29, .93], [35, 1], [41, .975], [42, 1.0], [43, 1.025], [45, .99], [50, .93], [59, .88]], cap: [12, 41, 1], vol: [[33, 41, .55], [43, 43, .7]], lv: [[1, "Resistance"]],
+    lesson: "Price poked above resistance but volume was fading and it couldn't hold. It fell back into the range, trapping buyers who chased the breakout.", watch: "Shrinking volume into resistance is a warning. Wait for a close above the level with volume, and exit fast if price falls back inside." },
+  doubletop: { n: "Double top", ans: 1, wp: [[0, .78], [15, 1], [24, .9], [33, .995], [41, .95], [42, .93], [46, .9], [49, .86], [59, .8]], cap: [10, 41, 1], vol: [[30, 35, .7], [46, 49, 2]], lv: [[1, "Resistance"], [.9, "Neckline"]],
+    lesson: "Price failed twice at the same high on weaker volume the second time, then broke below the neckline (the low between the two peaks). Two failures show sellers defending that level.", watch: "A close below the neckline confirms the pattern. Until then it's just two highs." },
+  doublebottom: { n: "Double bottom", ans: 0, mirror: "doubletop", lv: [[1, "Support"], [1.1, "Neckline"]],
+    lesson: "Price held the same low twice, then broke above the neckline (the high between the two lows). Buyers defended that level twice.", watch: "A close above the neckline with volume confirms it. Until then it's just two lows." },
+  bullflag: { n: "Bull flag", ans: 0, wp: [[0, .72], [10, .74], [20, 1], [26, .975], [32, .97], [37, .955], [41, .95], [42, .96], [45, 1.01], [52, 1.1], [59, 1.16]], vol: [[10, 20, 2], [21, 41, .55], [44, 46, 2.2]], lv: [[1, "Flag top"]],
+    lesson: "After a sharp rally (the pole), price drifted lower gently on light volume (the flag), then the uptrend resumed. The quiet pullback showed sellers weren't in control.", watch: "A shallow pullback on falling volume after a strong move; the break of the flag with volume is the trigger." },
+  bearflag: { n: "Bear flag", ans: 1, mirror: "bullflag", lv: [[1, "Flag bottom"]],
+    lesson: "After a sharp fall (the pole), price bounced weakly on light volume (the flag), then the downtrend resumed. The weak bounce showed buyers had no strength.", watch: "A shallow bounce on falling volume after a strong drop; a break below the flag continues the trend." },
+  supporthold: { n: "Support holds", ans: 0, wp: [[0, 1.2], [12, 1], [16, 1.07], [24, 1], [30, 1.06], [38, 1.005], [41, 1], [42, 1.02], [47, 1.08], [54, 1.12], [59, 1.15]], floor: [10, 41, 1], wick: [38, 41], vol: [[39, 44, 1.7]], lv: [[1, "Support"]],
+    lesson: "Buyers stepped in at the same support for the third time, leaving long lower wicks on rising volume, and price bounced. Support that holds repeatedly attracts more buyers.", watch: "Long lower wicks and rising volume at support. A stop just below support keeps the risk small if it fails." },
+  supportbreak: { n: "Descending triangle breakdown", ans: 1, wp: [[0, 1.2], [12, 1], [16, 1.1], [24, 1], [28, 1.065], [35, 1], [38, 1.035], [41, 1.005], [42, .99], [44, .955], [52, .9], [59, .86]], floor: [10, 41, 1], vol: [[43, 46, 2.4]], lv: [[1, "Support"]],
+    lesson: "Each bounce from support was weaker than the last (lower highs). Buyers were losing strength, and support finally broke with a jump in volume.", watch: "Lower highs pressing into flat support often end in a breakdown, even though support has held so far." },
+  asctri: { n: "Ascending triangle", ans: 0, wp: [[0, .8], [10, 1], [16, .88], [23, 1], [28, .92], [34, 1], [38, .96], [41, .99], [42, 1.0], [44, 1.045], [52, 1.11], [59, 1.14]], cap: [8, 41, 1], vol: [[43, 45, 2.3]], lv: [[1, "Resistance"]],
+    lesson: "Resistance stayed flat while each dip was bought earlier (higher lows). Buyers were getting more aggressive, and price broke out higher.", watch: "Higher lows into flat resistance. The breakout usually comes with a volume jump." },
+  range: { n: "Range-bound market", ans: 2, wp: [[0, 1], [6, 1.075], [12, .955], [19, 1.07], [26, .96], [33, 1.075], [41, .97], [42, .99], [48, 1.07], [53, .96], [59, 1.02]], cap: [0, 59, 1.08], floor: [0, 59, .95], lv: [[1.08, "Resistance"], [.95, "Support"]],
+    lesson: "Price kept bouncing between support and resistance with no trend, and it stayed in the range. Not every chart is about to break out.", watch: "In a range, the edges matter. Buy near support, sell near resistance, or simply wait for a clear breakout." },
+  hs: { n: "Head and shoulders", ans: 1, wp: [[0, .8], [8, .95], [12, .9], [20, 1.05], [26, .9], [33, .97], [41, .92], [42, .905], [45, .88], [52, .82], [59, .78]], vol: [[18, 21, 1.3], [31, 34, .7], [44, 47, 2]], lv: [[.9, "Neckline"]],
+    lesson: "Three peaks with the middle one highest, on weaker volume at the right shoulder. The break below the neckline showed buyers had run out of steam.", watch: "A lower right shoulder and a close below the neckline confirm it." },
+};
+const KEYS = Object.keys(SC);
+// mirrored patterns: flip prices around 1.0
+KEYS.forEach(k => { const s = SC[k]; if (!s.mirror) return; const m = SC[s.mirror]; s.wp = m.wp.map(([i, v]) => [i, 2 - v]); s.vol = m.vol; if (m.cap) s.floor = [m.cap[0], m.cap[1], 2 - m.cap[2]]; if (m.floor) s.cap = [m.floor[0], m.floor[1], 2 - m.floor[2]]; });
+SC.doublebottom.lv = [[1, "Support"], [1.1, "Neckline"]];
+
+const S = K.store("chart_v1", { num: "1", scn: "breakout", seed: 12345, mode: "q", level: true, vol: true, recent: [] });
+
+/* ---------- generator ---------- */
+function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gen(key, seed) {
+  const s = SC[key], r = rng(seed), gauss = () => (r() + r() + r() - 1.5) / 1.5;
+  const base = [120, 260, 480, 850, 1450, 2300, 3600][Math.floor(r() * 7)] * (0.9 + r() * .2), sig = .006 + r() * .004;
+  const path = i => { const w = s.wp; for (let j = 1; j < w.length; j++) if (i <= w[j][0]) { const [i0, v0] = w[j - 1], [i1, v1] = w[j]; return v0 + (v1 - v0) * (i - i0) / (i1 - i0); } return w[w.length - 1][1]; };
+  const C = []; let prev = path(0);
+  for (let i = 0; i < N; i++) {
+    let c = path(i) * (1 + gauss() * sig), o = prev * (1 + gauss() * sig * .35);
+    let h = Math.max(o, c) * (1 + Math.abs(gauss()) * sig * .9), l = Math.min(o, c) * (1 - Math.abs(gauss()) * sig * .9);
+    if (s.cap && i >= s.cap[0] && i <= s.cap[1]) { const L = s.cap[2]; c = Math.min(c, L * (1 - .002 - r() * .004)); o = Math.min(o, L * (1 - .002)); h = Math.min(h, L * (1 + .0015)); if (path(i) >= L * .99) h = L * (1 + r() * .0015); }
+    if (s.floor && i >= s.floor[0] && i <= s.floor[1]) { const L = s.floor[2]; c = Math.max(c, L * (1 + .002 + r() * .004)); o = Math.max(o, L * (1 + .002)); l = Math.max(l, L * (1 - .0015)); if (path(i) <= L * 1.01) l = L * (1 - r() * .0015); }
+    if (s.wick && i >= s.wick[0] && i <= s.wick[1]) { l = Math.min(l, Math.min(o, c) * (1 - sig * 2.2)); if (s.floor) l = Math.max(l, s.floor[2] * (1 - .004)); }
+    h = Math.max(h, o, c); l = Math.min(l, o, c);
+    let v = .7 + r() * .6; (s.vol || []).forEach(([a, b, m]) => { if (i >= a && i <= b) v *= m; });
+    C.push({ o: o * base, h: h * base, l: l * base, c: c * base, v }); prev = c;
+  }
+  return { C, lv: (s.lv || []).map(([p, t]) => [p * base, t]), base };
+}
+const dp = p => p >= 1000 ? 0 : p >= 100 ? 1 : 2;
+
+/* ---------- drawing ---------- */
+function drawChart(ctx, x, y, w, h, G, o) {
+  const show = o.mode === "q" ? CUT : N, vis = G.C.slice(0, show);
+  const all = o.mode === "q" ? vis : G.C;
+  let lo = Math.min(...all.map(c => c.l)), hi = Math.max(...all.map(c => c.h));
+  G.lv.forEach(([p]) => { lo = Math.min(lo, p); hi = Math.max(hi, p); });
+  const pad = (hi - lo) * .08; lo -= pad; hi += pad;
+  const vh = o.vol ? h * .18 : 0, ph = h - vh - (o.vol ? 8 : 0), axW = o.fs * 4.6;
+  const cw = (w - axW) / N, X = i => x + i * cw + cw / 2, Y = p => y + (hi - p) / (hi - lo) * ph;
+  // future region
+  const fx = x + CUT * cw;
+  if (o.mode === "q") {
+    ctx.save(); ctx.setLineDash([o.fs * .6, o.fs * .5]); ctx.strokeStyle = "rgba(255,255,255,0.25)"; ctx.lineWidth = Math.max(1, o.fs / 8);
+    K.rr(ctx, fx + cw * .3, y + 4, (N - CUT) * cw - cw * .6, h - 8, o.fs); ctx.stroke(); ctx.restore();
+    K.txt(ctx, "?", fx + (N - CUT) * cw / 2, y + ph / 2 + o.fs * 3, `800 ${o.fs * 8}px ${K.F.INTER}`, "rgba(255,255,255,0.55)", "center");
+  } else { ctx.fillStyle = "rgba(91,140,255,0.10)"; ctx.fillRect(fx, y, (N - CUT) * cw, h); K.txt(ctx, "WHAT HAPPENED", fx + (N - CUT) * cw / 2, y + o.fs * 1.4, `700 ${o.fs * .85}px ${K.F.MONO}`, "#9cc2ff", "center"); }
+  // levels
+  if (o.level) G.lv.forEach(([p, t]) => {
+    ctx.save(); ctx.setLineDash([o.fs * .7, o.fs * .45]); ctx.strokeStyle = "rgba(254,188,46,0.8)"; ctx.lineWidth = Math.max(1, o.fs / 9);
+    ctx.beginPath(); ctx.moveTo(x, Y(p)); ctx.lineTo(x + N * cw, Y(p)); ctx.stroke(); ctx.restore();
+    K.txt(ctx, t.toUpperCase(), x + 4, Y(p) - o.fs * .45, `700 ${o.fs * .8}px ${K.F.MONO}`, "#febc2e");
+  });
+  // candles
+  const vmax = Math.max(...G.C.map(c => c.v));
+  (o.mode === "q" ? vis : G.C).forEach((c, i) => {
+    const up = c.c >= c.o, col = up ? "#22d39a" : "#ff5470", dim = o.mode === "a" && i < CUT ? .55 : 1;
+    ctx.globalAlpha = dim; ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = Math.max(1, cw * .12);
+    ctx.beginPath(); ctx.moveTo(X(i), Y(c.h)); ctx.lineTo(X(i), Y(c.l)); ctx.stroke();
+    const top = Y(Math.max(c.o, c.c)), bh = Math.max(1, Math.abs(Y(c.o) - Y(c.c)));
+    ctx.fillRect(X(i) - cw * .34, top, cw * .68, bh);
+    if (o.vol) { const vh2 = c.v / vmax * vh; ctx.globalAlpha = dim * .45; ctx.fillRect(X(i) - cw * .34, y + h - vh2, cw * .68, vh2); }
+    ctx.globalAlpha = 1;
+  });
+  // price axis
+  ctx.font = `500 ${o.fs * .78}px ${K.F.MONO}`; ctx.fillStyle = "#8a90a2"; ctx.textAlign = "right";
+  for (let k = 0; k <= 3; k++) { const p = lo + pad + (hi - lo - 2 * pad) * k / 3; ctx.fillText(K.nf(p, dp(p)), x + w - 2, Y(p) + o.fs * .3); }
+}
+function drawPage() {
+  const cv = $("#chart"), r = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w * r; cv.height = h * r; const ctx = cv.getContext("2d"); ctx.scale(r, r); ctx.clearRect(0, 0, w, h);
+  drawChart(ctx, 8, 8, w - 16, h - 16, gen(S.scn, S.seed), { mode: S.mode, level: S.mode === "a" || S.level, vol: S.vol, fs: 11 });
+}
+
+/* ---------- UI ---------- */
+$("#scn").innerHTML = KEYS.map(k => `<option value="${k}">${SC[k].n}</option>`).join("");
+const placeMode = K.seg("#modeSeg", () => S.mode, v => { S.mode = v; render(); });
+$("#num").value = S.num; $("#num").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, ""); S.num = e.target.value; render(); });
+$("#scn").addEventListener("change", e => { S.scn = e.target.value; S.seed = Math.floor(Math.random() * 1e9); render(); });
+$("#optLevel").checked = S.level; $("#optLevel").addEventListener("change", e => { S.level = e.target.checked; render(); });
+$("#optVol").checked = S.vol; $("#optVol").addEventListener("change", e => { S.vol = e.target.checked; render(); });
+$("#newBtn").addEventListener("click", () => {
+  const pool = KEYS.filter(k => !S.recent.includes(k));
+  S.scn = pool[Math.floor(Math.random() * pool.length)]; S.seed = Math.floor(Math.random() * 1e9);
+  S.recent = [...S.recent, S.scn].slice(-4); S.mode = "q"; placeMode(); render(); K.toast("🎲 New chart ready");
+});
+K.inviteField("#inviteBox", () => render());
+addEventListener("resize", drawPage);
+
+const letter = () => "ABC"[SC[S.scn].ans];
+function render() {
+  const s = SC[S.scn]; $("#scn").value = S.scn;
+  $("#admin").innerHTML = `🔒 <b>Only you see this:</b> the answer is <b>${letter()}) ${OPTS[s.ans].replace(/^\S+\s/, "")}</b>. Pattern: <b>${s.n}</b>.`;
+  $("#opts").innerHTML = OPTS.map((t, i) => `<div class="${S.mode === "a" && i === s.ans ? "ok" : ""}"><i>${"ABC"[i]}</i>${t}${S.mode === "a" && i === s.ans ? " ✓" : ""}</div>`).join("") +
+    (S.mode === "a" ? `<div style="font-weight:400;font-size:.84rem;color:#d5d8e3;line-height:1.5"><b style="color:#9cc2ff">${s.n}.</b> ${s.lesson}</div>` : "");
+  S.ans = s.ans; S.opts = OPTS; drawPage(); S.save();   // ans/opts are read by the Quiz scoreboard
+}
+
+/* ---------- share ---------- */
+const DISC = "_Practice chart, computer-generated. Not a real stock or advice. Not SEBI registered._";
+function text() {
+  const s = SC[S.scn];
+  if (S.mode === "q") return [`📈 *READ THE CHART #${S.num}*`, "", "This chart stops at a decision point. *What happens next?*", "", ...OPTS.map((t, i) => `*${"ABC"[i]}*) ${t}`), "", "Reply with *A, B or C* 👇 Answer tomorrow!", S.level ? "_Hint: watch the dashed level._" : ""].filter((l, i, a) => l !== "" || a[i - 1] !== "").concat(K.signoff("chart-game", "Play along", DISC)).join("\n");
+  return [`✅ *READ THE CHART #${S.num}: ANSWER*`, "", `*${letter()}) ${OPTS[s.ans]}*`, `Pattern: *${s.n}*`, "", `💡 ${s.lesson}`, "", `👀 *What to watch:* ${s.watch}`, "", "_Patterns show what often happens, not what always happens._"].concat(K.signoff("chart-game", "Play along", DISC)).join("\n");
+}
+async function draw() {
+  await K.loadFonts(); await document.fonts.load(`800 90px ${K.F.INTER}`).catch(() => {});
+  const s = SC[S.scn], W = 1080, G = gen(S.scn, S.seed), m = K.measure();
+  m.font = `400 30px ${K.F.INTER}`;
+  const les = S.mode === "a" ? K.cap(K.wrap(m, s.lesson, W - 210), 5) : [], wat = S.mode === "a" ? K.cap(K.wrap(m, s.watch, W - 210), 4) : [];
+  const chartY = 320, chartH = 620, optY = chartY + chartH + 40;
+  const bodyH = S.mode === "q" ? 3 * 104 + 70 : 120 + (88 + les.length * 42) + 20 + (88 + wat.length * 42);
+  const H = optY + bodyH + 30 + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [["rgba(91,140,255,0.28)", .9, .08, .6], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(34,211,154,0.10)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, `READ THE CHART #${S.num}${S.mode === "a" ? " · ANSWER" : ""}`, 70, 200, `600 26px ${K.F.MONO}`, "#9cc2ff");
+  K.txt(ctx, S.mode === "q" ? "What happens next?" : s.n, 70, 282, `800 ${S.mode === "q" ? 76 : 64}px ${K.F.INTER}`, "#ffffff");
+  K.panel(ctx, 70, chartY, W - 140, chartH, 28, "rgba(0,0,0,0.45)");
+  drawChart(ctx, 96, chartY + 20, W - 192, chartH - 40, G, { mode: S.mode, level: S.mode === "a" || S.level, vol: S.vol, fs: 24 });
+  K.txt(ctx, "PRACTICE CHART · COMPUTER-GENERATED · NOT A REAL STOCK", W / 2, chartY + chartH + 28, `600 18px ${K.F.MONO}`, "#6c7285", "center");
+  let y = optY + 20;
+  if (S.mode === "q") {
+    OPTS.forEach((t, i) => { K.panel(ctx, 70, y, W - 140, 88, 24, "rgba(255,255,255,0.05)", "rgba(255,255,255,0.14)"); K.rr(ctx, 96, y + 16, 56, 56, 16); ctx.fillStyle = "rgba(91,140,255,0.25)"; ctx.fill(); K.txt(ctx, "ABC"[i], 124, y + 56, `700 32px ${K.F.MONO}`, "#9cc2ff", "center"); K.txt(ctx, t, 178, y + 57, `700 36px ${K.F.INTER}`, "#eef0f6"); y += 104; });
+    K.txt(ctx, "Reply A, B or C 👇  Answer tomorrow!", W / 2, y + 40, `700 34px ${K.F.INTER}`, "#9cc2ff", "center");
+  } else {
+    K.panel(ctx, 70, y, W - 140, 96, 26, "rgba(34,211,154,0.12)", "rgba(34,211,154,0.6)");
+    K.txt(ctx, `ANSWER: ${letter()}) ${OPTS[s.ans]}`, W / 2, y + 62, `800 40px ${K.F.INTER}`, "#22d39a", "center"); y += 120;
+    [["THE LESSON", les, "#9cc2ff"], ["WHAT TO WATCH", wat, "#febc2e"]].forEach(([t, L, col]) => {
+      const h = 68 + L.length * 42; K.panel(ctx, 70, y, W - 140, h, 24, col + "12", col + "55");
+      K.txt(ctx, t, 104, y + 46, `700 22px ${K.F.MONO}`, col); L.forEach((l, k) => K.txt(ctx, l, 104, y + 88 + k * 42, `400 30px ${K.F.INTER}`, "#e3e6ee")); y += h + 20;
+    });
+  }
+  K.footer(ctx, W, H, K.toolUrl("chart-game"), "Practice chart, not a real stock · For learning only · Not SEBI registered", true);
+  return c;
+}
+K.share({ text, draw, file: () => `read-the-chart-${S.num}-${S.mode === "q" ? "question" : "answer"}` });
+render(); document.fonts.ready.then(drawPage);
+</script>
+</body>
+</html>
