@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>IPO Share Card — MANIMINDSMONEY</title>
+<meta name="description" content="Create and share IPO details on WhatsApp as text or image: type, money required, shareholder quota, allotment and profit chances." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh;
+    padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden;
+  }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .26; animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--a1); top: -25vmax; left: -15vmax; }
+  .blob.b2 { background: var(--a2); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .16; }
+  .blob.b3 { background: #ffb020; top: 40%; left: 55%; width: 28vmax; height: 28vmax; animation-delay: -12s; opacity: .10; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display: flex; gap: 8px; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  h1 { font: 700 clamp(1.9rem, 6vw, 2.8rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--a1), var(--a2) 55%, #ffb020); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 24px; font-size: .95rem; max-width: 620px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(18px, 4.5vw, 28px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); }
+  .sticky { position: sticky; top: 16px; }
+  @media (max-width: 900px) { .sticky { position: static; } }
+
+  .q { display: block; font: 600 .74rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--a2); margin: 20px 0 8px; }
+  .q:first-child { margin-top: 0; }
+  .q .opt { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; font-family: Inter; }
+
+  .field { display: flex; align-items: center; gap: 10px; padding: 4px 16px; border-radius: 16px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 1.1rem "JetBrains Mono"; color: var(--muted); }
+  .layout > *, .two > *, .three > * { min-width: 0; }
+  .field input { width: 100%; flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 600 1.15rem "JetBrains Mono"; padding: 12px 0; }
+  .field.big input { font: 700 clamp(1.3rem, 5vw, 1.6rem) "Space Grotesk"; letter-spacing: -.02em; }
+  .field input::placeholder { color: #3a3f52; }
+  .hint { font-size: .78rem; color: var(--muted); margin-top: 6px; font-family: "JetBrains Mono"; min-height: 16px; }
+
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 16px; background: rgba(0,0,0,.35); border: 1px solid var(--line); position: relative; }
+  .seg button { position: relative; z-index: 1; border: 0; background: none; color: var(--muted); padding: 11px 6px; border-radius: 12px; font: 600 .86rem Inter; cursor: pointer; transition: color .25s; line-height: 1.2; }
+  .seg button small { display: block; font-weight: 400; font-size: .7rem; opacity: .75; margin-top: 2px; }
+  .seg button.on { color: #000; }
+  .seg .pill { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 12px; background: var(--fg); transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s, background .35s; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .three .field { padding: 2px 10px; }
+  .three .field input { font-size: 1rem; padding: 10px 0; }
+  .mini { display: block; font-size: .72rem; color: var(--muted); margin-bottom: 5px; }
+
+  details.calc { margin-top: 10px; border: 1px dashed rgba(255,255,255,.15); border-radius: 14px; padding: 2px 14px; }
+  details.calc[open] { padding-bottom: 14px; }
+  details.calc summary { cursor: pointer; padding: 10px 0; font-size: .84rem; color: #cfd3df; list-style: none; }
+  details.calc summary::-webkit-details-marker { display: none; }
+
+  textarea { width: 100%; resize: vertical; min-height: 100px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); border-radius: 16px; color: var(--fg); font: 400 .95rem/1.5 Inter, sans-serif; padding: 12px 14px; outline: 0; transition: border-color .25s, box-shadow .25s; }
+  textarea:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+
+  /* preview */
+  .pv-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .pv-head h2 { font: 700 1.1rem "Space Grotesk"; }
+  .pv-head span { font: .72rem "JetBrains Mono"; color: var(--muted); }
+  .chat { border-radius: 20px; padding: 18px 14px; background: #0b141a url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='2' cy='2' r='1' fill='%23ffffff10'/></svg>"); border: 1px solid var(--line); }
+  .bubble { position: relative; margin-left: auto; max-width: 92%; background: #005c4b; color: #e9edef; border-radius: 12px 0 12px 12px; padding: 10px 12px 18px; font: 400 .9rem/1.45 Inter, sans-serif; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,.3); }
+  .bubble::after { content: ""; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: #005c4b; border-left-color: #005c4b; }
+  .bubble .time { position: absolute; right: 10px; bottom: 4px; font-size: .66rem; color: #ffffff99; }
+  .empty { color: #8696a0; font-style: italic; }
+
+  .share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 16px; font: 600 .98rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.img { grid-column: 1 / -1; background: linear-gradient(100deg, rgba(124,92,255,.22), rgba(0,224,184,.16)); border: 1px solid rgba(124,92,255,.5); font-weight: 700; }
+  .btn.img[disabled] { opacity: .6; pointer-events: none; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; font-weight: 700; }
+  .btn.wa svg { width: 18px; height: 18px; }
+  .btn.ghost { grid-column: 1 / -1; font-size: .85rem; padding: 11px; color: var(--muted); }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 140px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 30; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); }
+
+  .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .modal[hidden] { display: none; }
+  .modal-card { width: 100%; max-width: 400px; max-height: 100%; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px; }
+  .modal-card img { display: block; max-width: 100%; max-height: min(60vh, 540px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); }
+  .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
+  .modal-card .row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 14px; }
+
+  .disclaimer { margin: 26px auto 0; max-width: 1100px; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../sl-calculator/">SL Calculator</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Share an <span class="grad">IPO</span> in seconds.</h1>
+    <p class="sub">Fill in the IPO details and send them to WhatsApp as a neat message or a picture.</p>
+
+    <div class="layout">
+      <!-- FORM -->
+      <section class="card">
+        <label class="q" for="name">IPO name</label>
+        <label class="field big" id="f-name"><input id="name" type="text" maxlength="60" placeholder="e.g. ABC Technologies Ltd" autocomplete="off" /></label>
+
+        <span class="q">IPO type</span>
+        <div class="seg" id="type">
+          <div class="pill"></div>
+          <button data-v="mainboard" class="on">Mainboard<small>NSE / BSE main</small></button>
+          <button data-v="sme">SME<small>NSE Emerge / BSE SME</small></button>
+        </div>
+
+        <label class="q" for="money">Money required <span class="opt">(per application)</span></label>
+        <label class="field" id="f-money"><span class="unit">₹</span><input id="money" type="text" inputmode="decimal" placeholder="14,800" autocomplete="off" /></label>
+        <div class="hint" id="moneyHint"></div>
+        <details class="calc" id="calcBox">
+          <summary>🧮 Calculate from price &amp; lot size</summary>
+          <div class="three">
+            <div><span class="mini">Price (upper band)</span><label class="field"><span class="unit">₹</span><input id="price" type="text" inputmode="decimal" placeholder="148" autocomplete="off" /></label></div>
+            <div><span class="mini">Shares per lot</span><label class="field"><input id="lotsz" type="text" inputmode="numeric" placeholder="100" autocomplete="off" /></label></div>
+            <div><span class="mini">Lots</span><label class="field"><input id="lots" type="text" inputmode="numeric" placeholder="1" autocomplete="off" /></label></div>
+          </div>
+          <div class="hint">Check the minimum lots in the RHP. SME IPOs usually need a bigger minimum application.</div>
+        </details>
+
+        <label class="q" for="dates">IPO dates <span class="opt">(optional)</span></label>
+        <label class="field"><span class="unit">📅</span><input id="dates" type="text" maxlength="40" placeholder="e.g. 18–20 Nov, listing 25 Nov" autocomplete="off" /></label>
+
+        <span class="q">Shareholder quota?</span>
+        <div class="seg" id="quota">
+          <div class="pill"></div>
+          <button data-v="yes">✅ Yes<small>parent company holders</small></button>
+          <button data-v="no" class="on">❌ No<small>retail only</small></button>
+        </div>
+
+        <span class="q">Chances of allotment</span>
+        <div class="seg rate" id="allot">
+          <div class="pill"></div>
+          <button data-v="low">Low</button>
+          <button data-v="medium" class="on">Medium</button>
+          <button data-v="high">High</button>
+        </div>
+
+        <span class="q">Profit chances</span>
+        <div class="seg rate" id="profit">
+          <div class="pill"></div>
+          <button data-v="low">Low</button>
+          <button data-v="medium" class="on">Medium</button>
+          <button data-v="high">High</button>
+        </div>
+
+        <label class="q" for="notes">Notes <span class="opt">(optional, 2–4 lines)</span></label>
+        <textarea id="notes" maxlength="400" placeholder="e.g. Strong financials, 3x revenue growth in 2 years. Heavy subscription expected in QIB. Apply via family PANs for better odds."></textarea>
+        <div class="hint"><span id="nCount">0</span>/400</div>
+      </section>
+
+      <!-- PREVIEW + SHARE -->
+      <section class="card sticky">
+        <div class="pv-head"><h2>WhatsApp preview</h2><span>updates as you type</span></div>
+        <div class="chat"><div class="bubble" id="bubble"><span class="empty">Start typing the IPO name…</span><span class="time" id="bTime"></span></div></div>
+
+        <div class="share-row">
+          <button class="btn img" id="imgBtn">📸 Share as image</button>
+          <button class="btn" id="copyBtn">📋 Copy text</button>
+          <button class="btn wa" id="waBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg> WhatsApp</button>
+          <button class="btn ghost" id="resetBtn">↻ Clear form for a new IPO</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. IPO details, allotment chances, profit chances and notes shared from this page are based on <b>personal research and opinion</b> and are for <b>educational purposes only</b>. They are not investment advice or a recommendation to apply, buy or sell. IPO investments are subject to market risks, allotment is not guaranteed, and listing prices can be below the issue price. Read the RHP and do your own research, or consult a SEBI-registered adviser, before applying.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+  <div class="toast" id="toast">Copied ✓</div>
+  <div class="modal" id="imgModal" hidden>
+    <div class="modal-card">
+      <img id="imgPrev" alt="IPO snapshot" />
+      <p id="imgMsg"></p>
+      <div class="row">
+        <a class="btn" id="imgDl" download="ipo.png">⬇ Download</a>
+        <button class="btn primary" id="imgClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const inr0 = n => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+const num = s => parseFloat(String(s).replace(/[,₹\s]/g, ""));
+const fmtNum = el => {
+  const raw = el.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+  if (raw === "") { el.value = ""; return; }
+  const [i, d] = raw.split(".");
+  el.value = (i ? Number(i).toLocaleString("en-IN") : "0") + (d !== undefined ? "." + d.slice(0, 2) : "");
+};
+const LEVEL = {
+  low:    { t: "Low",    c: "#ff5470", e: "🔴", n: 1 },
+  medium: { t: "Medium", c: "#febc2e", e: "🟡", n: 2 },
+  high:   { t: "High",   c: "#22d39a", e: "🟢", n: 3 },
+};
+const TOOL_URL = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host)
+  ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/ipo/";
+const DISCL = "⚠️ _Disclaimer: Not SEBI registered. Based on personal research, for educational purposes only. Not investment advice. Read the RHP before applying._";
+
+/* ---------- state ---------- */
+const S = Object.assign({ type: "mainboard", quota: "no", allot: "medium", profit: "medium", fromCalc: false }, JSON.parse(localStorage.getItem("ipo_form") || "{}"));
+const FIELDS = ["name", "money", "dates", "price", "lotsz", "lots", "notes"];
+FIELDS.forEach(id => { if (S[id]) $("#" + id).value = S[id]; });
+function save() { FIELDS.forEach(id => S[id] = $("#" + id).value); localStorage.setItem("ipo_form", JSON.stringify(S)); }
+
+/* ---------- segmented controls ---------- */
+function setupSeg(id, key) {
+  const seg = $(id), pill = seg.querySelector(".pill"), btns = [...seg.querySelectorAll("button")];
+  const place = () => {
+    const on = btns.find(b => b.dataset.v === S[key]) || btns[0];
+    btns.forEach(b => b.classList.toggle("on", b === on));
+    pill.style.width = on.offsetWidth + "px";
+    pill.style.transform = `translateX(${on.offsetLeft - 4}px)`;
+    pill.style.background = seg.classList.contains("rate") ? LEVEL[S[key]].c : key === "quota" ? (S.quota === "yes" ? "#22d39a" : "#eef0f6") : "#eef0f6";
+  };
+  btns.forEach(b => b.addEventListener("click", () => { S[key] = b.dataset.v; place(); update(); }));
+  addEventListener("resize", place);
+  return place;
+}
+const placers = [setupSeg("#type", "type"), setupSeg("#quota", "quota"), setupSeg("#allot", "allot"), setupSeg("#profit", "profit")];
+
+/* ---------- inputs ---------- */
+["money", "price", "lotsz", "lots"].forEach(id => $("#" + id).addEventListener("input", e => {
+  fmtNum(e.target);
+  if (id === "money") S.fromCalc = false; else calcMoney();
+  e.target.closest(".field").classList.remove("err");
+  update();
+}));
+["name", "dates", "notes"].forEach(id => $("#" + id).addEventListener("input", e => { e.target.closest(".field")?.classList.remove("err"); update(); }));
+
+function calcMoney() {
+  const p = num($("#price").value), z = num($("#lotsz").value), l = num($("#lots").value) || 1;
+  if (p > 0 && z > 0) {
+    $("#money").value = Math.round(p * z * l).toLocaleString("en-IN");
+    $("#f-money").classList.remove("err");
+    S.fromCalc = true;
+  }
+}
+function calcDetail() {
+  const p = num($("#price").value), z = num($("#lotsz").value), l = num($("#lots").value) || 1;
+  return S.fromCalc && p > 0 && z > 0 ? `${l} lot${l > 1 ? "s" : ""} × ${z.toLocaleString("en-IN")} shares @ ₹${p.toLocaleString("en-IN")}` : "";
+}
+
+/* ---------- message text ---------- */
+function data() {
+  return {
+    name: $("#name").value.trim(), money: num($("#money").value), dates: $("#dates").value.trim(),
+    notes: $("#notes").value.trim(), detail: calcDetail(),
+    type: S.type, quota: S.quota, allot: LEVEL[S.allot], profit: LEVEL[S.profit],
+  };
+}
+function buildText() {
+  const d = data();
+  return [
+    `🚀 *IPO: ${d.name || "—"}*`,
+    `🏷️ Type: *${d.type === "sme" ? "SME IPO" : "Mainboard IPO"}*`,
+    d.dates ? `📅 Dates: ${d.dates}` : null,
+    `💰 Money required: *${d.money > 0 ? inr0(d.money) : "—"}*${d.detail ? `  (${d.detail})` : ""}`,
+    `👥 Shareholder quota: *${d.quota === "yes" ? "Yes ✅" : "No ❌"}*`,
+    ``,
+    `🎯 Allotment chances: ${d.allot.e} *${d.allot.t}*`,
+    `📈 Profit chances: ${d.profit.e} *${d.profit.t}*`,
+    d.notes ? `` : null,
+    d.notes ? `📝 *Notes:* ${d.notes}` : null,
+    ``,
+    `_Shared via ${TOOL_URL}_`,
+    DISCL,
+  ].filter(l => l !== null).join("\n");
+}
+const esc = s => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+function waFormat(t) {
+  return esc(t).replace(/\*([^*\n]+)\*/g, "<b>$1</b>").replace(/(^|\s)_([^_\n]+)_(?=\s|$)/g, "$1<i>$2</i>").replace(/\n/g, "<br>");
+}
+function update() {
+  const d = data();
+  $("#nCount").textContent = $("#notes").value.length;
+  $("#moneyHint").textContent = d.detail ? `= ${d.detail}` : (d.money > 0 ? `${inr0(d.money)}${d.money >= 1e5 ? ` (${(d.money / 1e5).toFixed(2)} lakh)` : ""}` : "");
+  const time = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  $("#bubble").innerHTML = (d.name ? waFormat(buildText()) : '<span class="empty">Start typing the IPO name…</span>') + `<span class="time">${time} ✓✓</span>`;
+  save();
+}
+
+/* ---------- validation ---------- */
+function valid() {
+  let ok = true;
+  const shake = id => { const f = $("#f-" + id); f.classList.remove("err"); void f.offsetWidth; f.classList.add("err"); };
+  if (!$("#name").value.trim()) { shake("name"); ok = false; }
+  if (!(num($("#money").value) > 0)) { shake("money"); ok = false; }
+  if (!ok) { toast("Add the IPO name and money required"); (!$("#name").value.trim() ? $("#name") : $("#money")).focus(); }
+  return ok;
+}
+
+/* ---------- copy / WhatsApp ---------- */
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch {
+    const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;opacity:0;top:0";
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} ta.remove(); return ok;
+  }
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1900); }
+$("#copyBtn").addEventListener("click", async () => { if (!valid()) return; toast(await copyText(buildText()) ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy"); });
+$("#waBtn").addEventListener("click", () => { if (!valid()) return; window.open("https://wa.me/?text=" + encodeURIComponent(buildText()), "_blank", "noopener"); });
+$("#resetBtn").addEventListener("click", () => {
+  if (!confirm("Clear all fields for a new IPO?")) return;
+  FIELDS.forEach(id => $("#" + id).value = "");
+  Object.assign(S, { type: "mainboard", quota: "no", allot: "medium", profit: "medium", fromCalc: false });
+  placers.forEach(p => p()); $("#calcBox").open = false; update(); $("#name").focus();
+});
+
+/* ---------- image ---------- */
+const CW = 1080;
+const GROT = '"Space Grotesk", sans-serif', MONO = '"JetBrains Mono", monospace', INTER = 'Inter, sans-serif';
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(ctx, x, y, w, h, r = 28, fill = "rgba(255,255,255,0.045)", stroke = "rgba(255,255,255,0.10)") { rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); }
+function txt(ctx, s, x, y, font, color, align = "left") { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); }
+function fit(ctx, s, weight, fam, size, maxW) { do { ctx.font = `${weight} ${size}px ${fam}`; if (ctx.measureText(s).width <= maxW) break; size -= 4; } while (size > 18); return ctx.font; }
+function pill(ctx, s, x, y, color) {
+  ctx.font = `600 28px ${MONO}`; const w = ctx.measureText(s).width + 48;
+  rr(ctx, x, y, w, 54, 27); ctx.fillStyle = color + "26"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color + "88"; ctx.stroke();
+  txt(ctx, s, x + 24, y + 37, `600 28px ${MONO}`, color); return w;
+}
+function wrapLines(ctx, text, maxW, font) {
+  ctx.font = font; const out = [];
+  text.split(/\n+/).forEach(par => { let line = ""; par.split(/\s+/).forEach(w => { const t = line ? line + " " + w : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); });
+  return out;
+}
+async function drawIPO() {
+  await Promise.all([`700 80px ${GROT}`, `600 40px ${MONO}`, `500 26px ${MONO}`, `500 26px ${INTER}`].map(f => document.fonts.load(f).catch(() => {})));
+  const d = data();
+  const m = document.createElement("canvas").getContext("2d");
+  let lines = d.notes ? wrapLines(m, d.notes, CW - 200, `400 28px ${INTER}`) : [];
+  if (lines.length > 7) { lines = lines.slice(0, 7); lines[6] = lines[6].replace(/\s*\S*$/, "") + "…"; }
+  const notesH = lines.length ? 52 + lines.length * 40 + 34 : 0;
+  const H = 1190 + (notesH ? notesH + 24 : 0);
+
+  const c = document.createElement("canvas"); c.width = CW; c.height = H; const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, r, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 650, "rgba(124,92,255,0.38)"); glow(CW - 40, H - 60, 680, "rgba(0,224,184,0.20)"); glow(CW, 380, 420, "rgba(255,176,32,0.10)");
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+  // brand
+  const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
+  rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
+  txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  txt(ctx, new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), CW - 70, 96, `500 26px ${MONO}`, "#8a90a2", "right");
+
+  // title
+  txt(ctx, "IPO WATCH", 70, 205, `600 26px ${MONO}`, "#00e0b8");
+  ctx.font = fit(ctx, d.name || "IPO", 700, GROT, 88, CW - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(d.name || "IPO", 70, 298);
+  let px = 70;
+  px += pill(ctx, d.type === "sme" ? "SME IPO" : "MAINBOARD IPO", px, 328, d.type === "sme" ? "#ffb020" : "#7c5cff") + 14;
+  if (d.dates) { ctx.font = `600 28px ${MONO}`; let ds = d.dates; while (px + ctx.measureText(ds).width + 48 > CW - 70 && ds.length > 4) ds = ds.slice(0, -2) + "…"; pill(ctx, ds, px, 328, "#8a90a2"); }
+
+  // money
+  panel(ctx, 70, 415, CW - 140, 220, 36);
+  txt(ctx, "MONEY REQUIRED", CW / 2, 470, `600 24px ${MONO}`, "#8a90a2", "center");
+  const mStr = d.money > 0 ? inr0(d.money) : "—";
+  ctx.font = fit(ctx, mStr, 700, GROT, 116, CW - 260);
+  const mg = ctx.createLinearGradient(CW / 2 - 260, 0, CW / 2 + 260, 0); mg.addColorStop(0, "#ffffff"); mg.addColorStop(1, "#c7bfff");
+  ctx.fillStyle = mg; ctx.textAlign = "center"; ctx.fillText(mStr, CW / 2, 575);
+  txt(ctx, d.detail || "per application", CW / 2, 615, `500 26px ${INTER}`, "#8a90a2", "center");
+
+  // ratings
+  const rw = (CW - 140 - 24) / 2;
+  [["CHANCES OF ALLOTMENT", d.allot], ["PROFIT CHANCES", d.profit]].forEach(([lbl, L], i) => {
+    const x = 70 + i * (rw + 24), y = 665;
+    panel(ctx, x, y, rw, 210, 28, "rgba(0,0,0,0.38)");
+    txt(ctx, lbl, x + 30, y + 52, `600 22px ${MONO}`, "#8a90a2");
+    txt(ctx, L.t, x + 30, y + 122, `700 54px ${GROT}`, L.c);
+    const sw = (rw - 60 - 16) / 3;
+    for (let k = 0; k < 3; k++) {
+      rr(ctx, x + 30 + k * (sw + 8), y + 152, sw, 18, 9);
+      ctx.fillStyle = k < L.n ? L.c : "rgba(255,255,255,0.08)"; ctx.fill();
+    }
+  });
+
+  // quota
+  const qy = 905, yes = d.quota === "yes";
+  panel(ctx, 70, qy, CW - 140, 110, 28, "rgba(0,0,0,0.38)");
+  txt(ctx, "Shareholder quota", 100, qy + 68, `600 32px ${INTER}`, "#eef0f6");
+  const qs = yes ? "YES" : "NO", qc = yes ? "#22d39a" : "#ff5470";
+  ctx.font = `700 30px ${MONO}`; const qw = ctx.measureText(qs).width + 56;
+  rr(ctx, CW - 100 - qw, qy + 28, qw, 56, 28); ctx.fillStyle = qc + "26"; ctx.fill(); ctx.strokeStyle = qc + "99"; ctx.lineWidth = 2; ctx.stroke();
+  txt(ctx, qs, CW - 100 - qw / 2, qy + 67, `700 30px ${MONO}`, qc, "center");
+
+  // notes
+  if (notesH) {
+    const ny = qy + 110 + 24;
+    panel(ctx, 70, ny, CW - 140, notesH, 28, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
+    txt(ctx, "NOTES", 100, ny + 50, `600 22px ${MONO}`, "#b6a6ff");
+    lines.forEach((l, k) => txt(ctx, l, 100, ny + 50 + (k + 1) * 40 + 4, `400 28px ${INTER}`, "#cfd3df"));
+  }
+
+  txt(ctx, TOOL_URL.replace(/\/$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  txt(ctx, "Not SEBI registered · Personal research · Educational purpose only · Not investment advice", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
+  return c;
+}
+$("#imgBtn").addEventListener("click", async e => {
+  if (!valid()) return;
+  const btn = e.currentTarget, label = btn.textContent; btn.disabled = true; btn.textContent = "Creating image…";
+  try {
+    const canvas = await drawIPO();
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const slug = $("#name").value.trim().toUpperCase().replace(/[^A-Z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const name = `ipo-${slug || "details"}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+    if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === "AbortError") return; }
+    }
+    let copied = false;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+    const url = URL.createObjectURL(blob);
+    $("#imgPrev").src = url; $("#imgDl").href = url; $("#imgDl").download = name;
+    $("#imgMsg").innerHTML = copied
+      ? "✅ <b>Image copied.</b> Open WhatsApp, pick a chat and press <b>Ctrl+V</b> to paste it. Or download it below."
+      : "Tap <b>Download</b>, or long-press the image to save or share it on WhatsApp.";
+    $("#imgModal").hidden = false;
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+$("#imgClose").addEventListener("click", () => $("#imgModal").hidden = true);
+$("#imgModal").addEventListener("click", e => { if (e.target.id === "imgModal") $("#imgModal").hidden = true; });
+
+/* ---------- init ---------- */
+document.fonts.ready.then(() => placers.forEach(p => p()));
+placers.forEach(p => p());
+if ($("#price").value || $("#lotsz").value) $("#calcBox").open = true;
+update();
+</script>
+</body>
+</html>

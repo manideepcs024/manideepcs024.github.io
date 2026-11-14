@@ -231,6 +231,10 @@
   .cd-row { display: flex; justify-content: space-between; padding: 12px 4px; border-bottom: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
   .cd-row b { color: var(--fg); font-weight: 600; transition: opacity .3s; }
   .cd-res { text-align: center; padding-top: 18px; }
+  .ipo-demo .cd-row b { display: inline-flex; align-items: center; gap: 4px; }
+  .lv { display: inline-block; width: 16px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); }
+  .lv.lv1 { background: var(--down); } .lv.lv3 { background: var(--up); }
+  .ipo-demo .cd-res strong { font-size: 2.4rem; background: linear-gradient(100deg, #25d366, var(--a2)); -webkit-background-clip: text; background-clip: text; }
   .cd-res span { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
   .cd-res strong { display: block; font: 700 3.4rem/1.1 "Space Grotesk"; letter-spacing: -.05em; background: linear-gradient(100deg, var(--a1), var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .cd-res em { font-style: normal; font-size: .78rem; color: var(--a2); }
@@ -491,6 +495,25 @@
             <strong id="cdQty">125</strong>
             <em id="cdCap">shares · ₹62,500 capital</em>
           </div>
+        </a>
+      </div>
+
+      <div class="project card reveal tilt" style="margin-top:16px">
+        <div class="proj-info">
+          <span class="tag">03 · Free tool · Live</span>
+          <h3 class="proj-title">IPO Share Card</h3>
+          <p>Fill in an IPO's <strong>type (SME or Mainboard)</strong>, <strong>money required</strong>, <strong>shareholder quota</strong>, <strong>allotment chances</strong> and <strong>profit chances</strong> plus notes, and share it on <strong>WhatsApp</strong> as a neat message or a picture.</p>
+          <div class="chips" style="margin-top:18px"><span class="chip">IPO</span><span class="chip">WhatsApp share</span><span class="chip">Image cards</span></div>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="btn primary magnetic" href="./ipo/">Open IPO card ↗</a>
+          </div>
+        </div>
+        <a class="calc-demo ipo-demo" href="./ipo/" aria-label="Open the IPO share card">
+          <div class="cd-row"><span>IPO type</span><b>SME · Mainboard</b></div>
+          <div class="cd-row"><span>Shareholder quota</span><b style="color:var(--up)">YES</b></div>
+          <div class="cd-row"><span>Allotment chances</span><b><span class="lv lv1"></span><span class="lv"></span><span class="lv"></span> Low</b></div>
+          <div class="cd-row"><span>Profit chances</span><b><span class="lv lv3"></span><span class="lv lv3"></span><span class="lv lv3"></span> High</b></div>
+          <div class="cd-res"><span>Share to</span><strong>WhatsApp</strong><em>as text or image</em></div>
         </a>
       </div>
     </section>
