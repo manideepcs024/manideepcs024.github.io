@@ -32,11 +32,13 @@
   @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
   .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
 
-  header { width: 100%; max-width: 560px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  header { width: 100%; max-width: 560px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 22px; }
   .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; }
   .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
   .home { font-size: .82rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; }
   .home:hover { color: var(--fg); }
+  .links { display: flex; gap: 8px; flex: none; }
+  .links .home { white-space: nowrap; }
 
   main { width: 100%; max-width: 560px; }
   h1 { font: 700 clamp(1.9rem, 7vw, 2.6rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
@@ -214,7 +216,7 @@
 
   <header>
     <div class="brand"><i>₹</i> SL Calculator</div>
-    <a class="home" href="../">← Manideep.</a>
+    <nav class="links"><a class="home" href="../average/">Average</a><a class="home" href="../">← Manideep.</a></nav>
   </header>
 
   <main>
