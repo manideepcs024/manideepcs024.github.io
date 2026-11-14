@@ -76,12 +76,24 @@
   #expl { min-height: 86px; }
 
   .opts { display: grid; gap: 8px; }
-  .optrow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+  .optrow { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 8px; align-items: center; }
   .letter { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font: 700 .95rem "JetBrains Mono"; background: rgba(255,255,255,.06); border: 1.5px solid var(--line); color: #cfd3df; cursor: pointer; transition: all .2s; }
   .optrow.correct .letter { background: var(--up); border-color: var(--up); color: #032015; }
   .optrow.correct .field { border-color: rgba(34,211,154,.55); background: rgba(34,211,154,.07); }
-  .mark { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); border-radius: 10px; padding: 9px 10px; font: 600 .74rem Inter; cursor: pointer; white-space: nowrap; }
-  .optrow.correct .mark { color: var(--up); border-color: rgba(34,211,154,.5); }
+  .del { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); cursor: pointer; font-size: .95rem; }
+  .del:hover { color: var(--down); border-color: rgba(255,84,112,.45); }
+  .del[disabled] { opacity: .25; pointer-events: none; }
+  .answer { margin-top: 4px; padding: 14px; border-radius: 18px; border: 1.5px solid rgba(34,211,154,.45); background: rgba(34,211,154,.06); }
+  .answer .picks { display: flex; gap: 8px; flex-wrap: wrap; }
+  .answer .picks button { min-width: 48px; height: 48px; border-radius: 14px; border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #cfd3df; font: 700 1.05rem "JetBrains Mono"; cursor: pointer; transition: all .2s; }
+  .answer .picks button.on { background: var(--up); border-color: var(--up); color: #032015; transform: scale(1.06); }
+  .answer .picks button.blank { opacity: .45; }
+  .answer .now { margin-top: 10px; font-size: .9rem; color: #bff3dd; }
+  .answer .now b { color: #fff; }
+  .answer .now.warn { color: #ffb4c0; }
+  .diff-now { margin-top: 8px; font-size: .82rem; color: var(--muted); }
+  .diff-now b { font-weight: 700; }
+  #diff button { padding: 13px 6px; font-size: .92rem; }
   .optbar { display: flex; gap: 8px; margin-top: 8px; }
   .optbar button { flex: 1; border: 1px dashed rgba(255,255,255,.18); background: none; color: var(--muted); border-radius: 12px; padding: 9px; font: 600 .8rem Inter; cursor: pointer; }
   .optbar button:hover { color: var(--fg); border-color: rgba(255,255,255,.3); }
@@ -157,22 +169,29 @@
           <div><div class="q">Topic</div><label class="field"><select id="topic"></select></label></div>
         </div>
 
-        <div class="q">Difficulty</div>
+        <div class="q">Difficulty level <span class="opt">tap to choose</span></div>
         <div class="seg" id="diff">
           <div class="pill"></div>
           <button data-v="easy" class="on">🟢 Easy</button>
           <button data-v="medium">🟡 Medium</button>
           <button data-v="hard">🔴 Hard</button>
         </div>
+        <div class="diff-now" id="diffNow"></div>
 
         <div class="q"><label for="question">Question</label><span class="opt"><span id="qCount">0</span>/220</span></div>
         <textarea id="question" maxlength="220" placeholder="e.g. A candle with a small body near the top and a long lower shadow, after a downtrend, is called…?"></textarea>
 
-        <div class="q">Options <span class="opt">tap a letter to mark the correct answer</span></div>
+        <div class="q">Options <span class="opt" id="optCount">4 of 6</span></div>
         <div class="opts" id="opts"></div>
-        <div class="optbar"><button id="addOpt">＋ Add option</button><button id="rmOpt">− Remove last</button></div>
+        <div class="optbar"><button id="addOpt">＋ Add option</button></div>
 
-        <div class="q"><label for="expl">Explanation</label><span class="opt">shown with the answer</span></div>
+        <div class="q">✅ Correct answer <span class="opt">tap the right letter</span></div>
+        <div class="answer">
+          <div class="picks" id="picks"></div>
+          <div class="now" id="ansNow"></div>
+        </div>
+
+        <div class="q"><label for="expl">Answer explanation</label><span class="opt">shown in the answer reveal</span></div>
         <textarea id="expl" maxlength="320" placeholder="Why is this the right answer? 1–3 short lines."></textarea>
 
         <label class="toggle"><span>Add disclaimer<small>Educational purpose only · not investment advice</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
@@ -217,7 +236,8 @@
 
 <script>
 const $ = s => document.querySelector(s);
-const LETTERS = ["A", "B", "C", "D"];
+const LETTERS = ["A", "B", "C", "D", "E", "F"];
+const MAXO = 6;
 const TOPICS = ["Basics", "Candlesticks", "Chart patterns", "Indicators", "Risk management", "Options", "Investing", "IPO", "Personal finance", "General"];
 const DIFF = { easy: { t: "Easy", e: "🟢", c: "#22d39a" }, medium: { t: "Medium", e: "🟡", c: "#febc2e" }, hard: { t: "Hard", e: "🔴", c: "#ff5470" } };
 
@@ -253,6 +273,9 @@ const BANK = [
 
 /* ---------- state ---------- */
 const S = Object.assign({ num: "1", topic: "Candlesticks", diff: "medium", q: "", opts: ["", "", "", ""], correct: 0, expl: "", mode: "q", disc: true }, JSON.parse(localStorage.getItem("quiz_form") || "{}"));
+if (!Array.isArray(S.opts) || S.opts.length < 2) S.opts = ["", "", "", ""];
+S.opts = S.opts.slice(0, 6); if (!(S.correct >= 0 && S.correct < S.opts.length)) S.correct = 0;
+if (!DIFF[S.diff]) S.diff = "medium";
 function save() { localStorage.setItem("quiz_form", JSON.stringify(S)); }
 
 $("#topic").innerHTML = TOPICS.map(t => `<option>${t}</option>`).join("");
@@ -265,16 +288,36 @@ function fillForm() {
 function drawOpts() {
   $("#opts").innerHTML = S.opts.map((o, i) => `
     <div class="optrow ${i === S.correct ? "correct" : ""}" data-i="${i}">
-      <button class="letter" title="Mark ${LETTERS[i]} as correct">${LETTERS[i]}</button>
+      <button class="letter" title="Set ${LETTERS[i]} as the correct answer">${LETTERS[i]}</button>
       <label class="field"><input type="text" maxlength="90" value="${o.replace(/"/g, "&quot;")}" placeholder="Option ${LETTERS[i]}" /></label>
-      <button class="mark">${i === S.correct ? "✓ Correct" : "Mark"}</button>
+      <button class="del" title="Delete option ${LETTERS[i]}" ${S.opts.length <= 2 ? "disabled" : ""}>✕</button>
     </div>`).join("");
-  $("#addOpt").disabled = S.opts.length >= 4; $("#rmOpt").disabled = S.opts.length <= 2;
+  $("#addOpt").disabled = S.opts.length >= MAXO;
+  $("#addOpt").textContent = S.opts.length >= MAXO ? "Maximum 6 options" : `＋ Add option ${LETTERS[S.opts.length]}`;
+  $("#optCount").textContent = `${S.opts.length} of ${MAXO}`;
+  drawPicks();
 }
-$("#opts").addEventListener("input", e => { const r = e.target.closest(".optrow"); S.opts[+r.dataset.i] = e.target.value; e.target.closest(".field").classList.remove("err"); update(); });
-$("#opts").addEventListener("click", e => { const b = e.target.closest(".letter, .mark"); if (!b) return; S.correct = +b.closest(".optrow").dataset.i; drawOpts(); update(); });
-$("#addOpt").addEventListener("click", () => { if (S.opts.length < 4) { S.opts.push(""); drawOpts(); update(); $("#opts").lastElementChild.querySelector("input").focus(); } });
-$("#rmOpt").addEventListener("click", () => { if (S.opts.length > 2) { S.opts.pop(); if (S.correct >= S.opts.length) S.correct = 0; drawOpts(); update(); } });
+function drawPicks() {
+  const box = $("#picks");
+  if (box.children.length !== S.opts.length) box.innerHTML = S.opts.map((o, i) => `<button data-i="${i}" aria-label="Correct answer ${LETTERS[i]}">${LETTERS[i]}</button>`).join("");
+  [...box.children].forEach((b, i) => { b.classList.toggle("on", i === S.correct); b.classList.toggle("blank", !S.opts[i].trim()); });
+  const o = (S.opts[S.correct] || "").trim(), el = $("#ansNow");
+  el.classList.toggle("warn", !o);
+  el.innerHTML = o ? `Correct answer: <b>${LETTERS[S.correct]}) ${o.replace(/</g, "&lt;")}</b>` : `Correct answer is <b>${LETTERS[S.correct]}</b>. Type option ${LETTERS[S.correct]} above.`;
+}
+function setCorrect(i) { S.correct = i; document.querySelectorAll(".optrow").forEach((r, k) => r.classList.toggle("correct", k === i)); drawPicks(); update(); }
+$("#opts").addEventListener("input", e => { const r = e.target.closest(".optrow"); if (!r) return; S.opts[+r.dataset.i] = e.target.value; e.target.closest(".field").classList.remove("err"); drawPicks(); update(); });
+$("#opts").addEventListener("click", e => {
+  const r = e.target.closest(".optrow"); if (!r) return; const i = +r.dataset.i;
+  if (e.target.closest(".letter")) { setCorrect(i); return; }
+  if (e.target.closest(".del") && S.opts.length > 2) {
+    S.opts.splice(i, 1);
+    if (S.correct === i) S.correct = 0; else if (S.correct > i) S.correct--;
+    drawOpts(); update();
+  }
+});
+$("#picks").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setCorrect(+b.dataset.i); });
+$("#addOpt").addEventListener("click", () => { if (S.opts.length < MAXO) { S.opts.push(""); drawOpts(); update(); $("#opts").lastElementChild.querySelector("input").focus(); } });
 
 $("#num").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, ""); S.num = e.target.value; update(); });
 $("#topic").addEventListener("change", e => { S.topic = e.target.value; update(); });
@@ -325,7 +368,7 @@ function buildText() {
     list.forEach(x => out.push(`*${x.L})* ${x.o}`));
     out.push("", `👇 Reply with ${list.map(x => x.L).join(", ").replace(/, ([^,]*)$/, " or $1")}. Answer coming soon!`);
   } else {
-    out.push(`✅ *QUIZ ${head()} · ANSWER*`, "", `*Q: ${q}*`, "");
+    out.push(`✅ *QUIZ ${head()} · ANSWER*  ${d.e} ${d.t}`, "", `*Q: ${q}*`, "");
     list.forEach(x => out.push(x.ok ? `✅ *${x.L}) ${x.o}*` : `▫️ ~${x.L}) ${x.o}~`));
     if (S.expl.trim()) out.push("", `💡 *Why:* ${S.expl.trim()}`);
     out.push("", "Did you get it right? Reply with ✅ or ❌ 🙌");
@@ -344,6 +387,7 @@ function waFormat(t) {
 }
 function update() {
   $("#qCount").textContent = S.q.length;
+  const dd = DIFF[S.diff]; $("#diffNow").innerHTML = `Selected: <b style="color:${dd.c}">${dd.e} ${dd.t}</b>, shown on the question and the answer.`;
   $("#nextNum").textContent = (+S.num || 0) + 1;
   const time = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
   $("#bubble").innerHTML = (S.q.trim() ? waFormat(buildText()) : '<span class="empty">Tap 🎲 Random or type a question…</span>') + `<span class="time">${time} ✓✓</span>`;
