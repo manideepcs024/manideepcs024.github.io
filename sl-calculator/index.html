@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Stop-Loss Position Size Calculator — Manideep Mittal</title>
+<meta name="description" content="Find how many shares to buy so a stop-loss hit costs exactly the amount you can afford to lose." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { min-height: 100%; }
+  body {
+    background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+    overflow-x: hidden;
+  }
+  /* animated background */
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .28; animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--a1); top: -25vmax; left: -15vmax; }
+  .blob.b2 { background: var(--a2); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .18; }
+  .blob.b3 { background: var(--a3); top: 40%; left: 50%; width: 30vmax; height: 30vmax; animation-delay: -12s; opacity: .12; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  header { width: 100%; max-width: 560px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .home { font-size: .82rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; }
+  .home:hover { color: var(--fg); }
+
+  main { width: 100%; max-width: 560px; }
+  h1 { font: 700 clamp(1.9rem, 7vw, 2.6rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--a1), var(--a2) 55%, var(--a3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 22px; font-size: .95rem; }
+
+  /* progress */
+  .progress { display: flex; gap: 6px; margin-bottom: 16px; }
+  .progress span { flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; position: relative; }
+  .progress span::after { content: ""; position: absolute; inset: 0; width: 0; background: linear-gradient(90deg, var(--a1), var(--a2)); transition: width .5s cubic-bezier(.2,.8,.2,1); }
+  .progress span.done::after { width: 100%; }
+
+  .card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(20px, 5vw, 30px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); overflow: hidden; }
+
+  /* steps */
+  .step { display: none; animation: stepIn .5s cubic-bezier(.2,.8,.2,1); }
+  .step.active { display: block; }
+  .step.back { animation-name: stepBack; }
+  @keyframes stepIn { from { opacity: 0; transform: translateX(30px); filter: blur(6px); } }
+  @keyframes stepBack { from { opacity: 0; transform: translateX(-30px); filter: blur(6px); } }
+  .q-num { font: 600 .72rem "JetBrains Mono"; color: var(--a2); letter-spacing: .14em; text-transform: uppercase; }
+  .q { font: 700 clamp(1.35rem, 5vw, 1.7rem)/1.2 "Space Grotesk"; letter-spacing: -.03em; margin: 8px 0 6px; }
+  .hint { color: var(--muted); font-size: .88rem; margin-bottom: 20px; }
+
+  .field { display: flex; align-items: center; gap: 10px; padding: 6px 18px; border-radius: 18px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 1.5rem "JetBrains Mono"; color: var(--muted); }
+  .field input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 600 clamp(1.6rem, 7vw, 2.1rem) "JetBrains Mono"; padding: 12px 0; letter-spacing: -.03em; }
+  .field input::placeholder { color: #3a3f52; }
+  .words { min-height: 20px; margin-top: 8px; font-size: .8rem; color: var(--muted); font-family: "JetBrains Mono"; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: #cfd3df; padding: 9px 14px; border-radius: 999px; font: 500 .85rem "JetBrains Mono"; cursor: pointer; transition: background .2s, border-color .2s, transform .1s; }
+  .chip:hover { background: rgba(255,255,255,.08); }
+  .chip:active { transform: scale(.95); }
+
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 16px; background: rgba(0,0,0,.35); border: 1px solid var(--line); margin-bottom: 16px; position: relative; }
+  .seg.two { grid-template-columns: 1fr 1fr; }
+  .seg button { position: relative; z-index: 1; border: 0; background: none; color: var(--muted); padding: 11px 6px; border-radius: 12px; font: 600 .84rem Inter; cursor: pointer; transition: color .25s; line-height: 1.2; }
+  .seg button small { display: block; font-weight: 400; font-size: .7rem; opacity: .75; margin-top: 2px; }
+  .seg button.on { color: #000; }
+  .seg .pill { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 12px; background: var(--fg); transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s; }
+
+  .actions { display: flex; gap: 10px; margin-top: 24px; }
+  .btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 20px; border-radius: 16px; font: 600 1rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s, opacity .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); background-size: 200% auto; border: 0; color: #fff; flex: 2; animation: shine 4s linear infinite; box-shadow: 0 10px 30px -10px rgba(124,92,255,.7); }
+  @keyframes shine { to { background-position: 200% center; } }
+  .btn.ghost { flex: 0 0 auto; padding-inline: 18px; }
+  kbd { font: .7rem "JetBrains Mono"; opacity: .7; border: 1px solid rgba(255,255,255,.35); border-radius: 5px; padding: 1px 5px; }
+  @media (hover: none) { kbd { display: none; } }
+
+  /* results */
+  .hero-res { text-align: center; padding: 6px 0 22px; border-bottom: 1px dashed var(--line); }
+  .hero-res .lbl { font: 600 .74rem "JetBrains Mono"; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .qty { font: 700 clamp(3.6rem, 18vw, 5.4rem)/1 "Space Grotesk"; letter-spacing: -.05em; margin: 10px 0 4px; }
+  .qty-unit { color: var(--muted); font-size: .95rem; }
+  .sentence { margin-top: 16px; font-size: 1rem; line-height: 1.55; color: #d9dce6; }
+  .sentence b { color: var(--fg); }
+  .sentence .g { color: var(--a2); font-weight: 600; }
+  .sentence .r { color: var(--down); font-weight: 600; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+  .stat { padding: 14px 16px; border-radius: 16px; background: rgba(0,0,0,.3); border: 1px solid var(--line); animation: pop .5s cubic-bezier(.2,.8,.2,1) both; }
+  .stat:nth-child(2) { animation-delay: .06s; } .stat:nth-child(3) { animation-delay: .12s; } .stat:nth-child(4) { animation-delay: .18s; }
+  @keyframes pop { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+  .stat span { display: block; font-size: .74rem; color: var(--muted); margin-bottom: 4px; }
+  .stat strong { font: 600 1.15rem "JetBrains Mono"; letter-spacing: -.02em; word-break: break-word; }
+  .stat.loss strong { color: var(--down); } .stat.cap strong { color: var(--a2); }
+
+  /* price ladder */
+  .ladder { margin-top: 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(0,0,0,.3); padding: 16px; }
+  .ladder h4 { font: 600 .74rem "JetBrains Mono"; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: flex; justify-content: space-between; }
+  .rung { display: grid; grid-template-columns: 74px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.05); font-size: .88rem; }
+  .rung:first-of-type { border-top: 0; }
+  .rung .tag { font: 600 .7rem "JetBrains Mono"; padding: 4px 8px; border-radius: 7px; text-align: center; }
+  .rung .px { font: 600 .95rem "JetBrains Mono"; }
+  .rung .pl { font: 500 .82rem "JetBrains Mono"; text-align: right; }
+  .t-tp .tag { background: rgba(34,211,154,.12); color: var(--up); } .t-tp .pl { color: var(--up); }
+  .t-en .tag { background: rgba(255,255,255,.08); color: var(--fg); } .t-en .pl { color: var(--muted); }
+  .t-sl .tag { background: rgba(255,84,112,.14); color: var(--down); } .t-sl .pl { color: var(--down); }
+
+  .alert { margin-top: 16px; padding: 12px 14px; border-radius: 14px; font-size: .86rem; display: flex; gap: 10px; align-items: flex-start; }
+  .alert.warn { background: rgba(254,188,46,.08); border: 1px solid rgba(254,188,46,.3); color: #f5d27a; }
+  .alert.bad { background: rgba(255,84,112,.08); border: 1px solid rgba(255,84,112,.3); color: #ff9aab; }
+
+  .inputs-recap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .inputs-recap button { border: 1px dashed rgba(255,255,255,.18); background: none; color: #c8ccd8; border-radius: 12px; padding: 8px 12px; font: 500 .8rem "JetBrains Mono"; cursor: pointer; }
+  .inputs-recap button:hover { border-color: var(--a2); color: var(--fg); }
+  .inputs-recap button::after { content: " ✎"; opacity: .5; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 120px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 10; }
+  .toast.show { transform: translate(-50%, 0); }
+
+  footer { margin-top: 26px; text-align: center; color: #5a6072; font-size: .75rem; max-width: 560px; line-height: 1.6; }
+  footer a { color: var(--muted); }
+
+  /* tool tabs */
+  .tabs { margin-bottom: 18px; }
+  .rstep { display: none; animation: stepIn .5s cubic-bezier(.2,.8,.2,1); }
+  .rstep.active { display: block; }
+  .rstep.back { animation-name: stepBack; }
+  .seg.three-sm button { padding: 9px 4px; }
+  .field.small input { font-size: clamp(1.2rem, 5vw, 1.5rem); padding: 8px 0; }
+  .field.small .unit { font-size: 1.1rem; }
+  .two-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mini-lbl { font: 600 .7rem "JetBrains Mono"; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; display: block; }
+  .opt { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: .7; }
+  .verdict { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 7px 14px; border-radius: 999px; font-size: .82rem; font-weight: 600; }
+  .verdict.good { background: rgba(34,211,154,.12); color: var(--up); border: 1px solid rgba(34,211,154,.3); }
+  .verdict.meh { background: rgba(254,188,46,.1); color: var(--warn); border: 1px solid rgba(254,188,46,.3); }
+  .verdict.bad { background: rgba(255,84,112,.1); color: var(--down); border: 1px solid rgba(255,84,112,.3); }
+  .qty.pos { background: linear-gradient(100deg, var(--up), var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .qty.neg { color: var(--down); }
+  .bars { margin-top: 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(0,0,0,.3); padding: 16px; display: grid; gap: 14px; }
+  .bars h4 { font: 600 .74rem "JetBrains Mono"; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .bar-top { display: flex; justify-content: space-between; font-size: .84rem; margin-bottom: 6px; color: #cfd3df; }
+  .bar-top b { font-family: "JetBrains Mono"; }
+  .track { height: 10px; border-radius: 6px; background: rgba(255,255,255,.06); overflow: hidden; }
+  .track i { display: block; height: 100%; width: 0; border-radius: inherit; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+  .track i.t { background: linear-gradient(90deg, var(--a1), #5b8cff); }
+  .track i.a { background: linear-gradient(90deg, #6b7280, #9ca3af); }
+  .track i.e { background: linear-gradient(90deg, var(--up), var(--a2)); }
+  .track i.neg { background: linear-gradient(90deg, #ff7a8f, var(--down)); }
+  .cta-row { margin-top: 18px; }
+  .link-btn { width: 100%; border: 1px dashed rgba(0,224,184,.4); background: rgba(0,224,184,.06); color: var(--a2); padding: 13px; border-radius: 14px; font: 600 .9rem Inter; cursor: pointer; }
+  .link-btn:hover { background: rgba(0,224,184,.12); }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grid-bg"></div>
+
+  <header>
+    <div class="brand"><i>₹</i> SL Calculator</div>
+    <a class="home" href="../">← Manideep.</a>
+  </header>
+
+  <main>
+    <h1 id="title">Size your trade by <span class="grad">risk</span>, not by hope.</h1>
+    <p class="sub" id="subtitle">Three quick questions and you'll know exactly how many shares to buy.</p>
+
+    <div class="seg two tabs" id="toolTabs">
+      <div class="pill"></div>
+      <button class="on" data-v="size">🎯 Position size<small>how many shares</small></button>
+      <button data-v="ret">📊 Real return<small>vs no-risk option</small></button>
+    </div>
+
+    <div id="toolSize">
+    <div class="progress" id="progress"><span></span><span></span><span></span><span></span></div>
+
+    <div class="card">
+      <!-- STEP 1 -->
+      <section class="step active" data-step="0">
+        <div class="q-num">Question 1 of 3</div>
+        <h2 class="q">How much loss can you take on this trade?</h2>
+        <p class="hint">The maximum ₹ you're okay losing if your stop-loss gets hit.</p>
+        <label class="field" id="f-risk">
+          <span class="unit">₹</span>
+          <input id="risk" type="text" inputmode="decimal" placeholder="5,000" autocomplete="off" />
+        </label>
+        <div class="words" id="w-risk"></div>
+        <div class="chips" data-for="risk">
+          <button class="chip" data-v="1000">₹1,000</button>
+          <button class="chip" data-v="2500">₹2,500</button>
+          <button class="chip" data-v="5000">₹5,000</button>
+          <button class="chip" data-v="10000">₹10,000</button>
+          <button class="chip" data-v="25000">₹25,000</button>
+        </div>
+        <div class="actions">
+          <button class="btn primary next">Next <kbd>Enter</kbd></button>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="step" data-step="1">
+        <div class="q-num">Question 2 of 3</div>
+        <h2 class="q">What's the share price per unit?</h2>
+        <p class="hint">Your entry price, the price you'll buy (or short) at.</p>
+        <div class="seg two" id="dir">
+          <div class="pill"></div>
+          <button class="on" data-v="long">Long / Buy<small>SL below entry</small></button>
+          <button data-v="short">Short / Sell<small>SL above entry</small></button>
+        </div>
+        <label class="field" id="f-price">
+          <span class="unit">₹</span>
+          <input id="price" type="text" inputmode="decimal" placeholder="1,250.50" autocomplete="off" />
+        </label>
+        <div class="words" id="w-price"></div>
+        <div class="actions">
+          <button class="btn ghost prev">←</button>
+          <button class="btn primary next">Next <kbd>Enter</kbd></button>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="step" data-step="2">
+        <div class="q-num">Question 3 of 3</div>
+        <h2 class="q">Where's your stop-loss?</h2>
+        <p class="hint" id="slHint">How many ₹ per share your chart SL is away from entry.</p>
+        <div class="seg" id="mode">
+          <div class="pill"></div>
+          <button class="on" data-v="points">Chart SL<small>₹ per share</small></button>
+          <button data-v="percent">Percent<small>% from entry</small></button>
+          <button data-v="level">SL price<small>exact level</small></button>
+        </div>
+        <label class="field" id="f-sl">
+          <span class="unit" id="slUnit">₹</span>
+          <input id="sl" type="text" inputmode="decimal" placeholder="40" autocomplete="off" />
+        </label>
+        <div class="words" id="w-sl"></div>
+        <div class="chips" id="slChips"></div>
+        <div class="actions">
+          <button class="btn ghost prev">←</button>
+          <button class="btn primary next">Calculate ⚡</button>
+        </div>
+      </section>
+
+      <!-- RESULT -->
+      <section class="step" data-step="3">
+        <div class="hero-res">
+          <div class="lbl">You can buy</div>
+          <div class="qty" id="rQty">0</div>
+          <div class="qty-unit" id="rQtyUnit">shares</div>
+          <p class="sentence" id="rSentence"></p>
+        </div>
+
+        <div class="stats">
+          <div class="stat cap"><span>Total capital needed</span><strong id="rCap">—</strong></div>
+          <div class="stat loss"><span>Loss if SL hits</span><strong id="rLoss">—</strong></div>
+          <div class="stat"><span>Risk per share</span><strong id="rPerShare">—</strong></div>
+          <div class="stat"><span>Stop-loss price</span><strong id="rSlPx">—</strong></div>
+        </div>
+
+        <div id="rAlerts"></div>
+
+        <div class="ladder">
+          <h4><span>Price map</span><span>P&amp;L at qty</span></h4>
+          <div id="rLadder"></div>
+        </div>
+
+        <div class="inputs-recap" id="rRecap"></div>
+
+        <div class="cta-row"><button class="link-btn" id="toRet">📊 Is this trade worth it? Check the real return →</button></div>
+
+        <div class="actions">
+          <button class="btn" id="copyBtn">Copy plan</button>
+          <button class="btn primary" id="restart">New trade ↻</button>
+        </div>
+      </section>
+    </div>
+    </div>
+
+    <div id="toolRet" hidden>
+    <div class="progress" id="rprogress"><span></span><span></span><span></span><span></span></div>
+    <div class="card">
+      <!-- R1 -->
+      <section class="rstep active">
+        <div class="q-num">Question 1 of 3</div>
+        <h2 class="q">If you don't buy this, what return would your money earn elsewhere?</h2>
+        <p class="hint">A no-risk or low-risk option: FD, liquid fund, index fund, bonds…</p>
+        <div class="seg two" id="altUnit">
+          <div class="pill"></div>
+          <button class="on" data-v="year">Per year</button>
+          <button data-v="month">Per month</button>
+        </div>
+        <label class="field" id="f-alt">
+          <input id="alt" type="text" inputmode="decimal" placeholder="12" autocomplete="off" />
+          <span class="unit" id="altSuffix">% / yr</span>
+        </label>
+        <div class="words" id="w-alt"></div>
+        <div class="chips">
+          <button class="chip" data-v="7" data-unit="year">FD 7%/yr</button>
+          <button class="chip" data-v="12" data-unit="year">12%/yr</button>
+          <button class="chip" data-v="15" data-unit="year">15%/yr</button>
+          <button class="chip" data-v="1" data-unit="month">1%/month</button>
+        </div>
+        <div class="actions"><button class="btn primary rnext">Next <kbd>Enter</kbd></button></div>
+      </section>
+
+      <!-- R2 -->
+      <section class="rstep">
+        <div class="q-num">Question 2 of 3</div>
+        <h2 class="q">How long will you hold this trade?</h2>
+        <p class="hint">From the day you buy to the day you sell.</p>
+        <div class="seg three-sm" id="perUnit">
+          <div class="pill"></div>
+          <button data-v="days">Days</button>
+          <button class="on" data-v="months">Months</button>
+          <button data-v="years">Years</button>
+        </div>
+        <label class="field" id="f-hold">
+          <input id="hold" type="text" inputmode="decimal" placeholder="6" autocomplete="off" />
+          <span class="unit" id="holdSuffix">months</span>
+        </label>
+        <div class="words" id="w-hold"></div>
+        <div class="chips">
+          <button class="chip" data-v="15" data-unit="days">15 days</button>
+          <button class="chip" data-v="1" data-unit="months">1 month</button>
+          <button class="chip" data-v="3" data-unit="months">3 months</button>
+          <button class="chip" data-v="6" data-unit="months">6 months</button>
+          <button class="chip" data-v="1" data-unit="years">1 year</button>
+        </div>
+        <div class="actions">
+          <button class="btn ghost rprev">←</button>
+          <button class="btn primary rnext">Next <kbd>Enter</kbd></button>
+        </div>
+      </section>
+
+      <!-- R3 -->
+      <section class="rstep">
+        <div class="q-num">Question 3 of 3</div>
+        <h2 class="q">What return did (or will) you make on this trade?</h2>
+        <p class="hint">Use a minus sign for a loss, e.g. −5.</p>
+        <div class="seg two" id="tmode">
+          <div class="pill"></div>
+          <button class="on" data-v="pct">Return %<small>e.g. 10%</small></button>
+          <button data-v="px">Buy → Sell<small>prices</small></button>
+        </div>
+        <div id="tPctBox">
+          <label class="field" id="f-tpct">
+            <input id="tpct" type="text" inputmode="text" placeholder="10" autocomplete="off" />
+            <span class="unit">%</span>
+          </label>
+          <div class="chips">
+            <button class="chip" data-v="5">5%</button>
+            <button class="chip" data-v="10">10%</button>
+            <button class="chip" data-v="20">20%</button>
+            <button class="chip" data-v="-5">−5%</button>
+          </div>
+        </div>
+        <div id="tPxBox" hidden>
+          <div class="two-fields">
+            <div><span class="mini-lbl">Buy price</span>
+              <label class="field small" id="f-buy"><span class="unit">₹</span><input id="buy" type="text" inputmode="decimal" placeholder="500" autocomplete="off" /></label></div>
+            <div><span class="mini-lbl">Sell price</span>
+              <label class="field small" id="f-sell"><span class="unit">₹</span><input id="sell" type="text" inputmode="decimal" placeholder="550" autocomplete="off" /></label></div>
+          </div>
+        </div>
+        <span class="mini-lbl">Amount invested <span class="opt">(optional, to see ₹ figures)</span></span>
+        <label class="field small" id="f-rcap"><span class="unit">₹</span><input id="rcap" type="text" inputmode="decimal" placeholder="1,00,000" autocomplete="off" /></label>
+        <div class="words" id="w-t"></div>
+        <div class="actions">
+          <button class="btn ghost rprev">←</button>
+          <button class="btn primary rnext">Calculate ⚡</button>
+        </div>
+      </section>
+
+      <!-- R RESULT -->
+      <section class="rstep">
+        <div class="hero-res">
+          <div class="lbl">Your real profit</div>
+          <div class="qty" id="xPct">0%</div>
+          <div class="qty-unit" id="xSub">over the no-risk option</div>
+          <div class="verdict" id="xVerdict"></div>
+          <p class="sentence" id="xSentence"></p>
+        </div>
+
+        <div class="bars">
+          <h4 id="barsTitle">Return over the holding period</h4>
+          <div><div class="bar-top"><span>📈 This trade</span><b id="bT">—</b></div><div class="track"><i class="t" id="iT"></i></div></div>
+          <div><div class="bar-top"><span>🏦 No-risk option</span><b id="bA">—</b></div><div class="track"><i class="a" id="iA"></i></div></div>
+          <div><div class="bar-top"><span>⚡ Real profit (extra for the risk)</span><b id="bE">—</b></div><div class="track"><i class="e" id="iE"></i></div></div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><span id="sTl">Trade profit</span><strong id="sT">—</strong></div>
+          <div class="stat"><span>No-risk would earn</span><strong id="sA">—</strong></div>
+          <div class="stat cap"><span>Real extra profit</span><strong id="sE">—</strong></div>
+          <div class="stat"><span>Trade, per year</span><strong id="sY">—</strong></div>
+        </div>
+
+        <span class="mini-lbl" style="margin-top:18px">No-risk return calculated as</span>
+        <div class="seg two" id="comp">
+          <div class="pill"></div>
+          <button class="on" data-v="simple">Simple<small>12%/yr → 6% in 6 mo</small></button>
+          <button data-v="compound">Compounded<small>grows on itself</small></button>
+        </div>
+
+        <div class="inputs-recap" id="xRecap"></div>
+
+        <div class="actions">
+          <button class="btn ghost" id="rToSize">← Size</button>
+          <button class="btn primary" id="rRestart">New check ↻</button>
+        </div>
+      </section>
+    </div>
+    </div>
+  </main>
+
+  <footer>
+    For position sizing only, not investment advice. Brokerage, taxes and slippage (gaps can skip your SL) aren't included.<br />
+    Built by <a href="../">Manideep Mittal</a>
+  </footer>
+
+  <div class="toast" id="toast">Copied ✓</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const inr = (n, d = 2) => "₹" + Number(n).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
+const inr0 = n => inr(n, 0);
+const num = s => parseFloat(String(s).replace(/[,₹%\s]/g, ""));
+const fmtInput = el => {
+  // live Indian-style grouping, keeps decimals
+  const raw = el.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+  if (raw === "") { el.value = ""; return; }
+  const [i, d] = raw.split(".");
+  el.value = (i ? Number(i).toLocaleString("en-IN") : "0") + (d !== undefined ? "." + d.slice(0, 2) : "");
+};
+
+const state = JSON.parse(localStorage.getItem("slcalc") || "{}");
+state.dir ??= "long"; state.mode ??= "points";
+let step = 0;
+
+/* ---------- segmented controls ---------- */
+function setupSeg(id, key, onChange) {
+  const seg = $(id), pill = seg.querySelector(".pill"), btns = [...seg.querySelectorAll("button")];
+  const place = () => {
+    const on = btns.find(b => b.dataset.v === state[key]) || btns[0];
+    btns.forEach(b => b.classList.toggle("on", b === on));
+    pill.style.width = on.offsetWidth + "px";
+    pill.style.transform = `translateX(${on.offsetLeft - 4}px)`;
+  };
+  btns.forEach(b => b.addEventListener("click", () => { state[key] = b.dataset.v; place(); onChange && onChange(); save(); }));
+  addEventListener("resize", place);
+  return place;
+}
+const placeDir = setupSeg("#dir", "dir", () => updateSlUI());
+const placeMode = setupSeg("#mode", "mode", () => { $("#sl").value = ""; updateSlUI(); $("#sl").focus(); });
+
+function updateSlUI() {
+  const m = state.mode, price = num($("#price").value);
+  $("#slUnit").textContent = m === "percent" ? "%" : "₹";
+  $("#sl").placeholder = m === "percent" ? "3" : m === "points" ? "40" : (price ? (state.dir === "long" ? (price * .97) : (price * 1.03)).toFixed(2) : "1,212.00");
+  $("#slHint").textContent =
+    m === "points" ? "How many ₹ per share your chart stop-loss is away from entry." :
+    m === "percent" ? `How far (in %) from entry you'll exit if wrong.` :
+    `The exact price where you'll exit (${state.dir === "long" ? "below" : "above"} your entry).`;
+  const chips = m === "percent" ? [1, 2, 3, 5, 8] : m === "points" ? [5, 10, 20, 40, 100] : [];
+  $("#slChips").innerHTML = chips.map(v => `<button class="chip" data-v="${v}">${m === "percent" ? v + "%" : "₹" + v}</button>`).join("");
+  liveWords();
+}
+
+/* ---------- chips ---------- */
+document.addEventListener("click", e => {
+  const c = e.target.closest(".chip"); if (!c) return;
+  const box = c.closest(".step, .rstep");
+  if (box.classList.contains("rstep")) return retChip(c, box);
+  const input = box.querySelector("input");
+  input.value = c.dataset.v; fmtInput(input); liveWords(); input.focus();
+});
+
+/* ---------- live helper text ---------- */
+function liveWords() {
+  const r = num($("#risk").value), p = num($("#price").value), s = num($("#sl").value);
+  $("#w-risk").textContent = r > 0 ? `Max loss: ${inr0(r)}${r >= 1e5 ? ` (${(r / 1e5).toFixed(2)} lakh)` : ""}` : "";
+  $("#w-price").textContent = p > 0 && r > 0 ? `Risk budget ${inr0(r)} on a ${inr(p)} stock` : "";
+  let t = "";
+  const per = riskPerShare(p, s);
+  if (s > 0 && p > 0 && per > 0) {
+    const q = Math.floor(r / per);
+    t = `≈ ${inr(per)} risk per share → ${q.toLocaleString("en-IN")} shares`;
+  } else if (state.mode === "level" && s > 0 && p > 0) t = "⚠ SL price should be on the other side of entry";
+  if (per > 0 && state.dir === "long" && per >= p) t = "⚠ Stop-loss can't be more than the share price";
+  $("#w-sl").textContent = t;
+}
+["risk", "price", "sl"].forEach(id => {
+  const el = $("#" + id);
+  el.addEventListener("input", () => { fmtInput(el); el.closest(".field").classList.remove("err"); liveWords(); save(); });
+});
+
+function riskPerShare(p, s) {
+  if (!(p > 0) || !(s > 0)) return 0;
+  if (state.mode === "points") return s;
+  if (state.mode === "percent") return p * s / 100;
+  const d = state.dir === "long" ? p - s : s - p;
+  return d > 0 ? d : 0;
+}
+
+/* ---------- navigation ---------- */
+const steps = [...document.querySelectorAll(".step")];
+function go(n, back = false) {
+  step = n;
+  steps.forEach((s, i) => { s.classList.toggle("active", i === n); s.classList.toggle("back", back); });
+  [...$("#progress").children].forEach((b, i) => b.classList.toggle("done", i <= n));
+  if (n === 1) placeDir();
+  if (n === 2) { placeMode(); updateSlUI(); }
+  if (n === 3) calc();
+  const inp = steps[n].querySelector("input");
+  if (inp && matchMedia("(hover: hover)").matches) setTimeout(() => inp.focus(), 60);
+}
+function validate(n) {
+  const id = ["risk", "price", "sl"][n]; if (!id) return true;
+  const v = num($("#" + id).value);
+  let ok = v > 0;
+  if (ok && n === 2) {
+    if (state.mode === "percent" && v >= 100) ok = false;
+    if (state.mode === "level" && riskPerShare(num($("#price").value), v) <= 0) ok = false;
+    // a long can't lose more than the full share price
+    if (state.dir === "long" && riskPerShare(num($("#price").value), v) >= num($("#price").value)) ok = false;
+  }
+  if (!ok) { const f = $("#f-" + id); f.classList.remove("err"); void f.offsetWidth; f.classList.add("err"); }
+  return ok;
+}
+document.querySelectorAll(".next").forEach(b => b.addEventListener("click", () => { if (validate(step)) go(step + 1); }));
+document.querySelectorAll(".prev").forEach(b => b.addEventListener("click", () => go(step - 1, true)));
+document.addEventListener("keydown", e => {
+  if (state.tool === "ret") return retKey(e);
+  if (e.key === "Enter" && step < 3) { e.preventDefault(); if (validate(step)) go(step + 1); }
+  if (e.key === "Escape" && step > 0) go(step - 1, true);
+});
+$("#restart").addEventListener("click", () => { ["risk", "price", "sl"].forEach(id => $("#" + id).value = ""); save(); go(0, true); });
+
+/* ---------- calculation ---------- */
+let plan = "";
+function calc() {
+  const risk = num($("#risk").value), price = num($("#price").value), slIn = num($("#sl").value);
+  const per = riskPerShare(price, slIn);
+  const qty = Math.floor(risk / per);
+  const cap = qty * price, loss = qty * per;
+  const long = state.dir === "long";
+  const slPx = long ? price - per : price + per;
+  const pct = per / price * 100;
+
+  countTo($("#rQty"), qty);
+  $("#rQtyUnit").textContent = `share${qty === 1 ? "" : "s"} @ ${inr(price)}`;
+  $("#rCap").textContent = inr(cap);
+  $("#rLoss").textContent = "−" + inr(loss);
+  $("#rPerShare").textContent = `${inr(per)} (${pct.toFixed(2)}%)`;
+  $("#rSlPx").textContent = inr(slPx);
+
+  const slDesc = state.mode === "percent" ? `a <b>${slIn}%</b> stop-loss` :
+                 state.mode === "points" ? `a <b>${inr(per)}</b> chart stop-loss` :
+                 `a stop-loss at <b>${inr(slIn)}</b>`;
+  $("#rSentence").innerHTML = qty > 0
+    ? `${long ? "Buy" : "Short"} <b>${qty.toLocaleString("en-IN")}</b> shares of <b>${inr(price)}</b> (total <span class="g">${inr0(cap)}</span>). With ${slDesc}, if it hits you lose <span class="r">${inr0(loss)}</span>, within your <b>${inr0(risk)}</b> limit.`
+    : `With ${slDesc}, even <b>1 share</b> would lose ${inr(per)}, which is more than your <b>${inr0(risk)}</b> limit.`;
+
+  // alerts
+  const alerts = [];
+  if (qty === 0) alerts.push(["bad", "⛔", "Your stop is wider than your risk budget. Tighten the stop-loss or increase the loss you can take."]);
+  else if (risk - loss > 0.5 && (risk - loss) / risk > 0.05) alerts.push(["warn", "ℹ️", `Rounded down to whole shares, so actual risk is ${inr0(loss)} (${inr0(risk - loss)} under your limit).`]);
+  if (pct < 0.3 && qty > 0) alerts.push(["warn", "⚠️", `That's a very tight stop (${pct.toFixed(2)}%). Normal noise and spreads may hit it.`]);
+  if (pct > 15 && qty > 0) alerts.push(["warn", "⚠️", `That's a wide stop (${pct.toFixed(1)}%). Make sure it matches your timeframe.`]);
+  if (state.mode === "level" && per <= 0) alerts.push(["bad", "⛔", "SL price must be below entry for a long, above entry for a short."]);
+  $("#rAlerts").innerHTML = alerts.map(([c, i, t]) => `<div class="alert ${c}"><span>${i}</span><span>${t}</span></div>`).join("");
+
+  // ladder: targets 3R,2R,1R, entry, SL
+  const rows = [3, 2, 1].map(r => ({ cls: "t-tp", tag: `1:${r}`, px: long ? price + per * r : price - per * r, pl: "+" + inr0(loss * r) }));
+  rows.push({ cls: "t-en", tag: "ENTRY", px: price, pl: "₹0" }, { cls: "t-sl", tag: "SL", px: slPx, pl: "−" + inr0(loss) });
+  if (!long) rows.reverse();
+  $("#rLadder").innerHTML = rows.map(r => `<div class="rung ${r.cls}"><span class="tag">${r.tag}</span><span class="px">${inr(r.px)}</span><span class="pl">${qty ? r.pl : "—"}</span></div>`).join("");
+
+  $("#rRecap").innerHTML = `
+    <button data-go="0">Max loss ${inr0(risk)}</button>
+    <button data-go="1">${long ? "Long" : "Short"} @ ${inr(price)}</button>
+    <button data-go="2">SL ${state.mode === "percent" ? slIn + "%" : state.mode === "points" ? inr(slIn) + "/share" : "@ " + inr(slIn)}</button>`;
+  $("#rRecap").querySelectorAll("button").forEach(b => b.onclick = () => go(+b.dataset.go, true));
+
+  plan = `Trade plan (${long ? "LONG" : "SHORT"})
+Qty: ${qty} shares @ ${inr(price)}
+Capital: ${inr(cap)}
+Stop-loss: ${inr(slPx)} (${inr(per)}/share, ${pct.toFixed(2)}%)
+Max loss: ${inr(loss)} (limit ${inr0(risk)})
+Targets: 1:1 ${inr(long ? price + per : price - per)} · 1:2 ${inr(long ? price + 2 * per : price - 2 * per)} · 1:3 ${inr(long ? price + 3 * per : price - 3 * per)}`;
+  save();
+}
+
+function countTo(el, end) {
+  const t0 = performance.now(), dur = 900;
+  el.textContent = end.toLocaleString("en-IN"); // correct value even if animation frames never run
+  clearTimeout(el._t); el._t = setTimeout(() => el.textContent = end.toLocaleString("en-IN"), dur + 50);
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  (function f(t) {
+    const p = Math.min((t - t0) / dur, 1), e = 1 - Math.pow(1 - p, 4);
+    el.textContent = Math.round(end * e).toLocaleString("en-IN");
+    if (p < 1) requestAnimationFrame(f);
+  })(t0);
+}
+
+$("#copyBtn").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(plan); toast("Copied ✓"); }
+  catch { toast("Couldn't copy"); }
+});
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 1600); }
+
+/* ---------- persistence ---------- */
+var save = function () {
+  localStorage.setItem("slcalc", JSON.stringify({ dir: state.dir, mode: state.mode, risk: $("#risk").value, price: $("#price").value, sl: $("#sl").value }));
+};
+if (state.risk) $("#risk").value = state.risk;
+if (state.price) $("#price").value = state.price;
+if (state.sl) $("#sl").value = state.sl;
+/* =================== REAL RETURN TOOL =================== */
+state.tool ??= "size"; state.altUnit ??= "year"; state.perUnit ??= "months"; state.tmode ??= "pct"; state.comp ??= "simple";
+const pctFmt = (n, d = 2) => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(d) + "%";
+const rupee = n => (n < 0 ? "−" : n > 0 ? "+" : "") + inr0(Math.abs(n));
+const fmtSigned = el => {
+  const neg = /^\s*[-−]/.test(el.value);
+  const raw = el.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+  el.value = (neg ? "-" : "") + raw.replace(/(\.\d{0,2}).*/, "$1");
+};
+const numS = s => parseFloat(String(s).replace(/−/g, "-").replace(/[,₹%\s]/g, ""));
+
+const TITLES = {
+  size: ['Size your trade by <span class="grad">risk</span>, not by hope.', "Three quick questions and you'll know exactly how many shares to buy."],
+  ret: ['Is the risk <span class="grad">worth it?</span>', "Compare your trade with what the same money earns with no risk, and see your real profit."],
+};
+function showTool(t, opts = {}) {
+  state.tool = t; placeTabs();
+  $("#toolSize").hidden = t !== "size"; $("#toolRet").hidden = t !== "ret";
+  $("#title").innerHTML = TITLES[t][0]; $("#subtitle").textContent = TITLES[t][1];
+  if (t === "ret") rgo(opts.step ?? rstep); else go(step);
+  history.replaceState(null, "", t === "ret" ? "#returns" : location.pathname);
+  save();
+}
+const placeTabs = setupSeg("#toolTabs", "tool", () => showTool(state.tool));
+
+const placeAlt = setupSeg("#altUnit", "altUnit", () => { retUI(); $("#alt").focus(); });
+const placePer = setupSeg("#perUnit", "perUnit", () => { retUI(); $("#hold").focus(); });
+const placeTm = setupSeg("#tmode", "tmode", () => { retUI(); });
+const placeComp = setupSeg("#comp", "comp", () => rcalc());
+
+function retUI() {
+  $("#altSuffix").textContent = state.altUnit === "year" ? "% / yr" : "% / mo";
+  $("#holdSuffix").textContent = state.perUnit;
+  $("#tPctBox").hidden = state.tmode !== "pct"; $("#tPxBox").hidden = state.tmode !== "px";
+  retWords();
+}
+function months() {
+  const h = num($("#hold").value);
+  return state.perUnit === "days" ? h * 12 / 365 : state.perUnit === "years" ? h * 12 : h;
+}
+function altPct(m) {
+  const r = num($("#alt").value) / 100;
+  if (state.comp === "compound") {
+    const mo = state.altUnit === "month" ? r : Math.pow(1 + r, 1 / 12) - 1;
+    return (Math.pow(1 + mo, m) - 1) * 100;
+  }
+  return (state.altUnit === "month" ? r * m : r * m / 12) * 100;
+}
+function tradePct() {
+  if (state.tmode === "pct") return numS($("#tpct").value);
+  const b = num($("#buy").value), s = num($("#sell").value);
+  return b > 0 && s > 0 ? (s - b) / b * 100 : NaN;
+}
+function periodLabel() {
+  const h = num($("#hold").value), u = state.perUnit;
+  return `${h} ${h === 1 ? u.replace(/s$/, "") : u}`;
+}
+function retWords() {
+  const r = num($("#alt").value);
+  $("#w-alt").textContent = r > 0 ? (state.altUnit === "year" ? `= about ${(r / 12).toFixed(2)}% per month` : `= about ${(r * 12).toFixed(1)}% per year`) : "";
+  const m = months();
+  $("#w-hold").textContent = m > 0 && r > 0 ? `No-risk option would earn ≈ ${altPct(m).toFixed(2)}% in ${periodLabel()}` : "";
+  const t = tradePct();
+  $("#w-t").textContent = isFinite(t) && m > 0 ? `Trade ${pctFmt(t)} vs no-risk ${pctFmt(altPct(m))} → real ${pctFmt(t - altPct(m))}` : "";
+}
+["alt", "hold", "buy", "sell", "rcap"].forEach(id => $("#" + id).addEventListener("input", e => { fmtInput(e.target); e.target.closest(".field").classList.remove("err"); retWords(); save(); }));
+$("#tpct").addEventListener("input", e => { fmtSigned(e.target); e.target.closest(".field").classList.remove("err"); retWords(); save(); });
+
+function retChip(c, box) {
+  if (c.dataset.unit) {
+    const key = box.querySelector("#altUnit") ? "altUnit" : "perUnit";
+    state[key] = c.dataset.unit; key === "altUnit" ? placeAlt() : placePer();
+  }
+  const input = box.querySelector("#alt, #hold, #tpct");
+  input.value = c.dataset.v; input.id === "tpct" ? fmtSigned(input) : fmtInput(input);
+  retUI(); save(); input.focus();
+}
+
+const rsteps = [...document.querySelectorAll(".rstep")];
+let rstep = 0;
+function rgo(n, back = false) {
+  rstep = n;
+  rsteps.forEach((s, i) => { s.classList.toggle("active", i === n); s.classList.toggle("back", back); });
+  [...$("#rprogress").children].forEach((b, i) => b.classList.toggle("done", i <= n));
+  if (n === 0) placeAlt(); if (n === 1) placePer(); if (n === 2) placeTm(); if (n === 3) { placeComp(); rcalc(); }
+  retUI();
+  const inp = rsteps[n].querySelector("input:not([hidden])");
+  if (inp && matchMedia("(hover: hover)").matches) setTimeout(() => inp.focus(), 60);
+}
+function shake(id) { const f = $("#f-" + id); f.classList.remove("err"); void f.offsetWidth; f.classList.add("err"); }
+function rvalidate(n) {
+  if (n === 0) { const v = num($("#alt").value); if (!(v >= 0) || $("#alt").value === "") { shake("alt"); return false; } }
+  if (n === 1) { if (!(months() > 0)) { shake("hold"); return false; } }
+  if (n === 2) {
+    if (state.tmode === "pct") { if (!isFinite(numS($("#tpct").value))) { shake("tpct"); return false; } }
+    else {
+      let ok = true;
+      if (!(num($("#buy").value) > 0)) { shake("buy"); ok = false; }
+      if (!(num($("#sell").value) > 0)) { shake("sell"); ok = false; }
+      if (!ok) return false;
+    }
+  }
+  return true;
+}
+document.querySelectorAll(".rnext").forEach(b => b.addEventListener("click", () => { if (rvalidate(rstep)) rgo(rstep + 1); }));
+document.querySelectorAll(".rprev").forEach(b => b.addEventListener("click", () => rgo(rstep - 1, true)));
+function retKey(e) {
+  if (e.key === "Enter" && rstep < 3) { e.preventDefault(); if (rvalidate(rstep)) rgo(rstep + 1); }
+  if (e.key === "Escape" && rstep > 0) rgo(rstep - 1, true);
+}
+
+function rcalc() {
+  const m = months(), t = tradePct(), a = altPct(m), x = t - a;
+  const capIn = num($("#rcap").value), cap = capIn > 0 ? capIn : 100000;
+  const tY = t * 12 / m, aY = state.comp === "compound" ? altPct(12) : altPct(12);
+
+  const big = $("#xPct");
+  big.textContent = pctFmt(x);
+  big.classList.toggle("pos", x > 0.005); big.classList.toggle("neg", x < -0.005);
+  $("#xSub").textContent = `extra return for taking the risk, in ${periodLabel()}`;
+
+  let v, vc;
+  if (t < 0) { v = `❌ Loss of ${Math.abs(t).toFixed(2)}% + missed ${a.toFixed(2)}%`; vc = "bad"; }
+  else if (x > 0.005) { v = `✅ Beat the no-risk option by ${x.toFixed(2)}%`; vc = "good"; }
+  else if (Math.abs(x) <= 0.005) { v = "😐 Same as no-risk, so the risk wasn't rewarded"; vc = "meh"; }
+  else { v = `⚠️ Profit, but ${Math.abs(x).toFixed(2)}% less than no-risk`; vc = "meh"; }
+  const ve = $("#xVerdict"); ve.className = "verdict " + vc; ve.textContent = v;
+
+  const tWord = t >= 0 ? `made <b>${t.toFixed(2)}%</b>` : `lost <b>${Math.abs(t).toFixed(2)}%</b>`;
+  $("#xSentence").innerHTML =
+    `Your trade ${tWord} in <b>${periodLabel()}</b>. That money would have earned <b>${a.toFixed(2)}%</b> anyway with no risk ` +
+    `(${num($("#alt").value)}% per ${state.altUnit}). So your <b>real profit</b> is ` +
+    `<span class="${x >= 0 ? "g" : "r"}">${pctFmt(x)}</span>, not ${pctFmt(t)}.`;
+
+  $("#barsTitle").textContent = `Return over ${periodLabel()}`;
+  const max = Math.max(Math.abs(t), Math.abs(a), Math.abs(x), 0.0001);
+  [["T", t, "t"], ["A", a, "a"], ["E", x, "e"]].forEach(([k, val, cls]) => {
+    $("#b" + k).textContent = pctFmt(val);
+    const bar = $("#i" + k); bar.className = val < 0 ? "neg" : cls;
+    bar.style.width = "0"; requestAnimationFrame(() => requestAnimationFrame(() => bar.style.width = (Math.abs(val) / max * 100) + "%"));
+    setTimeout(() => bar.style.width = (Math.abs(val) / max * 100) + "%", 60);
+  });
+
+  $("#sTl").textContent = capIn > 0 ? `Trade profit on ${inr0(cap)}` : "Trade profit per ₹1 lakh";
+  $("#sT").textContent = rupee(cap * t / 100);
+  $("#sA").textContent = rupee(cap * a / 100);
+  $("#sE").textContent = rupee(cap * x / 100);
+  $("#sE").style.color = x >= 0 ? "var(--a2)" : "var(--down)";
+  $("#sY").textContent = `${pctFmt(tY, 1)} vs ${aY.toFixed(1)}%`;
+
+  const tDesc = state.tmode === "pct" ? pctFmt(t) : `${inr($("#buy").value.replace(/,/g, ""))} → ${inr($("#sell").value.replace(/,/g, ""))}`;
+  $("#xRecap").innerHTML = `
+    <button data-go="0">No-risk ${num($("#alt").value)}%/${state.altUnit === "year" ? "yr" : "mo"}</button>
+    <button data-go="1">Hold ${periodLabel()}</button>
+    <button data-go="2">Trade ${tDesc}</button>`;
+  $("#xRecap").querySelectorAll("button").forEach(b => b.onclick = () => rgo(+b.dataset.go, true));
+  save();
+}
+
+$("#rRestart").addEventListener("click", () => { ["alt", "hold", "tpct", "buy", "sell", "rcap"].forEach(id => $("#" + id).value = ""); save(); rgo(0, true); });
+$("#rToSize").addEventListener("click", () => showTool("size"));
+$("#toRet").addEventListener("click", () => {
+  const cap = num($("#rCap").textContent);
+  if (cap > 0) { $("#rcap").value = Math.round(cap).toLocaleString("en-IN"); }
+  const p = num($("#price").value);
+  if (p > 0 && !$("#buy").value) $("#buy").value = $("#price").value;
+  rgo(0); showTool("ret", { step: 0 });
+});
+
+// restore saved returns inputs
+["alt", "hold", "tpct", "buy", "sell", "rcap"].forEach(id => { if (state["r_" + id]) $("#" + id).value = state["r_" + id]; });
+const _save = save;
+save = function () {
+  _save();
+  const o = JSON.parse(localStorage.getItem("slcalc") || "{}");
+  Object.assign(o, { tool: state.tool, altUnit: state.altUnit, perUnit: state.perUnit, tmode: state.tmode, comp: state.comp });
+  ["alt", "hold", "tpct", "buy", "sell", "rcap"].forEach(id => o["r_" + id] = $("#" + id).value);
+  localStorage.setItem("slcalc", JSON.stringify(o));
+};
+
+go(0);
+liveWords();
+showTool(location.hash === "#returns" ? "ret" : "size", { step: 0 });
+</script>
+</body>
+</html>
