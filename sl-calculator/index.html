@@ -189,6 +189,22 @@
   .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
   .modal-card .actions { margin-top: 14px; }
 
+  /* notes + disclaimer */
+  .notes { margin-top: 18px; border: 1px solid rgba(124,92,255,.35); background: rgba(124,92,255,.07); border-radius: 18px; padding: 4px 16px; }
+  .notes[open] { padding-bottom: 16px; }
+  .notes summary { list-style: none; cursor: pointer; padding: 12px 0; font-weight: 600; font-size: .92rem; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .notes summary::-webkit-details-marker { display: none; }
+  .notes summary::after { content: "＋"; font-size: 1.1rem; color: #b6a6ff; transition: transform .25s; }
+  .notes[open] summary::after { transform: rotate(45deg); }
+  .notes summary small { display: block; font-weight: 400; font-size: .74rem; color: var(--muted); margin-top: 2px; }
+  .notes .mini-lbl { margin-top: 10px; }
+  .note-in { width: 100%; resize: vertical; min-height: 92px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); border-radius: 16px; color: var(--fg); font: 400 .95rem/1.5 Inter, sans-serif; padding: 12px 14px; outline: 0; transition: border-color .25s, box-shadow .25s; }
+  .note-in:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .pat-chips { margin-top: 10px; }
+  .pat-chips .chip { font-size: .76rem; padding: 7px 11px; }
+  .disclaimer { margin-top: 26px; max-width: 560px; width: 100%; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; text-align: left; }
+  .disclaimer b { color: #f5d27a; }
+
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -313,6 +329,24 @@
 
         <div class="cta-row"><button class="link-btn" id="toRet">📊 Is this trade worth it? Check the real return →</button></div>
 
+        <details class="notes" id="sNotes">
+          <summary><span>📝 Add trade setup &amp; notes<small>Optional. Included when you copy, share or save the image.</small></span></summary>
+          <span class="mini-lbl">Pattern / setup</span>
+          <label class="field small sym"><span class="unit">📐</span><input class="pat-in" type="text" maxlength="40" placeholder="e.g. Cup &amp; Handle breakout" autocomplete="off" /></label>
+          <div class="chips pat-chips">
+            <button class="chip pchip">Breakout</button>
+            <button class="chip pchip">Cup &amp; Handle</button>
+            <button class="chip pchip">VCP</button>
+            <button class="chip pchip">Flag</button>
+            <button class="chip pchip">Double Bottom</button>
+            <button class="chip pchip">Triangle</button>
+            <button class="chip pchip">Support Bounce</button>
+            <button class="chip pchip">Head &amp; Shoulders</button>
+          </div>
+          <span class="mini-lbl">Why this trade? <span class="opt">(2–3 lines)</span></span>
+          <textarea class="note-in" maxlength="280" rows="3" placeholder="e.g. Breaking 6-month resistance on 2x volume. SL below the breakout candle low."></textarea>
+          <div class="words"><span class="note-count">0</span>/280</div>
+        </details>
         <div class="share-row">
           <button class="btn img" id="imgBtn">📸 Share as image</button>
           <button class="btn" id="copyBtn">📋 Copy all</button>
@@ -458,6 +492,24 @@
 
         <div class="inputs-recap" id="xRecap"></div>
 
+        <details class="notes" id="rNotes">
+          <summary><span>📝 Add trade setup &amp; notes<small>Optional. Included when you copy, share or save the image.</small></span></summary>
+          <span class="mini-lbl">Pattern / setup</span>
+          <label class="field small sym"><span class="unit">📐</span><input class="pat-in" type="text" maxlength="40" placeholder="e.g. Cup &amp; Handle breakout" autocomplete="off" /></label>
+          <div class="chips pat-chips">
+            <button class="chip pchip">Breakout</button>
+            <button class="chip pchip">Cup &amp; Handle</button>
+            <button class="chip pchip">VCP</button>
+            <button class="chip pchip">Flag</button>
+            <button class="chip pchip">Double Bottom</button>
+            <button class="chip pchip">Triangle</button>
+            <button class="chip pchip">Support Bounce</button>
+            <button class="chip pchip">Head &amp; Shoulders</button>
+          </div>
+          <span class="mini-lbl">Why this trade? <span class="opt">(2–3 lines)</span></span>
+          <textarea class="note-in" maxlength="280" rows="3" placeholder="e.g. Breaking 6-month resistance on 2x volume. SL below the breakout candle low."></textarea>
+          <div class="words"><span class="note-count">0</span>/280</div>
+        </details>
         <div class="share-row">
           <button class="btn img" id="rImgBtn">📸 Share as image</button>
           <button class="btn" id="rCopyBtn">📋 Copy all</button>
@@ -472,8 +524,10 @@
     </div>
   </main>
 
+  <div class="disclaimer">
+    <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This tool and any trade setups or notes shared from it are based on <b>personal research</b> and are for <b>educational purposes only</b>. They are not investment advice or a recommendation to buy or sell any security. Trading and investing in the stock market involve risk, including loss of capital. Brokerage, taxes and slippage aren't included, and gaps can skip your stop-loss. Do your own research or consult a SEBI-registered adviser before making any decision.
+  </div>
   <footer>
-    For position sizing only, not investment advice. Brokerage, taxes and slippage (gaps can skip your SL) aren't included.<br />
     Built by <a href="../">Manideep Mittal</a>
   </footer>
 
@@ -539,6 +593,11 @@ function updateSlUI() {
 /* ---------- chips ---------- */
 document.addEventListener("click", e => {
   const c = e.target.closest(".chip"); if (!c) return;
+  if (c.classList.contains("pchip")) {
+    document.querySelectorAll(".pat-in").forEach(i => i.value = c.textContent);
+    localStorage.setItem("slcalc_pat", c.textContent);
+    document.querySelectorAll(".notes").forEach(d => d.open = true); return;
+  }
   const box = c.closest(".step, .rstep");
   if (box.classList.contains("rstep")) return retChip(c, box);
   const input = box.querySelector("input");
@@ -710,8 +769,35 @@ async function copyText(text) {
 }
 const doCopy = async text => toast(await copyText(text) ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy");
 const doWa = text => window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
-$("#copyBtn").addEventListener("click", () => doCopy(plan));
-$("#waBtn").addEventListener("click", () => doWa(plan));
+const DISCL = "⚠️ _Disclaimer: Not SEBI registered. Based on personal research, for educational purposes only. Not investment advice._";
+const pat = () => (document.querySelector(".pat-in").value || "").trim();
+const note = () => (document.querySelector(".note-in").value || "").trim();
+function finalText(base) {
+  const lines = base.split("\n");
+  const extra = [];
+  if (pat()) extra.push(`📐 *Setup:* ${pat()}`);
+  if (note()) extra.push(`📝 ${note()}`);
+  if (extra.length) lines.splice(2, 0, "", ...extra);
+  const i = lines.findIndex(l => l.startsWith("_Calculated on"));
+  lines.splice(i < 0 ? lines.length : i + 1, 0, DISCL);
+  return lines.join("\n");
+}
+// keep both copies of the notes fields in sync and remembered
+function syncNotes(cls, key, el) {
+  document.querySelectorAll(cls).forEach(o => { if (o !== el) o.value = el.value; });
+  localStorage.setItem(key, el.value);
+  if (pat() || note()) document.querySelectorAll(".notes").forEach(d => d.open = true);
+  document.querySelectorAll(".note-count").forEach(c => c.textContent = (document.querySelector(".note-in").value || "").length);
+}
+document.querySelectorAll(".pat-in").forEach(i => i.addEventListener("input", () => syncNotes(".pat-in", "slcalc_pat", i)));
+document.querySelectorAll(".note-in").forEach(i => i.addEventListener("input", () => syncNotes(".note-in", "slcalc_note", i)));
+document.querySelectorAll(".pat-in").forEach(i => i.value = localStorage.getItem("slcalc_pat") || "");
+document.querySelectorAll(".note-in").forEach(i => i.value = localStorage.getItem("slcalc_note") || "");
+document.querySelectorAll(".note-count").forEach(c => c.textContent = (localStorage.getItem("slcalc_note") || "").length);
+if (localStorage.getItem("slcalc_pat") || localStorage.getItem("slcalc_note")) document.querySelectorAll(".notes").forEach(d => d.open = true);
+
+$("#copyBtn").addEventListener("click", () => doCopy(finalText(plan)));
+$("#waBtn").addEventListener("click", () => doWa(finalText(plan)));
 function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 1600); }
 
 /* ---------- persistence ---------- */
@@ -901,8 +987,8 @@ function rcalc() {
   save();
 }
 let rplan = "";
-$("#rCopyBtn").addEventListener("click", () => doCopy(rplan));
-$("#rWaBtn").addEventListener("click", () => doWa(rplan));
+$("#rCopyBtn").addEventListener("click", () => doCopy(finalText(rplan)));
+$("#rWaBtn").addEventListener("click", () => doWa(finalText(rplan)));
 
 $("#rRestart").addEventListener("click", () => { ["alt", "hold", "tpct", "buy", "sell", "rcap"].forEach(id => $("#" + id).value = ""); save(); rgo(0, true); });
 $("#rToSize").addEventListener("click", () => showTool("size"));
@@ -938,15 +1024,15 @@ function pill(ctx, s, x, y, color) {
   rr(ctx, x, y, w, 54, 27); ctx.fillStyle = color + "26"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color + "88"; ctx.stroke();
   txt(ctx, s, x + 24, y + 37, `600 28px ${MONO}`, color);
 }
-async function base(label, title, pillText, pillColor) {
+async function base(label, title, pillText, pillColor, H = CH) {
   await Promise.all([`700 80px ${GROT}`, `600 40px ${MONO}`, `500 26px ${MONO}`, `500 26px ${INTER}`].map(f => document.fonts.load(f).catch(() => {})));
-  const c = document.createElement("canvas"); c.width = CW; c.height = CH; const ctx = c.getContext("2d");
-  const g = ctx.createLinearGradient(0, 0, 0, CH); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, CH);
-  const glow = (x, y, r, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, CH); };
-  glow(90, 40, 650, "rgba(124,92,255,0.38)"); glow(CW - 40, CH - 60, 680, "rgba(0,224,184,0.22)"); glow(CW, 380, 380, "rgba(255,77,141,0.10)");
+  const c = document.createElement("canvas"); c.width = CW; c.height = H; const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, r, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 650, "rgba(124,92,255,0.38)"); glow(CW - 40, H - 60, 680, "rgba(0,224,184,0.22)"); glow(CW, 380, 380, "rgba(255,77,141,0.10)");
   ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
-  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CH); ctx.stroke(); }
-  for (let y = 0; y <= CH; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
   const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
   rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
   txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
@@ -955,9 +1041,35 @@ async function base(label, title, pillText, pillColor) {
   txt(ctx, label, 70, 205, `600 26px ${MONO}`, "#00e0b8");
   ctx.font = fit(ctx, title, 700, GROT, 92, CW - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(title, 70, 300);
   pill(ctx, pillText, 70, 330, pillColor);
-  txt(ctx, TOOL_URL.replace(/\/$/, ""), CW / 2, CH - 64, `500 24px ${MONO}`, "#6c7285", "center");
-  txt(ctx, "For position sizing & education only. Not investment advice.", CW / 2, CH - 30, `400 20px ${INTER}`, "#454a5c", "center");
+  txt(ctx, TOOL_URL.replace(/\/$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  txt(ctx, "Not SEBI registered · Personal research · Educational purpose only · Not investment advice", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
   return { c, ctx };
+}
+function wrapLines(ctx, text, maxW, font) {
+  ctx.font = font; const out = [];
+  text.split(/\n+/).forEach(par => {
+    let line = "";
+    par.split(/\s+/).forEach(w => {
+      const t = line ? line + " " + w : w;
+      if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t;
+    });
+    if (line) out.push(line);
+  });
+  return out;
+}
+function notesBlock() {
+  const p = pat(), n = note(); if (!p && !n) return null;
+  const m = document.createElement("canvas").getContext("2d");
+  let lines = n ? wrapLines(m, n, CW - 200, `400 28px ${INTER}`) : [];
+  if (lines.length > 6) { lines = lines.slice(0, 6); lines[5] = lines[5].replace(/\s*\S*$/, "") + "…"; }
+  return { p, lines, h: 52 + (p ? 58 : 0) + lines.length * 40 + 34 };
+}
+function drawNotes(ctx, y, nb) {
+  panel(ctx, 70, y, CW - 140, nb.h, 28, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
+  let yy = y + 50;
+  txt(ctx, "TRADE SETUP & NOTES", 100, yy, `600 22px ${MONO}`, "#b6a6ff");
+  if (nb.p) { yy += 54; ctx.font = fit(ctx, nb.p, 700, GROT, 36, CW - 200); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(nb.p, 100, yy); yy += 4; }
+  nb.lines.forEach(l => { yy += 40; txt(ctx, l, 100, yy, `400 28px ${INTER}`, "#cfd3df"); });
 }
 function statGrid(ctx, y0, items, h = 118, gap = 20) {
   const w = (CW - 140 - 24) / 2;
@@ -969,8 +1081,9 @@ function statGrid(ctx, y0, items, h = 118, gap = 20) {
   });
 }
 async function drawSize() {
-  const d = lastSize;
-  const { c, ctx } = await base("TRADE PLAN", d.sym || "Position size", `${d.long ? "▲ LONG" : "▼ SHORT"} @ ${inr(d.price)}`, d.long ? "#22d39a" : "#ff5470");
+  const d = lastSize, nb = notesBlock();
+  const { c, ctx } = await base("TRADE PLAN", d.sym || "Position size", `${d.long ? "▲ LONG" : "▼ SHORT"} @ ${inr(d.price)}`, d.long ? "#22d39a" : "#ff5470", CH + (nb ? nb.h + 24 : 0));
+  if (nb) drawNotes(ctx, 1274, nb);
   panel(ctx, 70, 415, CW - 140, 240, 36);
   txt(ctx, "QUANTITY TO BUY", CW / 2, 470, `600 24px ${MONO}`, "#8a90a2", "center");
   const q = d.qty.toLocaleString("en-IN");
@@ -1002,8 +1115,9 @@ async function drawSize() {
   return c;
 }
 async function drawRet() {
-  const d = lastRet;
-  const { c, ctx } = await base("REAL RETURN CHECK", d.sym || "Is the risk worth it?", `Held ${d.period}`, "#7c5cff");
+  const d = lastRet, nb = notesBlock();
+  const { c, ctx } = await base("REAL RETURN CHECK", d.sym || "Is the risk worth it?", `Held ${d.period}`, "#7c5cff", CH + (nb ? nb.h : 0));
+  if (nb) drawNotes(ctx, 1241, nb);
   panel(ctx, 70, 415, CW - 140, 250, 36);
   txt(ctx, "REAL PROFIT VS NO-RISK", CW / 2, 470, `600 24px ${MONO}`, "#8a90a2", "center");
   const big = pctFmt(d.x);
