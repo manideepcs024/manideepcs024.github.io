@@ -1036,7 +1036,12 @@ async function base(label, title, pillText, pillColor, H = CH) {
   const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
   rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
   txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
-  txt(ctx, "SL Calculator", 152, 96, `700 34px ${GROT}`, "#eef0f6");
+  // brand title
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(0.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
   txt(ctx, new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), CW - 70, 96, `500 26px ${MONO}`, "#8a90a2", "right");
   txt(ctx, label, 70, 205, `600 26px ${MONO}`, "#00e0b8");
   ctx.font = fit(ctx, title, 700, GROT, 92, CW - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(title, 70, 300);
