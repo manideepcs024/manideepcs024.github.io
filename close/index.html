@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Market Close Summary Card — MANIMINDSMONEY</title>
+<meta name="description" content="Post the day's market wrap: index closes, top gainers and losers, sectors, breadth and FII/DII flows, as WhatsApp text or a branded image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #ff5470; }
+  .idx { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 40px; gap: 6px; align-items: center; margin-top: 8px; }
+  .idx-head { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 40px; gap: 6px; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); }
+  .idx .field, .mv .field { padding: 0 9px; border-radius: 12px; }
+  .idx .field input, .mv .field input { font-size: .88rem; padding: 9px 0; }
+  .pct { font: 600 .72rem "JetBrains Mono"; grid-column: 2 / 4; margin: -2px 0 0 4px; }
+  .mv { display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 6px; margin-top: 6px; }
+  .mvgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .mvgrid h4 { font: 600 .7rem "JetBrains Mono"; letter-spacing: .1em; margin-top: 16px; }
+  .prev-idx { display: grid; gap: 6px; }
+  .pi { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); }
+  .pi b { font: 700 .95rem "Space Grotesk"; }
+  .pi .v { text-align: right; font: 600 .95rem "JetBrains Mono"; }
+  .pi .v small { display: block; font-size: .74rem; }
+  .breadth { display: flex; height: 10px; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+  .mood { display: inline-block; font: 700 .7rem "JetBrains Mono"; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Today's market, <span class="grad">wrapped up.</span></h1>
+    <p class="sub">Fill in the closing numbers after 3:30 PM: indices, top movers, sectors, breadth and FII/DII flows. Post a clean evening wrap in a minute. It pairs well with the morning Levels card.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="cols2">
+          <div><div class="q">Date</div><label class="field sm"><input id="date" class="txt" type="date" /></label></div>
+          <div><div class="q">Mood</div><div class="seg" id="moodSeg"><div class="pill"></div><button data-v="auto">Auto</button><button data-v="bull">🟢</button><button data-v="flat">⚪</button><button data-v="bear">🔴</button></div></div>
+        </div>
+
+        <div class="q">Indices <span class="opt">close & change in points (− for a fall)</span></div>
+        <div class="chips-in" id="idxPresets"></div>
+        <div class="idx-head" style="margin-top:10px"><span>NAME</span><span>CLOSE</span><span>CHANGE</span><span></span></div>
+        <div id="idx"></div>
+
+        <div class="mvgrid">
+          <div><h4 class="up">📈 TOP GAINERS · %</h4><div id="gain"></div></div>
+          <div><h4 class="down">📉 TOP LOSERS · %</h4><div id="lose"></div></div>
+        </div>
+
+        <div class="q">Sectors <span class="opt">optional · % change</span></div>
+        <div id="sect"></div>
+
+        <div class="cols2">
+          <div><div class="q">Advances</div><label class="field sm"><input id="adv" type="text" inputmode="numeric" placeholder="1,850" /></label></div>
+          <div><div class="q">Declines</div><label class="field sm"><input id="dec" type="text" inputmode="numeric" placeholder="1,240" /></label></div>
+          <div><div class="q">FII net ₹ cr</div><label class="field sm"><input id="fii" type="text" inputmode="decimal" placeholder="-1,250" /></label></div>
+          <div><div class="q">DII net ₹ cr</div><label class="field sm"><input id="dii" type="text" inputmode="decimal" placeholder="2,100" /></label></div>
+        </div>
+
+        <div class="q">Your view <span class="opt">optional · one or two lines</span></div>
+        <textarea id="note" maxlength="240" placeholder="e.g. Banks led the recovery after a weak start. All eyes on US inflation data tonight."></textarea>
+        <label class="toggle"><span>Add disclaimer<small>Not SEBI registered · information only</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Market close</h2><span id="meta"></span></div>
+        <div id="prev"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="tip"><b>Where to get the numbers:</b> NSE and BSE websites or your broker app for closes, movers and advances/declines. FII/DII figures are published by NSE in the evening and are <b>provisional</b>. Double-check before posting.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This card summarises market data you enter, for <b>information and educational purposes only</b>. It is not investment advice or a recommendation to buy or sell any security.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const PRESETS = ["NIFTY 50", "SENSEX", "BANK NIFTY", "NIFTY IT", "MIDCAP 100", "SMALLCAP 100", "INDIA VIX", "USD/INR"];
+function lastSession() {
+  const d = K.istNow(), mins = d.getHours() * 60 + d.getMinutes();
+  if (d.getDay() >= 1 && d.getDay() <= 5 && mins < 930) d.setDate(d.getDate() - 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
+  return K.iso(d);
+}
+const blankMv = () => [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }];
+const S = K.store("close_v1", { date: "", mood: "auto", idx: [{ n: "NIFTY 50", c: "", ch: "" }, { n: "SENSEX", c: "", ch: "" }, { n: "BANK NIFTY", c: "", ch: "" }], gain: blankMv(), lose: blankMv(), sect: [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }], adv: "", dec: "", fii: "", dii: "", note: "", disc: true });
+if (!S.date || S.date < lastSession()) S.date = lastSession();
+
+/* ---------- inputs ---------- */
+$("#date").value = S.date; $("#date").addEventListener("change", e => { S.date = e.target.value; render(); });
+const placeMood = K.seg("#moodSeg", () => S.mood, v => { S.mood = v; render(); });
+$("#idxPresets").innerHTML = PRESETS.map(p => `<button data-p="${p}">＋ ${p}</button>`).join("");
+$("#idxPresets").addEventListener("click", e => {
+  const b = e.target.closest("[data-p]"); if (!b) return;
+  if (S.idx.some(r => r.n === b.dataset.p)) { K.toast("Already added"); return; }
+  if (S.idx.length >= 6) { K.toast("Up to 6 indices"); return; }
+  const empty = S.idx.find(r => !r.n.trim()); if (empty) empty.n = b.dataset.p; else S.idx.push({ n: b.dataset.p, c: "", ch: "" });
+  drawIdx(); render();
+});
+function drawIdx() {
+  $("#idx").innerHTML = S.idx.map((r, i) => `<div class="idx" data-i="${i}">
+    <label class="field"><input class="name" data-f="n" type="text" maxlength="16" value="${K.esc(r.n)}" placeholder="Index" /></label>
+    <label class="field"><input data-f="c" type="text" inputmode="decimal" value="${r.c}" placeholder="24,500" /></label>
+    <label class="field"><input data-f="ch" type="text" inputmode="decimal" value="${r.ch}" placeholder="+120" /></label>
+    <button class="rm" title="Remove">✕</button><span></span><span class="pct"></span></div>`).join("");
+}
+$("#idx").addEventListener("input", e => {
+  const row = e.target.closest(".idx"), f = e.target.dataset.f; if (!row) return; const r = S.idx[+row.dataset.i];
+  if (f === "c") K.fmtNum(e.target); if (f === "ch") K.fmtNum(e.target, 2, true);
+  r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render();
+});
+$("#idx").addEventListener("click", e => { const row = e.target.closest(".idx"); if (row && e.target.closest(".rm")) { S.idx.splice(+row.dataset.i, 1); drawIdx(); render(); } });
+
+function drawMv(id, list, ph) {
+  $("#" + id).innerHTML = list.map((r, i) => `<div class="mv" data-i="${i}"><label class="field"><input class="name" data-f="n" type="text" maxlength="18" value="${K.esc(r.n)}" placeholder="${ph[i] || "Name"}" /></label><label class="field"><input data-f="p" type="text" inputmode="decimal" value="${r.p}" placeholder="%" /></label></div>`).join("");
+  $("#" + id).addEventListener("input", e => {
+    const row = e.target.closest(".mv"), f = e.target.dataset.f; if (!row) return; const r = list[+row.dataset.i];
+    if (f === "p") K.fmtNum(e.target, 2, true); r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render();
+  });
+}
+drawMv("gain", S.gain, ["Stock", "", ""]); drawMv("lose", S.lose, ["Stock", "", ""]); drawMv("sect", S.sect, ["e.g. IT", "Bank", "Auto", "Pharma"]);
+["adv", "dec"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { K.fmtNum(e.target, 0); S[k] = e.target.value; render(); }); });
+["fii", "dii"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { K.fmtNum(e.target, 2, true); S[k] = e.target.value; render(); }); });
+$("#note").value = S.note; $("#note").addEventListener("input", e => { S.note = e.target.value; render(); });
+$("#optDisc").checked = S.disc; $("#optDisc").addEventListener("change", e => { S.disc = e.target.checked; render(); });
+
+/* ---------- data ---------- */
+function data() {
+  const idx = S.idx.map(r => { const c = K.num(r.c), ch = K.num(r.ch); if (!(c > 0) || !r.n.trim()) return null; const v = isNaN(ch) ? 0 : ch; return { n: r.n.trim(), c, ch: v, p: c - v ? v / (c - v) * 100 : 0, vix: /VIX/.test(r.n) }; }).filter(Boolean);
+  const mv = l => l.map(r => ({ n: r.n.trim(), p: K.num(r.p) })).filter(r => r.n && !isNaN(r.p));
+  const adv = K.num(S.adv), dec = K.num(S.dec), fii = K.num(S.fii), dii = K.num(S.dii);
+  const lead = idx.find(x => !x.vix);
+  let mood = S.mood; if (mood === "auto") mood = !lead ? "flat" : lead.p > .25 ? "bull" : lead.p < -.25 ? "bear" : "flat";
+  return { idx, gain: mv(S.gain), lose: mv(S.lose), sect: mv(S.sect).sort((a, b) => b.p - a.p), adv: adv >= 0 ? adv : NaN, dec: dec >= 0 ? dec : NaN, fii, dii, mood };
+}
+const MOOD = { bull: ["BULLISH DAY", "#22d39a", "🟢"], flat: ["FLAT / MIXED DAY", "#c9cfdb", "⚪"], bear: ["BEARISH DAY", "#ff5470", "🔴"] };
+const arrow = v => v > 0 ? "▲" : v < 0 ? "▼" : "•";
+const col = (v, vix) => (vix ? -v : v) > 0 ? "up" : (vix ? -v : v) < 0 ? "down" : "";
+const crore = v => `${K.sgn(v)}₹${K.nf(Math.abs(v), 2).replace(/\.00$/, "")} cr`;
+const niceD = () => K.niceDate(S.date);
+
+function render() {
+  const D = data();
+  document.querySelectorAll(".idx").forEach((row, i) => { const r = S.idx[i], c = K.num(r.c), ch = K.num(r.ch); row.querySelector(".pct").innerHTML = c > 0 && !isNaN(ch) && c - ch ? `<span class="${col(ch, /VIX/.test(r.n))}">${K.pct(ch / (c - ch) * 100)}</span>` : ""; });
+  $("#meta").textContent = niceD();
+  if (!D.idx.length) { $("#prev").innerHTML = `<div class="placeholder">Enter at least one index close to build the card.</div>`; S.save(); return; }
+  const [ml, mc] = MOOD[D.mood];
+  let h = `<span class="mood" style="color:${mc};background:${mc}1f;border:1px solid ${mc}66">${ml}</span><div class="prev-idx">`;
+  h += D.idx.map(x => `<div class="pi"><b>${K.esc(x.n)}</b><div class="v">${K.nf(x.c)}<small class="${col(x.ch, x.vix)}">${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})</small></div></div>`).join("") + "</div><div class='stats'>";
+  if (D.gain.length) h += `<div class="stat"><span>Top gainers</span>${D.gain.map(g => `<div style="font:500 .84rem 'JetBrains Mono'">${K.esc(g.n)} <b class="up" style="font-size:.84rem">${K.pct(g.p)}</b></div>`).join("")}</div>`;
+  if (D.lose.length) h += `<div class="stat"><span>Top losers</span>${D.lose.map(g => `<div style="font:500 .84rem 'JetBrains Mono'">${K.esc(g.n)} <b class="down" style="font-size:.84rem">${K.pct(g.p)}</b></div>`).join("")}</div>`;
+  if (D.sect.length) h += `<div class="stat wide"><span>Sectors</span><div style="font:500 .84rem 'JetBrains Mono'">${D.sect.map(s => `${K.esc(s.n)} <b class="${col(s.p)}" style="font-size:.84rem">${K.pct(s.p)}</b>`).join(" · ")}</div></div>`;
+  if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) h += `<div class="stat wide"><span>Breadth · ${K.qty(D.adv)} up / ${K.qty(D.dec)} down</span><div class="breadth"><i style="width:${D.adv / (D.adv + D.dec) * 100}%;background:var(--up)"></i><i style="flex:1;background:var(--down)"></i></div></div>`;
+  if (!isNaN(D.fii)) h += `<div class="stat"><span>FII net</span><b class="${col(D.fii)}">${crore(D.fii)}</b></div>`;
+  if (!isNaN(D.dii)) h += `<div class="stat"><span>DII net</span><b class="${col(D.dii)}">${crore(D.dii)}</b></div>`;
+  h += "</div>";
+  if (S.note.trim()) h += `<div class="tip" style="color:#d5d8e3">📝 ${K.esc(S.note.trim())}</div>`;
+  $("#prev").innerHTML = h; S.save();
+}
+
+/* ---------- share ---------- */
+function valid() { if (data().idx.length) return true; K.shake($("#idx .field:nth-child(2)")); K.toast("Enter at least one index close"); return false; }
+function buildText() {
+  const D = data(), [ml, , me] = MOOD[D.mood], out = [`🔔 *MARKET CLOSE* · ${niceD()}`, `${me} _${ml.charAt(0) + ml.slice(1).toLowerCase()}_`, ""];
+  D.idx.forEach(x => out.push(`${(x.vix ? -x.ch : x.ch) > 0 ? "🟢" : (x.vix ? -x.ch : x.ch) < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`));
+  if (D.gain.length) out.push("", `📈 *Top gainers:* ${D.gain.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
+  if (D.lose.length) out.push(`${D.gain.length ? "" : "\n"}📉 *Top losers:* ${D.lose.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
+  if (D.sect.length) out.push("", `🏭 *Sectors:* ${D.sect.map(s => `${s.n} ${K.pct(s.p)}`).join(" · ")}`);
+  if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) out.push(`📊 *Breadth:* ${K.qty(D.adv)} advances / ${K.qty(D.dec)} declines`);
+  if (!isNaN(D.fii) || !isNaN(D.dii)) out.push(`💰 *FII:* ${isNaN(D.fii) ? "—" : crore(D.fii)} · *DII:* ${isNaN(D.dii) ? "—" : crore(D.dii)} _(provisional)_`);
+  if (S.note.trim()) out.push("", `📝 ${K.clean(S.note)}`);
+  return out.concat(K.signoff("close", "Daily wrap", S.disc ? "⚠️ _Information only, not investment advice. Not SEBI registered._" : "")).join("\n");
+}
+async function draw() {
+  await K.loadFonts();
+  const D = data(), W = 1080, m = K.measure(); m.font = `400 28px ${K.F.INTER}`;
+  const noteL = S.note.trim() ? K.cap(K.wrap(m, K.clean(S.note), W - 200), 4) : [];
+  const idxH = D.idx.length * 104, mvRows = Math.max(D.gain.length, D.lose.length), mvH = mvRows ? 80 + mvRows * 50 + 20 : 0;
+  const sectH = D.sect.length ? 120 : 0, brH = D.adv + D.dec > 0 ? 120 : 0, flowH = !isNaN(D.fii) || !isNaN(D.dii) ? 120 : 0, noteH = noteL.length ? 70 + noteL.length * 40 + 20 : 0;
+  const blocks = [mvH, sectH, brH, flowH, noteH].filter(Boolean);
+  const top = 360, H = top + idxH + blocks.reduce((a, b) => a + b + 20, 0) + 20 + K.footerH(true);
+  const [ml, mc] = MOOD[D.mood];
+  const { c, ctx } = K.canvas(W, H, [[mc + "33", .9, .08, .55], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, "MARKET CLOSE", 70, 205, `600 26px ${K.F.MONO}`, "#00e0b8");
+  ctx.font = K.fit(ctx, niceD(), 700, K.F.GROT, 72, W - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(niceD(), 70, 282);
+  K.pill(ctx, ml, 70, 300, mc, 20);
+  let y = top;
+  D.idx.forEach(x => {
+    const cc = (x.vix ? -x.ch : x.ch) > 0 ? "#22d39a" : (x.vix ? -x.ch : x.ch) < 0 ? "#ff5470" : "#c9cfdb";
+    K.panel(ctx, 70, y, W - 140, 88, 22, "rgba(0,0,0,0.40)");
+    K.rr(ctx, 70, y + 18, 6, 52, 3); ctx.fillStyle = cc; ctx.fill();
+    ctx.font = K.fit(ctx, x.n, 700, K.F.GROT, 34, 330); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(x.n, 100, y + 56);
+    K.txt(ctx, K.nf(x.c), 640, y + 56, `700 36px ${K.F.MONO}`, "#ffffff", "right");
+    const chg = `${arrow(x.ch)} ${K.nf(Math.abs(x.ch))}  ${K.pct(x.p)}`; ctx.font = K.fit(ctx, chg, 600, K.F.MONO, 28, 330); ctx.fillStyle = cc; ctx.textAlign = "right"; ctx.fillText(chg, W - 100, y + 55);
+    y += 104;
+  });
+  y += 0;
+  const block = (h, draw) => { draw(y, h); y += h + 20; };
+  if (mvH) block(mvH, (by, h) => {
+    const cw = (W - 160) / 2;
+    [[D.gain, "TOP GAINERS", "#22d39a", 70], [D.lose, "TOP LOSERS", "#ff5470", 90 + cw]].forEach(([l, t, cc, bx]) => {
+      K.panel(ctx, bx, by, cw, h, 22, cc + "10", cc + "55");
+      K.txt(ctx, t, bx + 26, by + 46, `700 22px ${K.F.MONO}`, cc);
+      l.forEach((g, i) => { ctx.font = `600 27px ${K.F.INTER}`; K.txt(ctx, K.clip(ctx, g.n, cw - 190), bx + 26, by + 96 + i * 50, `600 27px ${K.F.INTER}`, "#e3e6ee"); K.txt(ctx, K.pct(g.p), bx + cw - 24, by + 96 + i * 50, `700 27px ${K.F.MONO}`, cc, "right"); });
+    });
+  });
+  if (sectH) block(sectH, (by, h) => {
+    K.panel(ctx, 70, by, W - 140, h, 22, "rgba(0,0,0,0.38)");
+    K.txt(ctx, "SECTORS", 100, by + 44, `700 22px ${K.F.MONO}`, "#8a90a2");
+    let x = 100; D.sect.forEach(s => { const lab = `${s.n} ${K.pct(s.p, 1)}`; ctx.font = `600 24px ${K.F.MONO}`; const w = ctx.measureText(lab).width + 28; if (x + w > W - 90) return; const cc = s.p > 0 ? "#22d39a" : s.p < 0 ? "#ff5470" : "#c9cfdb"; K.rr(ctx, x, by + 62, w, 40, 12); ctx.fillStyle = cc + "22"; ctx.fill(); K.txt(ctx, lab, x + 14, by + 90, `600 24px ${K.F.MONO}`, cc); x += w + 10; });
+  });
+  if (brH) block(brH, (by, h) => {
+    K.panel(ctx, 70, by, W - 140, h, 22, "rgba(0,0,0,0.38)");
+    K.txt(ctx, "BREADTH", 100, by + 44, `700 22px ${K.F.MONO}`, "#8a90a2");
+    K.txt(ctx, `${K.qty(D.adv)} up · ${K.qty(D.dec)} down`, W - 100, by + 44, `600 24px ${K.F.MONO}`, "#e3e6ee", "right");
+    const bw = W - 200, a = D.adv / (D.adv + D.dec);
+    K.rr(ctx, 100, by + 66, bw, 24, 12); ctx.fillStyle = "#ff5470"; ctx.fill(); K.rr(ctx, 100, by + 66, Math.max(24, bw * a), 24, 12); ctx.fillStyle = "#22d39a"; ctx.fill();
+  });
+  if (flowH) block(flowH, (by, h) => {
+    const cw = (W - 160) / 2;
+    [["FII NET", D.fii, 70], ["DII NET", D.dii, 90 + cw]].forEach(([t, v, bx]) => {
+      K.panel(ctx, bx, by, cw, h, 22, "rgba(0,0,0,0.38)");
+      K.txt(ctx, t + " (PROV.)", bx + 26, by + 44, `700 20px ${K.F.MONO}`, "#8a90a2");
+      K.txt(ctx, isNaN(v) ? "—" : crore(v), bx + 26, by + 92, `700 34px ${K.F.MONO}`, isNaN(v) ? "#8a90a2" : v >= 0 ? "#22d39a" : "#ff5470");
+    });
+  });
+  if (noteH) block(noteH, (by, h) => {
+    K.panel(ctx, 70, by, W - 140, h, 22, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
+    K.txt(ctx, "VIEW", 100, by + 46, `600 22px ${K.F.MONO}`, "#b6a6ff");
+    noteL.forEach((l, k) => K.txt(ctx, l, 100, by + 50 + (k + 1) * 40, `400 28px ${K.F.INTER}`, "#d5d8e3"));
+  });
+  K.footer(ctx, W, H, K.toolUrl("close"), S.disc ? "Information only · Not investment advice · Not SEBI registered" : "", true);
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => "market-close-" + S.date });
+
+drawIdx(); render();
+</script>
+</body>
+</html>

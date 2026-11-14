@@ -67,6 +67,21 @@
   .open i { font-style: normal; transition: transform .25s; }
   .tool:hover .open i { transform: translate(3px, -3px); }
 
+  .plan { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 1000px) { .plan { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .plan { grid-template-columns: 1fr; } }
+  .day { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .day h3 { font: 700 .95rem "Space Grotesk"; display: flex; justify-content: space-between; }
+  .day h3 span { font: 500 .7rem "JetBrains Mono"; color: var(--muted); }
+  .day a { display: block; text-decoration: none; color: #d5d9e4; font-size: .8rem; line-height: 1.35; padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .day a:hover { border-color: rgba(255,255,255,.22); color: #fff; }
+  .day a small { display: block; font: 500 .66rem "JetBrains Mono"; color: var(--muted); margin-bottom: 2px; }
+  .day.today { border-color: rgba(0,224,184,.5); box-shadow: 0 0 0 3px rgba(0,224,184,.1); }
+  .tips { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .tip-c { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px; }
+  .tip-c b { display: block; font: 700 1rem "Space Grotesk"; margin-bottom: 6px; }
+  .tip-c p { color: #b4b9c8; font-size: .86rem; line-height: 1.5; margin: 0; }
+  .tip-c a { color: var(--a2); }
   .disclaimer { margin: 34px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
   .disclaimer b { color: #f5d27a; }
   footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
@@ -86,10 +101,21 @@
 
     <span class="eyebrow">Free · No sign-up · Works on mobile</span>
     <h1>Every tool, <span class="grad">one place.</span></h1>
-    <p class="sub">Calculators that help you size and manage trades, plus the cards I use to run the MANIMINDSMONEY WhatsApp community. Each one shares as text or an image in one tap.</p>
+    <p class="sub">Calculators that help you size and manage trades, the cards I use to run the MANIMINDSMONEY WhatsApp community, and tools to grow it. Each one shares as text or an image in one tap. Scroll down for a weekly posting plan.</p>
 
     <div class="filters" id="filters"></div>
     <div id="groups"></div>
+
+    <section class="group" id="plan">
+      <h2>📅 Weekly posting plan<span>for community admins</span></h2>
+      <p>A simple rhythm members can rely on. Same posts, same times, every week. Tap a post to open its tool.</p>
+      <div class="plan" id="planGrid"></div>
+    </section>
+
+    <section class="group" id="tips">
+      <h2>🚀 Growing the community<span>what actually works</span></h2>
+      <div class="tips" id="tipsGrid"></div>
+    </section>
 
     <div class="disclaimer">
       <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. These tools do calculations on the numbers you enter and help you format content, for <b>educational purposes only</b>. Nothing here is investment advice or a recommendation to buy or sell any security. Trading involves risk, including loss of capital.
@@ -100,18 +126,26 @@
 <script>
 /* Add new tools here: this list drives the whole page. */
 const GROUPS = {
-  calc: { name: "Calculators", blurb: "Do the maths before you place the trade." },
+  grow: { name: "Grow your community", blurb: "Bring in new members and get quiet ones talking." },
   card: { name: "Community cards", blurb: "Ready-to-post updates for WhatsApp groups and communities." },
+  calc: { name: "Calculators", blurb: "Do the maths before you place the trade." },
 };
 const TOOLS = [
-  { href: "../sl-calculator/", g: "calc", ico: "🎯", c: "#7c5cff", name: "Stop-Loss Position Size", desc: "Tell it how much you can lose, the price and your stop-loss. It tells you how many shares to buy, the capital needed and 1:1 to 1:3 targets. Includes a Real Return tab versus FD or index funds.", tags: ["Risk", "Position size", "Targets"] },
-  { href: "../average/", g: "calc", ico: "🧮", c: "#00e0b8", name: "Average Price Calculator", desc: "Add every buy to get your average price, total shares and P&L. Or set a target average to see how many shares to buy to reach it.", tags: ["Averaging", "Break-even", "P&L"] },
+  { href: "../status/", g: "grow", ico: "📲", c: "#25d366", name: "WhatsApp Status Maker", desc: "Vertical status images that bring people in: join invite with QR code, quiz and term teasers, market mood, quotes, event alerts and milestones. Each ends with your join link.", tags: ["Growth", "Status", "QR code"], fresh: true },
+  { href: "../contest/", g: "grow", ico: "🎯", c: "#febc2e", name: "Guess the Close Contest", desc: "A weekly 'where will Nifty close?' contest. Paste replies from WhatsApp, get the closest guesses ranked automatically, post winners and a season leaderboard.", tags: ["Engagement", "Leaderboard", "Weekly"], fresh: true },
   { href: "../levels/", g: "card", ico: "📊", c: "#22d39a", name: "Daily Levels Card", desc: "Previous day's high, low and close in, then Classic or Fibonacci pivots, support, resistance and CPR out, for up to 3 indices or stocks.", tags: ["Pivots", "CPR", "Morning post"] },
-  { href: "../calendar/", g: "card", ico: "📅", c: "#febc2e", name: "Results & Events Calendar", desc: "The week ahead in one card: quarterly results, dividends, bonus and splits, IPOs, RBI or Fed meetings, expiry and market holidays.", tags: ["Earnings", "Corporate actions", "Weekly post"], fresh: true },
-  { href: "../ipo/", g: "card", ico: "🚀", c: "#ff4d8d", name: "IPO Share Card", desc: "SME or Mainboard, money required, shareholder quota, allotment and profit chances, as a neat message or picture.", tags: ["IPO", "Allotment"] },
+  { href: "../close/", g: "card", ico: "🔔", c: "#00e0b8", name: "Market Close Card", desc: "The evening wrap: index closes, top gainers and losers, sector moves, advance/decline breadth and FII/DII flows, with your one-line view.", tags: ["Evening post", "Breadth", "FII/DII"], fresh: true },
+  { href: "../calendar/", g: "card", ico: "📅", c: "#febc2e", name: "Results & Events Calendar", desc: "The week ahead in one card: quarterly results, dividends, bonus and splits, IPOs, RBI or Fed meetings, expiry and market holidays.", tags: ["Earnings", "Corporate actions", "Weekly post"] },
+  { href: "../glossary/", g: "card", ico: "📖", c: "#5ec8ff", name: "Term of the Day Card", desc: "A market term explained simply every day: meaning, example and a common mistake. Comes with a built-in glossary of 100+ terms and remembers which ones you've posted.", tags: ["Learning", "Glossary", "Daily post"] },
   { href: "../quiz/", g: "card", ico: "🧠", c: "#b18cff", name: "Quiz Card", desc: "Post a question today and the answer reveal tomorrow. Comes with a built-in bank of questions on candles, patterns, indicators and risk.", tags: ["Learning", "Engagement"] },
-  { href: "../glossary/", g: "card", ico: "📖", c: "#5ec8ff", name: "Term of the Day Card", desc: "A market term explained simply every day: meaning, example and a common mistake. Comes with a built-in glossary of 100+ terms and remembers which ones you've posted.", tags: ["Learning", "Glossary", "Daily post"], fresh: true },
+  { href: "../trade-review/", g: "card", ico: "🔍", c: "#b18cff", name: "Trade Review Card", desc: "Turn a closed trade into a lesson: setup, plan versus result in R, a rules checklist, what went right and wrong. Loads trades from your journal.", tags: ["Lessons", "Process", "Honesty"], fresh: true },
+  { href: "../ipo/", g: "card", ico: "🚀", c: "#ff4d8d", name: "IPO Share Card", desc: "SME or Mainboard, money required, shareholder quota, allotment and profit chances, as a neat message or picture.", tags: ["IPO", "Allotment"] },
   { href: "../message/", g: "card", ico: "💬", c: "#5b8cff", name: "Community Message Card", desc: "Market updates, alerts, news and lessons from ready templates, with WhatsApp formatting, as text or a branded image.", tags: ["Templates", "Announcements"] },
+  { href: "../sl-calculator/", g: "calc", ico: "🎯", c: "#7c5cff", name: "Stop-Loss Position Size", desc: "Tell it how much you can lose, the price and your stop-loss. It tells you how many shares to buy, the capital needed and 1:1 to 1:3 targets. Includes a Real Return tab versus FD or index funds.", tags: ["Risk", "Position size", "Targets"] },
+  { href: "../journal/", g: "calc", ico: "📒", c: "#22d39a", name: "Risk-Reward & Trade Journal", desc: "Check a trade's R:R before you take it, log the exit, and track win rate and R-multiples. Share a weekly summary card; ₹ amounts stay hidden unless you choose.", tags: ["R:R", "Journal", "Win rate"], fresh: true },
+  { href: "../options/", g: "calc", ico: "📈", c: "#ff9a5c", name: "Options Payoff Calculator", desc: "Pick a strategy or build up to 6 legs with calls, puts and futures. See the expiry payoff chart, breakevens, max profit and max loss.", tags: ["F&O", "Payoff chart", "Strategies"], fresh: true },
+  { href: "../average/", g: "calc", ico: "🧮", c: "#00e0b8", name: "Average Price Calculator", desc: "Add every buy to get your average price, total shares and P&L. Or set a target average to see how many shares to buy to reach it.", tags: ["Averaging", "Break-even", "P&L"] },
+  { href: "../tax/", g: "calc", ico: "🧾", c: "#ff5470", name: "Capital Gains Tax Estimator", desc: "STCG and LTCG on shares and equity funds with loss set-off and the yearly exemption, plus how much tax-free gain you can still book this year.", tags: ["STCG", "LTCG", "Tax harvesting"], fresh: true },
 ];
 
 const $ = s => document.querySelector(s);
@@ -134,6 +168,29 @@ function drawTools() {
       </a>`).join("")}</div></section>`;
   }).join("");
 }
+/* Weekly posting plan: [time, label, tool] */
+const PLAN = [
+  ["Mon", [["8:45 AM", "📊 Daily levels", "levels"], ["9:00 AM", "🎯 Announce Guess the Close", "contest"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Market mood", "status"]]],
+  ["Tue", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "📖 Term of the day", "glossary"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Term teaser", "status"]]],
+  ["Wed", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "🧠 Quiz question", "quiz"], ["After 3:30", "🔔 Market close wrap", "close"], ["Status", "📲 Quiz teaser", "status"]]],
+  ["Thu", [["8:45 AM", "📊 Daily levels", "levels"], ["1:00 PM", "🧠 Quiz answer reveal", "quiz"], ["7:00 PM", "🔍 Trade review (a lesson)", "trade-review"], ["Status", "📲 Quote", "status"]]],
+  ["Fri", [["8:45 AM", "📊 Daily levels", "levels"], ["After 3:30", "🔔 Market close wrap", "close"], ["6:00 PM", "🏆 Contest results", "contest"], ["Status", "📲 Contest winners", "status"]]],
+  ["Sat", [["10:00 AM", "📒 My week in R (journal)", "journal"], ["6:00 PM", "📈 Strategy study (options)", "options"], ["Status", "📲 Join invite", "status"]]],
+  ["Sun", [["11:00 AM", "📖 Weekend term or tax tip", "glossary"], ["7:00 PM", "📅 Week-ahead calendar", "calendar"], ["Status", "📲 Event alert for Monday", "status"]]],
+];
+const TIPS = [
+  ["Every post is an invite", "Add your invite link once in any new tool (Status, Contest, Journal…). Every card you share then ends with “Join free: link”, so each forward can bring someone new."],
+  ["Use your Status daily", "Everyone with your number sees your Status, even people not in the group. Post one teaser a day from the <a href='../status/'>Status maker</a> with the join link in the caption."],
+  ["Make it two-way", "Quizzes, the weekly contest and “reply with your view” questions turn readers into members who talk. Reply to the first few answers yourself."],
+  ["Recognise people", "Shout out contest winners and great answers by name. A monthly leaderboard and a “Contest Champ” mention keep people coming back."],
+  ["Be consistent, not loud", "Same posts at the same times beats 20 random forwards. Keep the main group for your posts and use a separate chat for discussion so updates don't get buried."],
+  ["Share losses too", "Honest trade reviews, losses included, build far more trust than screenshots of wins. Teach the process, not tips."],
+  ["Ask for one referral", "Once a month: “Know someone starting out? Share this link with one friend.” Pin a short welcome post with the rules and what members get."],
+  ["Stay on the right side of SEBI", "No buy/sell calls with targets, no promised returns, no paid tips: those need SEBI registration. Educational content, tools and contests are the safe, sustainable route."],
+];
+const todayIdx = (new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })).getDay() + 6) % 7;
+document.getElementById("planGrid").innerHTML = PLAN.map(([d, items], i) => `<div class="day${i === todayIdx ? " today" : ""}"><h3>${d}${i === todayIdx ? "<span>today</span>" : ""}</h3>${items.map(([t, l, h]) => `<a href="../${h}/"><small>${t}</small>${l}</a>`).join("")}</div>`).join("");
+document.getElementById("tipsGrid").innerHTML = TIPS.map(([h, p]) => `<div class="tip-c"><b>${h}</b><p>${p}</p></div>`).join("");
 $("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; filter = b.dataset.f; drawFilters(); drawTools(); });
 drawFilters(); drawTools();
 </script>

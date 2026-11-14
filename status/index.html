@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>WhatsApp Status Maker — MANIMINDSMONEY</title>
+<meta name="description" content="Make vertical WhatsApp Status images that bring new members to your community: invite with QR code, quiz and term teasers, market mood, quotes, events and milestones." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #25d366; --acc2: #7c5cff; }
+  .tpls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  @media (max-width: 520px) { .tpls { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .tpls button { border: 1px solid var(--line); background: rgba(0,0,0,.25); color: #cfd3df; border-radius: 14px; padding: 10px 4px; font: 600 .74rem Inter; cursor: pointer; line-height: 1.25; }
+  .tpls button i { display: block; font-style: normal; font-size: 1.3rem; margin-bottom: 4px; }
+  .tpls button.on { border-color: var(--acc); background: rgba(37,211,102,.12); color: #fff; }
+  .swatches { display: flex; gap: 8px; }
+  .swatches button { width: 34px; height: 34px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+  .swatches button.on { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.15); }
+  .phone { width: min(300px, 100%); margin: 0 auto; aspect-ratio: 9 / 16; border-radius: 28px; overflow: hidden; border: 6px solid #1b1d27; box-shadow: 0 30px 60px -20px rgba(0,0,0,.8); background: #000; position: relative; }
+  .phone img { display: block; width: 100%; height: 100%; }
+  .phone .bar { position: absolute; top: 8px; left: 10px; right: 10px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.35); }
+  .loadbtn { margin-top: 10px; width: 100%; padding: 11px; border-radius: 14px; border: 1px dashed rgba(124,92,255,.5); background: rgba(124,92,255,.08); color: #cdbfff; font: 600 .84rem Inter; cursor: pointer; }
+  .quotes { display: grid; gap: 6px; max-height: 210px; overflow: auto; }
+  .quotes button { text-align: left; border: 1px solid var(--line); background: rgba(0,0,0,.22); color: #cfd3df; border-radius: 12px; padding: 9px 12px; font: 400 .8rem/1.4 Inter; cursor: pointer; }
+  .quotes button b { color: var(--muted); font-weight: 500; }
+  .quotes button.on { border-color: var(--acc); color: #fff; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Status posts that <span class="grad">bring people in.</span></h1>
+    <p class="sub">Your WhatsApp Status is seen by everyone who has your number, including people not in your community yet. Post one of these every day: each one teases something useful and ends with a link and QR code to join.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="q">Template</div>
+        <div class="tpls" id="tpls"></div>
+
+        <div id="fields"></div>
+
+        <div id="inviteBox"></div>
+        <label class="toggle"><span>Show QR code<small>People can scan it from another phone. Needs the invite link.</small></span><input type="checkbox" id="optQr" checked /><span class="sw"></span></label>
+        <div class="q">Accent colour</div>
+        <div class="swatches" id="sw"></div>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Status preview</h2><span>1080 × 1920</span></div>
+        <div class="phone"><div class="bar"></div><img id="prev" alt="Status preview" /></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="tip"><b>How to post:</b> tap <b>Create status image</b>, then open WhatsApp → <b>Updates</b> → <b>My status</b> → pick the image. Paste the copied caption: links in the caption are tappable, which works better than asking people to scan. Post at the same times every day (around 8:30 AM and 7 PM work well) so people get used to checking.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. Community content is for <b>learning and educational purposes only</b>, not investment advice. Avoid promising returns or "sure-shot" calls in your status: it breaks SEBI rules for unregistered persons and erodes trust.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/vendor/qrcode.js"></script>
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const QUOTES = [
+  ["Be fearful when others are greedy and greedy when others are fearful.", "Warren Buffett"],
+  ["Price is what you pay. Value is what you get.", "Warren Buffett"],
+  ["Growth comes at the expense of comfort.", "Mark Minervini"],
+  ["In the short run, the market is a voting machine but in the long run, it is a weighing machine.", "Benjamin Graham"],
+  ["Our favorite holding period is forever.", "Warren Buffett"],
+  ["Your first loss is your best loss.", "Mark Minervini"],
+  ["The investor's chief problem, and even his worst enemy, is likely to be himself.", "Benjamin Graham"],
+  ["It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.", "Warren Buffett"],
+  ["The market can stay irrational longer than you can stay solvent.", "John Maynard Keynes"],
+  ["Know what you own, and know why you own it.", "Peter Lynch"],
+  ["There is nothing new in Wall Street. There can't be because speculation is as old as the hills.", "Jesse Livermore"],
+];
+const COLORS = ["#25d366", "#7c5cff", "#00e0b8", "#febc2e", "#ff4d8d", "#5ec8ff"];
+const TPL = {
+  join: { i: "👥", n: "Join invite", f: [["head", "Headline", "Learn the stock market. Free.", 60], ["sub", "Sub-line", "A friendly community for Indian traders & investors", 80], ["b1", "Point 1", "📊 Daily levels every morning", 48], ["b2", "Point 2", "🧠 Quiz & market term of the day", 48], ["b3", "Point 3", "🔔 Market close wrap every evening", 48], ["b4", "Point 4", "📅 Weekly results & events calendar", 48], ["count", "Members (optional)", "e.g. 500+", 12, "ph"]] },
+  quiz: { i: "🧠", n: "Quiz teaser", load: "quiz", f: [["q", "Question", "A candle with a small body and a long lower shadow after a fall is called…?", 180, "area"], ["o", "Options (one per line)", "Shooting star\nHammer\nDoji\nMarubozu", 160, "area"]] },
+  term: { i: "📖", n: "Term teaser", load: "term", f: [["t", "Term", "Ex-dividend date", 40], ["m", "One-line meaning", "Buy before this date to get the upcoming dividend.", 140, "area"]] },
+  market: { i: "📊", n: "Market mood", load: "market", f: [["l1", "Line 1", "NIFTY 50 · 24,510 · +0.54%", 40], ["l2", "Line 2", "SENSEX · 80,450 · +0.51%", 40], ["l3", "Line 3", "BANK NIFTY · 52,311 · −0.16%", 40], ["mood", "Mood", "bull", 0, "mood"], ["take", "One-line take", "IT and autos led the rally. Banks lagged.", 90]] },
+  quote: { i: "💬", n: "Quote", f: [["qt", "Quote", "", 200, "quote"], ["au", "Author", "", 40]] },
+  event: { i: "⏰", n: "Event alert", f: [["title", "Event", "RBI policy decision", 40], ["when", "When", "Tomorrow · 10:00 AM", 40], ["det", "Why it matters", "Rate decisions move banks, NBFCs and real-estate stocks.", 120, "area"]] },
+  mile: { i: "🎉", n: "Milestone", f: [["big", "Big number", "500", 8], ["lbl", "Label", "members strong!", 40], ["thx", "Thank-you line", "Thank you for learning with us every day. Invite a friend who's starting out 🙏", 140, "area"]] },
+};
+const defaults = () => Object.fromEntries(Object.entries(TPL).map(([k, t]) => [k, Object.fromEntries(t.f.map(f => [f[0], f[4] === "quote" || f[4] === "ph" ? "" : f[2]]))]));
+const S = K.store("status_v1", { t: "join", f: defaults(), qr: true, col: "#25d366", qi: 0 });
+Object.entries(defaults()).forEach(([k, d]) => { S.f[k] = Object.assign({}, d, S.f[k] || {}); });
+if (!S.f.quote.qt) { S.f.quote.qt = QUOTES[S.qi % QUOTES.length][0]; S.f.quote.au = QUOTES[S.qi % QUOTES.length][1]; }
+
+/* ---------- UI ---------- */
+$("#tpls").innerHTML = Object.entries(TPL).map(([k, t]) => `<button data-t="${k}"><i>${t.i}</i>${t.n}</button>`).join("");
+$("#tpls").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) { S.t = b.dataset.t; drawFields(); upd(); } });
+$("#sw").innerHTML = COLORS.map(c => `<button data-c="${c}" style="background:${c}"></button>`).join("");
+$("#sw").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b) { S.col = b.dataset.c; upd(); } });
+$("#optQr").checked = S.qr; $("#optQr").addEventListener("change", e => { S.qr = e.target.checked; upd(); });
+K.inviteField("#inviteBox", () => upd());
+
+function drawFields() {
+  const t = TPL[S.t], F = S.f[S.t];
+  let h = t.load ? `<button class="loadbtn" id="loadBtn">↙ Use what I made in the ${t.load === "quiz" ? "Quiz" : t.load === "term" ? "Term of the Day" : "Market Close"} tool</button>` : "";
+  h += t.f.map(([k, lab, ph, max, kind]) => {
+    if (kind === "mood") return `<div class="q">${lab}</div><div class="chips-in" id="moodC">${[["bull", "🟢 Bullish"], ["flat", "⚪ Mixed"], ["bear", "🔴 Bearish"]].map(([v, l]) => `<button data-v="${v}" class="${F.mood === v ? "on" : ""}">${l}</button>`).join("")}</div>`;
+    if (kind === "quote") return `<div class="q">Pick a quote <span class="opt">or edit below</span></div><div class="quotes" id="qList">${QUOTES.map(([q, a], i) => `<button data-i="${i}" class="${F.qt === q ? "on" : ""}">“${q}” <b>— ${a}</b></button>`).join("")}</div><div class="q">${lab}</div><textarea data-k="${k}" maxlength="${max}">${K.esc(F[k])}</textarea>`;
+    return `<div class="q">${lab}</div>` + (kind === "area" ? `<textarea data-k="${k}" maxlength="${max}" placeholder="${K.esc(ph)}">${K.esc(F[k])}</textarea>` : `<label class="field sm"><input class="txt" data-k="${k}" type="text" maxlength="${max}" value="${K.esc(F[k])}" placeholder="${K.esc(ph)}" /></label>`);
+  }).join("");
+  $("#fields").innerHTML = `<div style="margin-top:6px">${h}</div>`;
+  document.querySelectorAll("#tpls button").forEach(b => b.classList.toggle("on", b.dataset.t === S.t));
+  $("#loadBtn")?.addEventListener("click", loadFromTool);
+}
+$("#fields").addEventListener("input", e => { const k = e.target.dataset.k; if (!k) return; S.f[S.t][k] = e.target.value; upd(); });
+$("#fields").addEventListener("click", e => {
+  const m = e.target.closest("#moodC [data-v]"); if (m) { S.f.market.mood = m.dataset.v; drawFields(); upd(); return; }
+  const q = e.target.closest("#qList [data-i]"); if (q) { const [qt, au] = QUOTES[+q.dataset.i]; S.qi = +q.dataset.i; Object.assign(S.f.quote, { qt, au }); drawFields(); upd(); }
+});
+
+function readLS(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+function loadFromTool() {
+  if (S.t === "quiz") {
+    const z = readLS("quiz_form"); if (!z || !z.q) { K.toast("No quiz saved yet. Make one in the Quiz tool"); return; }
+    Object.assign(S.f.quiz, { q: z.q, o: (z.opts || []).filter(o => o.trim()).join("\n") });
+  } else if (S.t === "term") {
+    const g = readLS("gloss_form"); if (!g || !g.term) { K.toast("No term saved yet. Open the Term of the Day tool"); return; }
+    Object.assign(S.f.term, { t: g.term, m: g.m });
+  } else if (S.t === "market") {
+    const c = readLS("close_v1"); const idx = (c?.idx || []).filter(r => r.n && K.num(r.c) > 0);
+    if (!idx.length) { K.toast("No market close saved yet. Fill in the Market Close tool"); return; }
+    const ln = r => { const cl = K.num(r.c), ch = K.num(r.ch) || 0, p = cl - ch ? ch / (cl - ch) * 100 : 0; return `${r.n} · ${K.nf(cl, 0)} · ${K.pct(p)}`; };
+    const lead = idx.find(r => !/VIX/.test(r.n)) || idx[0], lp = K.num(lead.ch) / (K.num(lead.c) - K.num(lead.ch)) * 100;
+    Object.assign(S.f.market, { l1: idx[0] ? ln(idx[0]) : "", l2: idx[1] ? ln(idx[1]) : "", l3: idx[2] ? ln(idx[2]) : "", mood: c.mood && c.mood !== "auto" ? c.mood : lp > .25 ? "bull" : lp < -.25 ? "bear" : "flat", take: c.note || S.f.market.take });
+  }
+  drawFields(); upd(); K.toast("↙ Loaded");
+}
+
+/* ---------- drawing ---------- */
+const W = 1080, H = 1920;
+function centerLines(ctx, lines, y, lh, font, color) { lines.forEach((l, i) => K.txt(ctx, l, W / 2, y + i * lh, font, color, "center")); return y + lines.length * lh; }
+function fitWrap(ctx, text, weight, fam, size, maxW, maxLines, min = 34) {
+  let lines; do { ctx.font = `${weight} ${size}px ${fam}`; lines = K.wrap(ctx, text, maxW); if (lines.length <= maxLines) break; size -= 4; } while (size > min);
+  return { lines: K.cap(lines, maxLines), size, font: `${weight} ${size}px ${fam}` };
+}
+function drawQR(ctx, text, x, y, size) {
+  const qr = qrcode(0, "M"); qr.addData(text); qr.make();
+  const n = qr.getModuleCount(), pad = size * .08, cell = (size - pad * 2) / n;
+  K.rr(ctx, x, y, size, size, 26); ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.fillStyle = "#05060a";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) ctx.fillRect(Math.floor(x + pad + c * cell), Math.floor(y + pad + r * cell), Math.ceil(cell), Math.ceil(cell));
+}
+const MOOD = { bull: ["BULLISH DAY", "#22d39a", "🟢"], flat: ["MIXED DAY", "#c9cfdb", "⚪"], bear: ["BEARISH DAY", "#ff5470", "🔴"] };
+
+async function drawStatus() {
+  await K.loadFonts(); await document.fonts.load(`800 120px ${K.F.INTER}`).catch(() => {});
+  const col = S.col, F = S.f[S.t], inv = K.invite(), showQR = S.qr && inv;
+  const { c, ctx } = K.canvas(W, H, [[col + "40", .85, .12, .7], ["rgba(124,92,255,0.32)", .05, .3, .7], [col + "26", .2, .95, .7]]);
+  // top brand (below WhatsApp's status bar overlay)
+  K.brand(ctx, (W - 470) / 2, 210, 1);
+  const tag = { join: "FREE COMMUNITY", quiz: "QUIZ TIME", term: "TERM OF THE DAY", market: "MARKET TODAY", quote: "WORDS TO TRADE BY", event: "HEADS UP", mile: "MILESTONE" }[S.t];
+  K.pill(ctx, tag, W / 2, 310, col, 24, "center");
+  const mw = W - 180, ctaTop = showQR ? 1290 : 1500, limit = ctaTop - 40;
+  let y = 440;
+  // ---- per template body (must end above the CTA block)
+  if (S.t === "join") {
+    const h = fitWrap(ctx, F.head || "Learn the stock market. Free.", 800, K.F.INTER, 104, mw, 3, 60);
+    y = centerLines(ctx, h.lines, y + h.size * .8, h.size * 1.08, h.font, "#ffffff");
+    ctx.font = `500 36px ${K.F.INTER}`; y = centerLines(ctx, K.cap(K.wrap(ctx, F.sub, mw), 2), y + 20, 48, `500 36px ${K.F.INTER}`, "#c9cfdb");
+    const pts = [F.b1, F.b2, F.b3, F.b4].map(s => (s || "").trim()).filter(Boolean), cnt = (F.count || "").trim();
+    y += 36;
+    const per = pts.length ? Math.min(116, (limit - y - (cnt ? 76 : 0)) / pts.length) : 0, bh = per - 14, fs = Math.min(38, bh * .42);
+    pts.forEach(p => { K.panel(ctx, 90, y, W - 180, bh, 24, "rgba(255,255,255,0.06)", "rgba(255,255,255,0.12)"); ctx.font = K.fit(ctx, p, 600, K.F.INTER, fs, W - 260); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(p, 130, y + bh / 2 + fs * .36); y += per; });
+    if (cnt) K.txt(ctx, `Join ${cnt} learners`, W / 2, y + 46, `700 42px ${K.F.GROT}`, col, "center");
+  } else if (S.t === "quiz") {
+    const h = fitWrap(ctx, F.q || "Your question", 700, K.F.INTER, 64, mw, 6, 40);
+    y = centerLines(ctx, h.lines, y + h.size, h.size * 1.2, h.font, "#ffffff") + 30;
+    const opts = (F.o || "").split("\n").map(s => s.trim()).filter(Boolean).slice(0, 4);
+    opts.forEach((o, i) => { K.panel(ctx, 110, y, W - 220, 100, 28, "rgba(255,255,255,0.06)", "rgba(255,255,255,0.14)"); K.rr(ctx, 136, y + 22, 56, 56, 16); ctx.fillStyle = col + "33"; ctx.fill(); K.txt(ctx, "ABCD"[i], 164, y + 63, `700 32px ${K.F.MONO}`, col, "center"); ctx.font = K.fit(ctx, o, 600, K.F.INTER, 38, W - 380); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(o, 216, y + 64); y += 120; });
+    K.txt(ctx, "🤔 Think you know? Answer inside the community", W / 2, y + 50, `600 34px ${K.F.INTER}`, "#c9cfdb", "center");
+  } else if (S.t === "term") {
+    const h = fitWrap(ctx, F.t || "Term", 800, K.F.INTER, 120, mw, 3, 60);
+    y = centerLines(ctx, h.lines, y + h.size + 40, h.size * 1.05, h.font, "#ffffff") + 40;
+    const m = fitWrap(ctx, F.m || "", 500, K.F.INTER, 48, mw - 60, 5, 34);
+    const bh = m.lines.length * m.size * 1.35 + 90;
+    K.panel(ctx, 90, y, W - 180, bh, 36, col + "14", col + "66");
+    centerLines(ctx, m.lines, y + 45 + m.size, m.size * 1.35, m.font, "#e3e6ee"); y += bh + 50;
+    K.txt(ctx, "📖 Example + common mistake inside the community", W / 2, y + 20, `600 32px ${K.F.INTER}`, "#c9cfdb", "center");
+  } else if (S.t === "market") {
+    const [ml, mc] = MOOD[F.mood] || MOOD.flat;
+    K.txt(ctx, K.niceDate(K.iso(K.istNow()), { weekday: "long", day: "numeric", month: "long" }), W / 2, y + 30, `600 38px ${K.F.INTER}`, "#c9cfdb", "center");
+    K.txt(ctx, ml, W / 2, y + 160, `800 110px ${K.F.INTER}`, mc, "center"); y += 230;
+    [F.l1, F.l2, F.l3].map(s => (s || "").trim()).filter(Boolean).forEach(l => {
+      const parts = l.split("·").map(s => s.trim()); const neg = /[−-]\s*\d/.test(parts[2] || ""), pc = parts[2] ? (neg ? "#ff5470" : "#22d39a") : "#eef0f6";
+      K.panel(ctx, 90, y, W - 180, 120, 30, "rgba(0,0,0,0.42)", "rgba(255,255,255,0.10)");
+      ctx.font = K.fit(ctx, parts[0] || "", 700, K.F.GROT, 42, 360); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(parts[0] || "", 130, y + 75);
+      K.txt(ctx, parts[1] || "", 690, y + 75, `700 42px ${K.F.MONO}`, "#ffffff", "right"); K.txt(ctx, parts[2] || "", W - 130, y + 75, `700 40px ${K.F.MONO}`, pc, "right"); y += 140;
+    });
+    if ((F.take || "").trim()) { ctx.font = `500 38px ${K.F.INTER}`; y = centerLines(ctx, K.cap(K.wrap(ctx, F.take, mw), 3), y + 60, 52, `500 38px ${K.F.INTER}`, "#d5d8e3"); }
+    K.txt(ctx, "🔔 Full market wrap inside the community", W / 2, y + 50, `600 32px ${K.F.INTER}`, "#c9cfdb", "center");
+  } else if (S.t === "quote") {
+    K.txt(ctx, "“", W / 2, y + 200, `800 260px ${K.F.GROT}`, col, "center");
+    const h = fitWrap(ctx, F.qt || "", 700, K.F.INTER, 76, mw, 7, 44);
+    y = centerLines(ctx, h.lines, y + 280, h.size * 1.25, h.font, "#ffffff");
+    if ((F.au || "").trim()) K.txt(ctx, "— " + F.au.trim(), W / 2, y + 50, `600 40px ${K.F.INTER}`, col, "center");
+  } else if (S.t === "event") {
+    K.txt(ctx, "⏰", W / 2, y + 100, `400 ${showQR ? 100 : 140}px ${K.F.INTER}`, "#fff", "center");
+    const h = fitWrap(ctx, F.title || "Event", 800, K.F.INTER, showQR ? 88 : 100, mw, 2, 56);
+    y = centerLines(ctx, h.lines, y + 150 + h.size, h.size * 1.08, h.font, "#ffffff");
+    if ((F.when || "").trim()) { K.pill(ctx, F.when.trim(), W / 2, y + 10, col, 32, "center"); y += 110; }
+    const d = fitWrap(ctx, F.det || "", 500, K.F.INTER, 42, mw - 40, Math.max(1, Math.floor((limit - y - 90) / 56)), 30);
+    y = centerLines(ctx, d.lines, y + 40, d.size * 1.35, d.font, "#d5d8e3");
+    K.txt(ctx, "📲 Live updates inside the community", W / 2, Math.min(y + 40, limit), `600 32px ${K.F.INTER}`, "#c9cfdb", "center");
+  } else if (S.t === "mile") {
+    K.txt(ctx, "🎉", W / 2, y + 150, `400 150px ${K.F.INTER}`, "#fff", "center");
+    ctx.font = K.fit(ctx, F.big || "", 800, K.F.GROT, 300, mw); const g = ctx.createLinearGradient(0, y + 200, 0, y + 480); g.addColorStop(0, "#ffffff"); g.addColorStop(1, col);
+    ctx.fillStyle = g; ctx.textAlign = "center"; ctx.fillText(F.big || "", W / 2, y + 460);
+    K.txt(ctx, F.lbl || "", W / 2, y + 550, `700 64px ${K.F.INTER}`, "#ffffff", "center");
+    const t = fitWrap(ctx, F.thx || "", 500, K.F.INTER, 42, mw, 4, 30);
+    centerLines(ctx, t.lines, y + 660, t.size * 1.35, t.font, "#d5d8e3");
+  }
+  // ---- CTA block (above WhatsApp's reply bar)
+  K.rr(ctx, 70, ctaTop, W - 140, H - 250 - ctaTop, 40);
+  const cg = ctx.createLinearGradient(70, ctaTop, W - 70, H - 250); cg.addColorStop(0, col + "33"); cg.addColorStop(1, "rgba(124,92,255,0.22)");
+  ctx.fillStyle = cg; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = col + "aa"; ctx.stroke();
+  if (showQR) {
+    drawQR(ctx, inv, 110, ctaTop + 40, 300);
+    K.txt(ctx, "JOIN FREE", 450, ctaTop + 110, `700 30px ${K.F.MONO}`, col);
+    K.txt(ctx, "Scan or tap", 450, ctaTop + 180, `800 56px ${K.F.INTER}`, "#ffffff");
+    K.txt(ctx, "the link 👇", 450, ctaTop + 245, `800 56px ${K.F.INTER}`, "#ffffff");
+    ctx.font = `500 26px ${K.F.MONO}`; K.txt(ctx, K.clip(ctx, K.shortLink(inv), W - 140 - 380 - 20), 450, ctaTop + 310, `500 26px ${K.F.MONO}`, "#c9cfdb");
+  } else {
+    K.txt(ctx, "👥 Join the MANIMINDSMONEY community", W / 2, ctaTop + 70, `700 38px ${K.F.INTER}`, "#ffffff", "center");
+    ctx.font = `600 30px ${K.F.MONO}`; K.txt(ctx, inv ? K.clip(ctx, K.shortLink(inv), W - 220) : "Link in caption 👇", W / 2, ctaTop + 125, `600 30px ${K.F.MONO}`, col, "center");
+  }
+  K.txt(ctx, "Not SEBI registered · For learning only · Not investment advice", W / 2, H - 200, `400 24px ${K.F.INTER}`, "#6c7285", "center");
+  return c;
+}
+
+/* ---------- preview + share ---------- */
+let tmr;
+function upd() {
+  document.querySelectorAll("#sw button").forEach(b => b.classList.toggle("on", b.dataset.c === S.col));
+  S.save(); clearTimeout(tmr);
+  tmr = setTimeout(async () => { const c = await drawStatus(); $("#prev").src = c.toDataURL("image/jpeg", .85); }, 120);
+}
+function caption() {
+  const F = S.f[S.t], inv = K.invite(), link = inv ? `\n👉 Join free: ${inv}` : "";
+  const cap = {
+    join: `📈 ${F.head || "Learn the stock market, free."}\n${[F.b1, F.b2, F.b3, F.b4].filter(Boolean).join("\n")}`,
+    quiz: `🧠 Quiz time! ${F.q}\nAnswer inside my free community.`,
+    term: `📖 Term of the day: *${F.t}*\nFull explanation with an example inside my community.`,
+    market: `📊 ${MOOD[F.mood]?.[0] || "Market today"}: ${[F.l1, F.l2].filter(Boolean).join(" | ")}\nFull wrap inside my community.`,
+    quote: `💬 “${F.qt}” — ${F.au}`,
+    event: `⏰ ${F.title} · ${F.when}\nLive updates inside my community.`,
+    mile: `🎉 ${F.big} ${F.lbl} ${F.thx}`,
+  }[S.t];
+  return cap + link;
+}
+function valid() {
+  if (S.qr && !K.invite() && S.t !== "quote") { K.toast("Add your invite link so people can join"); K.shake($("#inviteIn").closest(".field")); return false; }
+  return true;
+}
+K.share({ text: caption, valid, draw: drawStatus, file: () => `status-${S.t}-${K.iso(K.istNow())}`, imgLabel: "Create status image" });
+document.querySelector("#copyBtn").innerHTML = "📋 Copy caption";
+drawFields(); upd();
+</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Options Payoff Calculator — MANIMINDSMONEY</title>
+<meta name="description" content="Free options payoff calculator: build single-leg or multi-leg strategies, see the payoff chart at expiry, breakevens, max profit and max loss. Share as an image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #ff9a5c; --acc2: #7c5cff; }
+  .leg { display: grid; grid-template-columns: 74px 78px minmax(0, 1fr) minmax(0, 1fr) 62px 40px; gap: 6px; align-items: center; margin-top: 8px; animation: pop .3s cubic-bezier(.2,.8,.2,1); }
+  .legs-head { display: grid; grid-template-columns: 74px 78px minmax(0, 1fr) minmax(0, 1fr) 62px 40px; gap: 6px; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); padding: 0 2px; }
+  .leg .field { padding: 0 8px; border-radius: 12px; }
+  .leg .field input, .leg .field select { font-size: .86rem; padding: 9px 0; }
+  .leg .act { border: 0; border-radius: 12px; padding: 10px 0; font: 700 .8rem "JetBrains Mono"; cursor: pointer; }
+  .leg .act.buy { background: rgba(34,211,154,.16); color: var(--up); }
+  .leg .act.sell { background: rgba(255,84,112,.16); color: var(--down); }
+  @media (max-width: 520px) {
+    .legs-head { display: none; }
+    .leg { grid-template-columns: 64px 70px minmax(0, 1fr) 40px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.2); }
+    .leg .k { grid-column: 1 / 3; } .leg .p { grid-column: 3 / 4; } .leg .l { grid-column: 3 / 4; grid-row: 1; } .leg .rm { grid-row: 1; grid-column: 4; }
+    .leg .k::before, .leg .p::before, .leg .l::before { font: 600 .6rem "JetBrains Mono"; color: var(--muted); margin-right: 4px; }
+    .leg .k::before { content: "STRIKE"; } .leg .p::before { content: "PREM"; } .leg .l::before { content: "LOTS"; }
+  }
+  .chartbox { position: relative; border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,.32); overflow: hidden; }
+  #chart { display: block; width: 100%; height: 280px; }
+  .probe { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; margin-top: 12px; }
+  .probe span { font: 600 .7rem "JetBrains Mono"; color: var(--muted); letter-spacing: .06em; }
+  .probe b { font: 700 1rem "JetBrains Mono"; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>See the payoff <span class="grad">before you trade.</span></h1>
+    <p class="sub">Pick a strategy or build your own with calls, puts and futures. See the profit or loss at expiry for every price, your breakevens, and the most you can make or lose.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="q">Strategy presets</div>
+        <div class="chips-in" id="presets"></div>
+
+        <div class="cols3">
+          <div><div class="q">Underlying</div><label class="field sm"><input id="und" class="name" type="text" maxlength="16" placeholder="NIFTY" autocomplete="off" /></label></div>
+          <div><div class="q">Spot ₹</div><label class="field sm"><input id="spot" type="text" inputmode="decimal" placeholder="24,500" /></label></div>
+          <div><div class="q">Lot size</div><label class="field sm"><input id="lot" type="text" inputmode="numeric" placeholder="75" /></label></div>
+        </div>
+        <p class="hint">Exchanges revise lot sizes from time to time, so check the current one for your contract.</p>
+
+        <div class="q">Legs <span class="opt" id="legCount"></span></div>
+        <div class="legs-head"><span>BUY/SELL</span><span>TYPE</span><span>STRIKE ₹</span><span>PREMIUM ₹</span><span>LOTS</span><span></span></div>
+        <div id="legs"></div>
+        <button class="add" id="addLeg">＋ Add leg</button>
+        <div class="ierr" id="legErr"></div>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2 id="stratName">Payoff at expiry</h2><span id="meta"></span></div>
+        <div class="chartbox"><canvas id="chart"></canvas></div>
+        <div class="probe"><span>P&amp;L IF EXPIRY AT</span><label class="field sm"><span class="unit">₹</span><input id="probe" type="text" inputmode="decimal" placeholder="price" /></label><b id="probeOut">—</b></div>
+        <div id="out"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="learn"><b>How it's calculated:</b> at expiry a call is worth max(price − strike, 0) and a put max(strike − price, 0). Each leg's P&amp;L = (value at expiry − premium) × lots × lot size, flipped for sold legs. Futures P&amp;L = (price − entry) × quantity. It shows the payoff <b>at expiry only</b>, before charges and taxes. Before expiry, option prices also depend on time left and volatility.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This calculator shows the expiry payoff of positions you enter, for <b>education only</b>. It is not a recommendation to trade any strategy. F&amp;O trading is high risk: SEBI studies have found that most individual F&amp;O traders lose money. Selling options can lead to losses far larger than the premium received.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const MAX = 6;
+// Preset legs are relative to an ATM strike (k) and a strike step (g). p = rough premium as % of spot (illustrative only).
+const PRESETS = [
+  { n: "Long call", legs: [["buy", "CE", 0, .9]] },
+  { n: "Long put", legs: [["buy", "PE", 0, .85]] },
+  { n: "Short call", legs: [["sell", "CE", 0, .9]] },
+  { n: "Short put", legs: [["sell", "PE", 0, .85]] },
+  { n: "Bull call spread", legs: [["buy", "CE", 0, .9], ["sell", "CE", 4, .35]] },
+  { n: "Bear put spread", legs: [["buy", "PE", 0, .85], ["sell", "PE", -4, .32]] },
+  { n: "Long straddle", legs: [["buy", "CE", 0, .9], ["buy", "PE", 0, .85]] },
+  { n: "Long strangle", legs: [["buy", "CE", 4, .35], ["buy", "PE", -4, .32]] },
+  { n: "Short straddle", legs: [["sell", "CE", 0, .9], ["sell", "PE", 0, .85]] },
+  { n: "Iron condor", legs: [["sell", "PE", -4, .32], ["buy", "PE", -8, .12], ["sell", "CE", 4, .35], ["buy", "CE", 8, .13]] },
+  { n: "Covered call", legs: [["buy", "FUT", 0, 0], ["sell", "CE", 4, .35]] },
+  { n: "Protective put", legs: [["buy", "FUT", 0, 0], ["buy", "PE", -2, .5]] },
+];
+const S = K.store("options_v1", { und: "NIFTY", spot: "24,500", lot: "75", name: "Bull call spread", legs: [], probe: "" });
+
+function step(spot) { return spot > 20000 ? 50 : spot > 5000 ? 50 : spot > 1000 ? 10 : spot > 200 ? 5 : 1; }
+function loadPreset(p) {
+  const spot = K.num(S.spot) || 24500, g = step(spot), atm = Math.round(spot / g) * g;
+  S.name = p.n;
+  S.legs = p.legs.map(([a, t, off, prem]) => ({ a, t, k: K.nf(t === "FUT" ? spot : atm + off * g, t === "FUT" ? 2 : 0).replace(/\.00$/, ""), p: t === "FUT" ? "" : K.nf(Math.max(.5, spot * prem / 100), 0), l: "1" }));
+  drawLegs(); render();
+}
+$("#presets").innerHTML = PRESETS.map((p, i) => `<button data-i="${i}">${p.n}</button>`).join("");
+$("#presets").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) loadPreset(PRESETS[+b.dataset.i]); });
+
+["und", "spot", "lot", "probe"].forEach(k => $("#" + k).value = S[k]);
+$("#und").addEventListener("input", e => { S.und = e.target.value.toUpperCase(); render(); });
+$("#spot").addEventListener("input", e => { K.fmtNum(e.target); S.spot = e.target.value; render(); });
+$("#lot").addEventListener("input", e => { K.fmtNum(e.target, 0); S.lot = e.target.value; render(); });
+$("#probe").addEventListener("input", e => { K.fmtNum(e.target); S.probe = e.target.value; render(); });
+
+function drawLegs() {
+  $("#legs").innerHTML = S.legs.map((g, i) => `<div class="leg" data-i="${i}">
+    <button class="act ${g.a}" data-f="a">${g.a === "buy" ? "BUY" : "SELL"}</button>
+    <label class="field"><select data-f="t">${["CE", "PE", "FUT"].map(t => `<option ${t === g.t ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+    <label class="field k"><input data-f="k" type="text" inputmode="decimal" value="${g.k}" placeholder="${g.t === "FUT" ? "entry" : "strike"}" /></label>
+    <label class="field p"><input data-f="p" type="text" inputmode="decimal" value="${g.p}" placeholder="${g.t === "FUT" ? "—" : "premium"}" ${g.t === "FUT" ? "disabled" : ""} /></label>
+    <label class="field l"><input data-f="l" type="text" inputmode="numeric" value="${g.l}" /></label>
+    <button class="rm" title="Remove leg">✕</button></div>`).join("");
+  $("#addLeg").hidden = S.legs.length >= MAX;
+  $("#legCount").textContent = `${S.legs.length} / ${MAX}`;
+}
+$("#legs").addEventListener("input", e => {
+  const row = e.target.closest(".leg"), f = e.target.dataset.f; if (!row || !f) return; const g = S.legs[+row.dataset.i];
+  if (f === "t") { g.t = e.target.value; if (g.t === "FUT") g.p = ""; drawLegs(); }
+  else { K.fmtNum(e.target, f === "l" ? 0 : 2); g[f] = e.target.value; }
+  S.name = "Custom strategy"; render();
+});
+$("#legs").addEventListener("click", e => {
+  const row = e.target.closest(".leg"); if (!row) return; const i = +row.dataset.i;
+  if (e.target.closest(".rm")) { S.legs.splice(i, 1); S.name = "Custom strategy"; drawLegs(); render(); }
+  if (e.target.dataset.f === "a") { S.legs[i].a = S.legs[i].a === "buy" ? "sell" : "buy"; S.name = "Custom strategy"; drawLegs(); render(); }
+});
+$("#addLeg").addEventListener("click", () => {
+  if (S.legs.length >= MAX) return;
+  const spot = K.num(S.spot) || 0, g = step(spot);
+  S.legs.push({ a: "buy", t: "CE", k: spot ? K.nf(Math.round(spot / g) * g, 0) : "", p: "", l: "1" }); S.name = "Custom strategy"; drawLegs(); render();
+  $("#legs").lastElementChild.querySelector("[data-f=p]").focus();
+});
+
+/* ---------- maths ---------- */
+function legs() {
+  const lot = K.num(S.lot) > 0 ? K.num(S.lot) : 1;
+  return S.legs.map(g => ({ dir: g.a === "buy" ? 1 : -1, t: g.t, k: K.num(g.k), p: g.t === "FUT" ? 0 : K.num(g.p), q: (K.num(g.l) > 0 ? K.num(g.l) : 0) * lot }));
+}
+function validLegs() {
+  const L = legs(); if (!L.length) return { err: "Add at least one leg or pick a preset." };
+  const bad = L.findIndex((g, i) => !(g.k > 0) || (g.t !== "FUT" && !(g.p >= 0 && String(S.legs[i].p).trim() !== "")) || !(g.q > 0));
+  if (bad >= 0) return { err: `Leg ${bad + 1}: fill in the ${L[bad].t === "FUT" ? "entry price" : "strike and premium"} and lots.`, bad };
+  return { L };
+}
+const pnlAt = (L, S0) => L.reduce((s, g) => s + g.dir * g.q * (g.t === "CE" ? Math.max(S0 - g.k, 0) - g.p : g.t === "PE" ? Math.max(g.k - S0, 0) - g.p : S0 - g.k), 0);
+function analyse(L) {
+  const kinks = [...new Set([0, ...L.map(g => g.k)])].sort((a, b) => a - b);
+  const top = kinks[kinks.length - 1];
+  const slopeR = L.reduce((s, g) => s + g.dir * g.q * (g.t === "PE" ? 0 : 1), 0);   // slope above all strikes
+  const vals = kinks.map(k => pnlAt(L, k));
+  const maxP = slopeR > 1e-9 ? Infinity : Math.max(...vals), maxL = slopeR < -1e-9 ? -Infinity : Math.min(...vals);
+  const be = [];
+  for (let i = 0; i < kinks.length - 1; i++) {
+    const a = kinks[i], b = kinks[i + 1], va = vals[i], vb = vals[i + 1];
+    if (va === 0 && i > 0) be.push(a);
+    else if (va * vb < 0) be.push(a + (b - a) * (-va / (vb - va)));
+  }
+  const vTop = vals[vals.length - 1];
+  if (vTop === 0 && top > 0) be.push(top); else if (slopeR && vTop * slopeR < 0) be.push(top - vTop / slopeR);
+  const net = L.reduce((s, g) => s + (g.t === "FUT" ? 0 : -g.dir * g.p * g.q), 0);   // + = credit received
+  return { maxP, maxL, be: [...new Set(be.map(x => Math.round(x * 100) / 100))].sort((a, b) => a - b), net, kinks };
+}
+const fmtMax = v => v === Infinity ? "Unlimited" : v === -Infinity ? "Unlimited" : K.srs(v);
+
+/* ---------- chart (shared by page + image) ---------- */
+function range(L, spot) {
+  const ks = L.map(g => g.k).concat(spot > 0 ? [spot] : []);
+  let lo = Math.min(...ks), hi = Math.max(...ks); const mid = (lo + hi) / 2, span = Math.max(hi - lo, mid * .06);
+  return [Math.max(0, lo - span * .6), hi + span * .6];
+}
+function drawChart(ctx, x, y, w, h, L, A, opts = {}) {
+  const spot = K.num(S.spot), [lo, hi] = range(L, spot), N = 240, pts = [];
+  for (let i = 0; i <= N; i++) { const s = lo + (hi - lo) * i / N; pts.push([s, pnlAt(L, s)]); }
+  let ymin = Math.min(0, ...pts.map(p => p[1])), ymax = Math.max(0, ...pts.map(p => p[1])); const pad = (ymax - ymin || 1) * .12; ymin -= pad; ymax += pad;
+  const X = s => x + (s - lo) / (hi - lo) * w, Y = v => y + (ymax - v) / (ymax - ymin) * h, fs = opts.fs || 11;
+  // zero line + fill
+  ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  const zero = Y(0);
+  ["up", "down"].forEach(side => {
+    ctx.save(); ctx.beginPath(); side === "up" ? ctx.rect(x, y, w, zero - y) : ctx.rect(x, zero, w, y + h - zero); ctx.clip();
+    ctx.beginPath(); ctx.moveTo(X(pts[0][0]), zero); pts.forEach(p => ctx.lineTo(X(p[0]), Y(p[1]))); ctx.lineTo(X(pts[N][0]), zero); ctx.closePath();
+    ctx.fillStyle = side === "up" ? "rgba(34,211,154,0.16)" : "rgba(255,84,112,0.16)"; ctx.fill(); ctx.restore();
+  });
+  ctx.strokeStyle = "rgba(255,255,255,0.25)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, zero); ctx.lineTo(x + w, zero); ctx.stroke(); ctx.setLineDash([]);
+  if (spot > lo && spot < hi) { ctx.strokeStyle = "rgba(124,92,255,0.7)"; ctx.setLineDash([6, 5]); ctx.beginPath(); ctx.moveTo(X(spot), y); ctx.lineTo(X(spot), y + h); ctx.stroke(); ctx.setLineDash([]); }
+  // line, coloured by sign
+  ctx.lineWidth = opts.lw || 2.5; ctx.lineJoin = "round";
+  for (let i = 1; i <= N; i++) { ctx.strokeStyle = (pts[i][1] + pts[i - 1][1]) / 2 >= 0 ? "#22d39a" : "#ff5470"; ctx.beginPath(); ctx.moveTo(X(pts[i - 1][0]), Y(pts[i - 1][1])); ctx.lineTo(X(pts[i][0]), Y(pts[i][1])); ctx.stroke(); }
+  A.be.forEach(b => { if (b > lo && b < hi) { ctx.fillStyle = "#febc2e"; ctx.beginPath(); ctx.arc(X(b), zero, (opts.lw || 2.5) * 2, 0, 7); ctx.fill(); } });
+  ctx.restore();
+  // labels
+  ctx.font = `500 ${fs}px ${K.F.MONO}`; ctx.fillStyle = "#8a90a2"; ctx.textAlign = "left";
+  ctx.fillText(K.srs(ymax - pad).replace(".00", ""), x + 6, y + fs + 4); ctx.fillText(K.srs(ymin + pad).replace(".00", ""), x + 6, y + h - 6);
+  ctx.textAlign = "left"; ctx.fillText(K.nf(lo, 0), x, y + h + fs + 6); ctx.textAlign = "right"; ctx.fillText(K.nf(hi, 0), x + w, y + h + fs + 6);
+  if (spot > lo && spot < hi) { ctx.fillStyle = "#b6a6ff"; ctx.textAlign = "center"; ctx.fillText("spot " + K.nf(spot, 0), X(spot), y + h + fs + 6); }
+}
+function drawPageChart(L, A) {
+  const cv = $("#chart"), dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w * dpr; cv.height = h * dpr; const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, w, h);
+  if (!L) { ctx.font = `400 13px ${K.F.INTER}`; ctx.fillStyle = "#8a90a2"; ctx.textAlign = "center"; ctx.fillText("Pick a preset or fill in the legs to see the payoff.", w / 2, h / 2); return; }
+  drawChart(ctx, 8, 10, w - 16, h - 34, L, A);
+}
+
+/* ---------- render ---------- */
+let cur = null;
+function render() {
+  const v = validLegs();
+  document.querySelectorAll(".leg").forEach((r, i) => r.style.outline = v.bad === i ? "1px solid rgba(255,84,112,.6)" : "");
+  $("#legErr").textContent = S.legs.length ? v.err || "" : "";
+  $("#stratName").textContent = S.name || "Payoff at expiry";
+  if (v.err) { cur = null; drawPageChart(null); $("#out").innerHTML = ""; $("#meta").textContent = ""; $("#probeOut").textContent = "—"; S.save(); return; }
+  const A = analyse(v.L); cur = { L: v.L, A };
+  $("#meta").textContent = `${S.und || "Underlying"} · lot ${K.qty(K.num(S.lot) || 1)}`;
+  drawPageChart(v.L, A);
+  const pr = K.num(S.probe); if (pr > 0) { const val = pnlAt(v.L, pr); $("#probeOut").textContent = K.srs(val); $("#probeOut").className = val >= 0 ? "up" : "down"; } else { $("#probeOut").textContent = "—"; $("#probeOut").className = ""; }
+  const st = (k, val, cls = "", wide) => `<div class="stat${wide ? " wide" : ""}"><span>${k}</span><b class="${cls}">${val}</b></div>`;
+  let h = `<div class="stats">${st("Max profit", fmtMax(A.maxP), "up")}${st("Max loss", fmtMax(A.maxL), "down")}`;
+  h += st(A.net >= 0 ? "Net credit" : "Net debit", K.rs(Math.abs(A.net)), A.net >= 0 ? "up" : "warnc");
+  h += st("Breakeven" + (A.be.length > 1 ? "s" : ""), A.be.length ? A.be.map(b => K.nf(b, 2).replace(/\.00$/, "")).join(" · ") : "None");
+  h += "</div>";
+  if (A.maxL === -Infinity) h += `<div class="warnbox">⚠️ <b>Unlimited risk:</b> this position can lose more than any fixed amount if the price moves sharply against it. Sold options need large margin and strict exits.</div>`;
+  $("#out").innerHTML = h; S.save();
+}
+addEventListener("resize", () => cur && drawPageChart(cur.L, cur.A));
+
+/* ---------- share ---------- */
+const legTxt = (g, raw) => `${raw.a === "buy" ? "Buy" : "Sell"} ${K.qty(K.num(raw.l))} lot${K.num(raw.l) === 1 ? "" : "s"} ${raw.t === "FUT" ? "FUT @ " + raw.k : raw.k + " " + raw.t + " @ ₹" + raw.p}`;
+function valid() { if (cur) return true; K.toast("Fill in the legs first"); return false; }
+function buildText() {
+  const A = cur.A, out = [`🧮 *OPTIONS PAYOFF* · ${S.name}`, `_${S.und || "Underlying"} · spot ${S.spot} · lot ${S.lot} · at expiry_`, ""];
+  S.legs.forEach((g, i) => out.push(`${i + 1}. ${legTxt(cur.L[i], g)}`));
+  out.push("", `📈 Max profit: ${fmtMax(A.maxP)}`, `📉 Max loss: ${fmtMax(A.maxL)}`, `⚖️ Breakeven: ${A.be.length ? A.be.map(b => K.nf(b, 0)).join(" / ") : "none"}`, `${A.net >= 0 ? "💰 Net credit" : "💸 Net debit"}: ${K.rs(Math.abs(A.net))}`);
+  return out.concat(K.signoff("options", "Try any strategy", "⚠️ _Strategy study for education only, not a recommendation. F&O is high risk. Not SEBI registered._")).join("\n");
+}
+async function draw() {
+  await K.loadFonts();
+  const W = 1080, A = cur.A, chartH = 520, legsH = 40 + S.legs.length * 58;
+  const top = 330, H = top + chartH + 70 + 24 + 250 + 24 + legsH + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [["rgba(255,154,92,0.20)", .9, .1, .55], ["rgba(124,92,255,0.30)", .05, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, `OPTIONS PAYOFF · ${(S.und || "").toUpperCase()}`, 70, 205, `600 26px ${K.F.MONO}`, "#ff9a5c");
+  ctx.font = K.fit(ctx, S.name, 700, K.F.GROT, 76, W - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(S.name, 70, 288);
+  K.panel(ctx, 70, top, W - 140, chartH + 70, 28, "rgba(0,0,0,0.42)");
+  drawChart(ctx, 96, top + 24, W - 192, chartH, cur.L, A, { fs: 22, lw: 5 });
+  // stats grid
+  let y = top + chartH + 70 + 24; const cw = (W - 140 - 20) / 2;
+  [["MAX PROFIT", fmtMax(A.maxP), "#22d39a"], ["MAX LOSS", fmtMax(A.maxL), "#ff5470"], [A.net >= 0 ? "NET CREDIT" : "NET DEBIT", K.rs(Math.abs(A.net)), A.net >= 0 ? "#22d39a" : "#febc2e"], ["BREAKEVEN", A.be.length ? A.be.map(b => K.nf(b, 0)).join(" · ") : "None", "#febc2e"]].forEach(([k, v, col], i) => {
+    const bx = 70 + (i % 2) * (cw + 20), by = y + Math.floor(i / 2) * 125;
+    K.panel(ctx, bx, by, cw, 105, 22, "rgba(0,0,0,0.38)");
+    K.txt(ctx, k, bx + 26, by + 40, `600 20px ${K.F.MONO}`, "#8a90a2");
+    ctx.font = K.fit(ctx, v, 700, K.F.MONO, 34, cw - 52); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.fillText(v, bx + 26, by + 84);
+  });
+  y += 250 + 24;
+  K.panel(ctx, 70, y, W - 140, legsH, 24, "rgba(255,255,255,0.03)");
+  S.legs.forEach((g, i) => { const s = `${i + 1}.  ${legTxt(cur.L[i], g)}`; ctx.font = K.fit(ctx, s, 500, K.F.MONO, 26, W - 200); ctx.fillStyle = g.a === "buy" ? "#9be8c9" : "#ffadb9"; ctx.textAlign = "left"; ctx.fillText(s, 100, y + 52 + i * 58); });
+  K.footer(ctx, W, H, K.toolUrl("options"), `${S.und} spot ${S.spot} · lot ${S.lot} · At expiry · Education only · Not SEBI registered`, true);
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => "payoff-" + (S.name || "strategy").toLowerCase().replace(/[^a-z0-9]+/g, "-") });
+
+if (!S.legs.length) loadPreset(PRESETS[4]); else { drawLegs(); render(); }
+document.fonts.ready.then(() => cur && drawPageChart(cur.L, cur.A));
+</script>
+</body>
+</html>

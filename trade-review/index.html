@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Trade Review Card — MANIMINDSMONEY</title>
+<meta name="description" content="Turn a closed trade into a lesson: setup, plan versus result in R, a rules checklist, what went right and wrong. Share it with your community as text or an image." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #b18cff; --acc2: #00e0b8; }
+  .rules { display: grid; gap: 6px; }
+  .rule { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.22); cursor: pointer; font-size: .88rem; user-select: none; }
+  .rule i { width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--line); display: grid; place-items: center; font-style: normal; font-size: .8rem; flex: none; }
+  .rule.on i { background: var(--up); border-color: var(--up); color: #00140c; }
+  .rule.off i { background: rgba(255,84,112,.18); border-color: var(--down); color: var(--down); }
+  .from-j { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 12px; border-radius: 16px; border: 1px dashed rgba(177,140,255,.45); background: rgba(177,140,255,.06); margin-bottom: 6px; }
+  .from-j select { width: 100%; background: rgba(0,0,0,.35); border: 1px solid var(--line); color: var(--fg); border-radius: 12px; padding: 10px 12px; font: 500 .86rem Inter; color-scheme: dark; outline: 0; min-width: 0; }
+  .from-j p { grid-column: 1 / -1; font-size: .8rem; color: #d9cff5; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Every trade <span class="grad">teaches something.</span></h1>
+    <p class="sub">Review a trade <b>after it's closed</b>: the setup, your plan against what happened, whether you followed your rules, and the lesson. Sharing honest reviews, losses included, builds more trust than sharing only wins.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="from-j" id="fromJ" hidden>
+          <p>📒 <b>Load a closed trade from your journal</b></p>
+          <select id="jSel"></select><button class="btn" id="jLoad" style="padding:10px 16px">Load</button>
+        </div>
+
+        <div class="cols2">
+          <div><div class="q">Review #</div><label class="field sm"><span class="unit">#</span><input id="num" type="text" inputmode="numeric" maxlength="4" placeholder="1" /></label></div>
+          <div><div class="q">Stock</div><label class="field sm"><input id="sym" class="name" type="text" maxlength="20" placeholder="e.g. TATAMOTORS" /></label></div>
+          <div><div class="q">Side</div><div class="seg" id="sideSeg"><div class="pill"></div><button data-v="long">Long</button><button data-v="short">Short</button></div></div>
+          <div><div class="q">Timeframe</div><label class="field sm"><select id="tf"><option>Intraday</option><option>Swing</option><option>Positional</option></select></label></div>
+          <div><div class="q">Setup</div><label class="field sm"><select id="setup"></select></label></div>
+          <div><div class="q">Closed on</div><label class="field sm"><input id="date" class="txt" type="date" /></label></div>
+        </div>
+
+        <div class="cols2">
+          <div><div class="q">Entry ₹</div><label class="field sm"><input id="entry" type="text" inputmode="decimal" placeholder="500" /></label></div>
+          <div><div class="q">Stop-loss ₹</div><label class="field sm"><input id="sl" type="text" inputmode="decimal" placeholder="490" /></label></div>
+          <div><div class="q">Target ₹ <span class="opt">planned</span></div><label class="field sm"><input id="tgt" type="text" inputmode="decimal" placeholder="530" /></label></div>
+          <div><div class="q">Exit ₹ <span class="opt">actual</span></div><label class="field sm"><input id="exit" type="text" inputmode="decimal" placeholder="522" /></label></div>
+        </div>
+        <div class="ierr" id="err"></div>
+
+        <div class="q">Did I follow my rules? <span class="opt">tap: ✓ yes · ✗ no · blank skip</span></div>
+        <div class="rules" id="rules"></div>
+
+        <div class="q">✅ What went right</div>
+        <textarea id="right" maxlength="200" placeholder="e.g. Waited for a close above resistance with volume."></textarea>
+        <div class="q">❌ What went wrong <span class="opt">optional</span></div>
+        <textarea id="wrong" maxlength="200" placeholder="e.g. Exited early out of fear instead of trailing the stop."></textarea>
+        <div class="q">💡 Lesson</div>
+        <textarea id="lesson" maxlength="200" placeholder="e.g. Trust the plan. Move the stop, not the exit."></textarea>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Preview</h2><span id="meta"></span></div>
+        <div id="sum"></div>
+        <div class="chat" style="margin-top:12px"><div class="bubble" id="bubble"></div></div>
+        <div class="share-row" id="shareRow"><button class="btn ghost" id="nextBtn">➡️ Start next review</button></div>
+        <div class="tip"><b>Keep it a lesson, not a tip:</b> post reviews only <b>after</b> the trade is closed, and focus on the process. No ₹ amounts are shown, only R-multiples and % move. Live buy or sell calls with targets need SEBI registration.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. Trade reviews are <b>after-the-fact case studies of closed personal trades, for education only</b>. They are not recommendations, signals or claims of returns, and past trades don't predict future results.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const SETUPS = ["Breakout", "Pullback", "Reversal", "Trend follow", "Gap play", "Range", "News / results", "Other"];
+const RULES = ["Waited for my setup (no FOMO entry)", "Sized the position by my risk", "Respected the stop-loss", "Followed my exit plan", "No revenge or overtrading after"];
+$("#setup").innerHTML = SETUPS.map(s => `<option>${s}</option>`).join("");
+const blank = n => ({ num: String(n || 1), sym: "", side: "long", tf: "Swing", setup: "Breakout", date: K.iso(K.istNow()), entry: "", sl: "", tgt: "", exit: "", rules: RULES.map(() => 0), right: "", wrong: "", lesson: "" });
+const S = K.store("review_v1", blank(1));
+if (!Array.isArray(S.rules) || S.rules.length !== RULES.length) S.rules = RULES.map(() => 0);
+
+function fill() {
+  ["num", "sym", "tf", "setup", "date", "entry", "sl", "tgt", "exit", "right", "wrong", "lesson"].forEach(k => $("#" + k).value = S[k] ?? "");
+  placeSide(); drawRules(); render();
+}
+["entry", "sl", "tgt", "exit"].forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); S[k] = e.target.value; render(); }));
+$("#num").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, ""); S.num = e.target.value; render(); });
+$("#sym").addEventListener("input", e => { S.sym = e.target.value.toUpperCase(); render(); });
+["tf", "setup", "date", "right", "wrong", "lesson"].forEach(k => $("#" + k).addEventListener("input", e => { S[k] = e.target.value; render(); }));
+const placeSide = K.seg("#sideSeg", () => S.side, v => { S.side = v; render(); });
+function drawRules() { $("#rules").innerHTML = RULES.map((r, i) => `<div class="rule ${S.rules[i] === 1 ? "on" : S.rules[i] === -1 ? "off" : ""}" data-i="${i}"><i>${S.rules[i] === 1 ? "✓" : S.rules[i] === -1 ? "✗" : ""}</i>${r}</div>`).join(""); }
+$("#rules").addEventListener("click", e => { const r = e.target.closest(".rule"); if (!r) return; const i = +r.dataset.i; S.rules[i] = S.rules[i] === 0 ? 1 : S.rules[i] === 1 ? -1 : 0; drawRules(); render(); });
+
+/* ---------- from journal ---------- */
+let J = [];
+try { J = (JSON.parse(localStorage.getItem("journal_v1") || "{}").trades || []).filter(t => K.num(t.exit) > 0 && K.num(t.entry) > 0 && K.num(t.sl) > 0); } catch {}
+if (J.length) {
+  $("#fromJ").hidden = false;
+  $("#jSel").innerHTML = J.map((t, i) => `<option value="${i}">${K.esc(t.sym)} · ${t.side} · ${K.niceDate(t.date, { day: "numeric", month: "short" })} · ${t.entry} → ${t.exit}</option>`).join("");
+  $("#jLoad").addEventListener("click", () => {
+    const t = J[+$("#jSel").value];
+    Object.assign(S, { sym: t.sym, side: t.side, setup: SETUPS.includes(t.setup) ? t.setup : "Other", date: t.date, entry: t.entry, sl: t.sl, tgt: t.tgt || "", exit: t.exit, lesson: S.lesson || t.note || "" });
+    fill(); K.toast("📒 Loaded " + t.sym);
+  });
+}
+
+/* ---------- maths ---------- */
+function calc() {
+  const dir = S.side === "short" ? -1 : 1, E = K.num(S.entry), SL = K.num(S.sl), T = K.num(S.tgt), X = K.num(S.exit);
+  if (!(E > 0 && SL > 0 && X > 0)) return null;
+  if ((E - SL) * dir <= 0) return { err: S.side === "short" ? "For a short, the stop-loss must be above the entry." : "For a long, the stop-loss must be below the entry." };
+  const rps = Math.abs(E - SL), R = (X - E) * dir / rps, move = (X - E) * dir / E * 100, rr = T > 0 && (T - E) * dir > 0 ? Math.abs(T - E) / rps : null;
+  let out;
+  if (rr && (X - T) * dir >= -rps * .02) out = ["TARGET HIT", "#22d39a"];
+  else if (R <= -0.95) out = ["STOPPED OUT", "#ff5470"];
+  else if (Math.abs(R) < 0.1) out = ["BREAKEVEN", "#c9cfdb"];
+  else if (R > 0) out = [rr ? "EXITED BEFORE TARGET" : "PROFIT BOOKED", "#00e0b8"];
+  else out = ["EXITED EARLY (LOSS)", "#febc2e"];
+  return { R, move, rr, out, rps };
+}
+const Rf = r => (r >= 0 ? "+" : "−") + Math.abs(r).toFixed(2) + "R";
+function score() { const y = S.rules.filter(v => v === 1).length, n = S.rules.filter(v => v !== 0).length; return { y, n }; }
+
+/* ---------- text ---------- */
+const DISC = "⚠️ _Review of a closed personal trade, for learning only. Not a recommendation. Not SEBI registered._";
+function buildText() {
+  const c = calc(), sc = score(), out = [`🔍 *TRADE REVIEW${S.num ? " #" + S.num : ""}* · ${S.sym || "—"}`, `_${S.side === "short" ? "Short" : "Long"} · ${S.tf} · ${S.setup} · closed ${K.niceDate(S.date, { day: "numeric", month: "short" })}_`, ""];
+  if (c && !c.err) {
+    out.push(`📋 Plan: entry ${S.entry} · SL ${S.sl}${S.tgt ? ` · target ${S.tgt}` : ""}${c.rr ? ` (1:${c.rr.toFixed(1)})` : ""}`, `🏁 Exit: ${S.exit} → *${Rf(c.R)}* (${K.pct(c.move)}) · ${c.out[0].charAt(0) + c.out[0].slice(1).toLowerCase()}`);
+  }
+  if (sc.n) { out.push("", `📏 *Rules followed: ${sc.y}/${sc.n}*`); RULES.forEach((r, i) => S.rules[i] && out.push(`${S.rules[i] === 1 ? "✅" : "❌"} ${r}`)); }
+  if (S.right.trim()) out.push("", `✅ *Went right:* ${K.clean(S.right)}`);
+  if (S.wrong.trim()) out.push(`${S.right.trim() ? "" : "\n"}❌ *Went wrong:* ${K.clean(S.wrong)}`);
+  if (S.lesson.trim()) out.push("", `💡 *Lesson:* ${K.clean(S.lesson)}`);
+  return out.concat(K.signoff("trade-review", "Review yours", DISC)).join("\n");
+}
+function render() {
+  const c = calc();
+  $("#err").textContent = c?.err || "";
+  const st = (k, v, cls = "") => `<div class="stat"><span>${k}</span><b class="${cls}">${v}</b></div>`;
+  $("#sum").innerHTML = c && !c.err
+    ? `<div class="hero-res"><span>${S.sym || "Result"}</span><strong class="${c.R >= 0 ? "up" : "down"}">${Rf(c.R)}</strong><em style="color:${c.out[1]}">${c.out[0]}</em></div><div class="stats">${st("Price move", K.pct(c.move), c.move >= 0 ? "up" : "down")}${st("Planned R:R", c.rr ? "1 : " + c.rr.toFixed(2) : "—")}${st("Rules followed", score().n ? `${score().y} / ${score().n}` : "—", score().n && score().y === score().n ? "up" : "")}${st("Setup", S.setup)}</div>`
+    : `<div class="placeholder">Fill in entry, stop-loss and exit to see the result in R.</div>`;
+  const t = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  $("#bubble").innerHTML = (ready() ? K.waHtml(buildText()) : `<span class="empty">Your review will appear here.</span>`) + `<span class="time">${t}</span>`;
+  $("#meta").textContent = S.num ? "Review #" + S.num : "";
+  S.save();
+}
+const ready = () => { const c = calc(); return c && !c.err && S.sym.trim(); };
+function valid() {
+  if (ready() && S.lesson.trim()) return true;
+  if (!S.sym.trim()) K.shake($("#sym").closest(".field"));
+  ["entry", "sl", "exit"].forEach(k => !(K.num(S[k]) > 0) && K.shake($("#" + k).closest(".field")));
+  if (ready() && !S.lesson.trim()) { K.shake($("#lesson")); K.toast("Add the lesson: it's the point of the review"); return false; }
+  K.toast("Fill in the stock, entry, stop-loss and exit"); return false;
+}
+$("#nextBtn").addEventListener("click", () => { if (!confirm(`Start review #${(+S.num || 0) + 1}? This one will be cleared.`)) return; Object.assign(S, blank((+S.num || 0) + 1)); fill(); });
+
+/* ---------- image ---------- */
+async function draw() {
+  await K.loadFonts();
+  const c0 = calc(), sc = score(), W = 1080, m = K.measure(); m.font = `400 28px ${K.F.INTER}`;
+  const secs = [["WENT RIGHT", S.right, "#22d39a"], ["WENT WRONG", S.wrong, "#ff5470"], ["LESSON", S.lesson, "#b18cff"]].filter(s => s[1].trim()).map(([l, t, col]) => ({ l, col, lines: K.cap(K.wrap(m, K.clean(t), W - 210), 3) }));
+  const secH = s => 64 + s.lines.length * 40 + 22;
+  const rulesOn = RULES.map((r, i) => [r, S.rules[i]]).filter(x => x[1]);
+  const rulesH = rulesOn.length ? 70 + rulesOn.length * 46 + 16 : 0;
+  const heroY = 330, heroH = 220, planY = heroY + heroH + 20, planH = 110;
+  const H = planY + planH + 20 + (rulesH ? rulesH + 20 : 0) + secs.reduce((a, s) => a + secH(s) + 18, 0) + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [["rgba(177,140,255,0.28)", .9, .08, .55], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, `TRADE REVIEW${S.num ? " · #" + S.num : ""}`, 70, 200, `600 26px ${K.F.MONO}`, "#b18cff");
+  ctx.font = K.fit(ctx, S.sym, 700, K.F.GROT, 80, 600); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(S.sym, 70, 282);
+  const sub = `${S.side === "short" ? "SHORT" : "LONG"} · ${S.tf.toUpperCase()} · ${S.setup.toUpperCase()}`;
+  ctx.font = K.fit(ctx, sub, 600, K.F.MONO, 22, 380); ctx.fillStyle = "#8a90a2"; ctx.textAlign = "right"; ctx.fillText(sub, W - 70, 276);
+  // hero
+  K.panel(ctx, 70, heroY, W - 140, heroH, 30, c0.out[1] + "18", c0.out[1] + "77");
+  K.txt(ctx, "RESULT", 110, heroY + 58, `600 24px ${K.F.MONO}`, "#c9bcff");
+  K.txt(ctx, Rf(c0.R), 110, heroY + 160, `700 100px ${K.F.GROT}`, c0.R >= 0 ? "#22d39a" : "#ff5470");
+  K.pill(ctx, c0.out[0], W - 110, heroY + 40, c0.out[1], 22, "right");
+  K.txt(ctx, `${K.pct(c0.move)} move`, W - 110, heroY + 150, `600 32px ${K.F.MONO}`, "#e3e6ee", "right");
+  K.txt(ctx, `closed ${K.niceDate(S.date, { day: "numeric", month: "short", year: "numeric" })}`, W - 110, heroY + 190, `500 22px ${K.F.MONO}`, "#8a90a2", "right");
+  // plan strip
+  const cells = [["ENTRY", S.entry], ["STOP-LOSS", S.sl], ["TARGET", S.tgt || "—"], ["EXIT", S.exit], ["PLANNED R:R", c0.rr ? "1:" + c0.rr.toFixed(1) : "—"]];
+  K.panel(ctx, 70, planY, W - 140, planH, 24, "rgba(0,0,0,0.40)");
+  const cw = (W - 140) / cells.length;
+  cells.forEach(([k, v], i) => { const cx = 70 + cw * i + cw / 2; K.txt(ctx, k, cx, planY + 42, `600 18px ${K.F.MONO}`, "#8a90a2", "center"); ctx.font = K.fit(ctx, v, 700, K.F.MONO, 30, cw - 20); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "center"; ctx.fillText(v, cx, planY + 84); });
+  let y = planY + planH + 20;
+  if (rulesH) {
+    K.panel(ctx, 70, y, W - 140, rulesH, 24, "rgba(0,0,0,0.36)");
+    K.txt(ctx, "RULES FOLLOWED", 100, y + 46, `700 22px ${K.F.MONO}`, "#8a90a2"); K.txt(ctx, `${sc.y} / ${sc.n}`, W - 100, y + 46, `700 26px ${K.F.MONO}`, sc.y === sc.n ? "#22d39a" : "#febc2e", "right");
+    rulesOn.forEach(([r, v], i) => { const ry = y + 70 + i * 46; K.rr(ctx, 100, ry + 2, 30, 30, 8); ctx.fillStyle = v === 1 ? "#22d39a" : "rgba(255,84,112,0.25)"; ctx.fill(); K.txt(ctx, v === 1 ? "✓" : "✗", 115, ry + 25, `700 22px ${K.F.INTER}`, v === 1 ? "#00140c" : "#ff5470", "center"); K.txt(ctx, r, 146, ry + 26, `500 26px ${K.F.INTER}`, "#e3e6ee"); });
+    y += rulesH + 20;
+  }
+  secs.forEach(s => {
+    const h = secH(s); K.panel(ctx, 70, y, W - 140, h, 24, s.col + "12", s.col + "55");
+    K.rr(ctx, 70, y + 20, 6, h - 40, 3); ctx.fillStyle = s.col; ctx.fill();
+    K.txt(ctx, s.l, 102, y + 46, `700 22px ${K.F.MONO}`, s.col);
+    s.lines.forEach((l, k) => K.txt(ctx, l, 102, y + 50 + (k + 1) * 40, `400 28px ${K.F.INTER}`, "#e3e6ee"));
+    y += h + 18;
+  });
+  K.footer(ctx, W, H, K.toolUrl("trade-review"), "Closed personal trade · Education only · Not a recommendation · Not SEBI registered", true);
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => `trade-review-${S.num || 1}-${(S.sym || "trade").toLowerCase()}` });
+fill();
+</script>
+</body>
+</html>

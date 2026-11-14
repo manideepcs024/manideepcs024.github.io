@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Guess the Close Contest — MANIMINDSMONEY</title>
+<meta name="description" content="Run a weekly 'guess the Nifty close' contest in your WhatsApp community: announce it, paste replies, auto-rank the closest guesses, post winners and a season leaderboard." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #febc2e; --acc2: #ff4d8d; }
+  .board { display: grid; gap: 6px; margin-top: 12px; }
+  .rk { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font: .88rem "JetBrains Mono"; }
+  .rk .m { font-size: 1.2rem; text-align: center; }
+  .rk b { font: 700 .95rem Inter; overflow-wrap: anywhere; }
+  .rk small { color: var(--muted); text-align: right; }
+  .rk.top { border-color: rgba(254,188,46,.45); background: rgba(254,188,46,.07); }
+  .parsed { font: .76rem "JetBrains Mono"; color: var(--muted); margin-top: 6px; }
+  .skipped { margin-top: 8px; font: .74rem "JetBrains Mono"; color: #ff9aab; white-space: pre-wrap; max-height: 90px; overflow: auto; }
+  textarea.paste { min-height: 150px; font: .82rem/1.45 "JetBrains Mono"; }
+  .season-ops { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .season-ops button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 10px; padding: 8px 12px; font: 500 .8rem Inter; cursor: pointer; }
+  .season-ops button:hover { color: var(--fg); }
+  .season-ops .go { border-color: rgba(254,188,46,.5); color: var(--warn); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Guess the close. <span class="grad">Crown a winner.</span></h1>
+    <p class="sub">A weekly contest gets quiet members talking: everyone replies with one number, the closest guess wins, and a season leaderboard brings them back every week. Paste the replies straight from your WhatsApp chat and the ranking is done for you.</p>
+
+    <div class="seg mb" id="stepSeg" style="max-width:640px"><div class="pill"></div><button data-v="announce">① Announce<small>post the question</small></button><button data-v="results">② Results<small>rank the guesses</small></button><button data-v="season">③ Season<small>leaderboard</small></button></div>
+
+    <div class="layout">
+      <section class="card">
+        <div class="cols2">
+          <div><div class="q">Contest #</div><label class="field sm"><span class="unit">#</span><input id="num" type="text" inputmode="numeric" maxlength="4" /></label></div>
+          <div><div class="q">Index</div><label class="field sm"><select id="idx"><option>NIFTY 50</option><option>SENSEX</option><option>BANK NIFTY</option><option>FIN NIFTY</option><option>MIDCAP NIFTY</option></select></label></div>
+          <div><div class="q">Closing day</div><label class="field sm"><input id="day" class="txt" type="date" /></label></div>
+          <div><div class="q">Entries close</div><label class="field sm"><input id="dl" class="txt" type="text" maxlength="30" placeholder="Tue 9:15 AM" /></label></div>
+        </div>
+        <div class="q">Prize <span class="opt">optional · a shout-out works great</span></div>
+        <label class="field sm"><input id="prize" class="txt" type="text" maxlength="60" placeholder="🏆 Winner's name on the leaderboard + shout-out" /></label>
+
+        <div id="resIn">
+          <div class="q">Actual close</div>
+          <label class="field"><input id="actual" type="text" inputmode="decimal" placeholder="e.g. 24,512.35" /></label>
+          <div class="q">Paste the guesses <span class="opt">copied from WhatsApp</span></div>
+          <textarea class="paste" id="paste" placeholder="[18/11/26, 9:02 AM] Ravi Kumar: 24550&#10;[18/11/26, 9:05 AM] Priya: my guess 24,480&#10;Amit - 24600"></textarea>
+          <p class="hint">Long-press the replies in WhatsApp → <b>Copy</b>, then paste here. Lines like <code>[date, time] Name: 24550</code> or <code>Name - 24550</code> both work. Only each person's <b>first</b> guess counts, and ties go to whoever replied first.</p>
+          <div class="parsed" id="parsed"></div>
+          <div class="skipped" id="skipped"></div>
+          <label class="toggle"><span>First names only on the card<small>Shows "Ravi K." instead of the full name</small></span><input type="checkbox" id="optShort" checked /><span class="sw"></span></label>
+        </div>
+        <div id="inviteBox"></div>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2 id="pvTitle">Preview</h2><span id="meta"></span></div>
+        <div id="pv"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="season-ops" id="seasonOps"></div>
+        <div class="tip" id="tip"></div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This contest is a <b>free, just-for-fun learning activity</b>. Guesses are not predictions or advice, and nothing here is a recommendation to trade. Don't ask members to pay to enter or offer cash prizes; keep it free and friendly.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+function nextFriday() { const d = K.istNow(); d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7 || (d.getHours() * 60 + d.getMinutes() >= 930 ? 7 : 0))); return K.iso(d); }
+const S = K.store("contest_v1", { step: "announce", num: "1", idx: "NIFTY 50", day: nextFriday(), dl: "Tue 9:15 AM", prize: "", actual: "", paste: "", short: true, season: {}, recorded: [] });
+
+/* ---------- inputs ---------- */
+["num", "idx", "day", "dl", "prize", "actual", "paste"].forEach(k => {
+  $("#" + k).value = S[k];
+  $("#" + k).addEventListener("input", e => { if (k === "actual") K.fmtNum(e.target); if (k === "num") e.target.value = e.target.value.replace(/\D/g, ""); S[k] = e.target.value; render(); });
+});
+$("#optShort").checked = S.short; $("#optShort").addEventListener("change", e => { S.short = e.target.checked; render(); });
+const placeStep = K.seg("#stepSeg", () => S.step, v => { S.step = v; render(); });
+K.inviteField("#inviteBox", () => render());
+
+/* ---------- parsing ---------- */
+// Accepts WhatsApp copy/export formats and simple "Name - number" lines.
+function parse(text, actual) {
+  const out = [], seen = new Set(), skipped = [];
+  const lo = actual > 0 ? actual * .7 : 1, hi = actual > 0 ? actual * 1.3 : Infinity;
+  text.split(/\r?\n/).forEach((raw, order) => {
+    let line = raw.trim(); if (!line) return;
+    line = line.replace(/^\[[^\]]*\]\s*/, "")                                         // [18/11/26, 9:02 AM]
+      .replace(/^\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4},?\s+\d{1,2}:\d{2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?\s*-\s*/i, ""); // 18/11/26, 9:02 am -
+    let name, msg;
+    const m = line.match(/^([^:]{1,40}):\s*(.+)$/) || line.match(/^(.{1,40}?)\s+[-–—]\s+(.+)$/) || line.match(/^(.{1,40}?)\s+([\d,]+(?:\.\d+)?)\s*$/);
+    if (!m) { skipped.push(raw); return; }
+    name = m[1].replace(/[~‎‏]/g, "").trim(); msg = m[2];
+    const nums = (msg.match(/\d{1,3}(?:,\d{2,3})+(?:\.\d+)?|\d+(?:\.\d+)?/g) || []).map(n => parseFloat(n.replace(/,/g, ""))).filter(n => n >= lo && n <= hi && n > 100);
+    if (!name || !nums.length) { skipped.push(raw); return; }
+    const key = name.toLowerCase();
+    if (seen.has(key)) return;                                                       // first guess only
+    seen.add(key); out.push({ name, guess: nums[0], order });
+  });
+  return { list: out, skipped };
+}
+const short = n => { if (!S.short) return n; const p = n.replace(/[^\p{L}\p{N}\s+]/gu, "").trim().split(/\s+/); if (/^\+?\d/.test(n)) return "…" + n.replace(/\D/g, "").slice(-4); return p.length > 1 ? `${p[0]} ${p[p.length - 1][0]}.` : p[0] || n; };
+function ranked() {
+  const A = K.num(S.actual); const { list, skipped } = parse(S.paste, A);
+  if (!(A > 0)) return { list, skipped, ranked: [] };
+  return { list, skipped, A, ranked: list.map(g => ({ ...g, diff: Math.abs(g.guess - A) })).sort((a, b) => a.diff - b.diff || a.order - b.order) };
+}
+const MED = ["🥇", "🥈", "🥉"], PTS = [3, 2, 1];
+
+/* ---------- season ---------- */
+const seasonTop = () => seasonList().filter(e => e.pts > 0);
+function seasonList() { return Object.entries(S.season).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.pts - a.pts || b.wins - a.wins || a.name.localeCompare(b.name)); }
+function renderOps() {
+  const ops = $("#seasonOps"); ops.innerHTML = "";
+  if (S.step === "results") {
+    const done = S.recorded.includes(S.num);
+    ops.innerHTML = `<button class="go" id="recBtn" ${done ? "disabled" : ""}>${done ? "✓ Added to season" : "➕ Add top 3 to season leaderboard"}</button><button id="nextBtn">➡️ Start contest #${(+S.num || 0) + 1}</button>`;
+    $("#recBtn").onclick = () => {
+      const r = ranked().ranked; if (r.length < 1) { K.toast("Add the actual close and guesses first"); return; }
+      r.slice(0, 3).forEach((g, i) => { const k = g.name.toLowerCase(); const e = S.season[k] || { name: g.name, pts: 0, wins: 0, played: 0 }; e.pts += PTS[i]; if (i === 0) e.wins++; S.season[k] = e; });
+      r.forEach(g => { const k = g.name.toLowerCase(); const e = S.season[k] || { name: g.name, pts: 0, wins: 0, played: 0 }; e.played = (e.played || 0) + 1; S.season[k] = e; });
+      S.recorded.push(S.num); K.toast("🏆 Season leaderboard updated"); render();
+    };
+    $("#nextBtn").onclick = () => { if (!confirm(`Start contest #${(+S.num || 0) + 1}? Guesses and the actual close will be cleared.`)) return; Object.assign(S, { num: String((+S.num || 0) + 1), actual: "", paste: "", day: nextFriday(), step: "announce" }); ["num", "actual", "paste", "day"].forEach(k => $("#" + k).value = S[k]); placeStep(); render(); };
+  } else if (S.step === "season") {
+    ops.innerHTML = `<button id="resetSeason">🔄 Start a new season</button>`;
+    $("#resetSeason").onclick = () => { if (confirm("Clear the season leaderboard? This can't be undone.")) { S.season = {}; S.recorded = []; render(); } };
+  }
+}
+
+/* ---------- render ---------- */
+const dayTxt = () => K.niceDate(S.day, { weekday: "long", day: "numeric", month: "short" });
+function render() {
+  $("#resIn").hidden = S.step !== "results";
+  const R = ranked();
+  $("#parsed").textContent = S.paste.trim() ? `✓ ${R.list.length} guess${R.list.length === 1 ? "" : "es"} found${R.skipped.length ? ` · ${R.skipped.length} line${R.skipped.length === 1 ? "" : "s"} skipped` : ""}` : "";
+  $("#skipped").textContent = R.skipped.length ? "Skipped (no name or number found):\n" + R.skipped.slice(0, 6).join("\n") : "";
+  let h = "";
+  if (S.step === "announce") {
+    $("#pvTitle").textContent = "Announcement"; $("#meta").textContent = "Contest #" + S.num;
+    h = `<div class="chat"><div class="bubble">${K.waHtml(textAnnounce())}</div></div>`;
+    $("#tip").innerHTML = "<b>Tip:</b> post this on Monday morning and pin it. Close entries before the market opens on Tuesday so nobody can copy the live price. Post the result on Friday evening.";
+  } else if (S.step === "results") {
+    $("#pvTitle").textContent = "Results"; $("#meta").textContent = R.A ? `${R.ranked.length} entries` : "";
+    h = R.ranked.length ? `<div class="hero-res"><span>${K.esc(S.idx)} closed at</span><strong>${K.nf(R.A)}</strong><em>${dayTxt()}</em></div><div class="board">${R.ranked.slice(0, 10).map((g, i) => `<div class="rk ${i < 3 ? "top" : ""}"><span class="m">${MED[i] || i + 1}</span><b>${K.esc(short(g.name))}</b><span>${K.nf(g.guess)}</span><small>±${K.nf(g.diff)}</small></div>`).join("")}</div>`
+      : `<div class="placeholder">Enter the actual close and paste the guesses to rank them.</div>`;
+    $("#tip").innerHTML = "<b>Tip:</b> tag the winners when you post the results, and add them to the season leaderboard so the competition builds week after week.";
+  } else {
+    const L = seasonList(); $("#pvTitle").textContent = "Season leaderboard"; $("#meta").textContent = `${S.recorded.length} contest${S.recorded.length === 1 ? "" : "s"}`;
+    h = L.length ? `<div class="board">${L.slice(0, 10).map((e, i) => `<div class="rk ${i < 3 ? "top" : ""}"><span class="m">${MED[i] || i + 1}</span><b>${K.esc(short(e.name))}</b><span>${e.pts} pts</span><small>${e.wins}🏆 · ${e.played || 0} played</small></div>`).join("")}</div>`
+      : `<div class="placeholder">No results yet. After each contest, tap <b>Add top 3 to season leaderboard</b> on the Results step. 1st gets 3 points, 2nd 2, 3rd 1.</div>`;
+    $("#tip").innerHTML = "<b>Tip:</b> post the leaderboard once a month and give the season champion a special shout-out or a 'Contest Champ' title in the group description.";
+  }
+  $("#pv").innerHTML = h; renderOps(); S.save();
+}
+
+/* ---------- text ---------- */
+const DISC = "_Just for fun & learning. Not a prediction or advice. Not SEBI registered._";
+function textAnnounce() {
+  return [`🎯 *GUESS THE CLOSE #${S.num}*`, "", `Where will *${S.idx}* close on *${dayTxt()}*?`, "", "Reply with *one number*, e.g. _24,550_", `⏰ Entries close: *${S.dl || "before market opens"}*`, "📏 Closest guess wins. Ties go to whoever replied first.", "1️⃣ One guess per person. Edits don't count.", S.prize ? `🏆 ${S.prize}` : "", "", "Season points: 🥇 3 · 🥈 2 · 🥉 1"].filter((l, i, a) => l !== "" || a[i - 1] !== "").concat(K.signoff("contest", "Contest by", DISC)).join("\n");
+}
+function textResults() {
+  const R = ranked(), out = [`🏆 *GUESS THE CLOSE #${S.num}: RESULTS*`, "", `${S.idx} closed at *${K.nf(R.A)}* on ${dayTxt()}`, ""];
+  R.ranked.slice(0, 3).forEach((g, i) => out.push(`${MED[i]} *${short(g.name)}*: ${K.nf(g.guess)} (off by ${K.nf(g.diff)})`));
+  out.push("", `${R.ranked.length} people played this week. Thank you! 🙌`, "Next contest starts Monday. Bring a friend!");
+  return out.concat(K.signoff("contest", "Contest by", DISC)).join("\n");
+}
+function textSeason() {
+  const L = seasonTop(), out = [`📊 *CONTEST LEADERBOARD*`, `_After ${S.recorded.length} contest${S.recorded.length === 1 ? "" : "s"}_`, ""];
+  L.slice(0, 10).forEach((e, i) => out.push(`${MED[i] || (i + 1) + "."} ${short(e.name)}: *${e.pts} pts*${e.wins ? ` (${e.wins}🏆)` : ""}`));
+  out.push("", "Points: 🥇 3 · 🥈 2 · 🥉 1. Play every week to climb!");
+  return out.concat(K.signoff("contest", "Contest by", DISC)).join("\n");
+}
+const text = () => S.step === "announce" ? textAnnounce() : S.step === "results" ? textResults() : textSeason();
+function valid() {
+  if (S.step === "results" && !ranked().ranked.length) { K.toast("Add the actual close and paste the guesses"); return false; }
+  if (S.step === "season" && !seasonTop().length) { K.toast("No season points yet"); return false; }
+  return true;
+}
+
+/* ---------- image ---------- */
+async function draw() {
+  await K.loadFonts(); await document.fonts.load(`800 90px ${K.F.INTER}`).catch(() => {});
+  const W = 1080, step = S.step;
+  const rows = step === "results" ? ranked().ranked.slice(0, 5) : step === "season" ? seasonTop().slice(0, 8) : [];
+  const bodyH = step === "announce" ? 760 : 260 + rows.length * 104;
+  const H = 330 + bodyH + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [["rgba(254,188,46,0.26)", .9, .08, .6], ["rgba(124,92,255,0.30)", .05, .05, .6], ["rgba(255,77,141,0.12)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, step === "announce" ? `CONTEST #${S.num}` : step === "results" ? `CONTEST #${S.num} · RESULTS` : "SEASON LEADERBOARD", 70, 200, `600 26px ${K.F.MONO}`, "#febc2e");
+  K.txt(ctx, step === "season" ? "Top guessers 🏆" : "Guess the close 🎯", 70, 282, `800 76px ${K.F.INTER}`, "#ffffff");
+  let y = 330;
+  if (step === "announce") {
+    K.panel(ctx, 70, y, W - 140, 330, 34, "rgba(254,188,46,0.10)", "rgba(254,188,46,0.5)");
+    K.txt(ctx, "Where will", W / 2, y + 80, `600 38px ${K.F.INTER}`, "#e3e6ee", "center");
+    ctx.font = K.fit(ctx, S.idx, 800, K.F.INTER, 96, W - 220); ctx.fillStyle = "#febc2e"; ctx.textAlign = "center"; ctx.fillText(S.idx, W / 2, y + 185);
+    K.txt(ctx, `close on ${dayTxt()}?`, W / 2, y + 260, `600 40px ${K.F.INTER}`, "#e3e6ee", "center");
+    y += 360;
+    const rules = [["💬", "Reply with ONE number"], ["⏰", `Entries close: ${S.dl || "before the open"}`], ["📏", "Closest guess wins · ties: first reply"], ["🏆", S.prize || "Winners get a shout-out + season points"]];
+    rules.forEach(([e, t], i) => { K.panel(ctx, 70, y, W - 140, 78, 22, "rgba(0,0,0,0.38)"); K.txt(ctx, e, 110, y + 52, `400 34px ${K.F.INTER}`, "#fff"); ctx.font = K.fit(ctx, t, 600, K.F.INTER, 32, W - 280); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(t, 170, y + 51); y += 94; });
+  } else {
+    if (step === "results") {
+      const R = ranked();
+      K.panel(ctx, 70, y, W - 140, 200, 32, "rgba(254,188,46,0.10)", "rgba(254,188,46,0.5)");
+      K.txt(ctx, `${S.idx} CLOSED AT`, W / 2, y + 58, `600 26px ${K.F.MONO}`, "#febc2e", "center");
+      K.txt(ctx, K.nf(R.A), W / 2, y + 140, `800 84px ${K.F.INTER}`, "#ffffff", "center");
+      K.txt(ctx, `${dayTxt()} · ${R.ranked.length} played`, W / 2, y + 182, `500 24px ${K.F.MONO}`, "#a9aec0", "center");
+    } else {
+      K.panel(ctx, 70, y, W - 140, 200, 32, "rgba(254,188,46,0.10)", "rgba(254,188,46,0.5)");
+      K.txt(ctx, `AFTER ${S.recorded.length} CONTEST${S.recorded.length === 1 ? "" : "S"}`, W / 2, y + 70, `600 26px ${K.F.MONO}`, "#febc2e", "center");
+      K.txt(ctx, "🥇 3 pts · 🥈 2 pts · 🥉 1 pt", W / 2, y + 140, `700 46px ${K.F.INTER}`, "#ffffff", "center");
+    }
+    y += 230;
+    rows.forEach((g, i) => {
+      const top = i < 3; K.panel(ctx, 70, y, W - 140, 88, 24, top ? "rgba(254,188,46,0.09)" : "rgba(0,0,0,0.38)", top ? "rgba(254,188,46,0.45)" : "rgba(255,255,255,0.10)");
+      K.txt(ctx, MED[i] || String(i + 1), 120, y + 60, `${MED[i] ? "400 44px" : "700 34px"} ${MED[i] ? K.F.INTER : K.F.MONO}`, "#c9cfdb", "center");
+      ctx.font = `700 38px ${K.F.INTER}`; K.txt(ctx, K.clip(ctx, short(g.name), 470), 180, y + 58, `700 38px ${K.F.INTER}`, "#ffffff");
+      const v = step === "results" ? K.nf(g.guess) : `${g.pts} pts`, sub = step === "results" ? `±${K.nf(g.diff)}` : `${g.wins} win${g.wins === 1 ? "" : "s"}`;
+      K.txt(ctx, v, W - 270, y + 58, `700 34px ${K.F.MONO}`, top ? "#febc2e" : "#e3e6ee", "right");
+      K.txt(ctx, sub, W - 100, y + 56, `500 26px ${K.F.MONO}`, "#8a90a2", "right");
+      y += 104;
+    });
+  }
+  K.footer(ctx, W, H, K.toolUrl("contest"), "Just for fun & learning · Not a prediction or advice · Not SEBI registered", true);
+  return c;
+}
+K.share({ text, valid, draw, file: () => `contest-${S.num}-${S.step}` });
+render();
+</script>
+</body>
+</html>

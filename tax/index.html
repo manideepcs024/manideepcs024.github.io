@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Capital Gains Tax Estimator — MANIMINDSMONEY</title>
+<meta name="description" content="Estimate STCG and LTCG tax on listed shares and equity mutual funds, with loss set-off, the LTCG exemption and how much tax-free gain you can still book this year." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #ff5470; --acc2: #febc2e; }
+  .sale { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 8px; }
+  .sale .wide { grid-column: 1 / 3; }
+  .badge { font: 700 .66rem "JetBrains Mono"; padding: 3px 8px; border-radius: 6px; align-self: center; justify-self: start; }
+  .badge.st { color: var(--warn); background: rgba(254,188,46,.12); }
+  .badge.lt { color: var(--up); background: rgba(34,211,154,.12); }
+  .sale .meta { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; font: .74rem "JetBrains Mono"; color: var(--muted); flex-wrap: wrap; }
+  .mini { display: block; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+  .rates { margin-top: 14px; border: 1px solid var(--line); border-radius: 18px; padding: 12px; background: rgba(0,0,0,.2); }
+  .rates summary { cursor: pointer; font: 600 .82rem Inter; color: #cfd3df; }
+  .rates .cols2 { margin-top: 6px; }
+  .tbl { margin-top: 12px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .tbl div { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; padding: 9px 14px; font: .84rem "JetBrains Mono"; }
+  .tbl div + div { border-top: 1px solid rgba(255,255,255,.05); }
+  .tbl div:first-child { background: rgba(255,255,255,.04); font: 600 .66rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); }
+  .tbl b { font-weight: 600; text-align: right; min-width: 90px; }
+  .tbl span:first-child { font-family: Inter; color: #cfd3df; }
+  .tbl .tot { background: rgba(255,84,112,.08); }
+  .tbl .tot span:first-child { font-weight: 700; color: var(--fg); }
+  .goodbox { margin-top: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(34,211,154,.3); background: rgba(34,211,154,.06); color: #b9eedb; font-size: .82rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Know the tax <span class="grad">before you sell.</span></h1>
+    <p class="sub">Estimate short- and long-term capital gains tax on listed shares and equity mutual funds. Losses are set off for you, the yearly LTCG exemption is applied, and you'll see how much tax-free long-term gain you can still book this year.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="seg mb" id="modeSeg"><div class="pill"></div><button data-v="sales">Add each sale<small>auto short / long term</small></button><button data-v="totals">I know my totals<small>quick estimate</small></button></div>
+
+        <div id="salesPane">
+          <div id="sales"></div>
+          <button class="add" id="addSale">＋ Add sale</button>
+          <p class="hint">Listed shares and equity funds held for <b>more than 12 months</b> are long term; otherwise short term. Enter total buy and sell amounts for each sale (quantity × price).</p>
+        </div>
+
+        <div id="totalsPane" hidden>
+          <div class="cols2">
+            <div><div class="q">Short-term gains ₹</div><label class="field sm"><input id="tStg" type="text" inputmode="decimal" placeholder="0" /></label></div>
+            <div><div class="q">Short-term losses ₹</div><label class="field sm"><input id="tStl" type="text" inputmode="decimal" placeholder="0" /></label></div>
+            <div><div class="q">Long-term gains ₹</div><label class="field sm"><input id="tLtg" type="text" inputmode="decimal" placeholder="0" /></label></div>
+            <div><div class="q">Long-term losses ₹</div><label class="field sm"><input id="tLtl" type="text" inputmode="decimal" placeholder="0" /></label></div>
+          </div>
+          <p class="hint">Enter gains and losses as positive numbers. Use totals for the whole financial year (April to March).</p>
+        </div>
+
+        <details class="rates" id="ratesBox">
+          <summary>⚙️ Tax rates used <span id="ratesSum" style="color:var(--muted);font-weight:400"></span></summary>
+          <div class="cols2">
+            <div><div class="q">STCG rate %</div><label class="field sm"><input id="rSt" type="text" inputmode="decimal" /></label></div>
+            <div><div class="q">LTCG rate %</div><label class="field sm"><input id="rLt" type="text" inputmode="decimal" /></label></div>
+            <div><div class="q">LTCG exemption ₹</div><label class="field sm"><input id="rEx" type="text" inputmode="decimal" /></label></div>
+            <div><div class="q">Cess %</div><label class="field sm"><input id="rCess" type="text" inputmode="decimal" /></label></div>
+          </div>
+          <p class="hint">Defaults: STCG 20%, LTCG 12.5% above ₹1.25 lakh a year, plus 4% cess, as set in Budget 2024 for sales from 23 July 2024. Rates can change in any Budget, so check the current ones and edit them here. <a href="#" id="ratesReset" style="color:inherit">Reset to defaults</a></p>
+        </details>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Estimate</h2><span id="meta">updates as you type</span></div>
+        <div id="out"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="learn"><b>How set-off works:</b> short-term losses can reduce both short- and long-term gains; long-term losses can reduce only long-term gains. This tool uses short-term losses against short-term gains first, because those are taxed at the higher rate. The LTCG exemption applies to what's left. Losses that remain can be carried forward for 8 years if you file your return on time. <b>Not covered:</b> surcharge, the basic exemption limit and rebates, grandfathering for shares bought before February 2018, intraday or F&amp;O income (taxed as business income), and debt funds.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> adviser or a tax professional. This is a <b>simplified estimate for education</b> based on the rates you see above, and tax rules can change. It is not tax advice. For filing, check the latest rules or ask a chartered accountant.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const DEF_RATES = { rSt: "20", rLt: "12.5", rEx: "1,25,000", rCess: "4" };
+const S = K.store("tax_v1", { mode: "sales", sales: [{ n: "", b: "", s: "", bd: "", sd: "" }], tStg: "", tStl: "", tLtg: "", tLtl: "", ...DEF_RATES });
+const MAX = 25;
+
+const placeMode = K.seg("#modeSeg", () => S.mode, v => { S.mode = v; showMode(); render(); });
+function showMode() { $("#salesPane").hidden = S.mode !== "sales"; $("#totalsPane").hidden = S.mode !== "totals"; }
+
+/* ---------- sales ---------- */
+function drawSales() {
+  $("#sales").innerHTML = S.sales.map((r, i) => `<div class="rowbox sale" data-i="${i}">
+    <label class="field sm wide"><input class="name" data-f="n" type="text" maxlength="24" value="${K.esc(r.n)}" placeholder="Stock or fund ${i + 1}" autocomplete="off" /></label>
+    <button class="rm" title="Remove">✕</button>
+    <div><span class="mini">BOUGHT ON</span><label class="field sm"><input class="txt" data-f="bd" type="date" value="${r.bd}" /></label></div>
+    <div><span class="mini">SOLD ON</span><label class="field sm"><input class="txt" data-f="sd" type="date" value="${r.sd}" /></label></div><span></span>
+    <div><span class="mini">BUY AMOUNT ₹</span><label class="field sm"><input data-f="b" type="text" inputmode="decimal" value="${r.b}" placeholder="50,000" /></label></div>
+    <div><span class="mini">SELL AMOUNT ₹</span><label class="field sm"><input data-f="s" type="text" inputmode="decimal" value="${r.s}" placeholder="65,000" /></label></div><span></span>
+    <div class="meta"></div></div>`).join("");
+  $("#addSale").hidden = S.sales.length >= MAX;
+}
+$("#sales").addEventListener("input", e => {
+  const box = e.target.closest(".sale"), f = e.target.dataset.f; if (!box || !f) return; const r = S.sales[+box.dataset.i];
+  if (f === "b" || f === "s") K.fmtNum(e.target);
+  r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render();
+});
+$("#sales").addEventListener("click", e => {
+  const box = e.target.closest(".sale"); if (!box || !e.target.closest(".rm")) return;
+  S.sales.splice(+box.dataset.i, 1); if (!S.sales.length) S.sales.push({ n: "", b: "", s: "", bd: "", sd: "" }); drawSales(); render();
+});
+$("#addSale").addEventListener("click", () => { const last = S.sales[S.sales.length - 1]; S.sales.push({ n: "", b: "", s: "", bd: "", sd: last?.sd || "" }); drawSales(); render(); $("#sales").lastElementChild.querySelector("input").focus(); });
+
+["tStg", "tStl", "tLtg", "tLtl", "rSt", "rLt", "rEx", "rCess"].forEach(k => {
+  $("#" + k).value = S[k];
+  $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); S[k] = e.target.value; render(); });
+});
+$("#ratesReset").addEventListener("click", e => { e.preventDefault(); Object.assign(S, DEF_RATES); Object.keys(DEF_RATES).forEach(k => $("#" + k).value = S[k]); render(); });
+
+/* ---------- maths ---------- */
+// Long term if sold more than 12 months after buying.
+function isLong(bd, sd) { const b = K.parseISO(bd), lim = new Date(b.getFullYear() + 1, b.getMonth(), b.getDate()); return K.parseISO(sd) > lim; }
+function classify() {
+  return S.sales.map(r => {
+    const b = K.num(r.b), s = K.num(r.s), o = { r };
+    if (!(b > 0 && s >= 0 && String(r.s).trim() !== "")) return o;
+    o.g = s - b;
+    if (r.bd && r.sd) { if (r.sd < r.bd) { o.err = "Sold before bought?"; return o; } o.lt = isLong(r.bd, r.sd); }
+    else o.lt = false, o.assumed = true;
+    return o;
+  });
+}
+function totals() {
+  if (S.mode === "totals") return { stg: K.num(S.tStg) || 0, stl: K.num(S.tStl) || 0, ltg: K.num(S.tLtg) || 0, ltl: K.num(S.tLtl) || 0, n: null };
+  const c = classify().filter(o => o.g != null && !o.err), t = { stg: 0, stl: 0, ltg: 0, ltl: 0, n: c.length, assumed: c.some(o => o.assumed) };
+  c.forEach(o => { const k = (o.lt ? "lt" : "st") + (o.g >= 0 ? "g" : "l"); t[k] += Math.abs(o.g); });
+  return t;
+}
+function compute() {
+  const t = totals(), rSt = (K.num(S.rSt) || 0) / 100, rLt = (K.num(S.rLt) || 0) / 100, ex = K.num(S.rEx) || 0, cess = (K.num(S.rCess) || 0) / 100;
+  if (!(t.stg || t.stl || t.ltg || t.ltl)) return { empty: true, t };
+  let st = t.stg - t.stl, lt = t.ltg - t.ltl, stLossUsedOnLt = 0, ltCarry = 0;
+  if (lt < 0) { ltCarry = -lt; lt = 0; }                         // LT loss can't touch ST gains
+  if (st < 0 && lt > 0) { stLossUsedOnLt = Math.min(-st, lt); lt -= stLossUsedOnLt; st += stLossUsedOnLt; }
+  const stCarry = st < 0 ? -st : 0; if (st < 0) st = 0;
+  const exUsed = Math.min(lt, ex), ltTaxable = lt - exUsed;
+  const stTax = st * rSt, ltTax = ltTaxable * rLt, base = stTax + ltTax, cessAmt = base * cess, total = base + cessAmt;
+  return { t, st, lt, exUsed, ltTaxable, stTax, ltTax, cessAmt, total, stCarry, ltCarry, stLossUsedOnLt, exLeft: Math.max(0, ex - lt), ex, rSt, rLt, cess,
+    net: t.stg - t.stl + t.ltg - t.ltl };
+}
+
+/* ---------- render ---------- */
+const neg = v => v ? "−" + K.rs(v) : "—";
+function render() {
+  // per-sale badges
+  const c = classify();
+  document.querySelectorAll(".sale").forEach((box, i) => {
+    const o = c[i]; box.querySelector(".meta").innerHTML = o?.err ? `<span style="color:#ff9aab">${o.err}</span>` : o?.g != null
+      ? `<span class="badge ${o.lt ? "lt" : "st"}">${o.lt ? "LONG TERM" : "SHORT TERM"}${o.assumed ? " (add dates)" : ""}</span><span class="${o.g >= 0 ? "up" : "down"}">${o.g >= 0 ? "Gain" : "Loss"} ${K.rs(Math.abs(o.g))}</span>` : "";
+  });
+  $("#ratesSum").textContent = `· STCG ${S.rSt}% · LTCG ${S.rLt}% · exemption ₹${S.rEx}`;
+  const R = compute();
+  if (R.empty) { $("#out").innerHTML = `<div class="placeholder">Add your sales (or totals) to estimate the tax.</div>`; $("#meta").textContent = "updates as you type"; S.save(); return; }
+  $("#meta").textContent = R.t.n != null ? `${R.t.n} sale${R.t.n === 1 ? "" : "s"}` : "from totals";
+  const row = (a, b, c2 = "", cls = "") => `<div class="${cls}"><span>${a}</span><b>${b}</b><b>${c2}</b></div>`;
+  let h = `<div class="hero-res"><span>Estimated tax</span><strong>${K.rs(R.total)}</strong><em>Net ${R.net >= 0 ? "gain" : "loss"} ${K.rs(Math.abs(R.net))}${R.net > 0 && R.total > 0 ? ` · effective rate ${(R.total / R.net * 100).toFixed(1)}%` : ""}</em></div>`;
+  h += `<div class="tbl">${row("", "SHORT TERM", "LONG TERM")}${row("Gains", K.rs(R.t.stg), K.rs(R.t.ltg))}${row("Losses", neg(R.t.stl), neg(R.t.ltl))}`;
+  if (R.stLossUsedOnLt) h += row("Short-term loss used on LT", "+" + K.rs(R.stLossUsedOnLt), "−" + K.rs(R.stLossUsedOnLt));
+  h += row("Exemption", "—", neg(R.exUsed)) + row("Taxable", K.rs(R.st), K.rs(R.ltTaxable));
+  h += row(`Tax (${S.rSt}% / ${S.rLt}%)`, K.rs(R.stTax), K.rs(R.ltTax)) + row(`Cess ${S.rCess}%`, "", K.rs(R.cessAmt)) + row("Total tax", "", K.rs(R.total), "tot") + `</div>`;
+  if (R.stCarry || R.ltCarry) h += `<div class="warnbox">📌 Loss to carry forward: ${R.stCarry ? `short-term ${K.rs(R.stCarry)}` : ""}${R.stCarry && R.ltCarry ? " and " : ""}${R.ltCarry ? `long-term ${K.rs(R.ltCarry)}` : ""}. File your return by the due date to carry it forward (up to 8 years).</div>`;
+  if (R.exLeft > 0) h += `<div class="goodbox">💡 You still have <b>${K.rs(R.exLeft)}</b> of the yearly LTCG exemption unused. Long-term gains up to that amount booked before 31 March would be tax-free at these rates (often called tax-gain harvesting).</div>`;
+  if (R.t.assumed) h += `<div class="warnbox">Some sales have no dates and are treated as short term. Add buy and sell dates for an accurate split.</div>`;
+  $("#out").innerHTML = h; S.save();
+}
+
+/* ---------- share ---------- */
+function valid() { if (!compute().empty) return true; K.toast("Add sales or totals first"); return false; }
+function buildText() {
+  const R = compute(), out = ["🧾 *CAPITAL GAINS TAX ESTIMATE*", `_Listed shares & equity funds · STCG ${S.rSt}% · LTCG ${S.rLt}% above ₹${S.rEx}_`, ""];
+  out.push(`Short-term: gains ${K.rs(R.t.stg)}, losses ${K.rs(R.t.stl)}`, `Long-term: gains ${K.rs(R.t.ltg)}, losses ${K.rs(R.t.ltl)}`, "");
+  out.push(`Taxable STCG: ${K.rs(R.st)}`, `Taxable LTCG (after ${K.rs(R.exUsed)} exemption): ${K.rs(R.ltTaxable)}`, `*Estimated tax: ${K.rs(R.total)}* (incl. ${S.rCess}% cess)`);
+  if (R.exLeft > 0) out.push("", `💡 Unused LTCG exemption: ${K.rs(R.exLeft)}`);
+  if (R.stCarry || R.ltCarry) out.push(`📌 Loss to carry forward: ${K.rs(R.stCarry + R.ltCarry)}`);
+  return out.concat(K.signoff("tax", "Estimate yours", "⚠️ _Simplified estimate for education, not tax advice. Rules change; check the latest or ask a CA._")).join("\n");
+}
+async function draw() {
+  await K.loadFonts();
+  const R = compute(), W = 1080;
+  const rows = [["SHORT-TERM GAINS", K.rs(R.t.stg), "#eef0f6"], ["SHORT-TERM LOSSES", neg(R.t.stl), "#ff9aab"], ["LONG-TERM GAINS", K.rs(R.t.ltg), "#eef0f6"], ["LONG-TERM LOSSES", neg(R.t.ltl), "#ff9aab"],
+    ["LTCG EXEMPTION USED", neg(R.exUsed), "#22d39a"], [`TAX @ ${S.rSt}% / ${S.rLt}%`, K.rs(R.stTax + R.ltTax), "#eef0f6"], [`CESS ${S.rCess}%`, K.rs(R.cessAmt), "#eef0f6"]];
+  const extra = (R.exLeft > 0 ? 1 : 0) + (R.stCarry || R.ltCarry ? 1 : 0);
+  const heroY = 320, heroH = 240, listY = heroY + heroH + 24, listH = 40 + rows.length * 72, H = listY + listH + extra * 96 + 24 + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [["rgba(255,84,112,0.20)", .9, .08, .5], ["rgba(124,92,255,0.30)", .05, .05, .6], ["rgba(254,188,46,0.10)", .95, .95, .55]]);
+  K.brand(ctx);
+  K.txt(ctx, "CAPITAL GAINS TAX · ESTIMATE", 70, 205, `600 26px ${K.F.MONO}`, "#ff9aab");
+  K.txt(ctx, "Shares & equity funds", 70, 284, `700 64px ${K.F.GROT}`, "#eef0f6");
+  K.panel(ctx, 70, heroY, W - 140, heroH, 32, "rgba(255,84,112,0.12)", "rgba(255,84,112,0.45)");
+  K.txt(ctx, "ESTIMATED TAX", W / 2, heroY + 60, `600 26px ${K.F.MONO}`, "#ffb3bf", "center");
+  ctx.font = K.fit(ctx, K.rs(R.total), 700, K.F.GROT, 100, W - 220); ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.fillText(K.rs(R.total), W / 2, heroY + 160);
+  K.txt(ctx, `Net ${R.net >= 0 ? "gain" : "loss"} ${K.rs(Math.abs(R.net))}`, W / 2, heroY + 208, `500 28px ${K.F.MONO}`, "#a9aec0", "center");
+  K.panel(ctx, 70, listY, W - 140, listH, 28, "rgba(0,0,0,0.40)");
+  rows.forEach(([k, v, col], j) => {
+    const ry = listY + 20 + j * 72;
+    if (j) { ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(100, ry); ctx.lineTo(W - 100, ry); ctx.stroke(); }
+    K.txt(ctx, k, 104, ry + 46, `600 23px ${K.F.MONO}`, "#8a90a2"); K.txt(ctx, v, W - 104, ry + 48, `600 30px ${K.F.MONO}`, col, "right");
+  });
+  let y = listY + listH + 24;
+  const note = (t, col, bg) => { K.panel(ctx, 70, y, W - 140, 76, 20, bg, col + "66"); ctx.font = K.fit(ctx, t, 600, K.F.INTER, 28, W - 200); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.fillText(t, 100, y + 48); y += 96; };
+  if (R.exLeft > 0) note(`💡 Unused LTCG exemption: ${K.rs(R.exLeft)}`, "#22d39a", "rgba(34,211,154,0.08)");
+  if (R.stCarry || R.ltCarry) note(`📌 Loss to carry forward: ${K.rs(R.stCarry + R.ltCarry)}`, "#febc2e", "rgba(254,188,46,0.08)");
+  K.footer(ctx, W, H, K.toolUrl("tax"), `STCG ${S.rSt}% · LTCG ${S.rLt}% above ₹${S.rEx} · Estimate for education · Not tax advice`, true);
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => "capital-gains-estimate" });
+
+showMode(); drawSales(); render();
+</script>
+</body>
+</html>

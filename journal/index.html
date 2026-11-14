@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Risk-Reward &amp; Trade Journal — MANIMINDSMONEY</title>
+<meta name="description" content="Plan trades by risk-reward, log entries and exits, and track win rate and R-multiples. Share a weekly journal summary card. Free, private, works on mobile." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #7c5cff; }
+  .calc { margin-top: 14px; border-radius: 18px; border: 1px solid var(--line); background: rgba(0,0,0,.28); padding: 12px 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .calc div span { display: block; font: 600 .64rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+  .calc div b { font: 600 .98rem "JetBrains Mono"; overflow-wrap: anywhere; }
+  .rbar { grid-column: 1 / -1; display: flex; height: 10px; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,.06); }
+  .rbar i { display: block; height: 100%; }
+  .actions { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 14px; }
+  .trades { display: grid; gap: 8px; margin-top: 14px; max-height: 420px; overflow: auto; padding-right: 2px; }
+  .tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
+  .tr b { font: 700 .95rem "Space Grotesk"; }
+  .tr small { display: block; color: var(--muted); font: .72rem "JetBrains Mono"; margin-top: 2px; overflow-wrap: anywhere; }
+  .tr .r { font: 700 .95rem "JetBrains Mono"; text-align: right; }
+  .tr .r small { text-align: right; }
+  .tr .ops { grid-column: 1 / -1; display: flex; gap: 6px; }
+  .tr .ops button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 8px; padding: 4px 9px; font: 500 .72rem Inter; cursor: pointer; }
+  .tr .ops button:hover { color: var(--fg); }
+  .tag-open { font: 700 .64rem "JetBrains Mono"; color: var(--warn); border: 1px solid rgba(254,188,46,.4); border-radius: 6px; padding: 2px 6px; margin-left: 6px; }
+  .lessons { margin-top: 12px; display: grid; gap: 6px; }
+  .lessons div { font-size: .82rem; color: #cfd3df; padding: 8px 12px; border-radius: 12px; background: rgba(124,92,255,.08); border: 1px solid rgba(124,92,255,.25); }
+  .editing { outline: 2px solid var(--warn); outline-offset: 4px; border-radius: 26px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Plan the risk, <span class="grad">log the result.</span></h1>
+    <p class="sub">Check a trade's risk-reward before you take it, then log the exit. Your journal tracks win rate and R-multiples (profit or loss measured in units of the risk you planned), so you learn from your own trades. Everything stays on this device.</p>
+
+    <div class="layout">
+      <!-- FORM -->
+      <section class="card" id="formCard">
+        <div class="seg mb" id="sideSeg"><div class="pill"></div><button data-v="long">📈 Long<small>buy first</small></button><button data-v="short">📉 Short<small>sell first</small></button></div>
+
+        <div class="cols2">
+          <div><div class="q">Stock</div><label class="field"><input id="sym" class="name" type="text" maxlength="20" placeholder="e.g. HDFCBANK" autocomplete="off" /></label></div>
+          <div><div class="q">Date</div><label class="field"><input id="date" class="txt" type="date" /></label></div>
+        </div>
+
+        <div class="cols3">
+          <div><div class="q">Entry ₹</div><label class="field sm"><input id="entry" type="text" inputmode="decimal" placeholder="500" /></label></div>
+          <div><div class="q">Stop-loss ₹</div><label class="field sm"><input id="sl" type="text" inputmode="decimal" placeholder="490" /></label></div>
+          <div><div class="q">Target ₹</div><label class="field sm"><input id="tgt" type="text" inputmode="decimal" placeholder="530" /></label></div>
+        </div>
+
+        <div class="cols2">
+          <div><div class="q">Quantity <span class="opt">or use risk</span></div><label class="field sm"><input id="qty" type="text" inputmode="numeric" placeholder="auto" /></label></div>
+          <div><div class="q">Max risk ₹ <span class="opt">optional</span></div><label class="field sm"><input id="risk" type="text" inputmode="decimal" placeholder="2,000" /></label></div>
+        </div>
+        <div class="ierr" id="planErr"></div>
+
+        <div class="calc" id="calc"></div>
+
+        <div class="cols2">
+          <div><div class="q">Exit ₹ <span class="opt">leave blank if open</span></div><label class="field sm"><input id="exit" type="text" inputmode="decimal" placeholder="—" /></label></div>
+          <div><div class="q">Setup</div><label class="field sm"><select id="setup"></select></label></div>
+        </div>
+
+        <div class="q">Note / lesson <span class="opt">optional</span></div>
+        <textarea id="note" maxlength="200" placeholder="e.g. Waited for the candle close before entry. Followed the stop-loss."></textarea>
+
+        <div class="actions">
+          <button class="btn primary" id="saveBtn">💾 Save to journal</button>
+          <button class="btn" id="resetBtn" title="Clear the form">Clear</button>
+        </div>
+      </section>
+
+      <!-- JOURNAL -->
+      <section class="card sticky">
+        <div class="res-head"><h2>Journal</h2><span id="meta"></span></div>
+        <div class="seg mb" id="periodSeg"><div class="pill"></div><button data-v="week">This week</button><button data-v="month">This month</button><button data-v="all">All time</button></div>
+        <div id="summary"></div>
+        <label class="toggle"><span>Show ₹ amounts on the shared card<small>Off by default: share R-multiples and lessons, not money</small></span><input type="checkbox" id="optMoney" /><span class="sw"></span></label>
+        <div class="share-row" id="shareRow"><button class="btn ghost" id="csvBtn">⬇ Export journal (CSV)</button></div>
+        <div class="trades" id="trades"></div>
+        <div class="learn"><b>How it's calculated:</b> Risk per share = |entry − stop-loss|. <b>R:R</b> = |target − entry| ÷ risk. <b>Result in R</b> = profit per share ÷ risk per share, so +2R means you made twice what you risked and −1R means you lost exactly what you planned. Break-even win rate for an R:R of 1:x is 1 ÷ (1 + x). Charges and taxes aren't included.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This journal does calculations on numbers you enter, for <b>personal record-keeping and education only</b>. It is not a trading signal, a recommendation or a claim of returns. Trading involves risk, including loss of capital.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const SETUPS = ["Breakout", "Pullback", "Reversal", "Trend follow", "Gap play", "Range", "News / results", "Other"];
+$("#setup").innerHTML = SETUPS.map(s => `<option>${s}</option>`).join("");
+
+const blank = () => ({ side: "long", sym: "", date: K.iso(K.istNow()), entry: "", sl: "", tgt: "", qty: "", risk: "", exit: "", setup: "Breakout", note: "" });
+const S = K.store("journal_v1", { form: blank(), trades: [], period: "week", money: false, editing: null });
+const F = S.form;
+
+/* ---------- form ---------- */
+const NUMS = ["entry", "sl", "tgt", "exit", "risk"];
+function fillForm() {
+  ["sym", "date", "entry", "sl", "tgt", "qty", "risk", "exit", "setup", "note"].forEach(k => $("#" + k).value = F[k] ?? "");
+  placeSide(); $("#formCard").classList.toggle("editing", S.editing != null);
+  $("#saveBtn").textContent = S.editing != null ? "💾 Update trade" : "💾 Save to journal";
+  calc();
+}
+NUMS.forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); F[k] = e.target.value; e.target.closest(".field").classList.remove("err"); calc(); }));
+$("#qty").addEventListener("input", e => { K.fmtNum(e.target, 0); F.qty = e.target.value; calc(); });
+$("#sym").addEventListener("input", e => { F.sym = e.target.value.toUpperCase(); S.save(); });
+["date", "setup", "note"].forEach(k => $("#" + k).addEventListener("input", e => { F[k] = e.target.value; S.save(); }));
+const placeSide = K.seg("#sideSeg", () => F.side, v => { F.side = v; calc(); });
+
+// Core maths for one trade (works for form values and saved trades)
+function math(t) {
+  const dir = t.side === "short" ? -1 : 1;
+  const E = K.num(t.entry), SL = K.num(t.sl), T = K.num(t.tgt), X = K.num(t.exit), R$ = K.num(t.risk);
+  const o = { dir, E, SL, T, X };
+  if (!(E > 0 && SL > 0)) return o;
+  if ((E - SL) * dir <= 0) { o.err = t.side === "short" ? "For a short, the stop-loss must be above the entry." : "For a long, the stop-loss must be below the entry."; return o; }
+  o.rps = Math.abs(E - SL);
+  if (T > 0) { if ((T - E) * dir <= 0) o.err = t.side === "short" ? "For a short, the target must be below the entry." : "For a long, the target must be above the entry."; else o.rr = Math.abs(T - E) / o.rps; }
+  o.q = K.num(t.qty) > 0 ? Math.floor(K.num(t.qty)) : (R$ > 0 ? Math.floor(R$ / o.rps) : 0);
+  if (X > 0) { o.R = (X - E) * dir / o.rps; if (o.q) o.pl = (X - E) * dir * o.q; }
+  return o;
+}
+function calc() {
+  const m = math(F);
+  $("#planErr").textContent = m.err || "";
+  const cell = (k, v, cls = "") => `<div><span>${k}</span><b class="${cls}">${v}</b></div>`;
+  let h = cell("Risk / share", m.rps ? K.money(m.rps) : "—") + cell("R:R", m.rr ? "1 : " + m.rr.toFixed(2) : "—", m.rr >= 2 ? "up" : m.rr && m.rr < 1 ? "down" : "") +
+    cell("Break-even win %", m.rr ? (100 / (1 + m.rr)).toFixed(0) + "%" : "—");
+  h += cell("Quantity", m.q ? K.qty(m.q) : "—") + cell("Capital", m.q ? K.rs(m.q * m.E) : "—") + cell("Max loss", m.q ? K.rs(m.q * m.rps) : "—", "down");
+  if (m.R != null) h += cell("Result", (m.R >= 0 ? "+" : "−") + Math.abs(m.R).toFixed(2) + "R", m.R >= 0 ? "up" : "down") + cell("P&L", m.pl != null ? K.srs(m.pl) : "add qty", m.pl >= 0 ? "up" : "down") + cell("Status", "Closed");
+  if (m.rr) { const a = 100 / (1 + m.rr); h += `<div class="rbar"><i style="width:${a}%;background:var(--down)"></i><i style="width:${100 - a}%;background:var(--up)"></i></div>`; }
+  $("#calc").innerHTML = h; S.save();
+}
+
+$("#saveBtn").addEventListener("click", () => {
+  const m = math(F);
+  if (!F.sym.trim()) { K.shake($("#sym").closest(".field")); K.toast("Add the stock name"); return; }
+  if (!m.rps) { ["entry", "sl"].forEach(k => !(K.num(F[k]) > 0) && K.shake($("#" + k).closest(".field"))); K.toast(m.err ? "Check the stop-loss" : "Entry and stop-loss are needed"); return; }
+  if (m.err) { K.toast("Check the highlighted values"); return; }
+  const t = { ...F, id: S.editing ?? Date.now() };
+  if (S.editing != null) { const i = S.trades.findIndex(x => x.id === S.editing); if (i >= 0) S.trades[i] = t; S.editing = null; K.toast("✅ Trade updated"); }
+  else { S.trades.unshift(t); K.toast(K.num(F.exit) > 0 ? "✅ Closed trade saved" : "✅ Open trade saved. Add the exit later"); }
+  Object.assign(F, blank(), { side: F.side, date: F.date, setup: F.setup }); fillForm(); render();
+});
+$("#resetBtn").addEventListener("click", () => { S.editing = null; Object.assign(F, blank()); fillForm(); });
+
+/* ---------- journal ---------- */
+const placePeriod = K.seg("#periodSeg", () => S.period, v => { S.period = v; render(); });
+$("#optMoney").checked = S.money;
+$("#optMoney").addEventListener("change", e => { S.money = e.target.checked; render(); });
+function inPeriod(t) {
+  if (S.period === "all") return true;
+  const d = K.parseISO(t.date), n = K.istNow();
+  if (S.period === "month") return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth();
+  const mon = new Date(n.getFullYear(), n.getMonth(), n.getDate() - ((n.getDay() + 6) % 7));
+  return d >= mon && d < new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7);
+}
+const PERIOD_LBL = { week: "This week", month: "This month", all: "All time" };
+function periodName() {
+  const n = K.istNow();
+  if (S.period === "month") return n.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  if (S.period === "all") return "All trades";
+  const mon = new Date(n.getFullYear(), n.getMonth(), n.getDate() - ((n.getDay() + 6) % 7)), fri = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 4);
+  return `Week of ${mon.getDate()}${mon.getMonth() !== fri.getMonth() ? " " + mon.toLocaleDateString("en-IN", { month: "short" }) : ""} – ${fri.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`;
+}
+function stats() {
+  const list = S.trades.filter(inPeriod).map(t => ({ t, m: math(t) }));
+  const closed = list.filter(x => x.m.R != null), open = list.length - closed.length;
+  const wins = closed.filter(x => x.m.R > 0), losses = closed.filter(x => x.m.R <= 0);
+  const sum = a => a.reduce((s, x) => s + x, 0);
+  const totR = sum(closed.map(x => x.m.R)), pls = closed.filter(x => x.m.pl != null);
+  const bySetup = {}; closed.forEach(x => { (bySetup[x.t.setup] ||= []).push(x.m.R); });
+  const best = Object.entries(bySetup).map(([k, v]) => [k, sum(v), v.length]).sort((a, b) => b[1] - a[1])[0];
+  return {
+    list, closed, open, wins: wins.length, losses: losses.length,
+    win: closed.length ? wins.length / closed.length * 100 : 0, totR, avgR: closed.length ? totR / closed.length : 0,
+    avgW: wins.length ? sum(wins.map(x => x.m.R)) / wins.length : 0, avgL: losses.length ? sum(losses.map(x => x.m.R)) / losses.length : 0,
+    pl: pls.length ? sum(pls.map(x => x.m.pl)) : null, plCount: pls.length,
+    bestT: closed.slice().sort((a, b) => b.m.R - a.m.R)[0], worstT: closed.slice().sort((a, b) => a.m.R - b.m.R)[0], bestSetup: best,
+    lessons: list.map(x => x.t.note.trim()).filter(Boolean).slice(0, 3),
+  };
+}
+const Rf = r => (r >= 0 ? "+" : "−") + Math.abs(r).toFixed(2) + "R";
+function render() {
+  const s = stats(), st = (k, v, cls = "", wide) => `<div class="stat${wide ? " wide" : ""}"><span>${k}</span><b class="${cls}">${v}</b></div>`;
+  $("#meta").textContent = `${S.trades.length} trade${S.trades.length === 1 ? "" : "s"} saved`;
+  if (!s.list.length) $("#summary").innerHTML = `<div class="placeholder">${S.trades.length ? "No trades in this period." : "Plan a trade on the left and tap <b>Save to journal</b>. Add the exit price when you close it."}</div>`;
+  else {
+    let h = `<div class="hero-res"><span>${PERIOD_LBL[S.period]} · total</span><strong class="${s.totR >= 0 ? "up" : "down"}">${s.closed.length ? Rf(s.totR) : "—"}</strong><em>${s.closed.length} closed${s.open ? ` · ${s.open} open` : ""}${s.pl != null ? ` · ${K.srs(s.pl)}` : ""}</em></div><div class="stats">`;
+    h += st("Win rate", s.closed.length ? `${s.win.toFixed(0)}% (${s.wins}W / ${s.losses}L)` : "—") + st("Avg trade", s.closed.length ? Rf(s.avgR) : "—", s.avgR >= 0 ? "up" : "down");
+    h += st("Avg win", s.wins ? Rf(s.avgW) : "—", "up") + st("Avg loss", s.losses ? Rf(s.avgL) : "—", "down");
+    if (s.bestSetup) h += st("Best setup", `${s.bestSetup[0]} (${Rf(s.bestSetup[1])} over ${s.bestSetup[2]})`, "", true);
+    h += "</div>";
+    if (s.lessons.length) h += `<div class="lessons">${s.lessons.map(l => `<div>📝 ${K.esc(l)}</div>`).join("")}</div>`;
+    $("#summary").innerHTML = h;
+  }
+  $("#trades").innerHTML = s.list.map(({ t, m }) => `<div class="tr" data-id="${t.id}">
+      <div><b>${K.esc(t.sym)}</b>${m.R == null ? '<span class="tag-open">OPEN</span>' : ""}<small>${t.side === "short" ? "Short" : "Long"} · ${K.niceDate(t.date, { day: "numeric", month: "short" })} · ${K.esc(t.setup)} · ${K.nf(m.E)} → ${m.X ? K.nf(m.X) : "?"} · SL ${K.nf(m.SL)}</small></div>
+      <div class="r ${m.R == null ? "" : m.R >= 0 ? "up" : "down"}">${m.R == null ? (m.rr ? "1:" + m.rr.toFixed(1) : "—") : Rf(m.R)}<small>${m.pl != null ? K.srs(m.pl) : ""}</small></div>
+      <div class="ops"><button data-op="edit">${m.R == null ? "✏️ Add exit / edit" : "✏️ Edit"}</button><button data-op="del">🗑 Delete</button></div>
+    </div>`).join("");
+  S.save();
+}
+$("#trades").addEventListener("click", e => {
+  const b = e.target.closest("[data-op]"); if (!b) return; const id = +b.closest(".tr").dataset.id, t = S.trades.find(x => x.id === id);
+  if (b.dataset.op === "del") { if (confirm(`Delete the ${t.sym} trade?`)) { S.trades = S.trades.filter(x => x.id !== id); if (S.editing === id) { S.editing = null; Object.assign(F, blank()); fillForm(); } render(); } return; }
+  S.editing = id; Object.assign(F, blank(), t); delete F.id; fillForm();
+  $("#formCard").scrollIntoView({ behavior: "smooth", block: "start" }); (K.num(F.exit) > 0 ? $("#note") : $("#exit")).focus({ preventScroll: true });
+});
+$("#csvBtn").addEventListener("click", () => {
+  if (!S.trades.length) { K.toast("No trades to export"); return; }
+  const head = ["date", "stock", "side", "setup", "entry", "stop_loss", "target", "exit", "qty", "risk_per_share", "rr", "result_R", "pnl", "note"];
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = S.trades.map(t => { const m = math(t); return [t.date, t.sym, t.side, t.setup, m.E || "", m.SL || "", m.T || "", m.X || "", m.q || "", m.rps?.toFixed(2) ?? "", m.rr?.toFixed(2) ?? "", m.R?.toFixed(2) ?? "", m.pl?.toFixed(2) ?? "", t.note].map(q).join(","); });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([head.join(",") + "\n" + rows.join("\n")], { type: "text/csv" }));
+  a.download = `trade-journal-${K.iso(K.istNow())}.csv`; a.click();
+});
+
+/* ---------- share ---------- */
+const DISC = "⚠️ _Personal trade journal for learning. Not a recommendation or a claim of returns. Not SEBI registered._";
+function valid() { if (stats().closed.length) return true; K.toast("Close at least one trade in this period first"); return false; }
+function buildText() {
+  const s = stats(), out = [`📒 *MY TRADING JOURNAL* · ${periodName()}`, ""];
+  out.push(`Trades closed: ${s.closed.length}${s.open ? ` (${s.open} still open)` : ""}`, `Win rate: ${s.win.toFixed(0)}% (${s.wins}W / ${s.losses}L)`, `Total: *${Rf(s.totR)}* · Avg: ${Rf(s.avgR)}`);
+  if (s.wins && s.losses) out.push(`Avg win ${Rf(s.avgW)} · Avg loss ${Rf(s.avgL)}`);
+  if (S.money && s.pl != null) out.push(`P&L: ${K.srs(s.pl)}`);
+  if (s.bestSetup) out.push(`Best setup: ${s.bestSetup[0]}`);
+  if (s.lessons.length) { out.push("", "📝 *Lessons*"); s.lessons.forEach(l => out.push("• " + K.clean(l))); }
+  out.push("", "_R = profit or loss in units of planned risk. +2R = made twice what I risked._");
+  return out.concat(K.signoff("journal", "Track yours", DISC)).join("\n");
+}
+async function draw() {
+  await K.loadFonts();
+  const s = stats(), W = 1080, m = K.measure(); m.font = `400 28px ${K.F.INTER}`;
+  const lessons = s.lessons.map(l => K.cap(K.wrap(m, "• " + K.clean(l), W - 200), 2));
+  const lessonsH = lessons.length ? 70 + lessons.reduce((a, l) => a + l.length * 40 + 10, 0) + 20 : 0;
+  const rows = [["WIN RATE", `${s.win.toFixed(0)}%  (${s.wins}W / ${s.losses}L)`, "#eef0f6"], ["AVERAGE TRADE", Rf(s.avgR), s.avgR >= 0 ? "#22d39a" : "#ff5470"]];
+  if (s.wins) rows.push(["AVERAGE WIN", Rf(s.avgW), "#22d39a"]);
+  if (s.losses) rows.push(["AVERAGE LOSS", Rf(s.avgL), "#ff5470"]);
+  if (s.bestSetup) rows.push(["BEST SETUP", s.bestSetup[0], "#c9bcff"]);
+  if (S.money && s.pl != null) rows.push(["P&L", K.srs(s.pl), s.pl >= 0 ? "#22d39a" : "#ff5470"]);
+  const heroY = 320, heroH = 250, listY = heroY + heroH + 24, listH = 40 + rows.length * 76;
+  const H = listY + listH + (lessonsH ? lessonsH + 24 : 0) + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "MY TRADING JOURNAL", 70, 205, `600 26px ${K.F.MONO}`, "#22d39a");
+  ctx.font = K.fit(ctx, periodName(), 700, K.F.GROT, 72, W - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(periodName(), 70, 284);
+  K.rr(ctx, 70, heroY, W - 140, heroH, 32);
+  const hg = ctx.createLinearGradient(70, heroY, W - 70, heroY + heroH); hg.addColorStop(0, s.totR >= 0 ? "rgba(34,211,154,0.20)" : "rgba(255,84,112,0.18)"); hg.addColorStop(1, "rgba(124,92,255,0.12)");
+  ctx.fillStyle = hg; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = s.totR >= 0 ? "rgba(34,211,154,0.5)" : "rgba(255,84,112,0.5)"; ctx.stroke();
+  K.txt(ctx, "TOTAL RESULT", W / 2, heroY + 60, `600 26px ${K.F.MONO}`, "#c9bcff", "center");
+  K.txt(ctx, Rf(s.totR), W / 2, heroY + 165, `700 104px ${K.F.GROT}`, s.totR >= 0 ? "#22d39a" : "#ff5470", "center");
+  K.txt(ctx, `${s.closed.length} closed trade${s.closed.length === 1 ? "" : "s"}${s.open ? ` · ${s.open} open` : ""}`, W / 2, heroY + 218, `500 28px ${K.F.MONO}`, "#a9aec0", "center");
+  K.panel(ctx, 70, listY, W - 140, listH, 28, "rgba(0,0,0,0.40)");
+  rows.forEach(([k, v, col], j) => {
+    const ry = listY + 20 + j * 76;
+    if (j) { ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(100, ry); ctx.lineTo(W - 100, ry); ctx.stroke(); }
+    K.txt(ctx, k, 104, ry + 48, `600 24px ${K.F.MONO}`, "#8a90a2");
+    ctx.font = K.fit(ctx, v, 600, K.F.MONO, 32, W - 480); ctx.fillStyle = col; ctx.textAlign = "right"; ctx.fillText(v, W - 104, ry + 50);
+  });
+  let y = listY + listH + 24;
+  if (lessonsH) {
+    K.panel(ctx, 70, y, W - 140, lessonsH, 28, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
+    K.txt(ctx, "LESSONS", 100, y + 50, `600 22px ${K.F.MONO}`, "#b6a6ff");
+    let ly = y + 70; lessons.forEach(ls => { ls.forEach(l => { ly += 40; K.txt(ctx, l, 100, ly, `400 28px ${K.F.INTER}`, "#d5d8e3"); }); ly += 10; });
+  }
+  K.footer(ctx, W, H, K.toolUrl("journal"), "Personal journal for learning · Not a recommendation · Not SEBI registered", true);
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => `journal-${S.period}-${K.iso(K.istNow())}`, imgLabel: "Share journal summary" });
+
+fillForm(); render();
+</script>
+</body>
+</html>
