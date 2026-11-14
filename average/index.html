@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Average Price Calculator — MANIMINDSMONEY</title>
+<meta name="description" content="Stock averaging calculator: find your average buy price across multiple buys, your profit or loss at the current price, and how many shares to buy to reach a target average." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.72); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .22; animation: float 18s ease-in-out infinite alternate; }
+  .blob.b1 { background: var(--a1); top: -25vmax; left: -15vmax; opacity: .24; }
+  .blob.b2 { background: var(--a2); bottom: -30vmax; right: -20vmax; animation-delay: -6s; opacity: .14; }
+  .blob.b3 { background: var(--a3); top: 35%; left: 50%; width: 30vmax; height: 30vmax; animation-delay: -12s; opacity: .10; }
+  @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .5; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 700 1.05rem "Space Grotesk"; letter-spacing: .04em; }
+  .brand i { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .95rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav a { font-size: .8rem; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .nav a:hover { color: var(--fg); }
+
+  h1 { font: 700 clamp(1.9rem, 6vw, 2.8rem)/1.05 "Space Grotesk"; letter-spacing: -.04em; margin-bottom: 8px; }
+  .grad { background: linear-gradient(100deg, var(--a1), #5b8cff 45%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin-bottom: 22px; font-size: .95rem; max-width: 660px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .layout > * { min-width: 0; }
+  @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: clamp(18px, 4.5vw, 28px); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3); box-shadow: 0 30px 80px -30px rgba(0,0,0,.7); }
+  .sticky { position: sticky; top: 16px; }
+  @media (max-width: 920px) { .sticky { position: static; } }
+
+  .q { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 600 .74rem "JetBrains Mono"; letter-spacing: .12em; text-transform: uppercase; color: var(--a2); margin: 20px 0 8px; }
+  .q:first-child { margin-top: 0; }
+  .q .opt { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; font-family: Inter; }
+  .hint { font-size: .76rem; color: var(--muted); margin-top: 6px; line-height: 1.45; }
+
+  .field { display: flex; align-items: center; gap: 8px; padding: 2px 14px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1.5px solid var(--line); transition: border-color .25s, box-shadow .25s; }
+  .field:focus-within { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .field.err { border-color: var(--down); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .field .unit { font: 600 .9rem "JetBrains Mono"; color: var(--muted); }
+  .field input { width: 100%; flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--fg); font: 600 1.05rem "JetBrains Mono"; padding: 11px 0; }
+  .field input::placeholder { color: #3f4558; }
+  .field input.name { font-family: "Space Grotesk"; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pair .q { margin-top: 16px; }
+
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 16px; background: rgba(0,0,0,.35); border: 1px solid var(--line); position: relative; margin-bottom: 18px; }
+  .seg button { position: relative; z-index: 1; border: 0; background: none; color: var(--muted); padding: 11px 6px; border-radius: 12px; font: 600 .88rem Inter; cursor: pointer; transition: color .25s; line-height: 1.2; }
+  .seg button small { display: block; font-weight: 400; font-size: .7rem; opacity: .75; margin-top: 2px; }
+  .seg button.on { color: #000; }
+  .seg .pill { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 12px; background: var(--fg); transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s; }
+
+  /* buy rows */
+  .buys-head, .buy { display: grid; grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 8px; align-items: center; }
+  .buys-head { font: 600 .68rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); padding: 0 2px 6px; }
+  .buy { margin-top: 8px; animation: pop .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px); } }
+  .buy .n { font: 600 .8rem "JetBrains Mono"; color: var(--muted); text-align: center; }
+  .buy .field { padding: 0 10px; }
+  .buy .field input { font-size: .98rem; padding: 10px 0; }
+  .buy .amt { grid-column: 2 / 4; font: .72rem "JetBrains Mono"; color: var(--muted); margin: -2px 0 0 4px; }
+  .rm { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); cursor: pointer; font-size: 1rem; }
+  .rm:hover { color: var(--down); border-color: rgba(255,84,112,.4); }
+  .rm[disabled] { visibility: hidden; }
+  .add { width: 100%; margin-top: 12px; padding: 13px; border-radius: 16px; border: 1px dashed rgba(0,224,184,.45); background: rgba(0,224,184,.05); color: var(--a2); font: 600 .9rem Inter; cursor: pointer; }
+  .add:hover { background: rgba(0,224,184,.1); }
+  .add[hidden] { display: none; }
+  .ierr { font-size: .78rem; color: #ff9aab; margin-top: 10px; }
+  .ierr:empty { display: none; }
+  [hidden] { display: none !important; }
+
+  /* results */
+  .res-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+  .res-head h2 { font: 700 1.1rem "Space Grotesk"; }
+  .res-head span { font: .72rem "JetBrains Mono"; color: var(--muted); }
+  .hero-res { border-radius: 22px; padding: 20px; background: linear-gradient(135deg, rgba(124,92,255,.18), rgba(0,224,184,.08)); border: 1px solid rgba(124,92,255,.4); text-align: center; animation: pop .4s cubic-bezier(.2,.8,.2,1); }
+  .hero-res span { font: 600 .72rem "JetBrains Mono"; letter-spacing: .12em; color: #c9bcff; text-transform: uppercase; }
+  .hero-res strong { display: block; font: 700 clamp(2.2rem, 8vw, 3.2rem)/1.1 "Space Grotesk"; letter-spacing: -.03em; margin: 6px 0 4px; word-break: break-word; }
+  .hero-res em { font-style: normal; font-size: .85rem; color: var(--muted); }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .stat { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: rgba(0,0,0,.28); min-width: 0; }
+  .stat span { display: block; font: 600 .66rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+  .stat b { font: 600 1.05rem "JetBrains Mono"; word-break: break-word; }
+  .stat.wide { grid-column: 1 / -1; }
+  .up { color: var(--up); } .down { color: var(--down); }
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 12px; border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: rgba(0,0,0,.28); text-align: center; }
+  .flow span { display: block; font: 600 .66rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+  .flow b { font: 700 1.15rem "JetBrains Mono"; }
+  .flow i { font-style: normal; color: var(--a2); font-size: 1.3rem; }
+  .placeholder { text-align: center; color: var(--muted); padding: 30px 10px; font-size: .9rem; border: 1px dashed var(--line); border-radius: 18px; }
+  .warnbox { margin-top: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(254,188,46,.3); background: rgba(254,188,46,.06); color: #e6cf8f; font-size: .8rem; line-height: 1.5; }
+
+  .share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 16px; font: 600 .98rem Inter; border: 1px solid var(--line); cursor: pointer; transition: transform .15s, background .2s; color: var(--fg); background: rgba(255,255,255,.05); text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.img { grid-column: 1 / -1; background: linear-gradient(100deg, rgba(124,92,255,.22), rgba(0,224,184,.16)); border: 1px solid rgba(124,92,255,.5); font-weight: 700; }
+  .btn.img[disabled] { opacity: .6; pointer-events: none; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; font-weight: 700; }
+  .btn.wa svg { width: 18px; height: 18px; }
+  .btn.primary { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+  .learn { margin-top: 16px; font-size: .8rem; color: var(--muted); line-height: 1.55; border-top: 1px solid var(--line); padding-top: 14px; }
+  .learn b { color: #cfd3df; }
+
+  .toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translate(-50%, 140px); background: var(--fg); color: #000; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .4s cubic-bezier(.2,.8,.2,1); z-index: 30; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); }
+  .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .modal-card { width: 100%; max-width: 440px; max-height: 100%; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px; }
+  .modal-card img { display: block; max-width: 100%; max-height: min(62vh, 560px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); }
+  .modal-card p { font-size: .88rem; color: #cfd3df; margin: 14px 4px 4px; line-height: 1.5; }
+  .modal-card .row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 14px; }
+  .disclaimer { margin: 26px auto 0; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.25); background: rgba(254,188,46,.05); color: #b9a77a; font-size: .76rem; line-height: 1.6; }
+  .disclaimer b { color: #f5d27a; }
+  footer { margin-top: 18px; text-align: center; color: #5a6072; font-size: .75rem; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../sl-calculator/">SL Calculator</a><a href="../levels/">Levels</a><a href="../quiz/">Quiz</a><a href="../message/">Message</a><a href="../ipo/">IPO card</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Know your <span class="grad">real average.</span></h1>
+    <p class="sub">Bought the same stock more than once? Add every buy to get your average price, total shares and profit or loss. Or enter a target average to see how many shares you'd need to buy to get there, and what it would cost.</p>
+
+    <div class="layout">
+      <!-- INPUT -->
+      <section class="card">
+        <div class="seg" id="modeSeg">
+          <div class="pill"></div>
+          <button data-v="buys" class="on">My buys<small>find my average</small></button>
+          <button data-v="target">Target average<small>how many to buy?</small></button>
+        </div>
+
+        <div class="q">Stock <span class="opt">optional</span></div>
+        <label class="field"><span class="unit">📈</span><input id="stock" class="name" type="text" maxlength="24" placeholder="e.g. TATAMOTORS" autocomplete="off" /></label>
+
+        <!-- MODE: BUYS -->
+        <div id="buysPane">
+          <div class="q">Your buys <span class="opt">price × quantity</span></div>
+          <div class="buys-head"><span>#</span><span>BUY PRICE ₹</span><span>QUANTITY</span><span></span></div>
+          <div id="buys"></div>
+          <button class="add" id="addBtn">＋ Add another buy</button>
+          <div class="ierr" id="buysErr"></div>
+
+          <div class="q">Current market price <span class="opt">optional, for P&amp;L</span></div>
+          <label class="field"><span class="unit">₹</span><input id="cmp" type="text" inputmode="decimal" placeholder="e.g. 640" /></label>
+        </div>
+
+        <!-- MODE: TARGET -->
+        <div id="targetPane" hidden>
+          <div class="pair">
+            <div>
+              <div class="q">Shares you hold</div>
+              <label class="field"><input id="tQty" type="text" inputmode="numeric" placeholder="100" /></label>
+            </div>
+            <div>
+              <div class="q">Your average ₹</div>
+              <label class="field"><input id="tAvg" type="text" inputmode="decimal" placeholder="800" /></label>
+            </div>
+          </div>
+          <div class="pair">
+            <div>
+              <div class="q">Buy price now ₹</div>
+              <label class="field"><input id="tCmp" type="text" inputmode="decimal" placeholder="600" /></label>
+            </div>
+            <div>
+              <div class="q">Target average ₹</div>
+              <label class="field"><input id="tTarget" type="text" inputmode="decimal" placeholder="700" /></label>
+            </div>
+          </div>
+          <p class="hint">The target must be between today's price and your current average. You can only average down to a price above today's price, or average up to a price below it.</p>
+          <div class="ierr" id="tErr"></div>
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section class="card sticky">
+        <div class="res-head"><h2>Result</h2><span id="resMeta">updates as you type</span></div>
+        <div id="out"></div>
+
+        <div class="share-row">
+          <button class="btn img" id="imgBtn">📸 Share as image</button>
+          <button class="btn" id="copyBtn">📋 Copy text</button>
+          <button class="btn wa" id="waBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg> WhatsApp</button>
+        </div>
+
+        <div class="learn">
+          <b>How it's calculated:</b> Average price = total money invested ÷ total shares, where total money invested = Σ (price × quantity).
+          <b>Target average:</b> shares to buy = held qty × (current avg − target) ÷ (target − buy price), rounded up to a whole share.
+          <b>Remember:</b> averaging down lowers your break-even, but it also puts more money into a stock that is falling. Only average into a position you'd still buy fresh today, and keep a stop-loss on the whole position.
+        </div>
+      </section>
+    </div>
+
+    <div class="disclaimer">
+      <b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This calculator does arithmetic on the numbers you enter and is shared for <b>educational purposes only</b>. It does not include brokerage, taxes or other charges, and it is not investment advice or a recommendation to buy, sell or average any security. Trading involves risk, including loss of capital.
+    </div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+  <div class="toast" id="toast">Copied ✓</div>
+  <div class="modal" id="imgModal" hidden>
+    <div class="modal-card">
+      <img id="imgPrev" alt="Average price snapshot" />
+      <p id="imgMsg"></p>
+      <div class="row">
+        <a class="btn" id="imgDl" download="average-price.png">⬇ Download</a>
+        <button class="btn primary" id="imgClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const MAX = 10;
+const num = s => parseFloat(String(s).replace(/[,₹\s]/g, ""));
+const fmtNum = (el, dec = 2) => {
+  const raw = el.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+  if (raw === "") { el.value = ""; return; }
+  const [i, d] = raw.split(".");
+  el.value = (i ? Number(i).toLocaleString("en-IN") : "0") + (dec && d !== undefined ? "." + d.slice(0, dec) : "");
+};
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const money = (n, dp = 2) => "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: dp, maximumFractionDigits: dp });
+const rs = n => money(n, Math.abs(n) >= 1e5 ? 0 : 2);
+const qty = n => n.toLocaleString("en-IN");
+const sign = n => (n > 0 ? "+" : n < 0 ? "−" : "");
+const pctS = p => sign(p) + Math.abs(p).toFixed(2) + "%";
+
+/* ---------- state ---------- */
+const saved = JSON.parse(localStorage.getItem("avg_form") || "{}");
+const S = Object.assign({ mode: "buys", stock: "", cmp: "", rows: [{ p: "", q: "" }, { p: "", q: "" }], tQty: "", tAvg: "", tCmp: "", tTarget: "" }, saved);
+function save() { localStorage.setItem("avg_form", JSON.stringify(S)); }
+$("#stock").value = S.stock; $("#cmp").value = S.cmp;
+["tQty", "tAvg", "tCmp", "tTarget"].forEach(k => $("#" + k).value = S[k]);
+
+/* ---------- segmented ---------- */
+const seg = $("#modeSeg"), pill = seg.querySelector(".pill"), segBtns = [...seg.querySelectorAll("button")];
+function placePill() {
+  const on = segBtns.find(b => b.dataset.v === S.mode) || segBtns[0];
+  segBtns.forEach(b => b.classList.toggle("on", b === on));
+  pill.style.width = on.offsetWidth + "px"; pill.style.transform = `translateX(${on.offsetLeft - 4}px)`;
+  $("#buysPane").hidden = S.mode !== "buys"; $("#targetPane").hidden = S.mode !== "target";
+}
+segBtns.forEach(b => b.addEventListener("click", () => { S.mode = b.dataset.v; placePill(); render(); }));
+addEventListener("resize", placePill);
+
+/* ---------- buy rows ---------- */
+function drawRows() {
+  $("#buys").innerHTML = S.rows.map((r, i) => `
+    <div class="buy" data-i="${i}">
+      <span class="n">${i + 1}</span>
+      <label class="field"><input class="p" type="text" inputmode="decimal" value="${r.p}" placeholder="${["850", "720", "640"][i] || "price"}" /></label>
+      <label class="field"><input class="qn" type="text" inputmode="numeric" value="${r.q}" placeholder="${["50", "50", "100"][i] || "qty"}" /></label>
+      <button class="rm" title="Remove" ${S.rows.length <= 1 ? "disabled" : ""}>✕</button>
+      <span class="amt"></span>
+    </div>`).join("");
+  $("#addBtn").hidden = S.rows.length >= MAX;
+}
+$("#buys").addEventListener("input", e => {
+  const box = e.target.closest(".buy"); if (!box) return; const r = S.rows[+box.dataset.i];
+  if (e.target.classList.contains("p")) { fmtNum(e.target); r.p = e.target.value; }
+  else if (e.target.classList.contains("qn")) { fmtNum(e.target, 0); r.q = e.target.value; }
+  e.target.closest(".field").classList.remove("err");
+  render();
+});
+$("#buys").addEventListener("click", e => {
+  const box = e.target.closest(".buy"); if (!box || !e.target.closest(".rm")) return;
+  S.rows.splice(+box.dataset.i, 1); drawRows(); render();
+});
+$("#addBtn").addEventListener("click", () => {
+  if (S.rows.length >= MAX) return;
+  S.rows.push({ p: "", q: "" }); drawRows(); render();
+  $("#buys").lastElementChild.querySelector(".p").focus();
+});
+$("#stock").addEventListener("input", e => { S.stock = e.target.value.toUpperCase(); render(); });
+$("#cmp").addEventListener("input", e => { fmtNum(e.target); S.cmp = e.target.value; render(); });
+["tAvg", "tCmp", "tTarget"].forEach(k => $("#" + k).addEventListener("input", e => { fmtNum(e.target); S[k] = e.target.value; e.target.closest(".field").classList.remove("err"); render(); }));
+$("#tQty").addEventListener("input", e => { fmtNum(e.target, 0); S.tQty = e.target.value; e.target.closest(".field").classList.remove("err"); render(); });
+
+/* ---------- maths ---------- */
+function calcBuys() {
+  const rows = S.rows.map(r => ({ p: num(r.p), q: num(r.q), raw: r }));
+  const partial = rows.some(r => (r.raw.p || r.raw.q) && !(r.p > 0 && r.q > 0));
+  const ok = rows.filter(r => r.p > 0 && r.q > 0);
+  if (!ok.length) return { empty: true, partial };
+  const Q = ok.reduce((a, r) => a + r.q, 0), I = ok.reduce((a, r) => a + r.p * r.q, 0), A = I / Q;
+  const C = num(S.cmp), res = { ok, Q, I, A, partial };
+  if (C > 0) { res.C = C; res.V = C * Q; res.PL = res.V - I; res.PLp = res.PL / I * 100; }
+  return res;
+}
+function calcTarget() {
+  const Q = num(S.tQty), A = num(S.tAvg), P = num(S.tCmp), T = num(S.tTarget);
+  if (!(Q > 0 && A > 0 && P > 0 && T > 0)) return { empty: true };
+  if (P === A) return { err: "The buy price equals your average, so buying more can't change your average." };
+  const lo = Math.min(P, A), hi = Math.max(P, A);
+  if (!(T > lo && T < hi)) return { err: P < A
+    ? `Averaging down: the target must be below your average (${money(A)}) and above the buy price (${money(P)}).`
+    : `Averaging up: the target must be above your average (${money(A)}) and below the buy price (${money(P)}).` };
+  const x = Math.ceil(Q * (A - T) / (T - P) - 1e-9);
+  const cost = x * P, NQ = Q + x, NI = Q * A + cost, NA = NI / NQ;
+  return { Q, A, P, T, x, cost, NQ, NI, NA, down: P < A, move: (A - NA) / A * 100 };
+}
+
+/* ---------- render ---------- */
+const stat = (k, v, cls = "", wide = false) => `<div class="stat${wide ? " wide" : ""}"><span>${k}</span><b class="${cls}">${v}</b></div>`;
+function render() {
+  if (S.mode === "buys") {
+    const r = calcBuys();
+    document.querySelectorAll(".buy").forEach((box, i) => {
+      const p = num(S.rows[i].p), q = num(S.rows[i].q);
+      box.querySelector(".amt").textContent = p > 0 && q > 0 ? `= ${rs(p * q)}` : "";
+    });
+    $("#buysErr").textContent = r.partial ? "Some buys are missing a price or quantity and are left out." : "";
+    $("#resMeta").textContent = r.empty ? "updates as you type" : `${r.ok.length} buy${r.ok.length > 1 ? "s" : ""}${S.stock ? " · " + S.stock : ""}`;
+    if (r.empty) { $("#out").innerHTML = `<div class="placeholder">Enter the price and quantity of each buy to see your average price.</div>`; save(); return; }
+    let h = `<div class="hero-res"><span>Average buy price</span><strong>${money(r.A)}</strong><em>${qty(r.Q)} shares · ${rs(r.I)} invested</em></div><div class="stats">`;
+    h += stat("Total shares", qty(r.Q)) + stat("Total invested", rs(r.I));
+    if (r.C) {
+      const c = r.PL >= 0 ? "up" : "down";
+      h += stat("Current value", rs(r.V)) + stat("Break-even", money(r.A));
+      h += stat(r.PL >= 0 ? "Profit" : "Loss", `${sign(r.PL)}${rs(Math.abs(r.PL))} (${pctS(r.PLp)})`, c, true);
+    }
+    h += "</div>";
+    $("#out").innerHTML = h;
+  } else {
+    const r = calcTarget();
+    $("#tErr").textContent = r.err || "";
+    $("#resMeta").textContent = r.x ? (r.down ? "averaging down" : "averaging up") + (S.stock ? " · " + S.stock : "") : "updates as you type";
+    if (!r.x) { $("#out").innerHTML = `<div class="placeholder">${r.err ? "Check the values on the left." : "Enter your holding, today's price and the average you want to reach."}</div>`; save(); return; }
+    let h = `<div class="hero-res"><span>Buy</span><strong>${qty(r.x)} shares</strong><em>at ${money(r.P)} · costs ${rs(r.cost)}</em></div>`;
+    h += `<div class="flow"><div><span>AVERAGE NOW</span><b>${money(r.A)}</b></div><i>→</i><div><span>NEW AVERAGE</span><b class="${r.down ? "up" : "down"}">${money(r.NA)}</b></div></div>`;
+    h += `<div class="stats">${stat("New total shares", qty(r.NQ))}${stat("New total invested", rs(r.NI))}${stat("Extra money needed", rs(r.cost))}${stat("Holding grows", "×" + (r.NQ / r.Q).toFixed(2))}</div>`;
+    if (r.down && r.cost > r.Q * r.A) h += `<div class="warnbox">⚠️ This needs more money than you've already put in (${rs(r.Q * r.A)}). Averaging down this hard makes the position much larger and riskier.</div>`;
+    $("#out").innerHTML = h;
+  }
+  save();
+}
+
+/* ---------- text ---------- */
+const TOOL_URL = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host)
+  ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/average/";
+const DISCL = "⚠️ _Disclaimer: Not SEBI registered. Educational calculation only, excludes charges. Not investment advice._";
+function buildText() {
+  const name = S.stock.trim();
+  const out = [];
+  if (S.mode === "buys") {
+    const r = calcBuys();
+    out.push(`🧮 *AVERAGE PRICE*${name ? " · " + name : ""}`, "");
+    r.ok.forEach((b, i) => out.push(`${i + 1}. ${qty(b.q)} @ ${money(b.p)} = ${rs(b.p * b.q)}`));
+    out.push("", `📊 *Average: ${money(r.A)}*`, `Total shares: ${qty(r.Q)}`, `Invested: ${rs(r.I)}`);
+    if (r.C) out.push("", `Current price: ${money(r.C)}`, `Current value: ${rs(r.V)}`, `${r.PL >= 0 ? "🟢 Profit" : "🔴 Loss"}: ${sign(r.PL)}${rs(Math.abs(r.PL))} (${pctS(r.PLp)})`);
+  } else {
+    const r = calcTarget();
+    out.push(`🎯 *TARGET AVERAGE*${name ? " · " + name : ""}`, "",
+      `Holding: ${qty(r.Q)} @ ${money(r.A)}`, `Buy price now: ${money(r.P)}`, `Target average: ${money(r.T)}`, "",
+      `👉 *Buy ${qty(r.x)} shares* (${rs(r.cost)})`,
+      `New average: ${money(r.NA)}`, `New holding: ${qty(r.NQ)} shares · ${rs(r.NI)} invested`);
+  }
+  out.push("", "— MANIMINDSMONEY Community", `_Calculate yours: ${TOOL_URL}_`, DISCL);
+  return out.join("\n");
+}
+
+/* ---------- share ---------- */
+function shakeEmpty(sel) {
+  document.querySelectorAll(sel).forEach(inp => { if (!(num(inp.value) > 0)) { const fl = inp.closest(".field"); fl.classList.remove("err"); void fl.offsetWidth; fl.classList.add("err"); } });
+}
+function valid() {
+  if (S.mode === "buys") {
+    if (!calcBuys().empty) return true;
+    shakeEmpty("#buys input"); toast("Enter at least one buy first"); return false;
+  }
+  const r = calcTarget();
+  if (r.x) return true;
+  shakeEmpty("#targetPane input"); toast(r.err ? "Check the target average" : "Fill in all four values"); return false;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch { const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;opacity:0;top:0"; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok; }
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1900); }
+$("#copyBtn").addEventListener("click", async () => { if (!valid()) return; toast(await copyText(buildText()) ? "Copied ✓ Paste it in WhatsApp" : "Couldn't copy"); });
+$("#waBtn").addEventListener("click", () => { if (!valid()) return; window.open("https://wa.me/?text=" + encodeURIComponent(buildText()), "_blank", "noopener"); });
+
+/* ---------- image ---------- */
+const CW = 1080;
+const GROT = '"Space Grotesk", sans-serif', MONO = '"JetBrains Mono", monospace', INTER = 'Inter, sans-serif';
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(ctx, x, y, w, h, r = 28, fill = "rgba(255,255,255,0.045)", stroke = "rgba(255,255,255,0.10)") { rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); }
+function txt(ctx, s, x, y, font, color, align = "left") { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); }
+function fit(ctx, s, weight, fam, size, maxW) { do { ctx.font = `${weight} ${size}px ${fam}`; if (ctx.measureText(s).width <= maxW) break; size -= 2; } while (size > 14); return ctx.font; }
+
+async function drawCard() {
+  await Promise.all([`700 96px ${GROT}`, `600 30px ${MONO}`, `700 30px ${MONO}`, `500 26px ${MONO}`, `400 28px ${INTER}`, `600 28px ${INTER}`].map(fn => document.fonts.load(fn).catch(() => {})));
+  const buys = S.mode === "buys", r = buys ? calcBuys() : calcTarget();
+  // rows: [label, value, color]
+  let rows, heroLabel, heroVal, heroSub;
+  if (buys) {
+    heroLabel = "AVERAGE BUY PRICE"; heroVal = money(r.A); heroSub = `${qty(r.Q)} shares · ${rs(r.I)} invested`;
+    rows = r.ok.slice(0, 8).map((b, i) => [`BUY ${i + 1}`, `${qty(b.q)} @ ${money(b.p)}`, "#e6e8f0"]);
+    if (r.ok.length > 8) rows.push(["", `+ ${r.ok.length - 8} more buys`, "#8a90a2"]);
+    if (r.C) rows.push(["CMP", money(r.C), "#e6e8f0"], [r.PL >= 0 ? "PROFIT" : "LOSS", `${sign(r.PL)}${rs(Math.abs(r.PL))} (${pctS(r.PLp)})`, r.PL >= 0 ? "#22d39a" : "#ff5470"]);
+  } else {
+    heroLabel = "BUY"; heroVal = `${qty(r.x)} shares`; heroSub = `at ${money(r.P)} · costs ${rs(r.cost)}`;
+    rows = [["HOLDING", `${qty(r.Q)} @ ${money(r.A)}`, "#e6e8f0"], ["TARGET AVG", money(r.T), "#e6e8f0"], ["NEW AVG", money(r.NA), r.down ? "#22d39a" : "#ff5470"], ["NEW HOLDING", `${qty(r.NQ)} shares`, "#e6e8f0"], ["INVESTED", rs(r.NI), "#e6e8f0"]];
+  }
+  const rowH = 76, heroY = 330, heroH = 260, listY = heroY + heroH + 24, listH = 40 + rows.length * rowH;
+  const H = listY + listH + 190;
+
+  const c = document.createElement("canvas"); c.width = CW; c.height = H; const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); ctx.fillStyle = g; ctx.fillRect(0, 0, CW, H);
+  const glow = (x, y, rad, col) => { const rg = ctx.createRadialGradient(x, y, 0, x, y, rad); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = rg; ctx.fillRect(0, 0, CW, H); };
+  glow(90, 40, 650, "rgba(124,92,255,0.34)"); glow(CW - 40, H - 60, 620, "rgba(0,224,184,0.14)");
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+  // brand
+  const lg = ctx.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8");
+  rr(ctx, 70, 52, 62, 62, 18); ctx.fillStyle = lg; ctx.fill();
+  txt(ctx, "₹", 101, 97, `700 36px ${GROT}`, "#05060a", "center");
+  ctx.font = `700 36px ${GROT}`; if ("letterSpacing" in ctx) ctx.letterSpacing = "2px";
+  const bw = ctx.measureText("MANIMINDSMONEY").width;
+  const bg2 = ctx.createLinearGradient(152, 0, 152 + bw, 0); bg2.addColorStop(0, "#ffffff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8");
+  ctx.fillStyle = bg2; ctx.textAlign = "left"; ctx.fillText("MANIMINDSMONEY", 152, 97);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+  // title
+  txt(ctx, buys ? "AVERAGE PRICE CALCULATOR" : "TARGET AVERAGE", 70, 205, `600 26px ${MONO}`, "#00e0b8");
+  const title = S.stock.trim() || (buys ? "My position" : (r.down ? "Averaging down" : "Averaging up"));
+  ctx.font = fit(ctx, title, 700, GROT, 80, CW - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(title, 70, 290);
+
+  // hero
+  rr(ctx, 70, heroY, CW - 140, heroH, 32);
+  const hg = ctx.createLinearGradient(70, heroY, CW - 70, heroY + heroH); hg.addColorStop(0, "rgba(124,92,255,0.24)"); hg.addColorStop(1, "rgba(0,224,184,0.10)");
+  ctx.fillStyle = hg; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(124,92,255,0.55)"; ctx.stroke();
+  txt(ctx, heroLabel, CW / 2, heroY + 62, `600 26px ${MONO}`, "#c9bcff", "center");
+  ctx.font = fit(ctx, heroVal, 700, GROT, 104, CW - 220); ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.fillText(heroVal, CW / 2, heroY + 170);
+  ctx.font = fit(ctx, heroSub, 500, MONO, 28, CW - 220); ctx.fillStyle = "#a9aec0"; ctx.fillText(heroSub, CW / 2, heroY + 222);
+
+  // rows
+  panel(ctx, 70, listY, CW - 140, listH, 28, "rgba(0,0,0,0.40)");
+  rows.forEach(([k, v, col], j) => {
+    const ry = listY + 20 + j * rowH;
+    if (j) { ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(100, ry); ctx.lineTo(CW - 100, ry); ctx.stroke(); }
+    txt(ctx, k, 104, ry + 48, `600 24px ${MONO}`, "#8a90a2");
+    ctx.font = fit(ctx, v, 600, MONO, 32, CW - 460); ctx.fillStyle = col; ctx.textAlign = "right"; ctx.fillText(v, CW - 104, ry + 50);
+  });
+
+  txt(ctx, "— MANIMINDSMONEY Community", 70, H - 118, `600 28px ${INTER}`, "#b6a6ff");
+  txt(ctx, TOOL_URL.replace(/\/$/, ""), CW / 2, H - 64, `500 24px ${MONO}`, "#6c7285", "center");
+  txt(ctx, "Not SEBI registered · Excludes charges · Educational purpose only", CW / 2, H - 30, `400 20px ${INTER}`, "#5a6072", "center");
+  return c;
+}
+$("#imgBtn").addEventListener("click", async e => {
+  if (!valid()) return;
+  const btn = e.currentTarget, label = btn.textContent; btn.disabled = true; btn.textContent = "Creating image…";
+  try {
+    const canvas = await drawCard();
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const name = `average-${(S.stock.trim() || S.mode).toLowerCase().replace(/[^a-z0-9]+/g, "-")}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+    if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === "AbortError") return; }
+    }
+    let copied = false;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+    const url = URL.createObjectURL(blob);
+    $("#imgPrev").src = url; $("#imgDl").href = url; $("#imgDl").download = name;
+    $("#imgMsg").innerHTML = copied
+      ? "✅ <b>Image copied.</b> Open WhatsApp, pick your chat and press <b>Ctrl+V</b> to paste it. Or download it below."
+      : "Tap <b>Download</b>, or long-press the image to save or share it on WhatsApp.";
+    $("#imgModal").hidden = false;
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+$("#imgClose").addEventListener("click", () => $("#imgModal").hidden = true);
+$("#imgModal").addEventListener("click", e => { if (e.target.id === "imgModal") $("#imgModal").hidden = true; });
+
+/* ---------- init ---------- */
+drawRows(); placePill(); document.fonts.ready.then(placePill); render();
+</script>
+</body>
+</html>
