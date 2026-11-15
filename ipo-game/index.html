@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>IPO Mania: apply, get allotted, list! · MANIMINDSMONEY</title>
+<meta name="description" content="A fast IPO game: read the fundamentals, apply by UPI or ASBA, watch subscription and GMP, try your luck in the allotment and decide on listing day. Learn how real IPOs work." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.78); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --gold: #ffd27a; --ipo: #ff4d8d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .2; }
+  .blob.b1 { background: var(--ipo); top: -25vmax; left: -20vmax; opacity: .16; }
+  .blob.b2 { background: var(--a1); bottom: -30vmax; right: -20vmax; }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .45; }
+  #fx { position: fixed; inset: 0; pointer-events: none; z-index: 45; }
+
+  .app { max-width: 620px; margin: 0 auto; padding: max(12px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .brand { min-width: 0; display: flex; align-items: center; gap: 9px; font: 700 .98rem "Space Grotesk"; letter-spacing: .04em; text-decoration: none; color: inherit; }
+  .brand i { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .85rem; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hbtns { display: flex; gap: 6px; }
+  .hbtn { white-space: nowrap; height: 34px; min-width: 34px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); font: 600 .78rem Inter; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+  .hbtn:hover { color: var(--fg); }
+
+  .hud { display: grid; grid-template-columns: 1.3fr 1.2fr .9fr; gap: 8px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 9px 11px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); min-width: 0; }
+  .stat span { display: block; font: 600 .6rem "JetBrains Mono"; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+  .stat strong { display: block; font: 700 clamp(1rem, 4.4vw, 1.3rem) "JetBrains Mono"; letter-spacing: -.03em; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  .steps div { text-align: center; font: 600 .62rem "JetBrains Mono"; letter-spacing: .04em; color: var(--muted); padding-top: 7px; border-top: 3px solid rgba(255,255,255,.08); transition: color .3s, border-color .3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .steps div.on { color: var(--fg); border-color: var(--ipo); }
+  .steps div.done { color: var(--up); border-color: var(--up); }
+
+  .stage { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 18px 16px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); min-height: 430px; overflow: hidden; }
+  .scene { animation: sceneIn .45s cubic-bezier(.2,.9,.3,1.1); }
+  @keyframes sceneIn { from { opacity: 0; transform: translateY(18px) scale(.98); } }
+  .kicker { font: 700 .66rem "JetBrains Mono"; letter-spacing: .14em; color: var(--ipo); text-transform: uppercase; }
+  h2 { font: 700 clamp(1.4rem, 6vw, 1.85rem)/1.1 "Space Grotesk"; letter-spacing: -.03em; margin: 6px 0 4px; }
+  .sub { color: var(--muted); font-size: .86rem; margin-bottom: 12px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+  .pill { font: 700 .7rem "JetBrains Mono"; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: #cfd3df; }
+  .pill.sme { color: var(--gold); border-color: rgba(255,210,122,.5); background: rgba(255,210,122,.08); }
+  .pill.main { color: #b6a6ff; border-color: rgba(124,92,255,.5); background: rgba(124,92,255,.1); }
+  .pill.bull { color: var(--up); border-color: rgba(34,211,154,.45); } .pill.bear { color: var(--down); border-color: rgba(255,84,112,.45); }
+
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 12px; }
+  .fact { padding: 9px 10px; border-radius: 13px; background: rgba(0,0,0,.3); border: 1px solid var(--line); min-width: 0; }
+  .fact span { display: block; font-size: .68rem; color: var(--muted); }
+  .fact b { font: 700 .92rem "JetBrains Mono"; }
+  .fund { display: grid; gap: 6px; margin-bottom: 12px; }
+  .frow { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); font-size: .84rem; animation: sceneIn .4s both; }
+  .frow i { font-style: normal; width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; font-size: .72rem; flex: none; }
+  .frow.g i { background: rgba(34,211,154,.18); color: var(--up); } .frow.b i { background: rgba(255,84,112,.18); color: var(--down); } .frow.n i { background: rgba(254,188,46,.16); color: var(--warn); }
+  .frow b { margin-left: auto; font: 700 .8rem "JetBrains Mono"; white-space: nowrap; }
+  .frow.g b { color: var(--up); } .frow.b b { color: var(--down); } .frow.n b { color: var(--warn); }
+
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 6px; }
+  .btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 14px 10px; border-radius: 16px; font: 800 1rem Inter; border: 1px solid var(--line); cursor: pointer; color: var(--fg); background: rgba(255,255,255,.06); text-decoration: none; transition: transform .1s, opacity .2s; user-select: none; -webkit-user-select: none; }
+  .btn small { font: 600 .68rem Inter; opacity: .8; }
+  .btn:active { transform: scale(.96); }
+  .btn.full { grid-column: 1 / -1; width: 100%; }
+  .btn.go { background: linear-gradient(100deg, var(--ipo), #b45cff 60%, var(--a1)); border: 0; color: #fff; box-shadow: 0 12px 30px -12px rgba(255,77,141,.8); }
+  .btn.ok { background: linear-gradient(160deg, #2fe0a7, #0fa877); border: 0; color: #fff; }
+  .btn.no { background: linear-gradient(160deg, #ff6b84, #d63353); border: 0; color: #fff; }
+  .btn.ghost { color: var(--muted); font-weight: 700; font-size: .88rem; }
+  .btn[disabled] { opacity: .35; pointer-events: none; }
+  .need { margin: 4px 0 10px; padding: 10px 12px; border-radius: 14px; background: rgba(255,77,141,.07); border: 1px solid rgba(255,77,141,.3); font-size: .86rem; }
+  .need b { font-family: "JetBrains Mono"; }
+
+  .info { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 14px; border: 1px dashed rgba(0,224,184,.45); background: rgba(0,224,184,.05); color: #bff3e8; font: 600 .8rem Inter; cursor: pointer; }
+  .info::before { content: "ⓘ"; color: var(--a2); font-size: 1rem; line-height: 1; }
+
+  /* UPI phone */
+  .phone { position: relative; margin: 8px auto 4px; width: min(100%, 300px); border-radius: 28px; padding: 14px; background: #0b0d14; border: 2px solid rgba(255,255,255,.12); box-shadow: 0 20px 60px -20px rgba(0,0,0,.9); min-height: 230px; }
+  .notch { width: 70px; height: 6px; border-radius: 4px; background: rgba(255,255,255,.15); margin: 0 auto 12px; }
+  .notif { border-radius: 16px; background: #1a1d2a; border: 1px solid rgba(255,255,255,.1); padding: 12px; animation: drop .5s cubic-bezier(.2,1.3,.3,1); }
+  @keyframes drop { from { transform: translateY(-40px); opacity: 0; } }
+  .notif .app { display: flex; flex-direction: row; gap: 8px; align-items: center; font: 700 .72rem Inter; color: var(--muted); padding: 0; max-width: none; margin: 0; }
+  .notif .app i { width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(135deg, #5b8cff, #00e0b8); display: inline-block; }
+  .notif h4 { font-size: .95rem; margin: 8px 0 2px; }
+  .notif p { font-size: .8rem; color: #cfd3df; }
+  .notif .tm { height: 4px; border-radius: 3px; background: rgba(255,255,255,.08); margin: 10px 0; overflow: hidden; }
+  .notif .tm i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--warn), var(--down)); transform-origin: left; }
+  .notif .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .notif button { border: 0; border-radius: 12px; padding: 11px; font: 800 .9rem Inter; cursor: pointer; }
+  .notif .ap { background: var(--up); color: #032015; } .notif .dc { background: rgba(255,255,255,.08); color: var(--fg); }
+  .wait { text-align: center; color: var(--muted); font-size: .85rem; padding: 30px 6px; }
+  .dots::after { content: ""; animation: dots 1.2s steps(4) infinite; }
+  @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+
+  /* ASBA */
+  .bank { margin: 8px 0; border-radius: 18px; border: 1px solid rgba(91,140,255,.4); background: linear-gradient(160deg, rgba(91,140,255,.12), rgba(0,0,0,.25)); padding: 14px; }
+  .bank-top { display: flex; justify-content: space-between; align-items: center; font: 700 .8rem Inter; color: #9ec0ff; margin-bottom: 10px; }
+  .bank .line { display: flex; justify-content: space-between; font-size: .84rem; padding: 7px 0; border-bottom: 1px dashed rgba(255,255,255,.08); }
+  .bank .line b { font-family: "JetBrains Mono"; }
+  .hold { position: relative; overflow: hidden; width: 100%; margin-top: 12px; border: 0; border-radius: 14px; padding: 15px; font: 800 .95rem Inter; color: #fff; background: #2d3a66; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .hold i { position: absolute; inset: 0; width: 0; background: linear-gradient(90deg, #5b8cff, var(--a2)); z-index: 0; }
+  .hold span { position: relative; z-index: 1; }
+
+  /* subscription */
+  .days { display: flex; gap: 6px; margin: 4px 0 12px; }
+  .days span { flex: 1; text-align: center; font: 700 .7rem "JetBrains Mono"; padding: 6px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid var(--line); color: var(--muted); transition: all .3s; }
+  .days span.on { color: #fff; border-color: var(--ipo); background: rgba(255,77,141,.12); }
+  .cat { margin-bottom: 11px; }
+  .cat-top { display: flex; justify-content: space-between; font-size: .84rem; margin-bottom: 5px; }
+  .cat-top b { font: 800 .98rem "JetBrains Mono"; }
+  .cat-top small { color: var(--muted); font-size: .7rem; margin-left: 6px; }
+  .bar { height: 10px; border-radius: 6px; background: rgba(255,255,255,.07); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s linear; }
+  .gmp { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 0 4px; padding: 11px 13px; border-radius: 14px; border: 1px solid rgba(255,210,122,.45); background: rgba(255,210,122,.07); }
+  .gmp span { font-size: .78rem; color: #f3dfb0; }
+  .gmp b { font: 800 1.1rem "JetBrains Mono"; }
+  .gmp em { font-style: normal; font-size: .64rem; color: var(--muted); display: block; }
+
+  /* allotment */
+  .odds { text-align: center; margin: 6px 0 10px; }
+  .odds b { display: block; font: 800 clamp(2rem, 9vw, 2.6rem) "JetBrains Mono"; letter-spacing: -.04em; }
+  .odds span { color: var(--muted); font-size: .82rem; }
+  .drum { position: relative; height: 120px; margin: 8px 0; border-radius: 18px; overflow: hidden; background: rgba(0,0,0,.35); border: 1px solid var(--line); }
+  .drum .reel { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center; }
+  .drum .reel div { height: 120px; display: grid; place-items: center; font: 800 1.5rem "Space Grotesk"; width: 100%; }
+  .drum::before, .drum::after { content: ""; position: absolute; left: 0; right: 0; height: 28px; z-index: 2; pointer-events: none; }
+  .drum::before { top: 0; background: linear-gradient(#0b0d14, transparent); } .drum::after { bottom: 0; background: linear-gradient(transparent, #0b0d14); }
+  .verdict { text-align: center; font: 800 clamp(1.6rem, 7vw, 2.1rem) "Space Grotesk"; margin: 8px 0 4px; animation: pop .5s cubic-bezier(.2,1.4,.3,1); }
+  @keyframes pop { from { transform: scale(.5); opacity: 0; } }
+  .note { text-align: center; color: #cfd3df; font-size: .86rem; margin-bottom: 8px; }
+  .note b { white-space: nowrap; }
+
+  /* listing */
+  .ticker { text-align: center; margin: 10px 0 6px; }
+  .ticker small { display: block; color: var(--muted); font: 600 .7rem "JetBrains Mono"; letter-spacing: .1em; }
+  .ticker b { display: block; font: 800 clamp(2.2rem, 10vw, 3rem) "JetBrains Mono"; letter-spacing: -.04em; }
+  .ticker em { font-style: normal; font: 700 1rem "JetBrains Mono"; }
+  .cmp { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 10px 0; }
+  .cmp div { text-align: center; padding: 8px 4px; border-radius: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .cmp span { display: block; font-size: .64rem; color: var(--muted); }
+  .cmp b { font: 700 .86rem "JetBrains Mono"; }
+  .lesson { margin-top: 10px; padding: 11px 13px; border-radius: 14px; background: rgba(124,92,255,.08); border: 1px solid rgba(124,92,255,.35); font-size: .84rem; line-height: 1.5; color: #dcd6ff; }
+  .lesson b { color: #fff; }
+  .spark { height: 70px; margin: 8px 0; }
+
+  /* sheet */
+  .sheet-bg { position: fixed; inset: 0; z-index: 30; background: rgba(3,4,8,.6); opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .sheet-bg.show { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; left: 50%; bottom: 0; z-index: 31; width: min(100%, 620px); max-height: 82vh; overflow: auto; transform: translate(-50%, 105%); transition: transform .4s cubic-bezier(.2,1,.3,1); background: #121522; border: 1px solid var(--line); border-radius: 24px 24px 0 0; padding: 18px 18px max(22px, env(safe-area-inset-bottom)); }
+  .sheet.show { transform: translate(-50%, 0); }
+  .sheet .grab { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.2); margin: -6px auto 12px; }
+  .sheet h3 { font: 700 1.2rem "Space Grotesk"; margin-bottom: 10px; }
+  .sheet ol { padding-left: 20px; display: grid; gap: 8px; font-size: .9rem; color: #d5d8e3; line-height: 1.5; }
+  .sheet li b { color: #fff; }
+  .sheet .warn { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(254,188,46,.07); border: 1px solid rgba(254,188,46,.3); color: #f3dfb0; font-size: .82rem; line-height: 1.5; }
+  .sheet .close { width: 100%; margin-top: 14px; }
+
+  /* overlays */
+  .overlay { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(3,4,8,.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); overflow-y: auto; }
+  .overlay[hidden] { display: none; }
+  .panel { width: 100%; max-width: 460px; background: rgba(16,18,28,.95); border: 1px solid var(--line); border-radius: 28px; padding: 22px 18px; text-align: center; animation: pop .45s cubic-bezier(.2,1.2,.3,1); }
+  .logo { font: 800 clamp(2.4rem, 11vw, 3.2rem)/1 "Space Grotesk"; letter-spacing: -.05em; background: linear-gradient(100deg, var(--ipo), #b45cff 45%, var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tagline { color: var(--muted); margin: 8px 0 16px; font-size: .9rem; }
+  .how { text-align: left; display: grid; gap: 8px; margin-bottom: 16px; }
+  .how div { display: flex; gap: 10px; font-size: .86rem; color: #d5d8e3; padding: 9px 11px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .how b { color: #fff; } .how i { font-style: normal; font-size: 1.1rem; }
+  .big { font: 800 clamp(2rem, 9vw, 2.7rem) "JetBrains Mono"; letter-spacing: -.04em; margin: 4px 0; }
+  .rank { display: inline-block; margin: 6px 0 12px; padding: 7px 14px; border-radius: 999px; font-weight: 700; background: rgba(255,210,122,.12); border: 1px solid rgba(255,210,122,.4); color: var(--gold); }
+  .rstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 12px; }
+  .rstats div { padding: 9px 5px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .rstats span { display: block; font: 600 .58rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .rstats b { font: 700 .95rem "JetBrains Mono"; }
+  .hist { text-align: left; display: grid; gap: 5px; margin-bottom: 12px; }
+  .hist div { display: flex; justify-content: space-between; gap: 8px; font-size: .78rem; padding: 7px 10px; border-radius: 10px; background: rgba(255,255,255,.03); }
+  .hist b { font-family: "JetBrains Mono"; white-space: nowrap; }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 12px; }
+  .badges span { padding: 6px 10px; border-radius: 999px; font-size: .76rem; font-weight: 600; background: rgba(255,77,141,.12); border: 1px solid rgba(255,77,141,.4); color: #ffd0e0; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; }
+  .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translate(-50%, 160%); z-index: 50; padding: 10px 16px; border-radius: 999px; background: linear-gradient(100deg, #2a2140, #142a2a); border: 1px solid rgba(255,210,122,.5); color: var(--gold); font-weight: 700; font-size: .86rem; white-space: nowrap; transition: transform .45s cubic-bezier(.2,1.3,.3,1); }
+  .toast.show { transform: translate(-50%, 0); }
+  .fine { text-align: center; font-size: .7rem; color: #5a6072; line-height: 1.5; }
+  .fine a { color: var(--muted); }
+  @media (max-width: 380px) { .brand span { font-size: .86rem; } .hbtn { padding: 0 8px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+  <div class="grid-bg"></div>
+  <canvas id="fx"></canvas>
+
+  <div class="app">
+    <header>
+      <a class="brand" href="../"><i>₹</i><span>MANIMINDSMONEY</span></a>
+      <div class="hbtns">
+        <button class="hbtn" id="soundBtn" title="Sound on/off">🔊</button>
+        <a class="hbtn" href="../tools/">🧰 Tools</a>
+        <a class="hbtn" href="../">Home</a>
+      </div>
+    </header>
+
+    <div class="hud">
+      <div class="stat"><span>Bank balance</span><strong id="hWallet">₹3,00,000</strong></div>
+      <div class="stat"><span>IPO profit</span><strong id="hPnl">₹0</strong></div>
+      <div class="stat"><span>IPO</span><strong id="hRound">1/5</strong></div>
+    </div>
+    <div class="steps" id="steps"><div>1 · IPO</div><div>2 · APPLY</div><div>3 · BIDS</div><div>4 · ALLOT</div><div>5 · LIST</div></div>
+
+    <div class="stage" id="stage"></div>
+
+    <p class="fine">A learning game with <b>fictional companies</b> and simulated numbers. Grey market premium (GMP) is unofficial and unreliable in real life. Not investment advice; not SEBI registered. · <a href="../">MANIMINDSMONEY</a></p>
+  </div>
+
+  <!-- info sheet -->
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div><button class="btn full close" id="sheetClose">Got it 👍</button></div>
+
+  <!-- start -->
+  <div class="overlay" id="startOv">
+    <div class="panel">
+      <div class="logo">IPO MANIA</div>
+      <p class="tagline">5 IPOs. ₹3,00,000 in your bank. Can you beat the allotment lottery?</p>
+      <div class="how">
+        <div><i>🔍</i><span>Read the <b>fundamentals</b> fast, then <b>apply</b> or <b>skip</b>.</span></div>
+        <div><i>📲</i><span>Apply with <b>UPI</b> (approve the mandate before time runs out!) or <b>ASBA</b> net banking.</span></div>
+        <div><i>🔥</i><span>Watch <b>subscription</b> and <b>GMP</b> climb. Oversubscribed? Your odds drop.</span></div>
+        <div><i>🎟️</i><span>Try your luck in the <b>allotment</b>, then <b>sell on listing</b> or <b>hold a month</b>.</span></div>
+      </div>
+      <button class="btn go full" id="goBtn">🎟️ START THE SEASON</button>
+      <div class="fine" id="bestLine" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- summary -->
+  <div class="overlay" id="endOv" hidden>
+    <div class="panel">
+      <div style="font:600 .7rem 'JetBrains Mono';letter-spacing:.14em;color:var(--muted)">SEASON OVER · TOTAL IPO PROFIT</div>
+      <div class="big" id="eTotal">₹0</div>
+      <div class="rank" id="eRank"></div>
+      <div class="rstats">
+        <div><span>Applied</span><b id="eApplied">0</b></div>
+        <div><span>Allotted</span><b id="eAllotted">0</b></div>
+        <div><span>Hit rate</span><b id="eHit">0%</b></div>
+      </div>
+      <div class="hist" id="eHist"></div>
+      <div class="badges" id="eBadges"></div>
+      <div class="lesson" id="eLesson" style="text-align:left;margin-bottom:12px"></div>
+      <button class="btn go full" id="againBtn">↻ NEW SEASON</button>
+      <div class="row2">
+        <button class="btn wa" id="shareWa">💬 Challenge friends</button>
+        <button class="btn" id="shareImg">📸 Score card</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="imgOv" hidden>
+    <div class="panel" style="padding:14px">
+      <img id="imgPrev" alt="Score card" style="display:block;max-width:100%;max-height:60vh;margin:0 auto;border-radius:16px;border:1px solid var(--line)" />
+      <p id="imgMsg" style="font-size:.86rem;color:#cfd3df;margin:12px 4px 4px;line-height:1.5"></p>
+      <div class="row2"><a class="btn" id="imgDl" download="ipo-mania-score.png">⬇ Download</a><button class="btn go" id="imgClose">Done</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const rnd = (a, b) => a + Math.random() * (b - a);
+const rint = (a, b) => Math.floor(rnd(a, b + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const inr = n => (n < 0 ? "−" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const sinr = n => (n >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const spct = n => (n >= 0 ? "+" : "−") + Math.abs(n * 100).toFixed(1) + "%";
+const xx = n => (n < 10 ? n.toFixed(2) : n < 100 ? n.toFixed(1) : Math.round(n)) + "x";
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const vib = ms => { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms); } catch {} };
+
+/* ---------- sound ---------- */
+let AC = null, soundOn = localStorage.getItem("ipom_sound") !== "off";
+$("#soundBtn").textContent = soundOn ? "🔊" : "🔇";
+$("#soundBtn").onclick = () => { soundOn = !soundOn; localStorage.setItem("ipom_sound", soundOn ? "on" : "off"); $("#soundBtn").textContent = soundOn ? "🔊" : "🔇"; };
+function tone(f, d = .09, type = "sine", vol = .05, when = 0) {
+  if (!soundOn) return;
+  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume().catch(() => {}); const t = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d + .02); } catch {}
+}
+const SFX = {
+  tap: () => tone(700, .05, "triangle", .04),
+  ping: () => { tone(980, .07, "square", .03); tone(1300, .08, "square", .03, .09); },
+  win: () => [660, 880, 1100, 1320, 1760].forEach((f, i) => tone(f, .14, "sine", .05, i * .08)),
+  lose: () => { tone(260, .2, "sawtooth", .03); tone(180, .3, "sawtooth", .03, .15); },
+  tick: () => tone(1500, .02, "square", .015),
+  coin: () => tone(1250, .06, "triangle", .04),
+};
+
+/* ---------- fictional IPO generator ---------- */
+const NAME_A = ["Shakti", "Navyug", "Tejas", "Akshar", "Vayu", "Kalpa", "Prithvi", "Sarthi", "Ojas", "Maitri", "Nirmaan", "Arogya", "Dhruv", "Kesar", "Sanchar", "Urja"];
+const SECTORS = [["Infra Projects", "Infrastructure"], ["Foods", "FMCG"], ["Pharma", "Pharma"], ["Techsoft", "IT services"], ["Solar Energy", "Renewables"], ["Logistics", "Logistics"], ["Finserv", "NBFC"], ["Textiles", "Textiles"], ["EV Motors", "Auto & EV"], ["Retail", "Retail"], ["Chemicals", "Chemicals"], ["Defence Systems", "Defence"]];
+function makeIPO(round) {
+  const sme = Math.random() < .32;
+  const [suf, sector] = pick(SECTORS), name = `${pick(NAME_A)} ${suf} Ltd`;
+  const price = sme ? rint(40, 260) : rint(60, 950);
+  const lot = sme ? Math.max(200, Math.ceil(60000 / price / 200) * 200) : Math.max(1, Math.ceil(14500 / price));
+  const lots = sme ? 2 : 1;                               // minimum retail application
+  const need = price * lot * lots, qty = lot * lots;
+  const f = {
+    growth: rint(-15, 70), margin: rint(-6, 24), de: +rnd(0, 2.3).toFixed(2), pe: +rnd(.6, 1.9).toFixed(2), fresh: rint(0, 100), promoter: rint(48, 78),
+  };
+  let score = 0;
+  const rows = [];
+  const add = (lbl, val, kind) => { rows.push({ lbl, val, kind }); score += kind === "g" ? 1 : kind === "b" ? -1 : 0; };
+  add("Revenue growth (3 yr avg)", (f.growth >= 0 ? "+" : "") + f.growth + "%", f.growth >= 25 ? "g" : f.growth < 6 ? "b" : "n");
+  add("Net profit margin", f.margin + "%", f.margin >= 12 ? "g" : f.margin < 3 ? "b" : "n");
+  add("Debt to equity", f.de + "x", f.de < .5 ? "g" : f.de > 1.5 ? "b" : "n");
+  add("Valuation vs peers (P/E)", f.pe < .9 ? "Cheaper" : f.pe > 1.35 ? "Pricier" : "Similar", f.pe < .9 ? "g" : f.pe > 1.35 ? "b" : "n");
+  add("Fresh issue (rest is promoters selling)", f.fresh + "%", f.fresh >= 60 ? "g" : f.fresh <= 25 ? "b" : "n");
+  const mood = rnd(-1, 1);
+  const hype = 1.25 + .45 * score + .8 * mood + (sme ? .7 : 0) + gauss() * .7;
+  const retail = clamp(Math.exp(hype), .35, 220);
+  const nii = clamp(retail * Math.exp(gauss() * .55) * 1.3, .2, 400);
+  const qib = clamp(retail * Math.exp(gauss() * .6) * (score > 0 ? 1.7 : .55), .1, 300);
+  let gmp = .1 * Math.log(retail) + .045 * score + .12 * mood + gauss() * .06;
+  if (sme) gmp *= 1.6;
+  gmp = clamp(gmp, -.3, 1.4);
+  let listing = gmp * rnd(.45, 1.25) + gauss() * .08 + .02 * score;   // GMP is a rough, unreliable hint
+  if (Math.random() < .12) listing -= rnd(.12, .3);                     // the odd nasty surprise
+  listing = clamp(listing, -.45, 1.7);
+  const month = .055 * score + .05 * mood + gauss() * .11;              // after the hype: fundamentals matter more
+  return { round, sme, name, sector, price, lot, lots, need, qty, rows, score, mood, retail, nii, qib, gmp, listing, month };
+}
+
+/* ---------- state ---------- */
+const START = 300000, ROUNDS = 5;
+let S, IPO, A;   // season, current IPO, current application
+function newSeason() {
+  S = { round: 0, wallet: START, pnl: 0, applied: 0, allotted: 0, hist: [], badges: new Set(), upiTimes: [] };
+  nextIPO();
+}
+function hud() {
+  $("#hWallet").textContent = inr(S.wallet);
+  $("#hPnl").textContent = sinr(S.pnl); $("#hPnl").style.color = S.pnl > 0 ? "var(--up)" : S.pnl < 0 ? "var(--down)" : "";
+  $("#hRound").textContent = `${Math.min(S.round, ROUNDS)}/${ROUNDS}`;
+}
+function setStep(i) { [...$("#steps").children].forEach((d, k) => { d.classList.toggle("on", k === i); d.classList.toggle("done", k < i); }); }
+function scene(html) { const st = $("#stage"); st.innerHTML = `<div class="scene">${html}</div>`; return st; }
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2200); }
+function badge(id, t) { if (S.badges.has(id)) return; S.badges.add(id); toast("🏆 " + t); SFX.ping(); }
+
+/* ---------- info sheets (how it works in real life) ---------- */
+const INFO = {
+  read: ["How to read an IPO before applying", `<ol>
+    <li>Download the <b>RHP</b> (Red Herring Prospectus) from SEBI, NSE or BSE, or read your broker's IPO note.</li>
+    <li>Check <b>revenue and profit growth</b>, <b>margins</b> and <b>debt</b> over the last 3 years.</li>
+    <li>Compare the <b>valuation (P/E)</b> with listed peers in the same sector.</li>
+    <li>See <b>why</b> they are raising money: a <b>fresh issue</b> goes into the business; an <b>OFS</b> (offer for sale) means existing owners are selling.</li>
+    <li><b>SME IPOs</b> list on NSE Emerge or BSE SME. They have a bigger minimum application and can be riskier and less liquid.</li></ol>`],
+  upi: ["Applying with UPI", `<ol>
+    <li>Place your bid in your <b>broker app</b> (or bank app) with your <b>UPI ID</b>.</li>
+    <li>A <b>UPI mandate</b> request arrives in your UPI app. <b>Approve it</b> before the cut-off on the closing day (usually <b>5 PM</b>), or your bid is not valid.</li>
+    <li>The money stays in your account but is <b>blocked</b>, not debited, until allotment.</li>
+    <li>UPI applications are allowed up to <b>₹5 lakh</b>.</li></ol>`],
+  asba: ["Applying with ASBA (net banking)", `<ol>
+    <li><b>ASBA</b> = Application Supported by Blocked Amount.</li>
+    <li>Log in to <b>net banking</b>, open the IPO / e-IPO section, and fill in your demat details, PAN and bid.</li>
+    <li>The bid amount is <b>blocked</b> in your savings account. It's only debited if you get shares, and unblocked if you don't.</li></ol>`],
+  sub: ["Checking subscription & GMP", `<ol>
+    <li>Live <b>subscription</b> (bids ÷ shares on offer) is on the <b>NSE and BSE websites</b> under the IPO's bid details, and in most broker apps.</li>
+    <li>Categories: <b>QIB</b> (big institutions), <b>NII/HNI</b> (₹2 lakh+), <b>Retail</b> (up to ₹2 lakh), plus employee and shareholder quotas when offered.</li>
+    <li>The <b>shareholder quota</b> is for people holding shares of the listed parent company on the RHP date.</li></ol>
+    <div class="warn">⚠️ <b>GMP</b> (grey market premium) is an <b>unofficial, unregulated</b> number traded outside the exchange. It changes fast and is often wrong. Don't apply only because of GMP.</div>`],
+  allot: ["How allotment works & how to check", `<ol>
+    <li>If retail is <b>under 1x</b> subscribed, every valid application gets its shares.</li>
+    <li>If retail is <b>oversubscribed</b>, SEBI rules give the <b>minimum lot</b> to as many applicants as possible by <b>lottery</b>. At 40x, roughly <b>1 in 40</b> retail applicants gets shares.</li>
+    <li>Check status on the <b>registrar's website</b> (named in the RHP) or the <b>BSE / NSE allotment page</b> using your <b>PAN</b> or application number.</li>
+    <li>Not allotted? The blocked money is <b>released</b> and the UPI mandate is revoked.</li></ol>`],
+  list: ["Listing day", `<ol>
+    <li>Since Dec 2023, IPOs list <b>3 working days after closing (T+3)</b>. Shares reach your <b>demat</b> a day before.</li>
+    <li>Mainboard IPOs open after a <b>pre-open session</b> sets the listing price. SME IPOs have their own price bands.</li>
+    <li>Selling on listing locks the gain or loss. Holding means you're now an investor, and <b>fundamentals</b> matter more than hype over time.</li></ol>`],
+};
+function openInfo(k) { const [t, b] = INFO[k]; $("#sheetBody").innerHTML = `<h3>${t}</h3>${b}`; $("#sheet").classList.add("show"); $("#sheetBg").classList.add("show"); SFX.tap(); }
+function closeInfo() { $("#sheet").classList.remove("show"); $("#sheetBg").classList.remove("show"); }
+$("#sheetClose").onclick = closeInfo; $("#sheetBg").onclick = closeInfo;
+document.addEventListener("click", e => { const b = e.target.closest("[data-info]"); if (b) openInfo(b.dataset.info); });
+
+/* ---------- 1 · IPO card ---------- */
+function nextIPO() {
+  S.round++; hud();
+  if (S.round > ROUNDS) return endSeason();
+  IPO = makeIPO(S.round); A = { applied: false, method: null, valid: false, allotted: false, sold: null };
+  setStep(0);
+  const moodTxt = IPO.mood > .3 ? ["🐂 Bullish market", "bull"] : IPO.mood < -.3 ? ["🐻 Weak market", "bear"] : ["😐 Sideways market", ""];
+  scene(`
+    <div class="kicker">IPO ${S.round} of ${ROUNDS} · opens today</div>
+    <h2>${IPO.name}</h2>
+    <div class="pills"><span class="pill ${IPO.sme ? "sme" : "main"}">${IPO.sme ? "SME IPO" : "MAINBOARD IPO"}</span><span class="pill">${IPO.sector}</span><span class="pill ${moodTxt[1]}">${moodTxt[0]}</span></div>
+    <div class="facts">
+      <div class="fact"><span>Price band (upper)</span><b>₹${IPO.price}</b></div>
+      <div class="fact"><span>Lot size</span><b>${IPO.lot.toLocaleString("en-IN")} shares</b></div>
+      <div class="fact"><span>Min. application</span><b>${IPO.lots} lot${IPO.lots > 1 ? "s" : ""}</b></div>
+      <div class="fact"><span>Money needed</span><b>${inr(IPO.need)}</b></div>
+    </div>
+    <div class="fund">${IPO.rows.map((r, i) => `<div class="frow ${r.kind}" style="animation-delay:${i * 70}ms"><i>${r.kind === "g" ? "▲" : r.kind === "b" ? "▼" : "●"}</i>${r.lbl}<b>${r.val}</b></div>`).join("")}</div>
+    <div class="btns">
+      <button class="btn go" id="applyBtn" ${IPO.need > S.wallet ? "disabled" : ""}>✅ APPLY<small>${inr(IPO.need)}</small></button>
+      <button class="btn ghost" id="skipBtn">⏭️ SKIP<small>not for me</small></button>
+    </div>
+    ${IPO.need > S.wallet ? `<div class="note" style="margin-top:8px;color:var(--down)">Not enough balance for this one, so you'll have to skip.</div>` : ""}
+    <button class="info" data-info="read">How to check an IPO's fundamentals in real life</button>`);
+  $("#applyBtn").onclick = () => { SFX.tap(); chooseMethod(); };
+  $("#skipBtn").onclick = () => { SFX.tap(); A.applied = false; runSubscription(); };
+}
+
+/* ---------- 2 · Apply ---------- */
+function chooseMethod() {
+  setStep(1);
+  scene(`
+    <div class="kicker">Step 2 · Apply</div>
+    <h2>How do you want to pay?</h2>
+    <p class="sub">Both block ${inr(IPO.need)} in your bank. It's only debited if you get shares.</p>
+    <div class="btns">
+      <button class="btn" id="upiBtn" style="padding:20px 8px">📲 UPI<small>via broker app · approve the mandate</small></button>
+      <button class="btn" id="asbaBtn" style="padding:20px 8px">🏦 ASBA<small>via net banking</small></button>
+    </div>
+    <button class="info" data-info="upi">How UPI applications work</button>
+    <button class="info" data-info="asba" style="margin-top:8px">How ASBA (net banking) works</button>`);
+  $("#upiBtn").onclick = () => { SFX.tap(); A.method = "UPI"; upiFlow(); };
+  $("#asbaBtn").onclick = () => { SFX.tap(); A.method = "ASBA"; asbaFlow(); };
+}
+async function upiFlow() {
+  const st = scene(`
+    <div class="kicker">Step 2 · UPI</div>
+    <h2>Bid placed in your broker app ✅</h2>
+    <p class="sub">Now watch your phone for the UPI mandate. Approve it quickly, before the cut-off!</p>
+    <div class="phone"><div class="notch"></div><div id="phoneBody"><div class="wait">Waiting for the mandate request<span class="dots"></span></div></div></div>`);
+  await sleep(rnd(1000, 2200));
+  if (!document.body.contains(st)) return;
+  SFX.ping(); vib(60);
+  const LIMIT = 6000, t0 = Date.now();
+  $("#phoneBody").innerHTML = `
+    <div class="notif">
+      <div class="app"><i></i> UPI · now</div>
+      <h4>Mandate request: ${inr(IPO.need)}</h4>
+      <p>Block for IPO: ${IPO.name}. Valid until the IPO closes.</p>
+      <div class="tm"><i id="tmBar"></i></div>
+      <div class="row"><button class="ap" id="apBtn">✔ APPROVE</button><button class="dc" id="dcBtn">Decline</button></div>
+    </div>`;
+  let done = false;
+  const bar = $("#tmBar");
+  const iv = setInterval(() => { const k = (Date.now() - t0) / LIMIT; bar.style.transform = `scaleX(${Math.max(0, 1 - k)})`; if (k >= 1) finish(false, "expired"); }, 50);
+  function finish(ok, why) {
+    if (done) return; done = true; clearInterval(iv);
+    if (ok) { S.upiTimes.push(Date.now() - t0); if (Date.now() - t0 < 1500) badge("fast", "Lightning mandate ⚡"); placed(); }
+    else invalid(why);
+  }
+  $("#apBtn").onclick = () => { SFX.coin(); vib(20); finish(true); };
+  $("#dcBtn").onclick = () => finish(false, "declined");
+}
+function asbaFlow() {
+  scene(`
+    <div class="kicker">Step 2 · ASBA</div>
+    <h2>Net banking · e-IPO</h2>
+    <p class="sub">Confirm your bid. <b>Press and hold</b> the button to block the amount.</p>
+    <div class="bank">
+      <div class="bank-top"><span>🏦 YOUR BANK · NetBanking</span><span>e-IPO / ASBA</span></div>
+      <div class="line"><span>Issue</span><b>${IPO.name.replace(" Ltd", "")}</b></div>
+      <div class="line"><span>Category</span><b>Retail (individual)</b></div>
+      <div class="line"><span>Quantity</span><b>${IPO.qty.toLocaleString("en-IN")} @ ₹${IPO.price} (cut-off)</b></div>
+      <div class="line"><span>Amount to block</span><b>${inr(IPO.need)}</b></div>
+      <button class="hold" id="holdBtn"><i id="holdFill"></i><span>🔒 HOLD TO BLOCK ${inr(IPO.need)}</span></button>
+    </div>
+    <button class="info" data-info="asba">How ASBA works in real life</button>`);
+  const btn = $("#holdBtn"), fill = $("#holdFill"); let t = null, iv = null;
+  const start = e => { e.preventDefault(); const s = Date.now(); clearInterval(iv); iv = setInterval(() => { const k = (Date.now() - s) / 900; fill.style.width = Math.min(100, k * 100) + "%"; if (k >= 1) { clearInterval(iv); SFX.coin(); vib(25); placed(); } else if (Math.random() < .3) SFX.tick(); }, 30); };
+  const stop = () => { clearInterval(iv); if (parseFloat(fill.style.width) < 100) { fill.style.transition = "width .25s"; fill.style.width = "0"; setTimeout(() => fill.style.transition = "", 260); } };
+  btn.addEventListener("pointerdown", start); ["pointerup", "pointerleave", "pointercancel"].forEach(ev => btn.addEventListener(ev, stop));
+}
+function placed() {
+  A.applied = true; A.valid = true; S.applied++;
+  S.wallet -= IPO.need; hud();   // blocked
+  toast(`🔒 ${inr(IPO.need)} blocked in your bank`);
+  setTimeout(runSubscription, 700);
+}
+function invalid(why) {
+  A.applied = true; A.valid = false;
+  SFX.lose(); vib(80);
+  scene(`
+    <div class="kicker">Step 2 · UPI</div>
+    <div class="verdict" style="color:var(--down)">❌ Bid not valid</div>
+    <p class="note">${why === "expired" ? "The mandate wasn't approved in time. In real life, an unapproved mandate by the cut-off (usually 5 PM on the last day) means your bid doesn't count." : "You declined the mandate, so the bid was never completed."}</p>
+    <div class="btns"><button class="btn go full" id="contBtn">See how this IPO turned out →</button></div>
+    <button class="info" data-info="upi">How the UPI mandate works</button>`);
+  $("#contBtn").onclick = runSubscription;
+}
+
+/* ---------- 3 · Subscription ---------- */
+function tween(dur, onStep) {   // timer-based (works even if animation frames are slow)
+  return new Promise(res => { const s = Date.now(); const iv = setInterval(() => { const k = Math.min(1, (Date.now() - s) / dur); onStep(k); if (k >= 1) { clearInterval(iv); res(); } }, 40); });
+}
+async function runSubscription() {
+  setStep(2);
+  const st = scene(`
+    <div class="kicker">Step 3 · Bidding · 3 days</div>
+    <h2>Subscription status</h2>
+    <div class="days" id="days"><span>DAY 1</span><span>DAY 2</span><span>DAY 3</span></div>
+    ${["Retail", "NII / HNI", "QIB"].map((c, i) => `<div class="cat"><div class="cat-top"><span>${c}<small>${["you are here", "₹2 lakh+", "institutions"][i]}</small></span><b id="c${i}">0.00x</b></div><div class="bar"><i id="b${i}"></i></div></div>`).join("")}
+    <div class="gmp"><div><span>📈 Grey market premium (GMP)</span><em>unofficial · rumour-driven</em></div><b id="gmpV">₹0</b></div>
+    <div class="btns"><button class="btn go full" id="nextBtn" disabled>Bidding in progress<span class="dots"></span></button></div>
+    <button class="info" data-info="sub">How to check subscription & GMP in real life</button>`);
+  const fin = [IPO.retail, IPO.nii, IPO.qib], shape = [[.18, .45, 1], [.1, .35, 1], [.03, .12, 1]];
+  const color = v => v >= 10 ? "linear-gradient(90deg,#ff4d8d,#ffd27a)" : v >= 1 ? "linear-gradient(90deg,#22d39a,#00e0b8)" : "linear-gradient(90deg,#5b8cff,#8a90a2)";
+  let skip = false; $("#nextBtn").onclick = () => { skip = true; };
+  for (let d = 0; d < 3; d++) {
+    if (!document.body.contains(st)) return;
+    [...$("#days").children].forEach((s, k) => s.classList.toggle("on", k === d));
+    const from = fin.map((f, i) => d ? f * shape[i][d - 1] : 0), to = fin.map((f, i) => f * shape[i][d]);
+    const gFrom = d ? IPO.gmp * [.5, .8][d - 1] : IPO.gmp * .25, gTo = IPO.gmp * [.5, .8, 1][d] + gauss() * .03;
+    await tween(skip ? 50 : 1300, k => {
+      for (let i = 0; i < 3; i++) {
+        const v = from[i] + (to[i] - from[i]) * k;
+        const el = $("#c" + i); if (!el) return; el.textContent = xx(v);
+        const b = $("#b" + i); b.style.width = Math.min(100, Math.log10(v * 10 + 1) / Math.log10(2001) * 100) + "%"; b.style.background = color(v);
+      }
+      const g = gFrom + (gTo - gFrom) * k + (k < 1 ? gauss() * .01 : 0), gv = $("#gmpV");
+      if (gv) { gv.textContent = `${g >= 0 ? "+" : "−"}₹${Math.abs(Math.round(IPO.price * g))} (${spct(g)})`; gv.style.color = g >= 0 ? "var(--up)" : "var(--down)"; }
+      if (Math.random() < .25) SFX.tick();
+    });
+  }
+  IPO.gmpShown = IPO.gmp;
+  const nb = $("#nextBtn"); if (!nb) return;
+  nb.disabled = false;
+  nb.innerHTML = A.applied && A.valid ? `🎟️ CHECK ALLOTMENT →` : `➡️ SEE LISTING DAY`;
+  nb.onclick = () => { SFX.tap(); A.applied && A.valid ? allotment() : listing(); };
+  if (IPO.retail > 50) toast(`🔥 Retail ${xx(IPO.retail)}! Allotment odds are tiny`);
+}
+
+/* ---------- 4 · Allotment ---------- */
+async function allotment() {
+  setStep(3);
+  const under = IPO.retail <= 1, p = under ? 1 : 1 / IPO.retail;
+  A.allotted = Math.random() < p;
+  const st = scene(`
+    <div class="kicker">Step 4 · Allotment day</div>
+    <h2>Did you get it?</h2>
+    <div class="odds"><b style="color:${under ? "var(--up)" : p > .2 ? "var(--warn)" : "var(--down)"}">${under ? "100%" : "1 in " + Math.round(IPO.retail)}</b><span>${under ? `Retail is only ${xx(IPO.retail)} subscribed, so every valid application gets shares` : `Retail is ${xx(IPO.retail)} subscribed: minimum lots go by lottery`}</span></div>
+    <div class="drum"><div class="reel" id="reel"></div></div>
+    <div class="btns"><button class="btn go full" id="spinBtn">🔎 CHECK STATUS WITH PAN</button></div>
+    <button class="info" data-info="allot">How allotment works & where to check</button>`);
+  const words = ["🎟️ CHECKING", "😔 NOT ALLOTTED", "🎉 ALLOTTED", "⏳ REGISTRAR", "😔 NOT ALLOTTED", "🎟️ LOTTERY", "🎉 ALLOTTED"];
+  const reel = $("#reel"); const N = 26;
+  const final = A.allotted ? "🎉 ALLOTTED" : "😔 NOT ALLOTTED";
+  reel.innerHTML = Array.from({ length: N }, (_, i) => `<div>${i === N - 1 ? final : words[i % words.length]}</div>`).join("");
+  $("#spinBtn").onclick = async () => {
+    $("#spinBtn").disabled = true; SFX.tap();
+    await tween(2200, k => { const e = 1 - Math.pow(1 - k, 3); reel.style.transform = `translateY(${-e * (N - 1) * 120}px)`; if (Math.random() < .35) SFX.tick(); });
+    if (!document.body.contains(st)) return;
+    if (A.allotted) {
+      S.allotted++; SFX.win(); vib([30, 40, 30]); confetti();
+      if (IPO.retail >= 20) badge("lucky", "Lottery winner 🍀");
+    } else {
+      S.wallet += IPO.need; hud(); SFX.lose();
+    }
+    st.querySelector(".btns").innerHTML = `
+      <div class="verdict full" style="grid-column:1/-1;color:${A.allotted ? "var(--up)" : "var(--down)"}">${A.allotted ? "🎉 ALLOTTED!" : "😔 Not allotted"}</div>
+      <p class="note" style="grid-column:1/-1">${A.allotted ? `${IPO.qty.toLocaleString("en-IN")} shares will reach your demat before listing. ${inr(IPO.need)} debited.` : `Better luck next time. ${inr(IPO.need)} unblocked back to your bank.`}</p>
+      <button class="btn go full" id="toList">📈 GO TO LISTING DAY →</button>`;
+    $("#toList").onclick = () => { SFX.tap(); listing(); };
+  };
+}
+
+/* ---------- 5 · Listing ---------- */
+async function listing() {
+  setStep(4);
+  const listP = IPO.price * (1 + IPO.listing), gmpP = IPO.price * (1 + IPO.gmp);
+  const holding = A.applied && A.valid && A.allotted;
+  const st = scene(`
+    <div class="kicker">Step 5 · Listing day · T+3</div>
+    <h2>${IPO.name.replace(" Ltd", "")} lists today</h2>
+    <div class="ticker"><small>OPENING PRICE</small><b id="lp">₹${IPO.price}</b><em id="lpct">+0.0%</em></div>
+    <div class="cmp">
+      <div><span>Issue price</span><b>₹${IPO.price}</b></div>
+      <div><span>GMP hinted</span><b>₹${Math.round(gmpP)}</b></div>
+      <div><span>Actual open</span><b id="act">…</b></div>
+    </div>
+    <div id="listMore"></div>
+    <button class="info" data-info="list">How listing day works</button>`);
+  await tween(1800, k => {
+    const e = 1 - Math.pow(1 - k, 3), v = IPO.price + (listP - IPO.price) * e + (k < 1 ? gauss() * IPO.price * .01 : 0), el = $("#lp");
+    if (!el) return; el.textContent = "₹" + v.toFixed(2); const pc = v / IPO.price - 1;
+    el.style.color = pc >= 0 ? "var(--up)" : "var(--down)"; $("#lpct").textContent = spct(pc); $("#lpct").style.color = el.style.color;
+    if (Math.random() < .3) SFX.tick();
+  });
+  if (!document.body.contains(st)) return;
+  $("#act").textContent = "₹" + listP.toFixed(0); $("#act").style.color = IPO.listing >= 0 ? "var(--up)" : "var(--down)";
+  IPO.listing >= 0 ? SFX.coin() : SFX.lose();
+  if (holding) {
+    $("#listMore").innerHTML = `
+      <p class="note">You hold <b>${IPO.qty.toLocaleString("en-IN")} shares</b>: ${sinr(IPO.qty * (listP - IPO.price))} right now. What's your move?</p>
+      <div class="btns"><button class="btn ok" id="sellBtn">💰 SELL NOW<small>book ${sinr(IPO.qty * (listP - IPO.price))}</small></button><button class="btn" id="holdBtn2">💎 HOLD<small>for a month</small></button></div>`;
+    $("#sellBtn").onclick = () => { SFX.tap(); settle(listP, "sold on listing"); };
+    $("#holdBtn2").onclick = () => { SFX.tap(); holdMonth(listP); };
+  } else {
+    const would = IPO.qty * (listP - IPO.price);
+    const why = !A.applied ? "You skipped this IPO" : !A.valid ? "Your bid wasn't valid" : "You weren't allotted";
+    if (!A.applied && IPO.listing < -.03) badge("dodge", "Dodged a dud 🧠");
+    record(0, why, would);
+  }
+}
+async function holdMonth(listP) {
+  const endP = listP * (1 + IPO.month), more = $("#listMore");
+  more.innerHTML = `<p class="note">⏩ One month later…</p><svg class="spark" id="spark" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>`;
+  const pts = [listP]; for (let i = 1; i <= 22; i++) pts.push(listP * (1 + IPO.month * i / 22 + gauss() * .015));
+  pts[22] = endP;
+  const hi = Math.max(...pts), lo = Math.min(...pts), Y = v => 64 - (v - lo) / (hi - lo || 1) * 58;
+  const path = pts.map((v, i) => `${i ? "L" : "M"}${(i / 22 * 300).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  const col = endP >= listP ? "#22d39a" : "#ff5470";
+  $("#spark").innerHTML = `<path d="${path}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s ease"/>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => { const p = $("#spark path"); if (p) p.style.strokeDashoffset = 0; }));
+  setTimeout(() => { const p = $("#spark path"); if (p) p.style.strokeDashoffset = 0; }, 60);
+  await sleep(1700);
+  if (endP > listP * 1.05 && IPO.score > 0) badge("diamond", "Diamond hands 💎");
+  settle(endP, `held a month (${spct(endP / listP - 1)} after listing)`);
+}
+function settle(sellP, how) {
+  const pnl = IPO.qty * (sellP - IPO.price);
+  S.wallet += IPO.qty * sellP; S.pnl += pnl; hud();
+  if (pnl > 0) { SFX.win(); coins(Math.min(40, 10 + Math.floor(pnl / 1500))); } else SFX.lose();
+  if (pnl > 25000) badge("jackpot", "Jackpot listing 🚀");
+  record(pnl, how);
+}
+function record(pnl, how, would) {
+  const listP = IPO.price * (1 + IPO.listing);
+  S.hist.push({ name: IPO.name.replace(" Ltd", ""), sme: IPO.sme, pnl, how, applied: A.applied && A.valid, allotted: A.allotted, retail: IPO.retail, gmp: IPO.gmp, listing: IPO.listing, month: IPO.month, score: IPO.score, would });
+  const L = [];
+  if (Math.abs(IPO.listing - IPO.gmp) > .12) L.push(`<b>GMP said ${spct(IPO.gmp)}, it listed ${spct(IPO.listing)}.</b> The grey market is unofficial and often wrong.`);
+  if (IPO.retail > 10 && A.applied && A.valid && !A.allotted) L.push(`At <b>${xx(IPO.retail)}</b> retail subscription, only about <b>1 in ${Math.round(IPO.retail)}</b> applicants get shares. Not getting it is normal.`);
+  if (IPO.score <= -2 && IPO.listing > .05) L.push(`Weak fundamentals but a positive listing: <b>hype can beat numbers for a day</b>, but not usually for long.`);
+  if (IPO.score >= 2 && IPO.month > .04) L.push(`Strong fundamentals kept going up after listing: <b>quality matters once the hype fades</b>.`);
+  if (IPO.listing < 0) L.push(`Listed <b>below</b> the issue price. Even popular IPOs can lose money on day one.`);
+  if (!L.length) L.push(`Fundamentals score: <b>${IPO.score >= 0 ? "+" : ""}${IPO.score}</b>. Read the RHP, not just the GMP.`);
+  const more = $("#listMore");
+  const wouldTxt = would != null ? `<p class="note">${how}. If you had got shares: <b style="color:${would >= 0 ? "var(--up)" : "var(--down)"}">${sinr(would)}</b>.</p>` : `<div class="verdict" style="color:${pnl >= 0 ? "var(--up)" : "var(--down)"}">${sinr(pnl)}</div><p class="note">You ${how}.</p>`;
+  more.innerHTML = `${wouldTxt}<div class="lesson">💡 ${L[0]}</div>
+    <div class="btns" style="margin-top:12px"><button class="btn go full" id="nextIpo">${S.round >= ROUNDS ? "🏁 SEE SEASON RESULTS" : "NEXT IPO →"}</button></div>`;
+  $("#nextIpo").onclick = () => { SFX.tap(); nextIPO(); };
+}
+
+/* ---------- season end ---------- */
+function bests() { return JSON.parse(localStorage.getItem("ipom_scores") || "[]"); }
+function endSeason() {
+  setStep(5);
+  const h = S.hist, hit = S.applied ? Math.round(S.allotted / S.applied * 100) : 0;
+  if (S.applied === 0) badge("watcher", "Patient watcher 👀");
+  if (S.allotted >= 3) badge("luck", "Allotment king 👑");
+  const rank = S.pnl > 60000 ? "👑 IPO Tycoon" : S.pnl > 25000 ? "🚀 Listing-day legend" : S.pnl > 5000 ? "🎟️ Smart applicant" : S.pnl >= 0 ? "🧘 Patient investor" : S.pnl > -20000 ? "📚 Learning the hard way" : "🎢 Hype victim";
+  $("#eTotal").textContent = sinr(S.pnl); $("#eTotal").style.color = S.pnl > 0 ? "var(--up)" : S.pnl < 0 ? "var(--down)" : "";
+  $("#eRank").textContent = rank;
+  $("#eApplied").textContent = S.applied; $("#eAllotted").textContent = S.allotted; $("#eHit").textContent = S.applied ? hit + "%" : "—";
+  $("#eHist").innerHTML = h.map(x => `<div><span>${x.sme ? "🟡" : "🟣"} ${x.name} · ${xx(x.retail)} · lists ${spct(x.listing)}</span><b style="color:${x.allotted ? (x.pnl >= 0 ? "var(--up)" : "var(--down)") : "var(--muted)"}">${x.allotted ? sinr(x.pnl) : x.applied ? "not allotted" : "skipped"}</b></div>`).join("");
+  $("#eBadges").innerHTML = S.badges.size ? [...S.badges].map(b => `<span>${BADGES[b]}</span>`).join("") : `<span style="opacity:.6">No badges this time</span>`;
+  const gmpMiss = h.filter(x => Math.abs(x.listing - x.gmp) > .12).length;
+  $("#eLesson").innerHTML = `💡 <b>Season lesson:</b> GMP was off by more than 12 points in <b>${gmpMiss} of ${h.length}</b> IPOs. ` + (hit < 50 && S.applied ? "Oversubscribed IPOs are a lottery, so never borrow money to apply." : "Read the RHP, apply only within your budget and remember listing gains are never guaranteed.");
+  const list = bests(); const me = { pnl: Math.round(S.pnl), at: Date.now() }; list.push(me); list.sort((a, b) => b.pnl - a.pnl); localStorage.setItem("ipom_scores", JSON.stringify(list.slice(0, 5)));
+  S.result = { rank, hit };
+  $("#endOv").hidden = false; if (S.pnl > 0) confetti();
+}
+const BADGES = { fast: "⚡ Lightning mandate", lucky: "🍀 Lottery winner", dodge: "🧠 Dodged a dud", diamond: "💎 Diamond hands", jackpot: "🚀 Jackpot listing", watcher: "👀 Patient watcher", luck: "👑 Allotment king" };
+
+/* ---------- share ---------- */
+const URL_ = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host) ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/ipo-game/";
+function shareText() {
+  return [`🎟️ *IPO MANIA*`, S.pnl >= 0 ? `I made *${sinr(S.pnl)}* from 5 IPOs! ${S.result.rank}` : `I lost *${inr(-S.pnl)}* chasing IPO hype 😅 ${S.result.rank}`,
+    `📊 Applied ${S.applied} · allotted ${S.allotted} (${S.result.hit}% hit rate)`, ``, `Think you can beat the allotment lottery? 👉 ${URL_}`, `_A learning game with fictional IPOs. Not investment advice._`].join("\n");
+}
+$("#shareWa").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent(shareText()), "_blank", "noopener");
+$("#shareImg").onclick = async () => {
+  const c = await card(), blob = await new Promise(r => c.toBlob(r, "image/png")), file = new File([blob], "ipo-mania-score.png", { type: "image/png" });
+  if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text: shareText() }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  let copied = false; try { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); copied = true; } catch {}
+  const u = URL.createObjectURL(blob); $("#imgPrev").src = u; $("#imgDl").href = u;
+  $("#imgMsg").innerHTML = copied ? "✅ <b>Image copied.</b> Paste it in WhatsApp with Ctrl+V, or download it." : "Tap <b>Download</b>, or long-press the image to save or share it.";
+  $("#imgOv").hidden = false;
+};
+$("#imgClose").onclick = () => $("#imgOv").hidden = true;
+async function card() {
+  const GR = '"Space Grotesk", sans-serif', MO = '"JetBrains Mono", monospace', IN = 'Inter, sans-serif';
+  await Promise.all([`800 80px ${GR}`, `700 40px ${MO}`, `600 30px ${IN}`].map(f => document.fonts.load(f).catch(() => {})));
+  const W = 1080, H = 1080, c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
+  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0e1020"); g.addColorStop(1, "#05060a"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const glow = (a, b, r, col) => { const rg = x.createRadialGradient(a, b, 0, a, b, r); rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = rg; x.fillRect(0, 0, W, H); };
+  glow(100, 60, 650, "rgba(255,77,141,.3)"); glow(W, H, 700, "rgba(124,92,255,.28)");
+  const lg = x.createLinearGradient(70, 50, 130, 110); lg.addColorStop(0, "#7c5cff"); lg.addColorStop(1, "#00e0b8"); x.fillStyle = lg; x.beginPath(); x.roundRect ? x.roundRect(70, 52, 62, 62, 18) : x.rect(70, 52, 62, 62); x.fill();
+  x.fillStyle = "#05060a"; x.font = `700 36px ${GR}`; x.textAlign = "center"; x.fillText("₹", 101, 97);
+  const bg2 = x.createLinearGradient(152, 0, 520, 0); bg2.addColorStop(0, "#fff"); bg2.addColorStop(.55, "#c9bcff"); bg2.addColorStop(1, "#00e0b8"); x.fillStyle = bg2; x.textAlign = "left"; x.fillText("MANIMINDSMONEY", 152, 97);
+  const tg = x.createLinearGradient(70, 0, 800, 0); tg.addColorStop(0, "#ff4d8d"); tg.addColorStop(.5, "#b45cff"); tg.addColorStop(1, "#ffd27a");
+  x.font = `800 120px ${GR}`; x.fillStyle = tg; x.fillText("IPO MANIA", 70, 270);
+  x.font = `600 32px ${IN}`; x.fillStyle = "#8a90a2"; x.fillText("My season: 5 IPOs", 70, 330);
+  x.font = `700 130px ${MO}`; x.fillStyle = S.pnl >= 0 ? "#22d39a" : "#ff5470"; x.fillText(sinr(S.pnl), 70, 480);
+  x.font = `700 40px ${MO}`; x.fillStyle = "#eef0f6"; x.fillText(`Applied ${S.applied} · Allotted ${S.allotted} · ${S.result.hit}% hit`, 70, 550);
+  x.font = `700 44px ${IN}`; x.fillStyle = "#ffd27a"; x.fillText(S.result.rank, 70, 625);
+  S.hist.forEach((h, i) => { const y = 700 + i * 42; x.font = `500 28px ${IN}`; x.fillStyle = "#cfd3df"; x.fillText(`${h.name} · ${xx(h.retail)}`, 70, y); x.textAlign = "right"; x.font = `700 28px ${MO}`; x.fillStyle = h.allotted ? (h.pnl >= 0 ? "#22d39a" : "#ff5470") : "#6c7285"; x.fillText(h.allotted ? sinr(h.pnl) : h.applied ? "not allotted" : "skipped", W - 70, y); x.textAlign = "left"; });
+  x.font = `800 44px ${GR}`; x.fillStyle = "#fff"; x.textAlign = "center"; x.fillText("Can you beat the allotment lottery? 🎟️", W / 2, 960);
+  x.font = `500 26px ${MO}`; x.fillStyle = "#8a90a2"; x.fillText(URL_.replace(/\/$/, ""), W / 2, 1005);
+  x.font = `400 20px ${IN}`; x.fillStyle = "#5a6072"; x.fillText("A learning game with fictional IPOs · not investment advice", W / 2, 1045);
+  return c;
+}
+
+/* ---------- effects ---------- */
+const fx = $("#fx"), fctx = fx.getContext("2d"); let parts = [], fxOn = false;
+function fxSize() { const d = Math.min(devicePixelRatio || 1, 2); fx.width = innerWidth * d; fx.height = innerHeight * d; fctx.setTransform(d, 0, 0, d, 0, 0); }
+addEventListener("resize", fxSize); fxSize();
+function confetti() { const cols = ["#ff4d8d", "#ffd27a", "#22d39a", "#7c5cff", "#00e0b8"]; for (let i = 0; i < 90; i++) parts.push({ x: innerWidth / 2 + rnd(-60, 60), y: innerHeight * .4, vx: rnd(-7, 7), vy: rnd(-12, -4), g: .32, s: rnd(4, 8), c: pick(cols), life: 0, max: rnd(60, 100), rot: rnd(0, 6) }); runFx(); }
+function coins(n) { const t = $("#hPnl").getBoundingClientRect(); for (let i = 0; i < n; i++) parts.push({ x: innerWidth / 2, y: innerHeight * .45, vx: rnd(-5, 5), vy: rnd(-9, -3), g: .3, s: rnd(6, 10), c: "#ffd27a", coin: true, tx: t.left + t.width / 2, ty: t.top + t.height / 2, life: 0, max: rnd(45, 65) }); runFx(); }
+function runFx() {
+  if (fxOn) return; fxOn = true;
+  const iv = setInterval(() => {
+    fctx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.life < p.max);
+    parts.forEach(p => {
+      p.life++; const k = p.life / p.max;
+      if (p.coin && k > .45) { p.x += (p.tx - p.x) * .15; p.y += (p.ty - p.y) * .15; } else { p.vy += p.g; p.x += p.vx; p.y += p.vy; }
+      fctx.globalAlpha = 1 - Math.max(0, k - .75) * 4; fctx.fillStyle = p.c;
+      if (p.coin) { fctx.beginPath(); fctx.arc(p.x, p.y, p.s, 0, 7); fctx.fill(); fctx.fillStyle = "rgba(0,0,0,.35)"; fctx.font = `700 ${p.s}px Inter`; fctx.textAlign = "center"; fctx.fillText("₹", p.x, p.y + p.s * .35); }
+      else { fctx.save(); fctx.translate(p.x, p.y); fctx.rotate(p.rot += .2); fctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); fctx.restore(); }
+    });
+    fctx.globalAlpha = 1;
+    if (!parts.length) { clearInterval(iv); fxOn = false; fctx.clearRect(0, 0, innerWidth, innerHeight); }
+  }, 16);
+}
+
+/* ---------- start ---------- */
+function showStart() { const b = bests()[0]; $("#bestLine").innerHTML = b ? `Your best season: <b style="color:var(--gold)">${sinr(b.pnl)}</b>` : "Takes about 3 minutes · fictional companies"; $("#startOv").hidden = false; }
+$("#goBtn").onclick = () => { $("#startOv").hidden = true; SFX.tap(); newSeason(); };
+$("#againBtn").onclick = () => { $("#endOv").hidden = true; SFX.tap(); newSeason(); };
+S = { round: 0, wallet: START, pnl: 0 }; hud(); scene(`<div class="wait">Press start to begin</div>`); showStart();
+</script>
+</body>
+</html>

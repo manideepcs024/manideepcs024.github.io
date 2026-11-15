@@ -232,6 +232,11 @@
   .cd-row b { color: var(--fg); font-weight: 600; transition: opacity .3s; }
   .cd-res { text-align: center; padding-top: 18px; }
   .ipo-demo .cd-row b { display: inline-flex; align-items: center; gap: 4px; }
+  .ipom-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .ipom-top b { font: 800 1.2rem "Space Grotesk"; background: linear-gradient(100deg, #ff4d8d, #b45cff 50%, #ffd27a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .ipom-top span { font-size: .78rem; color: var(--muted); }
+  .ipom-res { margin-top: 14px; text-align: center; font: 800 1.5rem "Space Grotesk"; color: var(--up); animation: ipomPulse 1.6s ease-in-out infinite alternate; }
+  @keyframes ipomPulse { to { transform: scale(1.06); text-shadow: 0 0 24px rgba(34,211,154,.5); } }
   .rush-top { display: flex; justify-content: space-between; align-items: center; }
   .rush-top b { font: 800 1.2rem "Space Grotesk"; background: linear-gradient(100deg, var(--up), var(--a2) 45%, #ffd27a 75%, var(--down)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .rush-top span { font-size: .78rem; color: var(--muted); }
@@ -724,6 +729,25 @@
           <div class="rush-chart"><i style="height:30%"></i><i class="r" style="height:22%"></i><i style="height:38%"></i><i style="height:46%"></i><i class="r" style="height:34%"></i><i style="height:52%"></i><i style="height:64%"></i><i style="height:72%"></i><i class="r" style="height:60%"></i><i style="height:82%"></i></div>
           <div class="rush-btns"><span class="b">▲ BUY</span><span class="s">▼ SELL</span></div>
           <div class="rush-pnl">+₹4,820 · 🔥 x3 streak</div>
+        </a>
+      </div>
+
+      <div class="project card reveal tilt" style="margin-top:16px">
+        <div class="proj-info">
+          <span class="tag">12 · Game · Play now</span>
+          <h3 class="proj-title">IPO Mania 🎟️</h3>
+          <p>A fast IPO game: read the <strong>fundamentals</strong>, apply by <strong>UPI or ASBA</strong>, watch <strong>subscription and GMP</strong> climb, try your luck in the <strong>allotment lottery</strong> and decide whether to sell or hold on <strong>listing day</strong>. Every step explains how to check it in real life.</p>
+          <div class="chips" style="margin-top:18px"><span class="chip">IPO allotment</span><span class="chip">UPI &amp; ASBA</span><span class="chip">GMP vs reality</span></div>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="btn primary magnetic" href="./ipo-game/">▶ Play IPO Mania</a>
+          </div>
+        </div>
+        <a class="calc-demo ipom-demo" href="./ipo-game/" aria-label="Play IPO Mania">
+          <div class="ipom-top"><b>IPO MANIA</b><span>IPO 3/5</span></div>
+          <div class="cd-row"><span>Retail subscribed</span><b style="color:#ffd27a">21.3x</b></div>
+          <div class="cd-row"><span>GMP (unofficial)</span><b style="color:var(--up)">+₹71</b></div>
+          <div class="cd-row"><span>Your odds</span><b style="color:var(--down)">1 in 21</b></div>
+          <div class="ipom-res">🎉 ALLOTTED!</div>
         </a>
       </div>
 
