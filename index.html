@@ -232,6 +232,20 @@
   .cd-row b { color: var(--fg); font-weight: 600; transition: opacity .3s; }
   .cd-res { text-align: center; padding-top: 18px; }
   .ipo-demo .cd-row b { display: inline-flex; align-items: center; gap: 4px; }
+  .rush-top { display: flex; justify-content: space-between; align-items: center; }
+  .rush-top b { font: 800 1.2rem "Space Grotesk"; background: linear-gradient(100deg, var(--up), var(--a2) 45%, #ffd27a 75%, var(--down)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .rush-top span { font-size: .78rem; color: var(--muted); }
+  .rush-news { margin: 10px 0; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(34,211,154,.5); font-family: Inter, sans-serif; font-size: .78rem; color: #d5d8e3; }
+  .rush-news b { color: var(--up); font-size: .66rem; margin: 0 4px; }
+  .rush-chart { height: 90px; display: flex; align-items: flex-end; gap: 6px; padding: 0 4px; }
+  .rush-chart i { flex: 1; background: var(--up); border-radius: 3px; animation: rushbar 2.4s ease-in-out infinite alternate; transform-origin: bottom; }
+  .rush-chart i.r { background: var(--down); }
+  .rush-chart i:nth-child(odd) { animation-delay: -.8s; }
+  @keyframes rushbar { to { transform: scaleY(.82); } }
+  .rush-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .rush-btns span { text-align: center; padding: 9px; border-radius: 12px; font: 800 .82rem Inter, sans-serif; color: #fff; }
+  .rush-btns .b { background: linear-gradient(160deg, #2fe0a7, #0fa877); } .rush-btns .s { background: linear-gradient(160deg, #ff6b84, #d63353); }
+  .rush-pnl { margin-top: 10px; text-align: center; font-weight: 700; color: var(--up); font-size: .9rem; }
   .lv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .lv-head b { font: 700 1.1rem "Space Grotesk"; color: var(--fg); }
   .lv-head span { font-size: .66rem; padding: 3px 9px; border-radius: 999px; color: var(--up); border: 1px solid rgba(34,211,154,.4); background: rgba(34,211,154,.1); }
@@ -692,6 +706,25 @@
           <a class="cd-row" href="./options/" style="text-decoration:none"><span>📈 Options payoff</span><b>F&amp;O ↗</b></a>
           <a class="cd-row" href="./tax/" style="text-decoration:none"><span>🧾 Capital gains tax</span><b>Tax ↗</b></a>
         </div>
+      </div>
+
+      <div class="project card reveal tilt" style="margin-top:16px">
+        <div class="proj-info">
+          <span class="tag">11 · Game · Play now</span>
+          <h3 class="proj-title">Market Rush 🎮</h3>
+          <p>Bored? Ride a <strong>live simulated chart for 60 seconds</strong> with ₹1,00,000 of play money. React to <strong>breaking news</strong>, go long or short, dodge hype traps, build <strong>win streaks</strong> and challenge friends on WhatsApp to beat your score.</p>
+          <div class="chips" style="margin-top:18px"><span class="chip">60-second game</span><span class="chip">Breaking news</span><span class="chip">Leaderboard</span></div>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="btn primary magnetic" href="./game/">▶ Play Market Rush</a>
+          </div>
+        </div>
+        <a class="calc-demo rush-demo" href="./game/" aria-label="Play Market Rush">
+          <div class="rush-top"><b>MARKET RUSH</b><span>⏱ 42s</span></div>
+          <div class="rush-news">📰 <b>BULLISH</b> RBI cuts repo rate by 25 bps</div>
+          <div class="rush-chart"><i style="height:30%"></i><i class="r" style="height:22%"></i><i style="height:38%"></i><i style="height:46%"></i><i class="r" style="height:34%"></i><i style="height:52%"></i><i style="height:64%"></i><i style="height:72%"></i><i class="r" style="height:60%"></i><i style="height:82%"></i></div>
+          <div class="rush-btns"><span class="b">▲ BUY</span><span class="s">▼ SELL</span></div>
+          <div class="rush-pnl">+₹4,820 · 🔥 x3 streak</div>
+        </a>
       </div>
 
       <div class="reveal" style="margin-top:28px;text-align:center">
