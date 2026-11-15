@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Stock Detective: learn fundamental analysis by playing · MANIMINDSMONEY</title>
+<meta name="description" content="Interactive labs for market cap, EPS, P/E, book value, P/B, shareholding pattern and promoter pledging, then a detective case where you pick the stock using everything you learned." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.8); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --gold: #ffd27a; --det: #5ec8ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .18; }
+  .blob.b1 { background: var(--det); top: -25vmax; left: -20vmax; }
+  .blob.b2 { background: var(--a1); bottom: -30vmax; right: -20vmax; }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .4; }
+
+  .app { max-width: 660px; margin: 0 auto; padding: max(12px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .brand { min-width: 0; display: flex; align-items: center; gap: 9px; font: 700 .98rem "Space Grotesk"; letter-spacing: .04em; text-decoration: none; color: inherit; }
+  .brand i { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .85rem; flex: none; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hbtns { display: flex; gap: 6px; }
+  .hbtn { white-space: nowrap; height: 34px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); font: 600 .78rem Inter; text-decoration: none; display: inline-flex; align-items: center; }
+  .hud { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 15px; padding: 8px 10px; min-width: 0; }
+  .stat span { display: block; font: 600 .58rem "JetBrains Mono"; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .stat strong { display: block; font: 700 clamp(.95rem, 4.2vw, 1.2rem) "JetBrains Mono"; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  .steps div { text-align: center; font: 700 .58rem "JetBrains Mono"; letter-spacing: .04em; padding: 6px 2px; border-radius: 9px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .steps div.on { color: var(--det); border-color: var(--det); background: rgba(94,200,255,.08); }
+  .steps div.done { color: var(--up); border-color: rgba(34,211,154,.4); }
+
+  .stage { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px 14px; min-height: 480px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .scene { animation: in .45s cubic-bezier(.2,.9,.3,1.1); }
+  @keyframes in { from { opacity: 0; transform: translateY(14px); } }
+  .kicker { font: 700 .66rem "JetBrains Mono"; letter-spacing: .14em; color: var(--det); text-transform: uppercase; }
+  h2 { font: 700 clamp(1.35rem, 5.8vw, 1.75rem)/1.12 "Space Grotesk"; letter-spacing: -.03em; margin: 5px 0 6px; }
+  h3 { font: 700 1.02rem "Space Grotesk"; margin: 14px 0 6px; }
+  .story { font-size: .9rem; color: #cfd3df; line-height: 1.5; margin-bottom: 10px; }
+  .story b { color: #fff; }
+  .formula { display: inline-block; font: 700 .82rem "JetBrains Mono"; padding: 6px 10px; border-radius: 10px; background: rgba(94,200,255,.1); border: 1px solid rgba(94,200,255,.35); color: #bfe9ff; margin: 2px 0 10px; }
+
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .co { text-align: left; padding: 12px; border-radius: 16px; border: 1.5px solid var(--line); background: rgba(255,255,255,.04); color: var(--fg); font: inherit; cursor: pointer; transition: transform .1s, border-color .2s; }
+  .co:active { transform: scale(.97); }
+  .co b { display: block; font-size: .95rem; }
+  .co small { display: block; color: var(--muted); font-size: .72rem; }
+  .co .px { font: 800 1.35rem "JetBrains Mono"; margin: 6px 0 2px; }
+  .co.win { border-color: var(--up); box-shadow: 0 0 0 2px rgba(34,211,154,.3); }
+  .co.lose { opacity: .6; }
+  .co[disabled] { cursor: default; }
+  .bars { display: grid; gap: 8px; margin: 8px 0; }
+  .brow .t { display: flex; justify-content: space-between; font-size: .8rem; margin-bottom: 4px; }
+  .brow .t b { font-family: "JetBrains Mono"; }
+  .track { height: 14px; border-radius: 8px; background: rgba(255,255,255,.06); overflow: hidden; }
+  .track i { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .9s cubic-bezier(.2,.8,.2,1); }
+
+  .ctl { margin: 6px 0 10px; }
+  .ctl label { display: flex; justify-content: space-between; font-size: .8rem; color: #cfd3df; margin-bottom: 2px; }
+  .ctl label b { font-family: "JetBrains Mono"; color: #fff; }
+  input[type=range] { width: 100%; accent-color: var(--det); }
+  .readout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0; }
+  .readout div { padding: 9px 6px; border-radius: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); text-align: center; min-width: 0; }
+  .readout span { display: block; font-size: .62rem; color: var(--muted); }
+  .readout b { font: 800 1.02rem "JetBrains Mono"; white-space: nowrap; }
+  .verdict { padding: 10px 12px; border-radius: 13px; font-size: .84rem; line-height: 1.5; margin: 6px 0; transition: background .3s, border-color .3s; border: 1px solid var(--line); }
+  .verdict.g { background: rgba(34,211,154,.08); border-color: rgba(34,211,154,.35); color: #c9f5e4; }
+  .verdict.y { background: rgba(254,188,46,.07); border-color: rgba(254,188,46,.35); color: #f3dfb0; }
+  .verdict.r { background: rgba(255,84,112,.08); border-color: rgba(255,84,112,.35); color: #ffd0d8; }
+  .verdict b { color: #fff; }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); margin: 6px 0 8px; }
+  .seg button { border: 0; background: none; color: var(--muted); padding: 9px 4px; border-radius: 10px; font: 600 .78rem Inter; cursor: pointer; }
+  .seg button.on { background: var(--fg); color: #000; }
+  .bs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0; align-items: end; height: 150px; }
+  .bs div { border-radius: 12px 12px 4px 4px; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; transition: height .5s; }
+  .bs .lbl { font: 700 .7rem "JetBrains Mono"; padding: 6px; text-align: center; color: #000; }
+  .bs .nw { background: linear-gradient(180deg, #22d39a, #0fa877); }
+  .bs .li { background: linear-gradient(180deg, #ff6b84, #d63353); }
+  .bs .as { background: linear-gradient(180deg, #5ec8ff, #3a8bd8); }
+
+  .donutwrap { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; margin: 6px 0 8px; }
+  .donut { width: 150px; height: 150px; }
+  .legend { display: grid; gap: 5px; font-size: .8rem; }
+  .legend div { display: flex; align-items: center; gap: 7px; }
+  .legend i { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+  .legend b { margin-left: auto; font-family: "JetBrains Mono"; }
+  .qtrs { display: flex; gap: 5px; margin: 4px 0 8px; }
+  .qtrs button { flex: 1; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); border-radius: 10px; padding: 7px 2px; font: 700 .7rem "JetBrains Mono"; cursor: pointer; }
+  .qtrs button.on { color: #fff; border-color: var(--det); background: rgba(94,200,255,.12); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 6px 0 8px; }
+  .chip { border: 1.5px solid var(--line); background: rgba(255,255,255,.04); color: #d5d8e3; border-radius: 999px; padding: 8px 12px; font: 600 .8rem Inter; cursor: pointer; transition: all .2s; }
+  .chip.on { border-color: var(--warn); background: rgba(254,188,46,.12); color: #fff; }
+  .chip.right { border-color: var(--up); background: rgba(34,211,154,.14); }
+  .chip.wrong { border-color: var(--down); background: rgba(255,84,112,.12); text-decoration: line-through; }
+  .chip.missed { border-style: dashed; border-color: var(--up); }
+
+  .cases { display: grid; gap: 9px; }
+  .case { border-radius: 16px; border: 1.5px solid var(--line); background: rgba(255,255,255,.035); padding: 12px; }
+  .case h4 { display: flex; justify-content: space-between; align-items: baseline; font: 700 1rem "Space Grotesk"; margin-bottom: 8px; }
+  .case h4 small { font: 600 .72rem "JetBrains Mono"; color: var(--muted); }
+  .mgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .m { position: relative; text-align: left; border: 1.5px solid var(--line); background: rgba(0,0,0,.28); border-radius: 11px; padding: 7px 8px; color: var(--fg); font: inherit; cursor: pointer; transition: all .2s; min-width: 0; }
+  .m span { display: block; font-size: .62rem; color: var(--muted); }
+  .m b { font: 700 .86rem "JetBrains Mono"; white-space: nowrap; }
+  .m.on { border-color: var(--warn); background: rgba(254,188,46,.1); }
+  .m.on::after { content: "🚩"; position: absolute; top: 4px; right: 5px; font-size: .7rem; }
+  .m.right { border-color: var(--up); background: rgba(34,211,154,.12); }
+  .m.wrong { border-color: var(--down); background: rgba(255,84,112,.1); }
+  .m.missed { border-style: dashed; border-color: var(--down); }
+  .m[disabled] { cursor: default; }
+  .why { font-size: .74rem; color: #cfd3df; margin-top: 8px; line-height: 1.45; display: grid; gap: 3px; }
+  .why div::before { content: "• "; color: var(--det); }
+
+  .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 13px 8px; border-radius: 15px; font: 800 .94rem Inter; border: 1px solid var(--line); cursor: pointer; color: var(--fg); background: rgba(255,255,255,.06); transition: transform .1s, opacity .2s; text-align: center; }
+  .btn small { font: 600 .66rem Inter; opacity: .8; }
+  .btn:active { transform: scale(.96); }
+  .btn.full { grid-column: 1 / -1; width: 100%; }
+  .btn.go { background: linear-gradient(100deg, var(--det), var(--a1) 60%, var(--a2)); border: 0; color: #fff; }
+  .btn.warn { border-color: rgba(254,188,46,.5); color: var(--gold); }
+  .btn[disabled] { opacity: .35; pointer-events: none; }
+  .lesson { margin-top: 10px; padding: 12px 13px; border-radius: 15px; background: rgba(94,200,255,.07); border: 1px solid rgba(94,200,255,.35); font-size: .86rem; line-height: 1.55; color: #d6efff; animation: in .4s; }
+  .lesson h4 { font: 700 .95rem "Space Grotesk"; color: #fff; margin-bottom: 4px; }
+  .lesson b { color: #fff; }
+  .lesson ul { padding-left: 18px; margin-top: 4px; display: grid; gap: 3px; }
+  .where { margin-top: 8px; font-size: .76rem; color: var(--muted); }
+  .where b { color: #cfd3df; }
+  .chart { width: 100%; height: 140px; display: block; margin: 8px 0; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+
+  .overlay { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 14px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); overflow-y: auto; }
+  .overlay[hidden] { display: none; }
+  .panel { width: 100%; max-width: 520px; background: rgba(16,18,28,.96); border: 1px solid var(--line); border-radius: 26px; padding: 20px 16px; animation: pop .4s cubic-bezier(.2,1.2,.3,1); }
+  @keyframes pop { from { opacity: 0; transform: scale(.92) translateY(12px); } }
+  .logo { font: 800 clamp(2.2rem, 10vw, 3rem)/1 "Space Grotesk"; letter-spacing: -.05em; background: linear-gradient(100deg, var(--det), #9a8cff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; text-align: center; }
+  .tagline { color: var(--muted); margin: 8px 0 14px; font-size: .9rem; text-align: center; }
+  .how { display: grid; gap: 7px; margin-bottom: 14px; }
+  .how div { display: flex; gap: 10px; font-size: .84rem; color: #d5d8e3; padding: 9px 11px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .how b { color: #fff; } .how i { font-style: normal; font-size: 1.05rem; }
+  .bigr { font: 800 clamp(2rem, 9vw, 2.6rem) "JetBrains Mono"; letter-spacing: -.04em; text-align: center; }
+  .rank { display: block; width: fit-content; margin: 6px auto 12px; padding: 7px 14px; border-radius: 999px; font-weight: 700; background: rgba(255,210,122,.12); border: 1px solid rgba(255,210,122,.4); color: var(--gold); }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 12px; }
+  .badges span { padding: 6px 10px; border-radius: 999px; font-size: .76rem; font-weight: 600; background: rgba(94,200,255,.1); border: 1px solid rgba(94,200,255,.4); color: #d6efff; }
+  table.rel { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: .76rem; margin-bottom: 12px; }
+  .rel th { font: 700 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); text-align: left; padding: 4px; }
+  .rel td { padding: 7px 6px; background: rgba(255,255,255,.03); line-height: 1.35; color: #d5d8e3; vertical-align: top; }
+  .rel td:first-child { border-radius: 8px 0 0 8px; color: #fff; font-weight: 600; }
+  .rel td:last-child { border-radius: 0 8px 8px 0; }
+  .box { padding: 12px 13px; border-radius: 15px; margin-bottom: 12px; font-size: .83rem; line-height: 1.5; background: rgba(0,224,184,.06); border: 1px solid rgba(0,224,184,.3); color: #c9f5ec; }
+  .box h4 { font: 700 .92rem "Space Grotesk"; margin-bottom: 6px; color: #fff; }
+  .box ul { padding-left: 18px; display: grid; gap: 4px; }
+  .box b { color: #fff; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; }
+  .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translate(-50%, 160%); z-index: 50; padding: 10px 16px; border-radius: 999px; background: #1b1f2e; border: 1px solid rgba(255,210,122,.5); color: var(--gold); font-weight: 700; font-size: .85rem; white-space: nowrap; transition: transform .45s cubic-bezier(.2,1.3,.3,1); }
+  .toast.show { transform: translate(-50%, 0); }
+  .fine { text-align: center; font-size: .7rem; color: #5a6072; line-height: 1.5; }
+  .fine a { color: var(--muted); }
+  @media (max-width: 420px) { .donutwrap { grid-template-columns: 120px 1fr; } .donut { width: 120px; height: 120px; } .mgrid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 380px) { .brand span { font-size: .86rem; } .hbtn { padding: 0 8px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="app">
+    <header>
+      <a class="brand" href="../"><i>₹</i><span>MANIMINDSMONEY</span></a>
+      <div class="hbtns"><a class="hbtn" href="../tools/">🧰 Tools</a><a class="hbtn" href="../">Home</a></div>
+    </header>
+    <div class="hud">
+      <div class="stat"><span>🔍 Detective score</span><strong id="hS">0</strong></div>
+      <div class="stat"><span>Lab</span><strong id="hL">1/5</strong></div>
+      <div class="stat"><span>Badges</span><strong id="hB">0</strong></div>
+    </div>
+    <div class="steps" id="steps"><div>MKT CAP</div><div>EPS · P/E</div><div>BOOK VALUE</div><div>HOLDERS</div><div>THE CASE</div></div>
+    <div class="stage" id="stage"></div>
+    <p class="fine">A learning game with <b>fictional companies</b> and simplified numbers. Ratios mean different things in different industries; always read the annual report. Not investment advice; not SEBI registered. · <a href="../">MANIMINDSMONEY</a></p>
+  </div>
+
+  <div class="overlay" id="startOv">
+    <div class="panel">
+      <div class="logo">STOCK DETECTIVE</div>
+      <p class="tagline">Share price alone tells you almost nothing. Learn the numbers that do, then crack a case with ₹1,00,000 on the line.</p>
+      <div class="how">
+        <div><i>🧪</i><span><b>4 hands-on labs:</b> drag sliders and play with real formulas for <b>market cap</b>, <b>EPS &amp; P/E</b>, <b>book value &amp; P/B</b>, <b>shareholding &amp; pledging</b>.</span></div>
+        <div><i>🕵️</i><span><b>The case:</b> 3 companies. Flag the red flags, pick one, and see what happened over 3 years.</span></div>
+        <div><i>💡</i><span>Learn <b>which numbers matter for which business</b>. A bank isn't judged like an IT company.</span></div>
+      </div>
+      <button class="btn go full" id="goBtn">🔍 START LAB 1</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="endOv" hidden>
+    <div class="panel">
+      <div style="font:600 .7rem 'JetBrains Mono';letter-spacing:.14em;color:var(--muted);text-align:center">CASE CLOSED · DETECTIVE SCORE</div>
+      <div class="bigr" id="eS">0</div>
+      <span class="rank" id="eRank"></span>
+      <div style="text-align:center;font:600 .86rem 'JetBrains Mono';margin:-4px 0 10px" id="eInv"></div>
+      <div class="badges" id="eBadges"></div>
+      <table class="rel">
+        <tr><th>WHAT MAKES SENSE FOR…</th><th>FOCUS ON</th><th>CAREFUL WITH</th></tr>
+        <tr><td>🏦 Banks &amp; NBFCs</td><td>P/B, ROE, bad loans (NPA), capital</td><td>P/E alone</td></tr>
+        <tr><td>💻 IT, FMCG, pharma</td><td>P/E vs growth, ROE, margins, cash flow</td><td>Book value (few physical assets)</td></tr>
+        <tr><td>🏭 Metals, cement, auto</td><td>Debt, cycle stage, P/B, EV/EBITDA</td><td>Low P/E at a cycle peak</td></tr>
+        <tr><td>🚀 Loss-making / young</td><td>Revenue growth, cash burn, runway</td><td>P/E (meaningless if EPS &lt; 0)</td></tr>
+        <tr><td>🏢 Any company</td><td>Promoter holding trend, pledge %, debt</td><td>Share price on its own</td></tr>
+      </table>
+      <div class="box">
+        <h4>📒 Fundamentals cheat sheet</h4>
+        <ul>
+          <li><b>Market cap</b> = share price × total shares. It shows the company's size; price alone doesn't.</li>
+          <li><b>EPS</b> = net profit ÷ shares. <b>P/E</b> = price ÷ EPS: what you pay for ₹1 of yearly profit. Compare within the same industry, and against growth.</li>
+          <li><b>Book value per share</b> = (assets − liabilities) ÷ shares. <b>P/B</b> = price ÷ BVPS. Most useful for banks and asset-heavy firms.</li>
+          <li><b>Shareholding</b>: steady or rising promoter holding is good. Steady promoter selling or rising <b>pledges</b> is a warning.</li>
+          <li><b>Pledged shares</b> can be sold by lenders if the price falls, which can push it down further.</li>
+          <li>A cheap P/E isn't a bargain if profits are shrinking. That's a <b>value trap</b>.</li>
+        </ul>
+      </div>
+      <button class="btn go full" id="againBtn">↻ PLAY AGAIN</button>
+      <div class="row2">
+        <button class="btn wa" id="shareBtn">💬 Share my score</button>
+        <button class="btn" id="cheatBtn">📒 Share cheat sheet</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const cr = n => (n < 0 ? "−" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN") + " cr";
+const rs = (n, d = 2) => (n < 0 ? "−" : "") + "₹" + Math.abs(n).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
+const inr = n => (n < 0 ? "−" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const sinr = n => (n >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const vib = ms => { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms); } catch {} };
+let AC; function beep(f, d = .1) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume().catch(() => {}); const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime; o.type = "triangle"; o.frequency.value = f; g.gain.setValueAtTime(.04, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d + .02); } catch {} }
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2300); }
+
+let G;
+function reset() { G = { score: 0, lab: 0, badges: [], inv: null }; hud(); }
+function hud() {
+  $("#hS").textContent = G.score; $("#hL").textContent = `${Math.min(G.lab, 5)}/5`; $("#hB").textContent = G.badges.length;
+  [...$("#steps").children].forEach((d, i) => d.className = i < G.lab - 1 ? "done" : i === G.lab - 1 ? "on" : "");
+}
+function pts(n, why) { G.score = Math.max(0, G.score + n); hud(); if (why) toast((n >= 0 ? "+" : "") + n + " · " + why); n > 0 ? beep(880) : beep(220, .2); }
+function badge(t) { if (!G.badges.includes(t)) { G.badges.push(t); hud(); setTimeout(() => toast("🏆 " + t), 600); } }
+function scene(html) { const s = $("#stage"); s.innerHTML = `<div class="scene">${html}</div>`; s.scrollIntoView({ block: "nearest" }); return s.firstChild; }
+function choose(sel) { return new Promise(r => { const box = $(sel); box.onclick = e => { const b = e.target.closest("[data-v]"); if (!b || b.disabled) return; box.onclick = null; beep(650, .06); r(b.dataset.v); }; }); }
+const lesson = (t, h) => `<div class="lesson"><h4>💡 ${t}</h4>${h}</div>`;
+const nextBtn = (l = "NEXT LAB →") => `<div class="acts" id="nx"><button class="btn go full" data-v="next">${l}</button></div>`;
+
+/* ================= LAB 1: MARKET CAP ================= */
+async function lab1() {
+  G.lab = 1; hud();
+  const A = { n: "Desi Grid Power", p: 52, sh: 950 }, B = { n: "Luxe Watches", p: 4800, sh: 2.5 };
+  const st = scene(`<div class="kicker">Lab 1 of 5 · Market capitalisation</div>
+    <h2>Which company is BIGGER?</h2>
+    <p class="story">Two stocks on your screen. Tap the one you think is the <b>bigger company</b>.</p>
+    <div class="duo" id="pick">
+      <button class="co" data-v="A"><b>${A.n}</b><small>Power utility</small><div class="px">₹${A.p}</div><small>per share</small></button>
+      <button class="co" data-v="B"><b>${B.n}</b><small>Luxury retail</small><div class="px">₹${B.p.toLocaleString("en-IN")}</div><small>per share</small></button>
+    </div>`);
+  const v = await choose("#pick");
+  const mA = A.p * A.sh, mB = B.p * B.sh, right = v === "A";
+  document.querySelectorAll("#pick .co").forEach(b => { b.disabled = true; b.classList.add(b.dataset.v === "A" ? "win" : "lose"); });
+  pts(right ? 10 : 0, right ? "Spot on" : null);
+  st.insertAdjacentHTML("beforeend", `<div class="formula">Market cap = share price × total shares</div>
+    <div class="bars">
+      <div class="brow"><div class="t"><span>${A.n}: ₹${A.p} × ${A.sh} cr shares</span><b>${cr(mA)}</b></div><div class="track"><i id="bA" style="background:linear-gradient(90deg,#5ec8ff,#22d39a)"></i></div></div>
+      <div class="brow"><div class="t"><span>${B.n}: ₹${B.p.toLocaleString("en-IN")} × ${B.sh} cr shares</span><b>${cr(mB)}</b></div><div class="track"><i id="bB" style="background:linear-gradient(90deg,#b18cff,#ff4d8d)"></i></div></div>
+    </div>
+    <div class="verdict ${right ? "g" : "y"}">${right ? "✅ Right!" : "🤔 Surprise!"} The <b>₹52 stock is ${Math.round(mA / mB)}× bigger</b> because it has far more shares. A high share price doesn't mean a big (or expensive) company.</div>
+    <h3>🎛️ Play with it</h3>
+    <div class="ctl"><label>Share price <b id="vP">₹500</b></label><input type="range" id="sP" min="10" max="5000" step="10" value="500" /></div>
+    <div class="ctl"><label>Total shares <b id="vS">20 cr</b></label><input type="range" id="sS" min="1" max="500" step="1" value="20" /></div>
+    <div class="readout"><div><span>Market cap</span><b id="oM">₹10,000 cr</b></div><div><span>If price doubles</span><b id="oD">₹20,000 cr</b></div><div><span>After a 1:10 split</span><b id="oSp">₹50 / share</b></div></div>
+    <div class="verdict" id="vSplit">A <b>stock split</b> or <b>bonus</b> changes the share price and share count, but <b>not</b> the market cap. The company's value stays the same.</div>
+    ${lesson("Size = market cap, not price", `<ul>
+      <li>Market cap tells you what the market values the <b>whole company</b> at.</li>
+      <li>In India, companies are grouped by market-cap <b>rank</b>: roughly the <b>top 100 = large cap</b>, <b>101–250 = mid cap</b>, the rest = <b>small cap</b> (the list is updated every six months).</li>
+      <li>Small caps can grow faster but swing harder and are easier to manipulate.</li></ul>`)}
+    <div class="where">📍 <b>Where to find it:</b> any stock page on NSE/BSE or your broker app.</div>
+    ${nextBtn()}`);
+  setTimeout(() => { $("#bA").style.width = "100%"; $("#bB").style.width = (mB / mA * 100) + "%"; }, 80);
+  const upd = () => { const p = +$("#sP").value, s = +$("#sS").value; $("#vP").textContent = "₹" + p.toLocaleString("en-IN"); $("#vS").textContent = s + " cr"; $("#oM").textContent = cr(p * s); $("#oD").textContent = cr(p * s * 2); $("#oSp").textContent = "₹" + (p / 10).toLocaleString("en-IN") + " / share"; };
+  $("#sP").oninput = upd; $("#sS").oninput = upd; upd();
+  await choose("#nx");
+}
+
+/* ================= LAB 2: EPS & P/E ================= */
+async function lab2() {
+  G.lab = 2; hud();
+  const IND = { fmcg: { n: "FMCG (foods)", pe: 45 }, metal: { n: "Metals", pe: 9 } };
+  let ind = "fmcg", profit = 500, shares = 50, growth = 0;
+  const st = scene(`<div class="kicker">Lab 2 of 5 · EPS &amp; P/E</div>
+    <h2>Cheap or expensive?</h2>
+    <p class="story"><b>Kavya Foods</b> made <b>₹500 crore</b> profit last year and has <b>50 crore</b> shares. Drag the price and watch what you're really paying.</p>
+    <div class="formula">EPS = net profit ÷ shares &nbsp;·&nbsp; P/E = price ÷ EPS</div>
+    <div class="ctl"><label>Share price <b id="vP">₹400</b></label><input type="range" id="sP" min="40" max="1200" step="10" value="400" /></div>
+    <div class="readout"><div><span>EPS</span><b id="oE">₹10.00</b></div><div><span>P/E</span><b id="oPE">40.0</b></div><div><span>Earnings yield</span><b id="oY">2.5%</b></div></div>
+    <div class="verdict" id="vPE"></div>
+    <div style="font-size:.78rem;color:var(--muted)">Compare it with its industry:</div>
+    <div class="seg" id="ind"><button data-i="fmcg" class="on">🍪 FMCG peers · P/E ~45</button><button data-i="metal">⛏️ Metal peers · P/E ~9</button></div>
+    <div class="acts" style="margin-top:0"><button class="btn" id="grow">📈 Profit grows 30%</button><button class="btn warn" id="loss">📉 Company makes a loss</button></div>
+    <div id="out"></div>`);
+  const upd = () => {
+    const p = +$("#sP").value, eps = profit / shares, pe = eps > 0 ? p / eps : null, peer = IND[ind].pe;
+    $("#vP").textContent = "₹" + p; $("#oE").textContent = rs(eps); $("#oE").style.color = eps < 0 ? "var(--down)" : "";
+    $("#oPE").textContent = pe ? pe.toFixed(1) : "n/a"; $("#oY").textContent = pe ? (100 / pe).toFixed(1) + "%" : "n/a";
+    const v = $("#vPE");
+    if (!pe) { v.className = "verdict r"; v.innerHTML = "🚫 With a <b>loss</b>, EPS is negative and <b>P/E is meaningless</b>. Look at revenue growth, cash flow and when it can become profitable."; return; }
+    const r = pe / peer;
+    v.className = "verdict " + (r < .8 ? "g" : r < 1.25 ? "y" : "r");
+    v.innerHTML = `You pay <b>₹${pe.toFixed(1)}</b> for every ₹1 of yearly profit. Peers trade at about <b>${peer}</b>, so this looks <b>${r < .8 ? "cheaper than peers" : r < 1.25 ? "in line with peers" : "expensive vs peers"}</b>${growth ? " (with 30% higher profits)" : ""}. ${r >= 1.25 ? "That's only justified by much faster growth or better quality." : r < .8 ? "Check <b>why</b>: is growth slowing or is there a problem?" : ""}`;
+  };
+  $("#sP").oninput = upd;
+  $("#ind").onclick = e => { const b = e.target.closest("[data-i]"); if (!b) return; ind = b.dataset.i; [...$("#ind").children].forEach(x => x.classList.toggle("on", x === b)); upd(); beep(500, .05); };
+  let used = { grow: false, loss: false, ind: false };
+  $("#ind").addEventListener("click", () => used.ind = true);
+  $("#grow").onclick = () => { profit = 650; growth = 1; used.grow = true; $("#grow").disabled = true; upd(); toast("Profit ₹650 cr → EPS ₹13. Same price, lower P/E."); };
+  $("#loss").onclick = () => { profit = -120; used.loss = true; $("#loss").disabled = true; $("#grow").disabled = true; upd(); };
+  upd();
+  $("#out").innerHTML = `<div class="acts"><button class="btn go full" id="done2">✅ I'VE EXPLORED IT</button></div>`;
+  await new Promise(r => $("#done2").onclick = r);
+  const explored = Object.values(used).filter(Boolean).length;
+  pts(explored * 5, explored ? `explored ${explored} scenario${explored > 1 ? "s" : ""}` : null);
+  if (explored === 3) badge("Ratio scientist 🧪");
+  $("#out").innerHTML = `${lesson("P/E only makes sense in context", `<ul>
+      <li><b>EPS</b> = profit per share. <b>P/E</b> = how many years of today's profit you're paying for.</li>
+      <li>A P/E of 40 can be fair for a fast-growing consumer brand and too high for a metal company. <b>Compare within the same industry.</b></li>
+      <li>When profits grow, P/E falls at the same price. Growth can justify a higher P/E (look up the <b>PEG ratio</b> = P/E ÷ growth %).</li>
+      <li>For <b>cyclical</b> businesses (metals, cement), P/E looks lowest at the profit peak, which is often the worst time to buy.</li>
+      <li>If EPS is negative, P/E is meaningless.</li></ul>`)}
+    <div class="where">📍 <b>Where to find it:</b> profit and share count are in the quarterly results on NSE/BSE. Use EPS for the last 4 quarters (TTM).</div>
+    ${nextBtn()}`;
+  await choose("#nx");
+}
+
+/* ================= LAB 3: BOOK VALUE & P/B ================= */
+async function lab3() {
+  G.lab = 3; hud();
+  let assets = 2000, liab = 1200, shares = 40, price = 30, wrote = false;
+  const st = scene(`<div class="kicker">Lab 3 of 5 · Book value &amp; P/B</div>
+    <h2>What's the company worth on paper?</h2>
+    <p class="story"><b>Saarthi Finance</b> (a lender) owns <b>₹2,000 cr</b> of assets (mostly loans given) and owes <b>₹1,200 cr</b>. It has <b>40 cr</b> shares trading at <b>₹30</b>.</p>
+    <div class="formula">Book value per share = (assets − liabilities) ÷ shares &nbsp;·&nbsp; P/B = price ÷ BVPS</div>
+    <div class="bs" id="bs"><div class="as" id="bA"><span class="lbl" id="lA">ASSETS</span></div><div style="display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div class="nw" id="bN"><span class="lbl" id="lN">NET WORTH</span></div><div class="li" id="bL"><span class="lbl" id="lL">LIABILITIES</span></div></div></div>
+    <div class="ctl"><label>Liabilities (borrowings) <b id="vL">₹1,200 cr</b></label><input type="range" id="sL" min="200" max="1900" step="50" value="1200" /></div>
+    <div class="readout"><div><span>Net worth</span><b id="oN"></b></div><div><span>Book value/share</span><b id="oB"></b></div><div><span>P/B at ₹30</span><b id="oPB"></b></div></div>
+    <div class="verdict" id="vB"></div>
+    <div class="acts" style="margin-top:4px"><button class="btn warn full" id="wo">💥 ₹300 cr of loans turn bad (written off)</button></div>
+    <div class="seg" id="biz" style="margin-top:10px"><button data-b="bank" class="on">🏦 For a bank / NBFC</button><button data-b="it">💻 For an IT company</button></div>
+    <div class="verdict y" id="vBiz"></div>
+    <div id="out"></div>`);
+  const upd = () => {
+    const nw = assets - liab, bv = nw / shares, pb = bv > 0 ? price / bv : null;
+    $("#vL").textContent = cr(liab);
+    const H = 140, sc = H / 2000;
+    $("#bA").style.height = assets * sc + "px"; $("#bN").style.height = Math.max(0, nw) * sc + "px"; $("#bL").style.height = Math.min(liab, assets) * sc + "px";
+    $("#lA").textContent = "ASSETS " + assets; $("#lN").textContent = nw > 0 ? "NET WORTH " + nw : ""; $("#lL").textContent = "LIAB. " + liab;
+    $("#oN").textContent = cr(nw); $("#oN").style.color = nw < 0 ? "var(--down)" : "";
+    $("#oB").textContent = rs(bv); $("#oPB").textContent = pb ? pb.toFixed(2) + "×" : "n/a";
+    const v = $("#vB");
+    if (nw <= 0) { v.className = "verdict r"; v.innerHTML = "🚨 Liabilities are bigger than assets: <b>negative net worth</b>. Shareholders' book value is wiped out."; }
+    else { v.className = "verdict " + (pb < 1 ? "g" : pb < 3 ? "y" : "r"); v.innerHTML = `Each share has <b>${rs(bv)}</b> of net assets behind it. At ₹30 you pay <b>${pb.toFixed(2)}×</b> book. ${pb < 1 ? "Below book value: cheap, <b>or</b> the market doubts the assets." : pb < 3 ? "A normal range for lenders." : "Expensive for a lender, so it needs high, reliable returns on equity (ROE)."}`; }
+  };
+  const biz = { bank: "For <b>banks and lenders</b>, P/B matters a lot: their assets are money lent out. Check <b>bad loans (NPA)</b>, because if loans go bad, book value shrinks.", it: "For <b>IT and other asset-light</b> companies, the real value is people, brands and contracts, not buildings, so P/B is often 8–15× and <b>not very useful</b>. Use P/E, ROE and growth instead." };
+  $("#vBiz").innerHTML = biz.bank;
+  let bizSeen = false;
+  $("#biz").onclick = e => { const b = e.target.closest("[data-b]"); if (!b) return; [...$("#biz").children].forEach(x => x.classList.toggle("on", x === b)); $("#vBiz").innerHTML = biz[b.dataset.b]; bizSeen = true; beep(500, .05); };
+  $("#sL").oninput = e => { liab = +e.target.value; upd(); };
+  $("#wo").onclick = () => { if (wrote) return; wrote = true; assets -= 300; $("#wo").disabled = true; upd(); vib(40); beep(220, .25); toast("Assets −₹300 cr → book value falls"); };
+  upd();
+  $("#out").innerHTML = `<div class="acts"><button class="btn go full" id="done3">✅ I'VE EXPLORED IT</button></div>`;
+  await new Promise(r => $("#done3").onclick = r);
+  const ex = (wrote ? 1 : 0) + (bizSeen ? 1 : 0) + (liab !== 1200 ? 1 : 0); pts(ex * 5, ex ? `explored ${ex} idea${ex > 1 ? "s" : ""}` : null);
+  if (ex === 3) badge("Balance-sheet reader 📚");
+  $("#out").innerHTML = `${lesson("Book value = what's left for shareholders", `<ul>
+      <li><b>Net worth</b> (shareholders' equity) = assets − liabilities. <b>BVPS</b> = net worth ÷ shares.</li>
+      <li><b>P/B below 1</b> can be a bargain, or a sign the assets aren't worth what the books say (like bad loans).</li>
+      <li>Most useful for <b>banks, NBFCs, insurers and asset-heavy</b> firms; much less for IT, FMCG or brands.</li>
+      <li>Pair it with <b>ROE</b> (profit ÷ net worth). A high P/B needs a high, steady ROE.</li></ul>`)}
+    <div class="where">📍 <b>Where to find it:</b> the balance sheet in the annual report or the half-yearly results on NSE/BSE.</div>
+    ${nextBtn()}`;
+  await choose("#nx");
+}
+
+/* ================= LAB 4: SHAREHOLDING & PLEDGE ================= */
+async function lab4() {
+  G.lab = 4; hud();
+  const Q = ["Mar", "Jun", "Sep", "Dec"];
+  const D = { promoter: [72, 70, 64, 58], fii: [9, 7, 5, 3], dii: [7, 7, 6, 5], retail: [12, 16, 25, 34], pledge: [0, 12, 34, 61] };
+  const COL = { promoter: "#5ec8ff", fii: "#b18cff", dii: "#22d39a", retail: "#ffd27a" };
+  const st = scene(`<div class="kicker">Lab 4 of 5 · Shareholding &amp; pledging</div>
+    <h2>Who owns the company, and who's leaving?</h2>
+    <p class="story">Every quarter, listed companies publish their <b>shareholding pattern</b>. Here's <b>Chamak Brands</b> over 4 quarters. Tap through the quarters.</p>
+    <div class="qtrs" id="qs">${Q.map((q, i) => `<button data-q="${i}" class="${i === 0 ? "on" : ""}">${q}</button>`).join("")}</div>
+    <div class="donutwrap"><svg class="donut" id="donut" viewBox="0 0 42 42"></svg><div class="legend" id="leg"></div></div>
+    <div class="verdict" id="vPl"></div>
+    <h3>🚩 What worries you? Tap all that apply</h3>
+    <div class="chips" id="flags">
+      <button class="chip" data-f="ps" data-ok="1">Promoters selling every quarter</button>
+      <button class="chip" data-f="pl" data-ok="1">Pledged shares jumping</button>
+      <button class="chip" data-f="fx" data-ok="1">FIIs and DIIs leaving</button>
+      <button class="chip" data-f="rt" data-ok="1">Retail holding rising fast</button>
+      <button class="chip" data-f="hp" data-ok="0">Promoters own over 50%</button>
+    </div>
+    <div class="acts" id="chk" style="margin-top:0"><button class="btn go full" data-v="chk">🔎 CHECK MY FLAGS</button></div>
+    <div id="out"></div>`);
+  const draw = i => {
+    const parts = ["promoter", "fii", "dii", "retail"]; let off = 25;
+    $("#donut").innerHTML = `<circle cx="21" cy="21" r="15.9" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="6"/>` + parts.map(k => { const v = D[k][i]; const s = `<circle cx="21" cy="21" r="15.9" fill="none" stroke="${COL[k]}" stroke-width="6" stroke-dasharray="${v} ${100 - v}" stroke-dashoffset="${off}" style="transition:all .5s"/>`; off -= v; return s; }).join("") +
+      (D.pledge[i] ? `<circle cx="21" cy="21" r="10.5" fill="none" stroke="#ff5470" stroke-width="2.2" stroke-dasharray="${D.pledge[i] * .66} ${66 - D.pledge[i] * .66}" stroke-dashoffset="16.5"/>` : "") +
+      `<text x="21" y="22" text-anchor="middle" font-size="5" font-weight="700" fill="#fff" font-family="JetBrains Mono">${Q[i]}</text><text x="21" y="27" text-anchor="middle" font-size="2.6" fill="#ff8fa3" font-family="Inter">${D.pledge[i]}% pledged</text>`;
+    const prev = j => j > 0 ? j - 1 : 0, d = k => D[k][i] - D[k][prev(i)];
+    $("#leg").innerHTML = [["promoter", "Promoters"], ["fii", "FIIs (foreign funds)"], ["dii", "DIIs (Indian funds)"], ["retail", "Retail & others"]].map(([k, n]) => `<div><i style="background:${COL[k]}"></i>${n}<b>${D[k][i]}%${i ? ` <span style="color:${d(k) > 0 ? "var(--up)" : d(k) < 0 ? "var(--down)" : "var(--muted)"};font-size:.7rem">${d(k) > 0 ? "▲" : d(k) < 0 ? "▼" : ""}${Math.abs(d(k)) || ""}</span>` : ""}</b></div>`).join("") + `<div style="color:#ff8fa3"><i style="background:#ff5470"></i>Promoter shares pledged<b>${D.pledge[i]}%</b></div>`;
+    const v = $("#vPl"); v.className = "verdict " + (D.pledge[i] > 30 ? "r" : D.pledge[i] > 0 ? "y" : "g");
+    v.innerHTML = D.pledge[i] ? `<b>${D.pledge[i]}%</b> of the promoters' shares are <b>pledged</b> (given to lenders as security for loans).` : "No promoter shares are pledged. Promoters hold a big, unencumbered stake.";
+  };
+  let seen = new Set([0]);
+  $("#qs").onclick = e => { const b = e.target.closest("[data-q]"); if (!b) return; const i = +b.dataset.q; seen.add(i); [...$("#qs").children].forEach(x => x.classList.toggle("on", x === b)); draw(i); beep(450 + i * 80, .06); };
+  draw(0);
+  $("#flags").onclick = e => { const c = e.target.closest(".chip"); if (!c || c.disabled) return; c.classList.toggle("on"); beep(600, .04); };
+  await choose("#chk"); $("#chk").remove();
+  if (seen.size < 4) { [...$("#qs").children].forEach((x, i) => x.classList.toggle("on", i === 3)); draw(3); }
+  let gain = 0;
+  document.querySelectorAll("#flags .chip").forEach(c => {
+    c.disabled = true; const ok = c.dataset.ok === "1", on = c.classList.contains("on");
+    if (on && ok) { c.classList.add("right"); gain += 5; } else if (on && !ok) { c.classList.add("wrong"); gain -= 5; } else if (!on && ok) c.classList.add("missed");
+  });
+  pts(gain, "shareholding flags");
+  if (gain >= 20) badge("Ownership sleuth 🕵️");
+  $("#out").innerHTML = `<div class="verdict ${gain >= 15 ? "g" : "y"}">✅ Real warnings: promoters cut from <b>72% to 58%</b>, pledges rose from <b>0 to 61%</b>, funds exited and retail jumped to 34%. <b>Promoters owning over 50% isn't a problem</b> by itself; it shows they have skin in the game.</div>
+    <h3>💣 The pledge spiral: drag the price down</h3>
+    <div class="ctl"><label>Chamak Brands share price <b id="vSp">₹100</b></label><input type="range" id="sp" min="20" max="100" step="1" value="100" /></div>
+    <div class="readout"><div><span>Fall so far</span><b id="oF">0%</b></div><div><span>Lender action</span><b id="oLd">Safe</b></div><div><span>Extra selling</span><b id="oX">none</b></div></div>
+    <div class="verdict" id="vSpi">Lenders lent money against these pledged shares. If the price falls too far, the security isn't enough…</div>
+    <div class="acts" id="d4"><button class="btn go full" data-v="d">✅ GOT IT</button></div>`;
+  let spiral = false;
+  $("#sp").oninput = e => {
+    let p = +e.target.value; const fall = 1 - p / 100;
+    $("#vSp").textContent = "₹" + p; $("#oF").textContent = "−" + Math.round(fall * 100) + "%";
+    const v = $("#vSpi");
+    if (fall >= .3) {
+      if (!spiral) { spiral = true; vib(80); beep(180, .3); }
+      $("#oLd").textContent = "SELLS"; $("#oLd").style.color = "var(--down)"; $("#oX").textContent = "18% stake"; $("#oX").style.color = "var(--down)";
+      v.className = "verdict r"; v.innerHTML = `🚨 At −30% the collateral is short, so lenders <b>invoke the pledge</b> and <b>sell the promoters' shares</b> in the market. That extra selling can push the price down another <b>15–25%</b>, triggering more sales. That's the <b>pledge spiral</b>.`;
+    } else if (fall >= .15) { $("#oLd").textContent = "Margin call"; $("#oLd").style.color = "var(--warn)"; $("#oX").textContent = "not yet"; $("#oX").style.color = ""; v.className = "verdict y"; v.innerHTML = "⚠️ Lenders ask promoters to <b>pledge more shares or repay</b>. That often means even more pledging."; }
+    else { $("#oLd").textContent = "Safe"; $("#oLd").style.color = ""; $("#oX").textContent = "none"; $("#oX").style.color = ""; v.className = "verdict"; v.innerHTML = "Lenders are comfortable for now."; }
+  };
+  await choose("#d4"); $("#d4").remove();
+  if (spiral) pts(5, "found the spiral");
+  $("#out").insertAdjacentHTML("beforeend", `${lesson("Follow the owners", `<ul>
+      <li><b>Promoters</b> run the company. High, stable holding is good; steady selling every quarter is a warning.</li>
+      <li><b>Pledged shares</b> are promoter shares given as collateral for loans. High or rising pledge % means promoters need money, and a price fall can trigger <b>forced selling</b>.</li>
+      <li><b>FIIs/DIIs</b> (big funds) research deeply. Them leaving while <b>retail</b> piles in is a classic warning in small caps.</li></ul>`)}
+    <div class="where">📍 <b>Where to find it:</b> the quarterly <b>shareholding pattern</b> on NSE/BSE (the company's page → shareholding). Pledged shares are shown as “encumbered”.</div>
+    ${nextBtn("🕵️ OPEN THE CASE →")}`);
+  await choose("#nx");
+}
+
+/* ================= LAB 5: THE CASE ================= */
+const COS = [
+  { id: "A", n: "Nirmal Consumer", sub: "FMCG · ₹48,000 cr", ret: .62, m: [
+    ["P/E", "40", 0, "In line with FMCG peers (~45) for a steady grower: fair, not a red flag."],
+    ["Profit growth (3 yr)", "18%/yr", 0, ""],
+    ["ROE", "24%", 0, ""],
+    ["Debt / equity", "0.1", 0, ""],
+    ["Promoter holding", "62%, steady", 0, ""],
+    ["Pledged", "0%", 0, ""]] },
+  { id: "B", n: "Chamak Brands", sub: "FMCG · ₹4,100 cr", ret: -.71, m: [
+    ["P/E", "77", 1, "P/E of 77 with only 4% growth: very expensive for what you get."],
+    ["Profit growth (3 yr)", "4%/yr", 1, "Barely growing."],
+    ["ROE", "6%", 1, "Weak return on shareholders' money."],
+    ["Debt / equity", "1.6", 1, "Heavy debt for a consumer company."],
+    ["Promoter holding", "41%, falling", 1, "Promoters sold steadily all year."],
+    ["Pledged", "48%", 1, "Nearly half the promoter stake is pledged: spiral risk."]] },
+  { id: "C", n: "Sahaj Products", sub: "FMCG · ₹6,200 cr", ret: -.08, m: [
+    ["P/E", "12", 0, "Looks cheap, but…"],
+    ["Profit growth (3 yr)", "−6%/yr", 1, "Shrinking sales and profit: cheap for a reason."],
+    ["ROE", "9%", 1, "Mediocre returns."],
+    ["Debt / equity", "0.4", 0, ""],
+    ["Promoter holding", "55%, steady", 0, ""],
+    ["Pledged", "0%", 0, ""]] },
+];
+async function lab5() {
+  G.lab = 5; hud();
+  const st = scene(`<div class="kicker">Lab 5 of 5 · The case</div>
+    <h2>Three companies. ₹1,00,000. One pick.</h2>
+    <p class="story">All three are consumer-goods companies, so the numbers are comparable. First, <b>tap every number you think is a red flag 🚩</b>. Then choose where to invest.</p>
+    <div class="cases" id="cases">${COS.map(c => `<div class="case" data-c="${c.id}"><h4>${c.n}<small>${c.sub}</small></h4><div class="mgrid">${c.m.map((m, i) => `<button class="m" data-i="${i}"><span>${m[0]}</span><b>${m[1]}</b></button>`).join("")}</div><div class="why" id="why${c.id}"></div></div>`).join("")}</div>
+    <div class="acts" id="chk"><button class="btn go full" data-v="chk">🔎 CHECK MY RED FLAGS</button></div>
+    <div id="out"></div>`);
+  $("#cases").onclick = e => { const b = e.target.closest(".m"); if (!b || b.disabled) return; b.classList.toggle("on"); beep(600, .04); };
+  await choose("#chk"); $("#chk").remove();
+  let gain = 0, right = 0, total = 0;
+  COS.forEach(c => {
+    const box = document.querySelector(`.case[data-c="${c.id}"]`), why = [];
+    box.querySelectorAll(".m").forEach(b => {
+      b.disabled = true; const m = c.m[+b.dataset.i], bad = m[2] === 1, on = b.classList.contains("on");
+      if (bad) total++;
+      if (on && bad) { b.classList.add("right"); gain += 5; right++; } else if (on && !bad) { b.classList.add("wrong"); gain -= 5; } else if (!on && bad) b.classList.add("missed");
+      if (m[3] && (bad || on)) why.push(`<b>${m[0]}:</b> ${m[3]}`);
+    });
+    $("#why" + c.id).innerHTML = why.map(w => `<div>${w}</div>`).join("") || `<div>No major red flags: a quality business at a fair price.</div>`;
+  });
+  pts(gain, `${right}/${total} red flags`);
+  if (right === total && gain === total * 5) badge("Red-flag hunter 🚩");
+  $("#out").innerHTML = `<h3>💰 Where do you put ₹1,00,000?</h3>
+    <div class="acts" id="inv">${COS.map(c => `<button class="btn" data-v="${c.id}">${c.n}<small>${c.m[0][1]} P/E · ${c.m[5][1]} pledged</small></button>`).join("")}<button class="btn warn" data-v="none">🙅 None<small>keep it in a fund</small></button></div>`;
+  const pick = await choose("#inv"); $("#inv").remove();
+  const res = COS.map(c => ({ ...c, end: 100000 * (1 + c.ret) })), fund = 100000 * 1.33;
+  G.inv = pick === "none" ? { n: "Index fund", end: fund } : res.find(c => c.id === pick);
+  // chart of 3 years
+  const yrs = [0, 1, 2, 3], paths = { A: [100, 118, 139, 162], B: [100, 112, 61, 29], C: [100, 96, 95, 92], F: [100, 110, 121, 133] };
+  $("#out").innerHTML = `<h3>⏩ Three years later…</h3><svg class="chart" id="ch" viewBox="0 0 300 140"></svg><div class="cases" id="res"></div>`;
+  const X = i => 14 + i / 3 * 272, Y = v => 130 - (v - 20) / 150 * 120, COL = { A: "#22d39a", B: "#ff5470", C: "#ffd27a", F: "#8a90a2" };
+  let svg = `<line x1="0" x2="300" y1="${Y(100)}" y2="${Y(100)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 4"/>`;
+  Object.entries(paths).forEach(([k, p]) => { svg += `<polyline points="${p.map((v, i) => `${X(i)},${Y(v)}`).join(" ")}" fill="none" stroke="${COL[k]}" stroke-width="${(pick === k || (pick === "none" && k === "F")) ? 3.5 : 2}" stroke-linecap="round" stroke-dasharray="400" stroke-dashoffset="400" style="transition:stroke-dashoffset 1.6s ease"/><text x="${X(3) - 2}" y="${Y(p[3]) - 5}" fill="${COL[k]}" font-size="9" text-anchor="end" font-family="JetBrains Mono">${k === "F" ? "Index fund" : COS.find(c => c.id === k).n.split(" ")[0]}</text>`; });
+  $("#ch").innerHTML = svg;
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll("#ch polyline").forEach(p => p.style.strokeDashoffset = 0)));
+  setTimeout(() => document.querySelectorAll("#ch polyline").forEach(p => p.style.strokeDashoffset = 0), 60);
+  await sleep(1500);
+  const story = {
+    A: "Profits kept compounding at ~18% a year with no debt. The P/E stayed similar, so the share price rose with earnings.",
+    B: "Year 2: a bad quarter hit, the price fell 30%, lenders sold the pledged shares and the stock collapsed. The promoters had been selling all along.",
+    C: "It stayed “cheap” because sales kept shrinking. A low P/E alone isn't value: a <b>value trap</b>.",
+  };
+  $("#res").innerHTML = res.map(c => `<div class="case" style="${pick === c.id ? "border-color:#fff" : ""}"><h4>${pick === c.id ? "👉 " : ""}${c.n}<small style="color:${c.ret >= 0 ? "var(--up)" : "var(--down)"}">${(c.ret >= 0 ? "+" : "") + Math.round(c.ret * 100)}% · ${inr(c.end)}</small></h4><div class="why"><div>${story[c.id]}</div></div></div>`).join("") +
+    `<div class="case" style="${pick === "none" ? "border-color:#fff" : ""}"><h4>${pick === "none" ? "👉 " : ""}Index fund (for comparison)<small style="color:var(--up)">+33% · ${inr(fund)}</small></h4></div>`;
+  const pl = G.inv.end - 100000;
+  pts(pick === "A" ? 30 : pick === "none" ? 15 : pick === "C" ? 5 : 0, pick === "A" ? "great pick" : pick === "none" ? "safe choice" : null);
+  if (pick === "A") badge("Quality investor 💎");
+  $("#out").insertAdjacentHTML("beforeend", `<div class="verdict ${pl >= 0 ? "g" : "r"}" style="margin-top:10px">Your ₹1,00,000 became <b>${inr(G.inv.end)}</b> (${sinr(pl)}).</div>
+    ${lesson("Put it all together", `<ul>
+      <li>The <b>highest P/E</b> isn't always the worst (Nirmal), and the <b>lowest</b> isn't always the best (Sahaj).</li>
+      <li>Look at <b>quality</b> (growth, ROE, low debt) and <b>ownership</b> (promoters, pledges) together, not one number alone.</li>
+      <li>Fundamentals win over <b>years</b>, not days. A great company bought at a crazy price can still disappoint.</li></ul>`)}
+    ${nextBtn("🏁 SEE MY RESULTS")}`);
+  await choose("#nx");
+}
+
+/* ---------- end ---------- */
+function end() {
+  const rank = G.score >= 120 ? "🕵️ Master detective" : G.score >= 85 ? "🔍 Sharp analyst" : G.score >= 50 ? "📚 Learning detective" : "🐣 Rookie investigator";
+  $("#eS").textContent = G.score; $("#eRank").textContent = rank; G.rank = rank;
+  $("#eInv").innerHTML = G.inv ? `Case pick: <b>${G.inv.n}</b> · ₹1,00,000 → <span style="color:${G.inv.end >= 100000 ? "var(--up)" : "var(--down)"}">${inr(G.inv.end)}</span>` : "";
+  $("#eBadges").innerHTML = G.badges.length ? G.badges.map(b => `<span>${b}</span>`).join("") : `<span style="opacity:.6">No badges this time, try again!</span>`;
+  $("#endOv").hidden = false; $("#endOv").scrollTop = 0; beep(880); setTimeout(() => beep(1100), 120);
+}
+const URL_ = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host) ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/fundamentals-game/";
+$("#shareBtn").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent([`🔍 *STOCK DETECTIVE*`, `I scored *${G.score}* · ${G.rank}`, G.inv ? `My case pick turned ₹1,00,000 into *${inr(G.inv.end)}*` : "", `Market cap, EPS, P/E, book value, shareholding and pledging, learned by playing.`, ``, `Can you crack the case? 👉 ${URL_}`, `_A learning game with fictional companies. Not investment advice._`].filter(Boolean).join("\n")), "_blank", "noopener");
+$("#cheatBtn").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent([`📒 *FUNDAMENTALS CHEAT SHEET*`, ``, `🏢 *Market cap* = price × total shares. Size, not price, tells you how big a company is.`, `💰 *EPS* = net profit ÷ shares. *P/E* = price ÷ EPS. Compare with the *same industry* and with growth.`, `📚 *Book value/share* = (assets − liabilities) ÷ shares. *P/B* = price ÷ BVPS. Best for banks and lenders.`, `👥 *Shareholding*: steady promoters ✅ · steady promoter selling 🚩 · funds exiting while retail piles in 🚩`, `⛓️ *Pledged shares* can be sold by lenders if the price falls, which can cause a spiral.`, `🪤 Low P/E + shrinking profits = *value trap*.`, ``, `🏦 Banks → P/B, ROE, NPAs · 💻 IT/FMCG → P/E, growth, ROE · 🏭 Cyclicals → debt, cycle, P/B`, ``, `Learn by playing 👉 ${URL_}`, `— MANIMINDSMONEY Community`].join("\n")), "_blank", "noopener");
+async function run() { reset(); for (const l of [lab1, lab2, lab3, lab4, lab5]) await l(); G.lab = 6; hud(); end(); }
+$("#goBtn").onclick = () => { $("#startOv").hidden = true; beep(700); run(); };
+$("#againBtn").onclick = () => { $("#endOv").hidden = true; run(); };
+reset();
+</script>
+</body>
+</html>
