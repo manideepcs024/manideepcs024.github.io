@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Tip Trap: survive a penny-stock pump & dump · MANIMINDSMONEY</title>
+<meta name="description" content="An interactive game: you've been added to a 'free stock tips' group. Spot the red flags, verify the claims and see how penny-stock pump and dump scams trap investors." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.8); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --gold: #ffd27a; --red: #ff3b5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .18; transition: background 1.2s; }
+  .blob.b1 { background: var(--warn); top: -25vmax; left: -20vmax; }
+  .blob.b2 { background: var(--a1); bottom: -30vmax; right: -20vmax; }
+  body.dump .blob.b1 { background: var(--red); opacity: .26; }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .4; }
+
+  .app { max-width: 600px; margin: 0 auto; padding: max(12px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 9px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .brand { min-width: 0; display: flex; align-items: center; gap: 9px; font: 700 .98rem "Space Grotesk"; letter-spacing: .04em; text-decoration: none; color: inherit; }
+  .brand i { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .85rem; flex: none; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hbtns { display: flex; gap: 6px; }
+  .hbtn { white-space: nowrap; height: 34px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); font: 600 .78rem Inter; text-decoration: none; display: inline-flex; align-items: center; cursor: pointer; }
+
+  .hud { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 7px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 15px; padding: 8px 10px; min-width: 0; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .stat span { display: block; font: 600 .58rem "JetBrains Mono"; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .stat strong { display: block; font: 700 clamp(.95rem, 4.2vw, 1.2rem) "JetBrains Mono"; letter-spacing: -.03em; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .3s; }
+
+  /* stock strip */
+  .stock { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px 12px; }
+  .stock .nm { font: 700 .8rem "JetBrains Mono"; color: #cfd3df; }
+  .stock .nm small { display: block; color: var(--muted); font-weight: 500; font-size: .66rem; }
+  .stock .px { font: 800 1.35rem "JetBrains Mono"; letter-spacing: -.03em; }
+  .stock .tag { display: inline-block; margin-left: 6px; font: 800 .62rem "JetBrains Mono"; padding: 3px 7px; border-radius: 6px; vertical-align: middle; }
+  .tag.uc { background: rgba(34,211,154,.18); color: var(--up); } .tag.lc { background: rgba(255,84,112,.2); color: var(--down); }
+  .spark { width: 100%; height: 54px; }
+
+  /* chat */
+  .chat { display: flex; flex-direction: column; background: #0b141a; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; height: min(56vh, 520px); min-height: 360px; }
+  .chat-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #1b2229; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, #ff9a3d, #ff3b5c); font-size: 1.1rem; flex: none; }
+  .chat-head b { display: block; font-size: .92rem; }
+  .chat-head small { color: #8696a0; font-size: .72rem; }
+  .chat-head .day { margin-left: auto; font: 700 .7rem "JetBrains Mono"; color: var(--gold); background: rgba(255,210,122,.1); padding: 4px 8px; border-radius: 8px; white-space: nowrap; }
+  .msgs { flex: 1; overflow-y: auto; padding: 12px 10px 16px; display: flex; flex-direction: column; gap: 6px; scroll-behavior: smooth; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='2' cy='2' r='1' fill='%23ffffff0d'/></svg>"); }
+  .sys { align-self: center; max-width: 90%; text-align: center; font-size: .72rem; color: #c7d0d6; background: #182229; padding: 5px 10px; border-radius: 8px; animation: in .3s; }
+  .sys.red { background: rgba(255,59,92,.18); color: #ffb3c0; }
+  .msg { position: relative; align-self: flex-start; max-width: 86%; background: #202c33; border-radius: 0 12px 12px 12px; padding: 7px 10px 18px; font-size: .88rem; line-height: 1.4; color: #e9edef; animation: in .3s; word-wrap: break-word; }
+  .msg.me { align-self: flex-end; background: #005c4b; border-radius: 12px 0 12px 12px; }
+  @keyframes in { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+  .msg .who { display: block; font-size: .74rem; font-weight: 700; margin-bottom: 2px; }
+  .msg .tm { position: absolute; right: 8px; bottom: 3px; font-size: .62rem; color: #ffffff80; }
+  .msg .flag { position: absolute; right: -36px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(255,59,92,.4); background: rgba(255,59,92,.1); cursor: pointer; font-size: .85rem; display: grid; place-items: center; transition: transform .15s, background .2s; }
+  .msg .flag:hover { background: rgba(255,59,92,.25); transform: translateY(-50%) scale(1.1); }
+  .msg.flagged { box-shadow: 0 0 0 2px var(--red); }
+  .msg.flagged .flag, .msg.cleared .flag { display: none; }
+  .msg.nope { animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .why { margin-top: 6px; padding: 6px 8px; border-radius: 8px; font-size: .76rem; line-height: 1.4; animation: in .3s; }
+  .why.good { background: rgba(255,59,92,.16); color: #ffc3cd; }
+  .why.bad { background: rgba(254,188,46,.14); color: #ffe3a6; }
+  .pnlimg { margin: 4px 0 2px; padding: 10px; border-radius: 10px; background: linear-gradient(160deg, #0f2a22, #0b1a16); border: 1px solid rgba(34,211,154,.35); font-family: "JetBrains Mono"; }
+  .pnlimg small { display: block; font-size: .62rem; color: #8fb3a6; }
+  .pnlimg b { font-size: 1.15rem; color: var(--up); }
+  .typing { align-self: flex-start; background: #202c33; border-radius: 0 12px 12px 12px; padding: 9px 12px; font-size: .74rem; color: #8696a0; animation: in .2s; }
+  .typing i { display: inline-block; width: 6px; height: 6px; margin: 0 1px; border-radius: 50%; background: #8696a0; animation: bounce 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 40% { transform: translateY(-4px); } }
+  .hint { align-self: center; font-size: .72rem; color: var(--gold); background: rgba(255,210,122,.08); border: 1px dashed rgba(255,210,122,.4); border-radius: 10px; padding: 6px 10px; text-align: center; max-width: 92%; animation: in .3s; }
+
+  /* action dock */
+  .dock { display: grid; gap: 8px; }
+  .q { font: 700 .82rem Inter; color: #cfd3df; text-align: center; padding: 2px 0; }
+  .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 12px 8px; border-radius: 15px; font: 800 .92rem Inter; border: 1px solid var(--line); cursor: pointer; color: var(--fg); background: rgba(255,255,255,.06); text-decoration: none; transition: transform .1s, opacity .2s; text-align: center; }
+  .btn small { font: 600 .66rem Inter; opacity: .8; }
+  .btn:active { transform: scale(.96); }
+  .btn.full { grid-column: 1 / -1; width: 100%; }
+  .btn.buy { background: linear-gradient(160deg, #2fe0a7, #0fa877); border: 0; color: #fff; }
+  .btn.sell { background: linear-gradient(160deg, #ff6b84, #d63353); border: 0; color: #fff; }
+  .btn.safe { background: linear-gradient(100deg, #5b8cff, var(--a2)); border: 0; color: #fff; }
+  .btn.warn { border-color: rgba(254,188,46,.45); color: var(--gold); }
+  .btn.go { background: linear-gradient(100deg, var(--warn), var(--red)); border: 0; color: #fff; }
+  .btn[disabled] { opacity: .35; pointer-events: none; }
+  .tools { display: flex; gap: 8px; }
+  .tools .btn { flex: 1; padding: 9px; font-size: .8rem; }
+
+  /* modals */
+  .overlay { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 14px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); overflow-y: auto; }
+  .overlay[hidden] { display: none; }
+  .panel { width: 100%; max-width: 480px; background: rgba(16,18,28,.96); border: 1px solid var(--line); border-radius: 26px; padding: 20px 16px; animation: pop .4s cubic-bezier(.2,1.2,.3,1); }
+  @keyframes pop { from { opacity: 0; transform: scale(.92) translateY(12px); } }
+  .panel h3 { font: 700 1.2rem "Space Grotesk"; margin-bottom: 4px; }
+  .panel .sub { color: var(--muted); font-size: .84rem; margin-bottom: 12px; }
+  .check { width: 100%; text-align: left; display: block; margin-bottom: 8px; padding: 11px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--fg); cursor: pointer; font: 600 .88rem Inter; }
+  .check small { display: block; color: var(--muted); font-weight: 500; font-size: .74rem; margin-top: 2px; }
+  .check.done { border-color: rgba(255,59,92,.45); background: rgba(255,59,92,.07); cursor: default; }
+  .check .ev { display: block; margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,.35); font-weight: 500; font-size: .8rem; line-height: 1.45; color: #ffd0d8; animation: in .3s; }
+  .check .ev b { color: #fff; }
+  .res { display: grid; gap: 8px; margin: 6px 0 12px; }
+  .res div { padding: 10px 12px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--line); font-size: .85rem; line-height: 1.45; }
+  .res b { color: #fff; }
+  .logo { font: 800 clamp(2.4rem, 11vw, 3.2rem)/1 "Space Grotesk"; letter-spacing: -.05em; background: linear-gradient(100deg, var(--warn), var(--red) 55%, #b45cff); -webkit-background-clip: text; background-clip: text; color: transparent; text-align: center; }
+  .tagline { color: var(--muted); margin: 8px 0 14px; font-size: .9rem; text-align: center; }
+  .how { display: grid; gap: 8px; margin-bottom: 14px; }
+  .how div { display: flex; gap: 10px; font-size: .85rem; color: #d5d8e3; padding: 9px 11px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .how b { color: #fff; } .how i { font-style: normal; font-size: 1.1rem; }
+  .big { font: 800 clamp(2rem, 9vw, 2.6rem) "JetBrains Mono"; letter-spacing: -.04em; text-align: center; }
+  .rank { display: block; width: fit-content; margin: 6px auto 12px; padding: 7px 14px; border-radius: 999px; font-weight: 700; background: rgba(255,210,122,.12); border: 1px solid rgba(255,210,122,.4); color: var(--gold); }
+  .rstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 12px; text-align: center; }
+  .rstats div { padding: 9px 5px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .rstats span { display: block; font: 600 .58rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .rstats b { font: 700 .95rem "JetBrains Mono"; }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 12px; }
+  .badges span { padding: 6px 10px; border-radius: 999px; font-size: .76rem; font-weight: 600; background: rgba(255,59,92,.1); border: 1px solid rgba(255,59,92,.35); color: #ffd0d8; }
+  .story { display: grid; gap: 6px; margin-bottom: 12px; }
+  .story div { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: start; font-size: .82rem; line-height: 1.45; color: #d5d8e3; }
+  .story i { font-style: normal; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 800 .74rem "JetBrains Mono"; background: rgba(255,59,92,.15); color: var(--red); }
+  .story b { color: #fff; }
+  .box { padding: 12px 13px; border-radius: 15px; margin-bottom: 12px; font-size: .83rem; line-height: 1.5; }
+  .box h4 { font: 700 .9rem "Space Grotesk"; margin-bottom: 6px; }
+  .box ul { padding-left: 18px; display: grid; gap: 4px; }
+  .box.safe { background: rgba(0,224,184,.06); border: 1px solid rgba(0,224,184,.3); color: #c9f5ec; }
+  .box.report { background: rgba(91,140,255,.08); border: 1px solid rgba(91,140,255,.35); color: #d7e3ff; }
+  .box b { color: #fff; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; }
+  .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translate(-50%, 160%); z-index: 50; padding: 10px 16px; border-radius: 999px; background: #1b1f2e; border: 1px solid rgba(255,210,122,.5); color: var(--gold); font-weight: 700; font-size: .85rem; white-space: nowrap; transition: transform .45s cubic-bezier(.2,1.3,.3,1); }
+  .toast.show { transform: translate(-50%, 0); }
+  .fine { text-align: center; font-size: .7rem; color: #5a6072; line-height: 1.5; }
+  .fine a { color: var(--muted); }
+  @media (max-width: 420px) { .msg { max-width: 80%; } .chat { height: 52vh; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="app">
+    <header>
+      <a class="brand" href="../"><i>₹</i><span>MANIMINDSMONEY</span></a>
+      <div class="hbtns"><a class="hbtn" href="../tools/">🧰 Tools</a><a class="hbtn" href="../">Home</a></div>
+    </header>
+
+    <div class="hud">
+      <div class="stat"><span>Your money</span><strong id="hMoney">₹50,000</strong></div>
+      <div class="stat"><span>Shares held</span><strong id="hShares">0</strong></div>
+      <div class="stat"><span>🛡️ Scam radar</span><strong id="hRadar">0</strong></div>
+    </div>
+
+    <div class="stock">
+      <div><div class="nm">ZENITHA AGRO-TECH<small>penny stock · fictional</small></div><div class="px" id="px">₹4.20</div></div>
+      <svg class="spark" id="spark" viewBox="0 0 300 54" preserveAspectRatio="none"></svg>
+    </div>
+
+    <div class="chat">
+      <div class="chat-head">
+        <div class="avatar">🚀</div>
+        <div><b>🚀 Multibagger Rocket VIP 💎</b><small id="members">4,812 members · admins only can post links</small></div>
+        <span class="day" id="day">DAY 1 · 9:02 AM</span>
+      </div>
+      <div class="msgs" id="msgs"></div>
+    </div>
+
+    <div class="dock">
+      <div class="q" id="q"></div>
+      <div class="acts" id="acts"></div>
+      <div class="tools">
+        <button class="btn" id="verifyBtn">🔍 Verify toolkit <small id="vCount">0 of 5 checks</small></button>
+        <button class="btn" id="fastBtn">⏩ Faster <small>skip typing</small></button>
+      </div>
+    </div>
+
+    <p class="fine">A learning game. The group, people, company and prices are <b>fictional</b>. It shows a common pattern described in regulators' investor warnings. · <a href="../">MANIMINDSMONEY</a></p>
+  </div>
+
+  <!-- start -->
+  <div class="overlay" id="startOv">
+    <div class="panel">
+      <div class="logo">TIP TRAP</div>
+      <p class="tagline">You've been added to a “FREE stock tips” group.<br />You have ₹50,000. Will you spot the trap?</p>
+      <div class="how">
+        <div><i>🚩</i><span>Tap the <b>🚩</b> next to any message that looks like a <b>red flag</b>. Right calls raise your <b>Scam radar</b>; wrong ones lower it.</span></div>
+        <div><i>🔍</i><span>Use the <b>Verify toolkit</b> anytime: SEBI registration, filings, surveillance list, volume.</span></div>
+        <div><i>💸</i><span>Decide: <b>buy</b>, <b>verify</b>, <b>pay for VIP</b>, <b>report</b> or <b>leave</b>. Then live with the result.</span></div>
+      </div>
+      <button class="btn go full" id="goBtn">📱 OPEN THE GROUP</button>
+    </div>
+  </div>
+
+  <!-- verify -->
+  <div class="overlay" id="verifyOv" hidden>
+    <div class="panel">
+      <h3>🔍 Verify toolkit</h3>
+      <p class="sub">What you'd check in real life before trusting a tip. Tap each check.</p>
+      <div id="checks"></div>
+      <button class="btn full" id="vClose">Back to the group</button>
+    </div>
+  </div>
+
+  <!-- report -->
+  <div class="overlay" id="reportOv" hidden>
+    <div class="panel">
+      <h3>📢 Report & exit</h3>
+      <p class="sub">In real life, here's where you report a stock tips scam in India:</p>
+      <div class="res">
+        <div>🏛️ <b>SEBI SCORES</b> (SEBI's complaints system): <b>scores.sebi.gov.in</b>, for unregistered advice, fake “SEBI registered” claims and market manipulation.</div>
+        <div>🚔 <b>Cyber crime portal: cybercrime.gov.in</b>, or call <b>1930</b> (national cyber fraud helpline), especially if you've paid money.</div>
+        <div>📱 <b>Report the group and the admin</b> inside WhatsApp or Telegram, then exit and block the number that added you.</div>
+        <div>🏦 Paid by UPI or card? Tell your <b>bank</b> immediately and keep screenshots as evidence.</div>
+      </div>
+      <button class="btn safe full" id="reportDone">✅ Reported, exit the group</button>
+    </div>
+  </div>
+
+  <!-- end -->
+  <div class="overlay" id="endOv" hidden>
+    <div class="panel">
+      <div style="font:600 .7rem 'JetBrains Mono';letter-spacing:.14em;color:var(--muted);text-align:center">GAME OVER · YOUR ₹50,000 BECAME</div>
+      <div class="big" id="eMoney">₹50,000</div>
+      <div style="text-align:center;font:600 .9rem 'JetBrains Mono'" id="ePnl"></div>
+      <span class="rank" id="eRank"></span>
+      <div class="rstats">
+        <div><span>Red flags</span><b id="eFlags">0/0</b></div>
+        <div><span>Checks done</span><b id="eChecks">0/5</b></div>
+        <div><span>Radar</span><b id="eRadar">0</b></div>
+      </div>
+      <div class="badges" id="eBadges"></div>
+      <div class="box" style="background:rgba(255,59,92,.06);border:1px solid rgba(255,59,92,.3)">
+        <h4>🧨 How the trap worked</h4>
+        <div class="story">
+          <div><i>1</i><span><b>Quiet buying:</b> operators collect a cheap, illiquid penny stock with tiny volumes.</span></div>
+          <div><i>2</i><span><b>Hype:</b> thousands are added to “free tips” groups. Fake profit screenshots, “SEBI registered ✅”, “big news”, urgency and secrecy.</span></div>
+          <div><i>3</i><span><b>Pump:</b> buy orders from the group push it into daily <b>upper circuits</b>. It looks like proof.</span></div>
+          <div><i>4</i><span><b>Dump:</b> operators sell all their shares to the group's buyers. The admin goes silent.</span></div>
+          <div><i>5</i><span><b>Trap:</b> <b>lower circuits</b> with only sellers. You can't exit, and the group disappears.</span></div>
+        </div>
+      </div>
+      <div class="box safe">
+        <h4>🛡️ Stay safe: do this every time</h4>
+        <ul>
+          <li>Check registration on <b>SEBI's website</b> (Intermediaries → Research Analysts / Investment Advisers). Real numbers start with <b>INH</b> (RA) or <b>INA</b> (IA).</li>
+          <li><b>Nobody</b> can promise fixed or guaranteed returns. “Operator call”, “insider news” and “100% accuracy” are lies or illegal.</li>
+          <li>Read the company's results and announcements on <b>NSE / BSE</b>. No filing means no “big news”.</li>
+          <li>Check whether the stock is on the exchange's <b>ASM / GSM surveillance</b> lists.</li>
+          <li>Huge volume and upper circuits with no news? That's a pump. Stay away.</li>
+          <li>Never pay for tips to a personal UPI ID, and never share OTPs or screen-sharing access.</li>
+        </ul>
+      </div>
+      <div class="box report">
+        <h4>📢 Report it</h4>
+        <b>scores.sebi.gov.in</b> · <b>cybercrime.gov.in</b> · helpline <b>1930</b> · report the group in the app · tell your bank if you paid.
+      </div>
+      <button class="btn go full" id="againBtn">↻ PLAY AGAIN</button>
+      <div class="row2">
+        <button class="btn wa" id="alertBtn">📢 Send scam alert</button>
+        <button class="btn" id="shareBtn">💬 Share my result</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const rnd = (a, b) => a + Math.random() * (b - a);
+const inr = n => (n < 0 ? "−" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const sinr = n => (n >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const vib = ms => { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms); } catch {} };
+
+/* ---------- people (fictional) ---------- */
+const P = {
+  admin: { n: "Rahul Sir (Market Expert) ✅", c: "#ff9a3d" },
+  pooja: { n: "Pooja K", c: "#53bdeb" }, vikas: { n: "Vikas 2X 🚀", c: "#25d366" }, amit: { n: "Amit", c: "#c58bff" },
+  neha: { n: "Neha S", c: "#ffd27a" }, raj: { n: "+91 97xxx xx418", c: "#ff7aa8" }, sunil: { n: "Sunil Traders", c: "#7ee0c3" },
+};
+
+/* ---------- price path (₹) ---------- */
+const PUMP = [4.20, 4.41, 4.63, 4.86, 5.10];              // day 1-5: 5% upper circuits
+const DUMP = [4.85, 4.61, 4.38, 4.16, 3.95, 3.75];        // day 6-11: 5% lower circuits
+const CRASH = 2.10, LATER = 1.40;                          // circuit breaks, then a month later
+
+/* ---------- state ---------- */
+const START = 50000;
+let G;
+function reset() {
+  G = { cash: START, shares: 0, cost: 0, radar: 0, flagsRight: 0, flagsTotal: 0, checks: new Set(), reported: false, left: false, vip: false, soldPump: false,
+        fast: false, prices: [PUMP[0]], day: 1, ended: false, boughtAt: [], realized: 0 };
+  $("#msgs").innerHTML = ""; $("#acts").innerHTML = ""; $("#q").textContent = ""; document.body.classList.remove("dump");
+  hud(); spark(); drawChecks();
+}
+const lastPx = () => G.prices[G.prices.length - 1];
+const money = () => G.cash + G.shares * lastPx();
+function hud() {
+  const m = money(); $("#hMoney").textContent = inr(m); $("#hMoney").style.color = m > START + 1 ? "var(--up)" : m < START - 1 ? "var(--down)" : "";
+  $("#hShares").textContent = G.shares.toLocaleString("en-IN"); $("#hRadar").textContent = G.radar;
+  $("#vCount").textContent = `${G.checks.size} of 5 checks`;
+}
+function spark(tag) {
+  const pr = G.prices, all = [...PUMP, ...DUMP], hi = Math.max(...all, ...pr) * 1.04, lo = Math.min(2, ...pr) * .96, n = 12;
+  const X = i => i / (n - 1) * 296 + 2, Y = v => 50 - (v - lo) / (hi - lo) * 46;
+  const pts = pr.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  const up = pr.length < 2 || pr[pr.length - 1] >= pr[pr.length - 2], col = up ? "#22d39a" : "#ff5470";
+  $("#spark").innerHTML = `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` +
+    pr.map((v, i) => `<circle cx="${X(i)}" cy="${Y(v)}" r="${i === pr.length - 1 ? 3.6 : 1.8}" fill="${col}"/>`).join("");
+  const p = lastPx(), prev = pr.length > 1 ? pr[pr.length - 2] : p, ch = (p / prev - 1) * 100;
+  $("#px").innerHTML = `₹${p.toFixed(2)}${tag ? `<span class="tag ${tag}">${tag === "uc" ? "UPPER CIRCUIT" : "LOWER CIRCUIT"}</span>` : ""}`;
+  $("#px").style.color = ch > 0 ? "var(--up)" : ch < 0 ? "var(--down)" : "";
+}
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2300); }
+function setDay(t) { $("#day").textContent = t; }
+
+/* ---------- chat engine ---------- */
+let uid = 0;
+const MSGDATA = {};
+function scrollDown() { const m = $("#msgs"); m.scrollTop = m.scrollHeight + 999; }
+function sys(text, red) { const d = document.createElement("div"); d.className = "sys" + (red ? " red" : ""); d.textContent = text; $("#msgs").appendChild(d); scrollDown(); }
+function hint(text) { const d = document.createElement("div"); d.className = "hint"; d.innerHTML = text; $("#msgs").appendChild(d); scrollDown(); }
+async function say(m) {
+  if (G.ended) return;
+  if (!G.fast) {
+    const t = document.createElement("div"); t.className = "typing"; t.innerHTML = `${esc(P[m.who]?.n || "")} is typing <i></i><i></i><i></i>`;
+    $("#msgs").appendChild(t); scrollDown();
+    await sleep(Math.min(1800, 450 + m.text.length * 14));
+    t.remove();
+  } else await sleep(90);
+  const id = "m" + ++uid; MSGDATA[id] = m;
+  if (m.flag) G.flagsTotal++;
+  const d = document.createElement("div"); d.className = "msg" + (m.who === "me" ? " me" : ""); d.id = id;
+  const who = m.who === "me" ? "" : `<span class="who" style="color:${P[m.who].c}">${esc(P[m.who].n)}</span>`;
+  const img = m.img ? `<div class="pnlimg"><small>P&amp;L TODAY · Demat statement</small><b>${m.img}</b></div>` : "";
+  d.innerHTML = `${who}${img}${m.html || esc(m.text)}<span class="tm">${m.tm || ""}</span>${m.who === "me" || m.noflag ? "" : `<button class="flag" title="Flag as a red flag" aria-label="Flag as red flag">🚩</button>`}`;
+  $("#msgs").appendChild(d); scrollDown();
+  try { if (!G.fast) tick(); } catch {}
+}
+async function play(list) { for (const m of list) { if (G.ended) return; await say(m); } }
+$("#msgs").addEventListener("click", e => {
+  const b = e.target.closest(".flag"); if (!b) return;
+  const el = b.closest(".msg"), m = MSGDATA[el.id]; if (!m || el.classList.contains("flagged") || el.classList.contains("cleared")) return;
+  const w = document.createElement("div");
+  if (m.flag) {
+    G.radar += 10; G.flagsRight++; el.classList.add("flagged"); w.className = "why good"; w.innerHTML = "🚩 <b>Red flag:</b> " + m.why; vib(20); beep(880);
+    if (G.flagsRight === 5) toast("🛡️ Scam radar: sharp eyes!");
+  } else {
+    G.radar -= 5; el.classList.add("cleared", "nope"); w.className = "why bad"; w.innerHTML = "🤔 <b>Not a red flag:</b> " + m.why; vib([10, 30, 10]); beep(220);
+  }
+  el.appendChild(w); hud();
+});
+let AC; function beep(f) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume().catch(() => {}); const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime; o.frequency.value = f; o.type = "triangle"; g.gain.setValueAtTime(.04, t); g.gain.exponentialRampToValueAtTime(.0001, t + .12); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + .14); } catch {} }
+function tick() { beep(1200); }
+$("#fastBtn").onclick = () => { G.fast = !G.fast; $("#fastBtn").innerHTML = G.fast ? "🐢 Normal <small>show typing</small>" : "⏩ Faster <small>skip typing</small>"; };
+
+/* ---------- decisions ---------- */
+function ask(question, options) {
+  return new Promise(res => {
+    $("#q").textContent = question;
+    $("#acts").innerHTML = options.map((o, i) => `<button class="btn ${o.cls || ""} ${o.full ? "full" : ""}" data-i="${i}" ${o.disabled ? "disabled" : ""}>${o.label}${o.small ? `<small>${o.small}</small>` : ""}</button>`).join("");
+    $("#acts").onclick = e => { const b = e.target.closest("button"); if (!b) return; $("#acts").onclick = null; $("#acts").innerHTML = ""; $("#q").textContent = ""; res(options[+b.dataset.i].v); };
+  });
+}
+function buy(amount, note) {
+  const p = lastPx(), qty = Math.floor(Math.min(amount, G.cash) / p);
+  if (qty < 1) return;
+  G.cash -= qty * p; G.shares += qty; G.cost += qty * p; G.boughtAt.push(p);
+  hud(); beep(660);
+  return say({ who: "me", text: `Bought ${qty.toLocaleString("en-IN")} shares @ ₹${p.toFixed(2)} ${note || "🙏"}`, tm: "✓✓" });
+}
+function sellAll(p, why) { const v = G.shares * p; G.realized += v - G.cost; G.cash += v; G.shares = 0; G.cost = 0; hud(); return v; }
+
+/* ---------- verify toolkit ---------- */
+const CHECKS = [
+  { id: "sebi", t: "🏛️ Is “Rahul Sir” SEBI-registered?", s: "Search SEBI's list of Research Analysts & Investment Advisers", ev: "<b>No match.</b> No INH (research analyst) or INA (investment adviser) number is shown anywhere. The “✅” in his name is just an emoji anyone can type." },
+  { id: "fin", t: "📊 Company financials", s: "Latest results filed on NSE / BSE", ev: "Revenue <b>₹1.2 crore</b>, <b>loss</b> of ₹0.8 crore last year, falling sales. Market value <b>₹38 crore</b>, which is 30× its revenue for a loss-making firm." },
+  { id: "news", t: "📰 Any “big news” filed?", s: "Corporate announcements on the exchange", ev: "<b>Nothing.</b> No order win, no merger, no board meeting. Listed companies must disclose price-sensitive news, so “big news coming” is invented." },
+  { id: "surv", t: "🚨 Exchange surveillance list", s: "NSE / BSE ASM & GSM lists", ev: "The stock is under the exchange's <b>surveillance framework</b>: tight price band, extra margin. The exchange is already watching it for unusual moves." },
+  { id: "vol", t: "📈 Price & volume pattern", s: "Compare with the 3-month average", ev: "Volume is <b>22×</b> its 3-month average, with daily upper circuits and <b>no news</b>. Classic pump pattern: a small group trading among themselves." },
+];
+function drawChecks() {
+  $("#checks").innerHTML = CHECKS.map(c => `<button class="check ${G && G.checks.has(c.id) ? "done" : ""}" data-c="${c.id}">${c.t}<small>${c.s}</small>${G && G.checks.has(c.id) ? `<span class="ev">${c.ev}</span>` : ""}</button>`).join("");
+}
+$("#checks").addEventListener("click", e => {
+  const b = e.target.closest(".check"); if (!b || G.checks.has(b.dataset.c)) return;
+  G.checks.add(b.dataset.c); G.radar += 5; beep(520); drawChecks(); hud();
+  if (G.checks.size === 5) toast("🔍 Investigator: all 5 checks done");
+});
+$("#verifyBtn").onclick = () => { drawChecks(); $("#verifyOv").hidden = false; };
+$("#vClose").onclick = () => $("#verifyOv").hidden = true;
+
+/* ---------- story ---------- */
+async function chapter1() {
+  setDay("DAY 1 · 9:02 AM");
+  sys("+91 98xxx xx210 added you");
+  MSGDATA["sys0"] = null;
+  await play([
+    { who: "admin", tm: "9:02", flag: true, text: "Welcome to India's No.1 FREE tips group 🙏 100% accuracy · SEBI registered ✅ · 4,800+ happy members", why: "“100% accuracy” is impossible, and a really registered adviser shows a <b>registration number</b> (INH/INA) you can check on SEBI's website. Being added by a stranger is itself a warning." },
+    { who: "pooja", tm: "9:04", flag: true, img: "+₹2,40,000", text: "Made this in 3 days with Sir's call 🙏🙏 thank you sir", why: "Profit screenshots are easy to fake and are often posted by accounts the group itself controls." },
+    { who: "amit", tm: "9:05", flag: false, text: "Good morning all 🙏", why: "Just a greeting. Not everything is a trap, which is why scam groups feel normal." },
+    { who: "admin", tm: "9:11", flag: true, text: "🚨 OPERATOR CALL 🚨\nZENITHA AGRO ₹4.20 ➜ TARGET ₹15 in 10 days 🎯\nBig news coming. BUY before 10:30 AM. Don't share outside group 🤫", why: "<b>Urgency + “operator” + “big news” + secrecy</b> is the classic pump script. Trading on real unpublished news would also be illegal insider trading." },
+    { who: "vikas", tm: "9:12", flag: true, text: "Bought 20,000 shares 🚀🚀🚀 LFG", why: "“I bought!” messages create FOMO. Many come from the operators' own accounts." },
+    { who: "neha", tm: "9:14", flag: false, text: "Is this company safe? Revenue looks very small 🤔", why: "This is a <b>genuine, smart question</b>. Scam groups usually shut down or remove people who ask it." },
+    { who: "admin", tm: "9:15", flag: true, text: "Doubters please leave the group 🙏 Only believers make money. Neha removed.", why: "Silencing questions and removing doubters is a big warning sign." },
+  ]);
+  if (G.ended) return;
+  sys("Neha S was removed");
+  hint("💡 Tap <b>🚩</b> on messages you think are red flags, and try the <b>🔍 Verify toolkit</b>.");
+  const v = await ask("ZENITHA is ₹4.20 right now. What do you do?", [
+    { label: "💸 Buy ₹50,000", small: "go all in", v: "all", cls: "buy" },
+    { label: "💸 Buy ₹20,000", small: "test it", v: "some", cls: "buy" },
+    { label: "👀 Just watch", small: "don't buy yet", v: "watch" },
+    { label: "📢 Report & exit", small: "it smells like a scam", v: "report", cls: "safe" },
+    { label: "🚪 Just leave the group", small: "ignore it", v: "leave", full: true },
+  ]);
+  if (v === "all") await buy(50000, "🙏 all in");
+  if (v === "some") await buy(20000);
+  if (v === "report") return reportExit();
+  if (v === "leave") return leaveEarly();
+  return chapter2();
+}
+
+async function chapter2() {
+  const days = [
+    [{ who: "admin", tm: "9:16", flag: true, text: "Day 2: UPPER CIRCUIT ✅ as promised 🔥 Next stop ₹8", why: "Small, illiquid stocks hit circuits on tiny volumes, so a group can easily create this “proof”." },
+     { who: "raj", tm: "9:20", flag: true, text: "Can't buy!! No sellers 😭😭 how to buy sir??", why: "“No sellers” messages push others to place higher buy orders, exactly what operators need to sell to later." }],
+    [{ who: "admin", tm: "9:15", flag: true, text: "Day 3 UC again ✅✅ Those who doubted are crying now 😂", why: "Mocking doubters is a pressure tactic to make you act on emotion, not facts." },
+     { who: "sunil", tm: "9:30", flag: false, text: "Market is closed on Friday for the holiday, right?", why: "An ordinary question about market holidays. Not every message is part of the script." }],
+    [{ who: "admin", tm: "9:15", flag: true, text: "VIP GROUP OPEN 🔐 Next 10x stock tomorrow. Fee only ₹9,999 today. Pay on UPI: rocketgains@upi", why: "Paying an individual's UPI ID for tips is a very common scam. Registered advisers are verifiable, issue invoices, and can't promise returns." },
+     { who: "pooja", tm: "9:18", flag: true, text: "Paid VIP fee ✅ thank you sir, already 3x in VIP 🙏", why: "Fake testimonials make paying feel safe. These replies are often scripted." }],
+    [{ who: "admin", tm: "9:15", flag: true, text: "Day 5 ₹5.10 🚀 HOLD tight. ₹15 confirmed. Don't sell, operator will punish weak hands 😎", why: "<b>“Don't sell”</b> keeps buyers locked in while the people behind it quietly sell to them." }],
+  ];
+  for (let d = 0; d < days.length; d++) {
+    if (G.ended) return;
+    G.day = d + 2; G.prices.push(PUMP[d + 1]); spark("uc"); hud(); setDay(`DAY ${G.day} · 9:15 AM`);
+    sys(`Day ${G.day} · ZENITHA hits 5% upper circuit at ₹${PUMP[d + 1].toFixed(2)}`);
+    await play(days[d]);
+    if (d === 2 && !G.vip) {
+      const v = await ask("The admin is selling a ₹9,999 VIP membership.", [
+        { label: "💳 Pay ₹9,999", small: "for the next 10x", v: "pay", cls: "warn", disabled: G.cash < 9999 },
+        { label: "🙅 No thanks", small: "keep watching", v: "no" },
+      ]);
+      if (v === "pay") {
+        G.vip = true; G.cash -= 9999; hud(); beep(300);
+        await say({ who: "me", text: "Paid ₹9,999 for VIP 🙏 please add me", tm: "✓✓" });
+        sys("Rahul Sir (Market Expert) ✅ removed you from the VIP payment chat", true);
+        await play([{ who: "admin", tm: "9:41", noflag: true, text: "VIP members please be patient, link coming soon 🙏" }]);
+        toast("💸 ₹9,999 gone. The VIP group never existed.");
+      }
+    }
+  }
+  if (G.ended) return;
+  const holding = G.shares > 0;
+  const opts = holding
+    ? [{ label: "💰 Sell everything", small: `book ${sinr(G.shares * lastPx() - G.cost)} now`, v: "sell", cls: "sell" },
+       { label: "💎 Hold for ₹15", small: "trust Sir", v: "hold", cls: "warn" },
+       { label: "💸 Buy more", small: "average up", v: "more", cls: "buy", disabled: G.cash < 600 },
+       { label: "📢 Sell, report & exit", small: "get out safely", v: "sellreport", cls: "safe" }]
+    : [{ label: "💸 Buy ₹40,000", small: "it's working!", v: "buy", cls: "buy", disabled: G.cash < 600 },
+       { label: "👀 Keep watching", small: "don't buy", v: "watch" },
+       { label: "📢 Report & exit", small: "warn others", v: "report", cls: "safe", full: true }];
+  const v = await ask(`Day 5: ZENITHA ₹5.10 (+21% in 4 days). ${holding ? `You hold ${G.shares.toLocaleString("en-IN")} shares.` : "You haven't bought."}`, opts);
+  if (v === "sell" || v === "sellreport") {
+    G.soldPump = true; const got = sellAll(lastPx());
+    await say({ who: "me", text: `Sold all @ ₹${lastPx().toFixed(2)} ✅`, tm: "✓✓" });
+    toast("🎲 You got out at the top. Lucky this time.");
+    if (v === "sellreport") return reportExit(true);
+  }
+  if (v === "more" || v === "buy") await buy(v === "buy" ? 40000 : G.cash, "🚀 more");
+  if (v === "report") return reportExit();
+  return chapter3();
+}
+
+async function chapter3() {
+  document.body.classList.add("dump");
+  for (let i = 0; i < DUMP.length; i++) {
+    if (G.ended) return;
+    G.day = 6 + i; G.prices.push(DUMP[i]); spark("lc"); hud(); setDay(`DAY ${G.day} · 9:15 AM`);
+    sys(`Day ${G.day} · ZENITHA locked at 5% LOWER CIRCUIT ₹${DUMP[i].toFixed(2)} · only sellers, no buyers`, true);
+    if (i === 0) await play([
+      { who: "vikas", tm: "9:16", flag: false, text: "Sir why lower circuit?? 😰😰", why: "A worried member asking a real question. The panic is real for the people who bought." },
+      { who: "admin", tm: "9:40", flag: true, text: "Shakeout by big players, it's normal 😎 Hold, ₹15 confirmed. Don't sell", why: "Excuses (“shakeout”) while the price collapses keep you holding as the operators exit." },
+    ]);
+    if (i === 1) { await play([{ who: "raj", tm: "9:17", flag: false, text: "Admin not replying. Can anyone sell?? My order not executing", why: "This is what being trapped looks like: sell orders that never fill at the lower circuit." }]); sys("Rahul Sir (Market Expert) ✅ changed group settings: only admins can send messages", true); }
+    if (i === 2) { sys("This group was deleted", true); $("#members").textContent = "group deleted · you can't send messages"; }
+    if (G.shares > 0) {
+      const v = await ask(`Day ${G.day}: lower circuit at ₹${DUMP[i].toFixed(2)}. You hold ${G.shares.toLocaleString("en-IN")} shares worth ${inr(G.shares * DUMP[i])}.`, [
+        { label: "🆘 Try to sell all", small: "place a sell order", v: "sell", cls: "sell" },
+        { label: "🙏 Wait, it'll bounce", small: "hope", v: "wait" },
+      ]);
+      if (v === "sell") {
+        const fill = Math.max(1, Math.floor(G.shares * rnd(.07, .14)));
+        const avgCost = G.cost / G.shares; G.cost -= avgCost * fill; G.cash += fill * DUMP[i]; G.realized += fill * (DUMP[i] - avgCost); G.shares -= fill; hud(); beep(260);
+        await say({ who: "me", text: `SELL ${(G.shares + fill).toLocaleString("en-IN")} @ ₹${DUMP[i].toFixed(2)} ➜ only ${fill.toLocaleString("en-IN")} sold. ${G.shares.toLocaleString("en-IN")} still pending. No buyers 😰`, tm: "✓" });
+      }
+    } else await sleep(G.fast ? 200 : 900);
+  }
+  if (G.ended) return;
+  G.day = 12; G.prices.push(CRASH); spark(); hud(); setDay("DAY 12 · 9:15 AM");
+  sys(`Day 12 · Circuit band revised · ZENITHA opens at ₹${CRASH.toFixed(2)} (−59% from the top). Buyers finally appear.`, true);
+  if (G.shares > 0) {
+    const v = await ask(`You can finally sell all ${G.shares.toLocaleString("en-IN")} shares at ₹${CRASH.toFixed(2)}.`, [
+      { label: "💔 Sell & accept the loss", small: inr(G.shares * CRASH), v: "sell", cls: "sell" },
+      { label: "🙏 Hold & hope", small: "maybe it comes back", v: "hold" },
+    ]);
+    if (v === "sell") { sellAll(CRASH); await say({ who: "me", text: `Sold all @ ₹${CRASH.toFixed(2)}. Lesson learned 💔`, tm: "✓✓" }); }
+    else { G.prices.push(LATER); spark(); sys(`One month later: ZENITHA ₹${LATER.toFixed(2)}, still falling, with almost no trading`, true); sellAll(LATER); hud(); }
+  }
+  finish();
+}
+
+async function reportExit(afterSell) {
+  $("#reportOv").hidden = false;
+  await new Promise(r => { $("#reportDone").onclick = () => { $("#reportOv").hidden = true; r(); }; });
+  G.reported = true; G.radar += 15; hud();
+  sys("You reported the group and exited 📢");
+  return fastForward(afterSell ? "You sold at the top, reported and left." : "You reported the group and left before the dump.");
+}
+async function leaveEarly() { G.left = true; sys("You left the group"); return fastForward("You left without buying."); }
+async function fastForward(text) {
+  toast("⏩ Here's what happened to the people who stayed…");
+  document.body.classList.add("dump");
+  for (let i = G.prices.length; i < PUMP.length; i++) { G.prices.push(PUMP[i]); }
+  spark("uc"); await sleep(700);
+  for (const p of DUMP) G.prices.push(p);
+  G.prices.push(CRASH); spark(); hud();
+  setDay("DAY 12");
+  sys(`Pumped to ₹5.10, then 6 lower circuits, then ₹${CRASH.toFixed(2)}. The group was deleted on day 8. Members who bought lost around 60%.`, true);
+  G.ffText = text;
+  await sleep(1200);
+  finish();
+}
+
+/* ---------- end ---------- */
+function finish() {
+  if (G.ended) return; G.ended = true;
+  const m = money(), pnl = m - START;
+  const neverBought = G.boughtAt.length === 0;
+  const rank = neverBought && (G.reported || G.checks.size >= 3) ? "🛡️ Scam Buster"
+    : neverBought && !G.vip ? "🧠 Smart skeptic"
+    : neverBought ? "💸 Paid for nothing"
+    : G.soldPump ? "🎲 Lucky escape (don't count on it)"
+    : pnl < -20000 ? "🥲 Exit liquidity" : "😬 Burned";
+  $("#eMoney").textContent = inr(m); $("#eMoney").style.color = pnl >= 0 ? "var(--up)" : "var(--down)";
+  $("#ePnl").textContent = `${sinr(pnl)} ${G.ffText ? "· " + G.ffText : ""}`; $("#ePnl").style.color = pnl >= 0 ? "var(--up)" : "var(--down)";
+  $("#eRank").textContent = rank;
+  $("#eFlags").textContent = `${G.flagsRight}/${G.flagsTotal}`; $("#eChecks").textContent = `${G.checks.size}/5`; $("#eRadar").textContent = G.radar;
+  const b = [];
+  if (G.flagsRight >= Math.max(4, G.flagsTotal - 2)) b.push("🚩 Red-flag radar");
+  if (G.checks.size === 5) b.push("🔍 Investigator");
+  if (G.reported) b.push("📢 Reported it");
+  if (neverBought) b.push("🙅 Didn't take the bait");
+  if (G.vip) b.push("💸 Paid a fake VIP fee");
+  if (G.soldPump) b.push("🎲 Sold at the top");
+  if (!neverBought && !G.soldPump) b.push("🪤 Got trapped");
+  $("#eBadges").innerHTML = b.map(x => `<span>${x}</span>`).join("");
+  G.result = { m, pnl, rank };
+  setTimeout(() => { $("#endOv").hidden = false; $("#endOv").scrollTop = 0; }, 500);
+}
+const URL_ = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host) ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/scam-game/";
+$("#shareBtn").onclick = () => {
+  const r = G.result;
+  const t = [`📱 *TIP TRAP*: the penny-stock scam game`, `I was added to a “free tips” group with ₹50,000 and ended with *${inr(r.m)}* (${sinr(r.pnl)}). ${r.rank}`, `🚩 Spotted ${G.flagsRight}/${G.flagsTotal} red flags · 🔍 ${G.checks.size}/5 checks`, ``, `Would you spot the trap? 👉 ${URL_}`, `_Fictional game for awareness. Not investment advice._`].join("\n");
+  window.open("https://wa.me/?text=" + encodeURIComponent(t), "_blank", "noopener");
+};
+$("#alertBtn").onclick = () => {
+  const t = [`⚠️ *SCAM ALERT: “free stock tips” groups* ⚠️`, ``, `If a stranger adds you to a WhatsApp or Telegram group promising *guaranteed profits*, *operator calls* or *100% accuracy*, it's almost always a *pump and dump*. They buy a cheap penny stock first, hype it to you, then sell to you at the top.`, ``, `🚩 *Red flags:* fake profit screenshots · “SEBI registered ✅” with no number · “big news coming” · “buy before 10:30” · “don't share” · paid VIP groups on UPI · “don't sell”`, ``, `✅ *Before you trust any tip:*`, `• Check SEBI registration (RA numbers start INH, IA numbers start INA)`, `• Read the company's filings on NSE / BSE`, `• Check the exchange ASM / GSM surveillance lists`, `• Never pay for tips to a personal UPI ID`, ``, `📢 *Report:* scores.sebi.gov.in · cybercrime.gov.in · call *1930*`, ``, `Try the free awareness game 👉 ${URL_}`, `— MANIMINDSMONEY Community`].join("\n");
+  window.open("https://wa.me/?text=" + encodeURIComponent(t), "_blank", "noopener");
+};
+$("#againBtn").onclick = () => { $("#endOv").hidden = true; start(); };
+async function start() { reset(); $("#members").textContent = "4,812 members · admins only can post links"; await chapter1(); }
+$("#goBtn").onclick = () => { $("#startOv").hidden = true; beep(700); start(); };
+reset();
+</script>
+</body>
+</html>
