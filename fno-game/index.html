@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>F&amp;O Survival: learn options &amp; futures by playing · MANIMINDSMONEY</title>
+<meta name="description" content="An interactive game that teaches F&O basics: calls vs puts, futures and margin, theta decay, expiry to zero, booking profit, liquidity and stop-losses." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #05060a; --fg: #eef0f6; --muted: #8a90a2; --line: rgba(255,255,255,.09);
+    --card: rgba(16,18,28,.8); --a1: #7c5cff; --a2: #00e0b8; --a3: #ff4d8d;
+    --up: #22d39a; --down: #ff5470; --warn: #febc2e; --gold: #ffd27a; --ce: #22d39a; --pe: #ff5470; --fut: #5b8cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; min-height: 100vh; overflow-x: hidden; }
+  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .blob { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .18; }
+  .blob.b1 { background: var(--fut); top: -25vmax; left: -20vmax; }
+  .blob.b2 { background: var(--a2); bottom: -30vmax; right: -20vmax; opacity: .12; }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); opacity: .4; }
+
+  .app { max-width: 640px; margin: 0 auto; padding: max(12px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .brand { min-width: 0; display: flex; align-items: center; gap: 9px; font: 700 .98rem "Space Grotesk"; letter-spacing: .04em; text-decoration: none; color: inherit; }
+  .brand i { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2)); font-style: normal; color: #000; font-size: .85rem; flex: none; }
+  .brand span { background: linear-gradient(100deg, #fff, #c9bcff 55%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hbtns { display: flex; gap: 6px; }
+  .hbtn { white-space: nowrap; height: 34px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--muted); font: 600 .78rem Inter; text-decoration: none; display: inline-flex; align-items: center; }
+
+  .hud { display: grid; grid-template-columns: 1.3fr 1.1fr .8fr; gap: 7px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 15px; padding: 8px 10px; min-width: 0; }
+  .stat span { display: block; font: 600 .58rem "JetBrains Mono"; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .stat strong { display: block; font: 700 clamp(.95rem, 4.2vw, 1.22rem) "JetBrains Mono"; letter-spacing: -.03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .3s; }
+  .dots { display: flex; gap: 5px; }
+  .dots i { flex: 1; height: 4px; border-radius: 3px; background: rgba(255,255,255,.08); }
+  .dots i.done { background: var(--up); } .dots i.on { background: var(--fut); }
+
+  .stage { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px 14px; min-height: 460px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .scene { animation: in .45s cubic-bezier(.2,.9,.3,1.1); }
+  @keyframes in { from { opacity: 0; transform: translateY(14px); } }
+  .kicker { font: 700 .66rem "JetBrains Mono"; letter-spacing: .14em; color: var(--fut); text-transform: uppercase; }
+  h2 { font: 700 clamp(1.35rem, 5.8vw, 1.75rem)/1.12 "Space Grotesk"; letter-spacing: -.03em; margin: 5px 0 6px; }
+  .story { font-size: .9rem; color: #cfd3df; line-height: 1.5; margin-bottom: 10px; }
+  .story b { color: #fff; }
+
+  .mkt { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(0,0,0,.3); border: 1px solid var(--line); margin-bottom: 8px; }
+  .mkt .n { font: 700 .74rem "JetBrains Mono"; color: var(--muted); }
+  .mkt .p { font: 800 1.35rem "JetBrains Mono"; letter-spacing: -.03em; }
+  .mkt .c { font: 700 .82rem "JetBrains Mono"; }
+  .mkt .t { font: 700 .7rem "JetBrains Mono"; color: var(--gold); background: rgba(255,210,122,.1); padding: 4px 8px; border-radius: 8px; white-space: nowrap; }
+  .chart { width: 100%; height: 120px; display: block; margin-bottom: 8px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+
+  .insts { display: grid; gap: 8px; margin-bottom: 10px; }
+  .inst { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 11px 12px; border-radius: 15px; border: 1.5px solid var(--line); background: rgba(255,255,255,.04); cursor: pointer; text-align: left; color: var(--fg); font: inherit; transition: border-color .2s, background .2s, transform .1s; width: 100%; }
+  .inst:active { transform: scale(.98); }
+  .inst.ce { border-color: rgba(34,211,154,.45); } .inst.pe { border-color: rgba(255,84,112,.45); } .inst.fut { border-color: rgba(91,140,255,.5); }
+  .inst.sel { background: rgba(255,255,255,.1); box-shadow: 0 0 0 2px #fff inset; }
+  .inst[disabled] { opacity: .4; pointer-events: none; }
+  .badge { font: 800 .72rem "JetBrains Mono"; padding: 6px 8px; border-radius: 9px; text-align: center; min-width: 52px; }
+  .badge.ce { background: rgba(34,211,154,.18); color: var(--ce); } .badge.pe { background: rgba(255,84,112,.18); color: var(--pe); } .badge.fut { background: rgba(91,140,255,.2); color: #9ec0ff; }
+  .inst b { display: block; font-size: .92rem; }
+  .inst small { display: block; color: var(--muted); font-size: .72rem; line-height: 1.35; }
+  .inst .px { font: 800 1rem "JetBrains Mono"; text-align: right; white-space: nowrap; }
+  .inst .px small { font-weight: 600; }
+
+  .live { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+  .live div { padding: 8px 6px; border-radius: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); text-align: center; min-width: 0; }
+  .live span { display: block; font-size: .62rem; color: var(--muted); }
+  .live b { font: 700 .9rem "JetBrains Mono"; white-space: nowrap; }
+  .split { height: 12px; border-radius: 7px; overflow: hidden; display: flex; background: rgba(255,255,255,.06); margin: 4px 0 10px; }
+  .split i { display: block; height: 100%; transition: width .4s; }
+
+  .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 13px 8px; border-radius: 15px; font: 800 .94rem Inter; border: 1px solid var(--line); cursor: pointer; color: var(--fg); background: rgba(255,255,255,.06); transition: transform .1s, opacity .2s; text-align: center; }
+  .btn small { font: 600 .66rem Inter; opacity: .8; }
+  .btn:active { transform: scale(.96); }
+  .btn.full { grid-column: 1 / -1; width: 100%; }
+  .btn.go { background: linear-gradient(100deg, var(--fut), var(--a1) 60%, var(--a2)); border: 0; color: #fff; }
+  .btn.ok { background: linear-gradient(160deg, #2fe0a7, #0fa877); border: 0; color: #fff; }
+  .btn.no { background: linear-gradient(160deg, #ff6b84, #d63353); border: 0; color: #fff; }
+  .btn.warn { border-color: rgba(254,188,46,.5); color: var(--gold); }
+  .btn[disabled] { opacity: .35; pointer-events: none; }
+  .log { display: grid; gap: 5px; margin: 8px 0; }
+  .log div { font-size: .8rem; padding: 7px 10px; border-radius: 10px; background: rgba(255,255,255,.04); border-left: 3px solid var(--fut); animation: in .3s; }
+  .log div.bad { border-left-color: var(--down); } .log div.good { border-left-color: var(--up); } .log div.warn { border-left-color: var(--warn); }
+
+  .result { margin-top: 10px; padding: 12px; border-radius: 16px; background: rgba(0,0,0,.3); border: 1px solid var(--line); animation: in .4s; }
+  .result .big { font: 800 1.9rem "JetBrains Mono"; letter-spacing: -.04em; text-align: center; }
+  .cmp { display: grid; gap: 5px; margin-top: 8px; }
+  .cmp div { display: flex; justify-content: space-between; font-size: .82rem; padding: 7px 10px; border-radius: 10px; background: rgba(255,255,255,.03); }
+  .cmp div.me { background: rgba(255,255,255,.09); font-weight: 700; }
+  .cmp b { font-family: "JetBrains Mono"; }
+  .lesson { margin-top: 10px; padding: 12px 13px; border-radius: 15px; background: rgba(91,140,255,.08); border: 1px solid rgba(91,140,255,.35); font-size: .86rem; line-height: 1.55; color: #dbe5ff; }
+  .lesson h4 { font: 700 .95rem "Space Grotesk"; color: #fff; margin-bottom: 4px; }
+  .lesson b { color: #fff; }
+  .lesson ul { padding-left: 18px; margin-top: 4px; display: grid; gap: 3px; }
+  .slider { width: 100%; accent-color: var(--fut); margin: 6px 0; }
+  .slval { text-align: center; font: 700 .92rem "JetBrains Mono"; color: #9ec0ff; }
+  .book { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .book div { border-radius: 12px; padding: 8px; background: rgba(0,0,0,.3); border: 1px solid var(--line); font: 600 .78rem "JetBrains Mono"; }
+  .book h5 { font: 700 .66rem "JetBrains Mono"; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; }
+  .book p { display: flex; justify-content: space-between; padding: 2px 0; }
+  .book .bid { color: var(--up); } .book .ask { color: var(--down); }
+
+  .overlay { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 14px; background: rgba(3,4,8,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); overflow-y: auto; }
+  .overlay[hidden] { display: none; }
+  .panel { width: 100%; max-width: 480px; background: rgba(16,18,28,.96); border: 1px solid var(--line); border-radius: 26px; padding: 20px 16px; animation: pop .4s cubic-bezier(.2,1.2,.3,1); }
+  @keyframes pop { from { opacity: 0; transform: scale(.92) translateY(12px); } }
+  .logo { font: 800 clamp(2.2rem, 10vw, 3rem)/1 "Space Grotesk"; letter-spacing: -.05em; background: linear-gradient(100deg, var(--ce), var(--fut) 50%, var(--pe)); -webkit-background-clip: text; background-clip: text; color: transparent; text-align: center; }
+  .tagline { color: var(--muted); margin: 8px 0 14px; font-size: .9rem; text-align: center; }
+  .how { display: grid; gap: 7px; margin-bottom: 14px; }
+  .how div { display: flex; gap: 10px; font-size: .84rem; color: #d5d8e3; padding: 9px 11px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .how b { color: #fff; } .how i { font-style: normal; font-size: 1.05rem; }
+  .bigr { font: 800 clamp(2rem, 9vw, 2.6rem) "JetBrains Mono"; letter-spacing: -.04em; text-align: center; }
+  .rank { display: block; width: fit-content; margin: 6px auto 12px; padding: 7px 14px; border-radius: 999px; font-weight: 700; background: rgba(255,210,122,.12); border: 1px solid rgba(255,210,122,.4); color: var(--gold); }
+  .mhist { display: grid; gap: 5px; margin-bottom: 12px; }
+  .mhist div { display: flex; justify-content: space-between; gap: 8px; font-size: .8rem; padding: 7px 10px; border-radius: 10px; background: rgba(255,255,255,.03); }
+  .mhist b { font-family: "JetBrains Mono"; white-space: nowrap; }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 12px; }
+  .badges span { padding: 6px 10px; border-radius: 999px; font-size: .76rem; font-weight: 600; background: rgba(91,140,255,.12); border: 1px solid rgba(91,140,255,.4); color: #d7e3ff; }
+  .box { padding: 12px 13px; border-radius: 15px; margin-bottom: 12px; font-size: .83rem; line-height: 1.5; }
+  .box h4 { font: 700 .92rem "Space Grotesk"; margin-bottom: 6px; color: #fff; }
+  .box ul { padding-left: 18px; display: grid; gap: 4px; }
+  .box.cheat { background: rgba(0,224,184,.06); border: 1px solid rgba(0,224,184,.3); color: #c9f5ec; }
+  .box.warnb { background: rgba(255,84,112,.07); border: 1px solid rgba(255,84,112,.35); color: #ffd0d8; }
+  .box b { color: #fff; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; }
+  .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translate(-50%, 160%); z-index: 50; padding: 10px 16px; border-radius: 999px; background: #1b1f2e; border: 1px solid rgba(255,210,122,.5); color: var(--gold); font-weight: 700; font-size: .85rem; white-space: nowrap; transition: transform .45s cubic-bezier(.2,1.3,.3,1); }
+  .toast.show { transform: translate(-50%, 0); }
+  .fine { text-align: center; font-size: .7rem; color: #5a6072; line-height: 1.5; }
+  .fine a { color: var(--muted); }
+  @media (max-width: 380px) { .brand span { font-size: .86rem; } .hbtn { padding: 0 8px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+  <div class="grid-bg"></div>
+
+  <div class="app">
+    <header>
+      <a class="brand" href="../"><i>₹</i><span>MANIMINDSMONEY</span></a>
+      <div class="hbtns"><a class="hbtn" href="../tools/">🧰 Tools</a><a class="hbtn" href="../">Home</a></div>
+    </header>
+    <div class="hud">
+      <div class="stat"><span>Trading capital</span><strong id="hCap">₹3,00,000</strong></div>
+      <div class="stat"><span>Total P&amp;L</span><strong id="hPnl">₹0</strong></div>
+      <div class="stat"><span>Mission</span><strong id="hM">1/6</strong></div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="stage" id="stage"></div>
+    <p class="fine">A learning game with a <b>fictional index (MANI 50)</b>, 1 lot = 75 units, simplified prices from a standard option-pricing model. Real lot sizes, margins and expiry days are set by the exchange and change over time. Not investment advice; not SEBI registered. · <a href="../">MANIMINDSMONEY</a></p>
+  </div>
+
+  <div class="overlay" id="startOv">
+    <div class="panel">
+      <div class="logo">F&amp;O SURVIVAL</div>
+      <p class="tagline">6 missions. ₹3,00,000 of play money. Learn calls, puts and futures the safe way, before the market teaches you.</p>
+      <div class="how">
+        <div><i>📈</i><span><b>CE</b> (call) gains when the price <b>rises</b>. <b>PE</b> (put) gains when it <b>falls</b>.</span></div>
+        <div><i>⏳</i><span>Feel <b>time decay</b>, watch an option go to <b>zero at expiry</b>, and test what happens when you <b>don't book profit</b>.</span></div>
+        <div><i>⚠️</i><span>Face the <b>liquidity trap</b> and a <b>futures trade with no stop-loss</b>.</span></div>
+      </div>
+      <button class="btn go full" id="goBtn">🚀 START MISSION 1</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="endOv" hidden>
+    <div class="panel">
+      <div style="font:600 .7rem 'JetBrains Mono';letter-spacing:.14em;color:var(--muted);text-align:center">ALL MISSIONS DONE · TOTAL P&amp;L</div>
+      <div class="bigr" id="eP">₹0</div>
+      <span class="rank" id="eRank"></span>
+      <div class="mhist" id="eHist"></div>
+      <div class="badges" id="eBadges"></div>
+      <div class="box cheat">
+        <h4>📒 F&amp;O cheat sheet</h4>
+        <ul>
+          <li>Expect a <b>rise</b>: buy <b>CE</b>. Expect a <b>fall</b>: buy <b>PE</b>. A buyer's maximum loss is the <b>premium paid</b>.</li>
+          <li><b>Futures</b> move ₹1 × lot size per point, both ways. They need a big <b>margin</b> and have <b>no loss limit</b>.</li>
+          <li>Premium = <b>intrinsic value + time value</b>. Time value melts every day (<b>theta</b>), fastest near expiry.</li>
+          <li>At <b>expiry</b> only intrinsic value is left, so <b>out-of-the-money options become ₹0</b>.</li>
+          <li><b>Book profits</b> or trail a stop-loss. Options can double and then halve within days.</li>
+          <li>Trade <b>liquid strikes</b>: check volume, open interest and the bid-ask spread. Use limit orders.</li>
+          <li><b>Always use a stop-loss</b>, and size so a gap past it won't wipe you out.</li>
+        </ul>
+      </div>
+      <div class="box warnb">
+        <h4>⚠️ Reality check</h4>
+        SEBI's 2024 study of individual F&amp;O traders found that roughly <b>9 in 10 lost money</b>. Learn on paper first, risk only what you can afford to lose, and never trade F&amp;O with borrowed money.
+      </div>
+      <button class="btn go full" id="againBtn">↻ PLAY AGAIN</button>
+      <div class="row2">
+        <button class="btn wa" id="shareBtn">💬 Share my score</button>
+        <button class="btn" id="cheatBtn">📒 Share cheat sheet</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const inr = n => (n < 0 ? "−" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const sinr = n => (n >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const pct = n => (n >= 0 ? "+" : "−") + Math.abs(n * 100).toFixed(1) + "%";
+const f2 = n => "₹" + n.toFixed(2);
+const pts = n => n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+const vib = ms => { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms); } catch {} };
+let AC; function beep(f, d = .1) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume().catch(() => {}); const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime; o.type = "triangle"; o.frequency.value = f; g.gain.setValueAtTime(.04, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d + .02); } catch {} }
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2300); }
+
+/* ---------- option pricing (Black-Scholes, r = 0) ---------- */
+function N(x) { const t = 1 / (1 + .2316419 * Math.abs(x)), d = .3989423 * Math.exp(-x * x / 2); const p = d * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; }
+function bs(type, S, K, T, iv) {               // T in years
+  if (T <= 1e-9) return Math.max(0, type === "CE" ? S - K : K - S);
+  const v = iv * Math.sqrt(T), d1 = (Math.log(S / K) + .5 * iv * iv * T) / v, d2 = d1 - v;
+  return type === "CE" ? S * N(d1) - K * N(d2) : K * N(-d2) - S * N(-d1);
+}
+const days = d => d / 365;                       // calendar-day convention
+const hrs = h => h / 6.25 / 252;                 // trading-hours convention (expiry day)
+const intrinsic = (type, S, K) => Math.max(0, type === "CE" ? S - K : K - S);
+const LOT = 75, MARGIN = .13, IV = .14;
+
+/* ---------- state ---------- */
+const START = 300000;
+let G;
+function reset() { G = { cap: START, pnl: 0, m: 0, hist: [], badges: [] }; hud(); }
+function hud() {
+  $("#hCap").textContent = inr(G.cap);
+  $("#hPnl").textContent = sinr(G.pnl); $("#hPnl").style.color = G.pnl > 0 ? "var(--up)" : G.pnl < 0 ? "var(--down)" : "";
+  $("#hM").textContent = `${Math.min(G.m, 6)}/6`;
+  $("#dots").innerHTML = Array.from({ length: 6 }, (_, i) => `<i class="${i < G.m - 1 ? "done" : i === G.m - 1 ? "on" : ""}"></i>`).join("");
+}
+function book(name, pnl, note) { G.cap += pnl; G.pnl += pnl; G.hist.push({ name, pnl, note }); hud(); pnl >= 0 ? beep(880) : beep(220, .25); vib(pnl >= 0 ? 20 : 60); }
+function badge(t) { if (!G.badges.includes(t)) { G.badges.push(t); toast("🏆 " + t); } }
+function scene(html) { const s = $("#stage"); s.innerHTML = `<div class="scene">${html}</div>`; s.scrollIntoView({ block: "nearest" }); return s.firstChild; }
+function choose(sel) { return new Promise(r => { const box = $(sel); box.onclick = e => { const b = e.target.closest("[data-v]"); if (!b || b.disabled) return; box.onclick = null; beep(650, .06); r(b.dataset.v); }; }); }
+function chart(svg, series, opts = {}) {      // series: [{data, color, w}], x from 0..n-1
+  const W = 300, H = 120, all = series.flatMap(s => s.data), hi = Math.max(...all, ...(opts.lines || []).map(l => l.v)), lo = Math.min(...all, ...(opts.lines || []).map(l => l.v));
+  const pad = (hi - lo) * .15 || 1, Y = v => 8 + (hi + pad - v) / (hi - lo + 2 * pad) * (H - 16), n = opts.n || Math.max(...series.map(s => s.data.length)), X = i => 8 + i / Math.max(1, n - 1) * (W - 16);
+  let out = (opts.lines || []).map(l => `<line x1="0" x2="${W}" y1="${Y(l.v)}" y2="${Y(l.v)}" stroke="${l.c}" stroke-dasharray="4 4" stroke-width="1.2"/><text x="${W - 4}" y="${Y(l.v) - 3}" fill="${l.c}" font-size="9" text-anchor="end" font-family="JetBrains Mono">${l.t}</text>`).join("");
+  out += series.map(s => `<polyline points="${s.data.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="${s.w || 2.5}" stroke-linejoin="round" stroke-linecap="round"/>` + (s.data.length ? `<circle cx="${X(s.data.length - 1)}" cy="${Y(s.data[s.data.length - 1])}" r="3.5" fill="${s.color}"/>` : "")).join("");
+  $(svg).innerHTML = out; $(svg).setAttribute("viewBox", `0 0 ${W} ${H}`);
+}
+function mkt(S, S0, t) { const c = S / S0 - 1; return `<div class="mkt"><div><div class="n">MANI 50 INDEX</div><div class="p" style="color:${c > 0 ? "var(--up)" : c < 0 ? "var(--down)" : ""}">${pts(S)}</div></div><div class="c" style="color:${c >= 0 ? "var(--up)" : "var(--down)"}">${c >= 0 ? "▲" : "▼"} ${Math.abs(c * 100).toFixed(2)}%</div><span class="t">${t}</span></div>`; }
+function lesson(title, html) { return `<div class="lesson"><h4>💡 ${title}</h4>${html}</div>`; }
+function nextBtn(label = "NEXT MISSION →") { return `<div class="acts" id="nx" style="margin-top:12px"><button class="btn go full" data-v="next">${label}</button></div>`; }
+
+/* ================= MISSION 1: CE vs PE vs FUT ================= */
+async function m1() {
+  G.m = 1; hud();
+  const S0 = 22000, K = 22000, D0 = 7;
+  const ce0 = bs("CE", S0, K, days(D0), IV), pe0 = bs("PE", S0, K, days(D0), IV), mg = S0 * LOT * MARGIN;
+  scene(`<div class="kicker">Mission 1 of 6 · Pick your weapon</div>
+    <h2>You think the market will go UP</h2>
+    <p class="story">Strong results season. You expect <b>MANI 50</b> to rise this week. 7 days to expiry. Which trade matches your view? (1 lot = 75)</p>
+    ${mkt(S0, S0, "7 days to expiry")}
+    <div class="insts" id="pick">
+      <button class="inst ce" data-v="CE"><span class="badge ce">CE</span><span><b>Buy 22,000 CALL</b><small>Gains if the index rises. Max loss = premium.</small></span><span class="px">${f2(ce0)}<small>${inr(ce0 * LOT)}/lot</small></span></button>
+      <button class="inst pe" data-v="PE"><span class="badge pe">PE</span><span><b>Buy 22,000 PUT</b><small>Gains if the index falls. Max loss = premium.</small></span><span class="px">${f2(pe0)}<small>${inr(pe0 * LOT)}/lot</small></span></button>
+      <button class="inst fut" data-v="FUT"><span class="badge fut">FUT</span><span><b>Buy 1 lot FUTURE</b><small>₹75 per point, both ways. Needs margin. No loss limit.</small></span><span class="px">${pts(S0)}<small>margin ${inr(mg)}</small></span></button>
+    </div>`);
+  const pick = await choose("#pick");
+  document.querySelectorAll("#pick .inst").forEach(b => { b.disabled = true; if (b.dataset.v === pick) { b.disabled = false; b.classList.add("sel"); } });
+  const path = [S0, 22110, 22260, 22420], st = $("#stage .scene");
+  st.insertAdjacentHTML("beforeend", `<svg class="chart" id="ch"></svg><div class="live"><div><span>Day</span><b id="lD">0</b></div><div><span>Your position</span><b id="lV">—</b></div><div><span>Your P&amp;L</span><b id="lP">₹0</b></div></div><div class="acts" id="nd"><button class="btn go full" data-v="go">▶ NEXT DAY</button></div>`);
+  const val = (S, d) => pick === "FUT" ? S : bs(pick, S, K, days(D0 - d), IV), entry = pick === "FUT" ? S0 : (pick === "CE" ? ce0 : pe0);
+  for (let d = 1; d < path.length; d++) {
+    await choose("#nd");
+    const S = path[d], v = val(S, d), pl = (v - entry) * LOT;
+    $("#lD").textContent = d; $("#lV").textContent = pick === "FUT" ? pts(v) : f2(v); $("#lP").textContent = sinr(pl); $("#lP").style.color = pl >= 0 ? "var(--up)" : "var(--down)";
+    st.querySelector(".mkt").outerHTML = mkt(S, S0, `${D0 - d} days left`);
+    chart("#ch", [{ data: path.slice(0, d + 1), color: "#9ec0ff" }], { n: path.length, lines: [{ v: K, c: "#8a90a2", t: "22,000" }] });
+    beep(500 + d * 80, .06);
+  }
+  $("#nd").remove();
+  const S = path[path.length - 1], dl = D0 - 3;
+  const r = { CE: (bs("CE", S, K, days(dl), IV) - ce0) * LOT, PE: (bs("PE", S, K, days(dl), IV) - pe0) * LOT, FUT: (S - S0) * LOT };
+  book("1 · CE vs PE vs FUT", r[pick], pick);
+  if (pick === "CE") badge("Direction master 🎯");
+  st.insertAdjacentHTML("beforeend", `<div class="result"><div class="big" style="color:${r[pick] >= 0 ? "var(--up)" : "var(--down)"}">${sinr(r[pick])}</div>
+    <div class="cmp">${[["CE", "Bought the CALL"], ["PE", "Bought the PUT"], ["FUT", "Bought the FUTURE"]].map(([k, t]) => `<div class="${k === pick ? "me" : ""}"><span>${k === pick ? "👉 " : ""}${t}</span><b style="color:${r[k] >= 0 ? "var(--up)" : "var(--down)"}">${sinr(r[k])}</b></div>`).join("")}</div></div>
+    ${lesson("Up = CE, down = PE", `The index rose <b>420 points</b> in 3 days.<ul>
+      <li><b>CE</b> (call) gains when the price rises. You paid ${inr(ce0 * LOT)}, and that's the most you could lose.</li>
+      <li><b>PE</b> (put) loses when the price rises. Buy a PE only when you expect a <b>fall</b>.</li>
+      <li><b>Futures</b> made ₹75 × 420 = ${inr(r.FUT)}, but needed <b>${inr(mg)} margin</b>, and a 420-point fall would have cost the same amount. No cap.</li></ul>`)}
+    ${nextBtn()}`);
+  await choose("#nx");
+}
+
+/* ================= MISSION 2: theta ================= */
+async function m2() {
+  G.m = 2; hud();
+  const K = 22000, D0 = 6, path = [22000, 21990, 22005, 21985, 22010, 21995, 21990];
+  const prem = path.map((S, d) => bs("CE", S, K, days(D0 - d), IV)), entry = prem[0];
+  const st = scene(`<div class="kicker">Mission 2 of 6 · The silent killer</div>
+    <h2>Time decay (theta)</h2>
+    <p class="story">You bought the <b>22,000 CE</b> at <b>${f2(entry)}</b> (${inr(entry * LOT)}), 6 days before expiry. But the market goes… <b>nowhere</b>. Watch your premium each day. Exit whenever you like.</p>
+    ${mkt(path[0], path[0], "6 days left")}
+    <svg class="chart" id="ch"></svg>
+    <div class="live"><div><span>Premium</span><b id="lV">${f2(entry)}</b></div><div><span>Time value lost today</span><b id="lT">—</b></div><div><span>Your P&amp;L</span><b id="lP">₹0</b></div></div>
+    <div style="font-size:.72rem;color:var(--muted)">Premium = <span style="color:var(--gold)">intrinsic value</span> + <span style="color:#9ec0ff">time value</span></div>
+    <div class="split"><i id="sI" style="background:var(--gold);width:0"></i><i id="sT" style="background:#5b8cff;width:100%"></i></div>
+    <div class="acts" id="nd"><button class="btn go" data-v="go">▶ NEXT DAY</button><button class="btn warn" data-v="exit">🚪 EXIT NOW</button></div>`);
+  chart("#ch", [{ data: [entry], color: "#ffd27a" }], { n: path.length, lines: [{ v: entry, c: "#8a90a2", t: "bought" }] });
+  let d = 0, exitAt = null;
+  while (d < D0) {
+    const v = await choose("#nd");
+    if (v === "exit") { exitAt = d; break; }
+    d++;
+    const S = path[d], p = prem[d], i = intrinsic("CE", S, K), lost = prem[d - 1] - p;
+    st.querySelector(".mkt").outerHTML = mkt(S, path[0], d === D0 ? "EXPIRY" : `${D0 - d} days left`);
+    $("#lV").textContent = f2(p); $("#lT").textContent = "−" + f2(Math.max(0, lost)); $("#lT").style.color = "var(--down)";
+    const pl = (p - entry) * LOT; $("#lP").textContent = sinr(pl); $("#lP").style.color = pl >= 0 ? "var(--up)" : "var(--down)";
+    $("#sI").style.width = (p ? i / p * 100 : 0) + "%"; $("#sT").style.width = (p ? (p - i) / p * 100 : 0) + "%";
+    chart("#ch", [{ data: prem.slice(0, d + 1), color: "#ffd27a" }], { n: path.length, lines: [{ v: entry, c: "#8a90a2", t: "bought" }] });
+    beep(420 - d * 30, .08);
+  }
+  if (exitAt === null) exitAt = D0;
+  $("#nd").remove();
+  const pl = (prem[exitAt] - entry) * LOT;
+  book("2 · Theta decay", pl, exitAt === D0 ? "held to expiry" : `exited day ${exitAt}`);
+  if (exitAt <= 2) badge("Theta-aware ⏳");
+  st.insertAdjacentHTML("beforeend", `<div class="result"><div class="big" style="color:${pl >= 0 ? "var(--up)" : "var(--down)"}">${sinr(pl)}</div>
+    <div class="cmp">${[1, 3, 5, 6].map(x => `<div class="${x === exitAt ? "me" : ""}"><span>Exit on ${x === 6 ? "expiry day" : "day " + x}</span><b style="color:var(--down)">${sinr((prem[x] - entry) * LOT)}</b></div>`).join("")}</div></div>
+    ${lesson("Flat market = the buyer slowly loses", `The index barely moved, yet the premium fell from <b>${f2(entry)}</b> to <b>${f2(prem[D0])}</b>.<ul>
+      <li>An option's price is <b>intrinsic value + time value</b>. Time value shrinks every day. That's <b>theta</b>.</li>
+      <li>Decay speeds up close to expiry: the last days hit hardest.</li>
+      <li>Option buyers need the move to come <b>fast</b>. If it doesn't, exit early instead of hoping.</li></ul>`)}
+    ${nextBtn()}`);
+  await choose("#nx");
+}
+
+/* ================= MISSION 3: expiry → zero ================= */
+async function m3() {
+  G.m = 3; hud();
+  const IVx = .15, times = ["10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "3:30"], hl = [5.5, 4.5, 3.5, 2.5, 1.5, .5, 0];
+  const path = [22000, 22060, 22110, 22140, 22120, 22100, 22090];
+  const strikes = [{ K: 22000, t: "AT the money" }, { K: 22300, t: "OUT of the money" }, { K: 22500, t: "far OUT of the money" }];
+  strikes.forEach(s => s.p0 = Math.max(.05, bs("CE", path[0], s.K, hrs(hl[0]), IVx)));
+  const st = scene(`<div class="kicker">Mission 3 of 6 · Expiry day</div>
+    <h2>Lottery ticket or real trade?</h2>
+    <p class="story">It's <b>expiry day</b>, 10:00 AM. You're bullish. Cheap far-away calls look tempting: “₹2 could become ₹50!” Pick one CE (1 lot).</p>
+    ${mkt(path[0], path[0], "expires 3:30 PM")}
+    <div class="insts" id="pick">${strikes.map(s => `<button class="inst ce" data-v="${s.K}"><span class="badge ce">${s.K === 22000 ? "ATM" : "OTM"}</span><span><b>Buy ${pts(s.K)} CE</b><small>${s.t} · needs the index above ${pts(s.K)}</small></span><span class="px">${f2(s.p0)}<small>${inr(s.p0 * LOT)}/lot</small></span></button>`).join("")}</div>`);
+  const K = +(await choose("#pick")); const s = strikes.find(x => x.K === K);
+  document.querySelectorAll("#pick .inst").forEach(b => { b.disabled = b.dataset.v !== String(K); if (!b.disabled) b.classList.add("sel"); });
+  st.insertAdjacentHTML("beforeend", `<svg class="chart" id="ch"></svg><div class="live"><div><span>Time</span><b id="lD">10:00</b></div><div><span>Your CE</span><b id="lV">${f2(s.p0)}</b></div><div><span>Your P&amp;L</span><b id="lP">₹0</b></div></div><div class="acts" id="nd"><button class="btn go" data-v="go">▶ NEXT HOUR</button><button class="btn warn" data-v="exit">💰 SELL NOW</button></div>`);
+  let i = 0, exitAt = null; const prem = [s.p0];
+  while (i < times.length - 1) {
+    const v = await choose("#nd"); if (v === "exit") { exitAt = i; break; }
+    i++; const p = bs("CE", path[i], K, hrs(hl[i]), IVx); prem.push(p);
+    st.querySelector(".mkt").outerHTML = mkt(path[i], path[0], i === times.length - 1 ? "EXPIRED" : "expires 3:30 PM");
+    $("#lD").textContent = times[i]; $("#lV").textContent = f2(p); const pl = (p - s.p0) * LOT; $("#lP").textContent = sinr(pl); $("#lP").style.color = pl >= 0 ? "var(--up)" : "var(--down)";
+    chart("#ch", [{ data: path.slice(0, i + 1), color: "#9ec0ff" }], { n: path.length, lines: [{ v: K, c: "#22d39a", t: "strike " + pts(K) }] });
+    beep(300 + i * 60, .06);
+  }
+  if (exitAt === null) exitAt = times.length - 1;
+  $("#nd").remove();
+  const final = prem[exitAt], pl = (final - s.p0) * LOT;
+  book("3 · Expiry day", pl, `${pts(K)} CE ${exitAt === times.length - 1 ? "held to 3:30" : "sold at " + times[exitAt]}`);
+  if (K === 22000) badge("No lottery tickets 🎟️");
+  const endS = path[path.length - 1], res = strikes.map(x => ({ K: x.K, end: intrinsic("CE", endS, x.K), p0: x.p0 }));
+  st.insertAdjacentHTML("beforeend", `<div class="result"><div class="big" style="color:${pl >= 0 ? "var(--up)" : "var(--down)"}">${sinr(pl)}</div>
+    <div class="cmp">${res.map(x => `<div class="${x.K === K ? "me" : ""}"><span>${pts(x.K)} CE · ${f2(x.p0)} ➜ ${f2(x.end)} at 3:30</span><b style="color:${x.end > x.p0 ? "var(--up)" : "var(--down)"}">${x.end === 0 ? "→ ₹0" : sinr((x.end - x.p0) * LOT)}</b></div>`).join("")}</div></div>
+    ${lesson("At expiry, only intrinsic value is left", `The index closed at <b>${pts(endS)}</b>, up 90 points, so you were right about the direction!<ul>
+      <li>The <b>22,000 CE</b> is worth its intrinsic value: ${pts(endS)} − 22,000 = <b>₹90</b>.</li>
+      <li>The <b>22,300</b> and <b>22,500 CE</b> are <b>out of the money</b>, so they become <b>₹0</b>. 100% loss, even with the right direction.</li>
+      <li>Cheap far-away options are cheap because they rarely pay off. Most expire worthless.</li></ul>`)}
+    ${nextBtn()}`);
+  await choose("#nx");
+}
+
+/* ================= MISSION 4: not booking profit ================= */
+async function m4() {
+  G.m = 4; hud();
+  const K = 22000, entryS = 22000, D = 4, entry = bs("CE", entryS, K, days(D), IV);
+  const upS = 22220, up = bs("CE", upS, K, days(D), IV);
+  const st = scene(`<div class="kicker">Mission 4 of 6 · Greed vs discipline</div>
+    <h2>Your trade is up big. Now what?</h2>
+    <p class="story">You bought the <b>22,000 CE</b> at <b>${f2(entry)}</b>, 4 days to expiry. By 2 PM the index rallies <b>+1%</b> and your call is now <b>${f2(up)}</b>: that's <b>${pct(up / entry - 1)}</b>, or <b>${sinr((up - entry) * LOT)}</b> on 1 lot!</p>
+    ${mkt(upS, entryS, "4 days left")}
+    <div class="live"><div><span>Bought at</span><b>${f2(entry)}</b></div><div><span>Now</span><b style="color:var(--up)">${f2(up)}</b></div><div><span>Profit</span><b style="color:var(--up)">${sinr((up - entry) * LOT)}</b></div></div>
+    <div class="acts" id="pick">
+      <button class="btn ok" data-v="book">💰 BOOK PROFIT<small>sell everything now</small></button>
+      <button class="btn warn" data-v="trail">🛡️ TRAIL A STOP-LOSS<small>exit if it falls to ₹200</small></button>
+      <button class="btn no full" data-v="hold">💎 HOLD FOR ₹400<small>no stop-loss, it'll keep going!</small></button>
+    </div>`);
+  const pick = await choose("#pick");
+  $("#pick").remove();
+  const dropS = 21887, drop = bs("CE", dropS, K, days(D - 1), IV), d2S = 21850, d2 = bs("CE", d2S, K, days(D - 2), IV);
+  const exit = { book: up, trail: 200, hold: d2 }, pl = (exit[pick] - entry) * LOT;
+  st.insertAdjacentHTML("beforeend", `<svg class="chart" id="ch"></svg><div class="log" id="log"></div>`);
+  const series = [entry, up]; chart("#ch", [{ data: series, color: "#ffd27a" }], { n: 5, lines: [{ v: entry, c: "#8a90a2", t: "bought" }, { v: 200, c: "#febc2e", t: "trail SL 200" }] });
+  const log = (t, c) => { $("#log").insertAdjacentHTML("beforeend", `<div class="${c || ""}">${t}</div>`); };
+  if (pick === "book") log(`✅ You sold at ${f2(up)} and booked <b>${sinr((up - entry) * LOT)}</b>. Let's see what happened next…`, "good");
+  await sleep(900);
+  series.push(drop); chart("#ch", [{ data: series, color: "#ffd27a" }], { n: 5, lines: [{ v: entry, c: "#8a90a2", t: "bought" }, { v: 200, c: "#febc2e", t: "trail SL 200" }] });
+  log(`📉 Next day: global sell-off. Index −1.5% to ${pts(dropS)}. The call crashes to <b>${f2(drop)}</b>.`, "bad"); beep(260, .2);
+  if (pick === "trail") log(`🛡️ Your stop-loss at ₹200 triggered on the way down. You exited at <b>₹200</b>, still a profit of <b>${sinr(pl)}</b>.`, "warn");
+  await sleep(900);
+  series.push(d2); chart("#ch", [{ data: series, color: "#ffd27a" }], { n: 5, lines: [{ v: entry, c: "#8a90a2", t: "bought" }, { v: 200, c: "#febc2e", t: "trail SL 200" }] });
+  log(`⏳ Day after: market flat, but theta keeps eating. The call is <b>${f2(d2)}</b>.`, "bad");
+  if (pick === "hold") log(`💔 You held for ₹400 with no stop-loss. A <b>${sinr((up - entry) * LOT)}</b> profit became <b>${sinr(pl)}</b>.`, "bad");
+  book("4 · Booking profit", pl, { book: "booked at the top", trail: "trailing SL", hold: "held, no SL" }[pick]);
+  if (pick !== "hold") badge("Profit booker 💰");
+  st.insertAdjacentHTML("beforeend", `<div class="result"><div class="big" style="color:${pl >= 0 ? "var(--up)" : "var(--down)"}">${sinr(pl)}</div>
+    <div class="cmp">${[["book", "Booked profit at " + f2(up)], ["trail", "Trailing stop-loss at ₹200"], ["hold", "Held, no stop-loss"]].map(([k, t]) => `<div class="${k === pick ? "me" : ""}"><span>${t}</span><b style="color:${(exit[k] - entry) >= 0 ? "var(--up)" : "var(--down)"}">${sinr((exit[k] - entry) * LOT)}</b></div>`).join("")}</div></div>
+    ${lesson("A profit isn't yours until you book it", `<ul>
+      <li>Options move fast both ways. <b>+${Math.round((up / entry - 1) * 100)}%</b> in hours can turn into a loss in a day.</li>
+      <li>If you want to stay in, <b>trail a stop-loss</b> behind the price to protect most of the gain.</li>
+      <li>For option buyers, every extra day of waiting also costs <b>time decay</b>.</li>
+      <li>This time it reversed. Sometimes it keeps running, but you can't know in advance, so plan your exit before you enter.</li></ul>`)}
+    ${nextBtn()}`);
+  await choose("#nx");
+}
+
+/* ================= MISSION 5: liquidity ================= */
+async function m5() {
+  G.m = 5; hud();
+  const opts = {
+    liq: { name: "22,000 CE", tag: "ATM", bid: 98.0, ask: 98.5, vol: "12,40,000", oi: "38,50,000", nextFair: 120.0, nextBid: 119.6, depth: [[119.6, 900], [119.5, 2400], [119.4, 3100]] },
+    ill: { name: "23,000 CE", tag: "FAR OTM", bid: 1.10, ask: 3.40, vol: "120", oi: "900", nextFair: 2.90, nextBid: 1.60, depth: [[1.60, 75], [1.20, 75], [0.80, 150]] },
+  };
+  const st = scene(`<div class="kicker">Mission 5 of 6 · The exit door</div>
+    <h2>The liquidity trap</h2>
+    <p class="story">Two calls on your screen. Check the <b>bid</b> (what buyers pay), the <b>ask</b> (what sellers want), <b>volume</b> and <b>OI</b> (open interest). You buy at the ask. Pick one (1 lot).</p>
+    <div class="insts" id="pick">${Object.entries(opts).map(([k, o]) => `<button class="inst ce" data-v="${k}"><span class="badge ce">${o.tag}</span><span><b>${o.name}</b><small>Bid ${f2(o.bid)} · Ask ${f2(o.ask)} · spread ${pct(o.ask / o.bid - 1)}<br>Volume ${o.vol} · OI ${o.oi}</small></span><span class="px">${f2(o.ask)}<small>you pay</small></span></button>`).join("")}</div>`);
+  const k = await choose("#pick"), o = opts[k];
+  document.querySelectorAll("#pick .inst").forEach(b => { b.disabled = b.dataset.v !== k; if (!b.disabled) b.classList.add("sel"); });
+  st.insertAdjacentHTML("beforeend", `<div class="log" id="log"></div><div class="acts" id="nd"><button class="btn go full" data-v="go">▶ NEXT DAY: TRY TO SELL</button></div>`);
+  $("#log").insertAdjacentHTML("beforeend", `<div>🛒 Bought ${o.name} at the ask: <b>${f2(o.ask)}</b> (${inr(o.ask * LOT)}). The “fair” price was about ${f2((o.bid + o.ask) / 2)}.</div>`);
+  await choose("#nd"); $("#nd").remove();
+  $("#log").insertAdjacentHTML("beforeend", `<div class="good">📈 Next day the index rises. Fair value of your call: <b>${f2(o.nextFair)}</b> (${pct(o.nextFair / o.ask - 1)} on paper).</div>`);
+  st.insertAdjacentHTML("beforeend", `<div class="book"><div><h5>BUYERS (BID)</h5>${o.depth.map(([p, q]) => `<p class="bid"><span>${f2(p)}</span><span>${q} qty</span></p>`).join("")}</div><div><h5>SELLERS (ASK)</h5><p class="ask"><span>${f2(k === "liq" ? 120.1 : 4.20)}</span><span>${k === "liq" ? 1800 : 75} qty</span></p><p class="ask"><span>${f2(k === "liq" ? 120.2 : 5.00)}</span><span>${k === "liq" ? 2600 : 75} qty</span></p></div></div>
+    <p class="story" style="font-size:.84rem">To sell <b>75 qty</b> right now you get the <b>bid</b>: <b>${f2(o.nextBid)}</b>.</p>`);
+  const pl = (o.nextBid - o.ask) * LOT;
+  book("5 · Liquidity", pl, k === "liq" ? "liquid ATM strike" : "illiquid far strike");
+  if (k === "liq") badge("Liquidity smart 🌊");
+  const alt = opts[k === "liq" ? "ill" : "liq"], altPl = (alt.nextBid - alt.ask) * LOT;
+  st.insertAdjacentHTML("beforeend", `<div class="result"><div class="big" style="color:${pl >= 0 ? "var(--up)" : "var(--down)"}">${sinr(pl)}</div>
+    <div class="cmp"><div class="me"><span>${o.name}: paper ${pct(o.nextFair / o.ask - 1)}, real exit</span><b style="color:${pl >= 0 ? "var(--up)" : "var(--down)"}">${pct(o.nextBid / o.ask - 1)}</b></div><div><span>${alt.name}: paper ${pct(alt.nextFair / alt.ask - 1)}, real exit</span><b style="color:${altPl >= 0 ? "var(--up)" : "var(--down)"}">${pct(alt.nextBid / alt.ask - 1)}</b></div></div></div>
+    ${lesson("Liquidity decides your real price", `<ul>
+      <li>You <b>buy at the ask</b> and <b>sell at the bid</b>. A wide gap (spread) is an instant loss.</li>
+      <li>The far OTM call “gained” on paper, but with almost <b>no buyers</b> you'd sell at ${f2(ill(opts))}: a loss.</li>
+      <li>Check <b>volume, open interest and the spread</b> before you trade. Prefer liquid strikes near the current price, and use <b>limit orders</b>.</li></ul>`)}
+    ${nextBtn()}`);
+  await choose("#nx");
+}
+const ill = o => o.ill.nextBid;
+
+/* ================= MISSION 6: futures without stop-loss ================= */
+async function m6() {
+  G.m = 6; hud();
+  const S0 = 22000, mg = S0 * LOT * MARGIN;
+  const st = scene(`<div class="kicker">Mission 6 of 6 · No safety net</div>
+    <h2>Futures without a stop-loss</h2>
+    <p class="story">You're bullish and want bigger exposure, so you <b>buy 1 lot of MANI 50 futures</b> at <b>22,000</b>. Margin blocked: <b>${inr(mg)}</b>. Every point = <b>₹75</b>, up or down. First, set your stop-loss:</p>
+    ${mkt(S0, S0, "futures · 1 lot")}
+    <input type="range" class="slider" id="sl" min="0" max="3" step="1" value="0" />
+    <div class="slval" id="slv">No stop-loss</div>
+    <div class="acts" id="pick" style="margin-top:8px"><button class="btn go full" data-v="go">✅ PLACE TRADE</button></div>`);
+  const SLS = [null, .005, .01, .02], lbl = i => SLS[i] ? `Stop-loss ${SLS[i] * 100}% below = ${pts(S0 * (1 - SLS[i]))} (max ~${inr(S0 * SLS[i] * LOT)})` : "No stop-loss";
+  $("#sl").oninput = e => { $("#slv").textContent = lbl(+e.target.value); $("#slv").style.color = +e.target.value ? "#9ec0ff" : "var(--down)"; beep(500, .03); };
+  $("#slv").style.color = "var(--down)";
+  await choose("#pick"); const si = +$("#sl").value, sl = SLS[si], slP = sl ? S0 * (1 - sl) : null;
+  $("#sl").disabled = true; $("#pick").remove();
+  st.insertAdjacentHTML("beforeend", `<svg class="chart" id="ch"></svg><div class="live"><div><span>Futures</span><b id="lV">${pts(S0)}</b></div><div><span>MTM loss</span><b id="lP">₹0</b></div><div><span>Margin left</span><b id="lM">${inr(mg)}</b></div></div><div class="log" id="log"></div><div class="acts" id="nd"><button class="btn go full" data-v="go">▶ NEXT DAY</button></div>`);
+  const days_ = [{ low: 21670, close: 21670, open: 21980, ev: "Day 1: steady selling all day, −1.5%." }, { open: 21010, low: 21010, close: 21040, ev: "Day 2: overnight global shock. Market <b>gaps down 3%</b> at the open." }, { open: 21020, low: 20600, close: 20600, ev: "Day 3: panic continues, another −2%." }];
+  const series = [S0], lines = slP ? [{ v: slP, c: "#febc2e", t: "SL " + pts(slP) }] : [];
+  const log = (t, c) => $("#log").insertAdjacentHTML("beforeend", `<div class="${c || ""}">${t}</div>`);
+  let exitP = null, how = "", d = 0, marginCall = false;
+  for (const day of days_) {
+    await choose("#nd"); d++;
+    log(day.ev, "bad");
+    if (slP && exitP === null && day.low <= slP) {
+      exitP = day.open <= slP ? day.open : slP;
+      how = day.open <= slP ? `gap-down opened below your SL, so it filled at the open ${pts(exitP)} (slippage!)` : `stop-loss hit at ${pts(exitP)}`;
+      log(`🛡️ ${how[0].toUpperCase() + how.slice(1)}. Trade closed.`, "warn");
+    }
+    series.push(day.close); chart("#ch", [{ data: series, color: "#9ec0ff" }], { n: 4, lines: [{ v: S0, c: "#8a90a2", t: "entry" }, ...lines] });
+    const cur = exitP ?? day.close, loss = (cur - S0) * LOT;
+    $("#lV").textContent = pts(cur); $("#lP").textContent = sinr(loss); $("#lP").style.color = "var(--down)"; $("#lM").textContent = inr(mg + loss);
+    beep(260 - d * 30, .2); vib(50);
+    if (exitP !== null) break;
+    if (!marginCall && mg + loss < mg * .75) {
+      marginCall = true; $("#nd").style.display = "none";
+      log(`🚨 <b>Margin call!</b> Losses are settled daily (mark-to-market). Your margin fell to ${inr(mg + loss)}. Add <b>${inr(-loss)}</b> or the broker will square off your position.`, "bad");
+      st.insertAdjacentHTML("beforeend", `<div class="acts" id="mc"><button class="btn warn" data-v="add">💸 ADD MONEY<small>hold, it'll bounce</small></button><button class="btn no" data-v="cut">✂️ CUT THE LOSS<small>exit at ${pts(day.close)}</small></button></div>`);
+      const c = await choose("#mc"); $("#mc").remove(); $("#nd").style.display = "";
+      if (c === "cut") { exitP = day.close; how = `cut after the margin call at ${pts(exitP)}`; log(`✂️ You exited at ${pts(exitP)}.`, "warn"); break; }
+      log("💸 You added money to hold on. Fingers crossed…", "warn");
+    }
+  }
+  if (exitP === null) { exitP = 20600; how = how || "no stop-loss, still holding after a 6.4% fall"; }
+  $("#nd")?.remove();
+  const pl = (exitP - S0) * LOT;
+  book("6 · Futures, stop-loss", pl, sl ? `${sl * 100}% SL` : "no SL");
+  if (sl && sl <= .01) badge("SL saved me 🛡️");
+  st.insertAdjacentHTML("beforeend", `<div class="result"><div class="big" style="color:var(--down)">${sinr(pl)}</div>
+    <div class="cmp">${SLS.map((x, i) => { const p = x ? S0 * (1 - x) : null; const e = !p ? 20600 : p >= 21670 ? p : 21010; const v = i === si ? pl : (e - S0) * LOT; return `<div class="${i === si ? "me" : ""}"><span>${x ? x * 100 + "% stop-loss" : "No stop-loss"}${x === .02 ? " (gap slipped)" : ""}${i === si && !x && exitP !== 20600 ? " (cut at margin call)" : ""}</span><b style="color:var(--down)">${sinr(v)}</b></div>`; }).join("")}</div></div>
+    ${lesson("Futures have no loss limit", `<ul>
+      <li>A 6.4% fall cost <b>${inr(1400 * LOT)}</b> on one lot. That's about <b>half your margin</b>, in 3 days.</li>
+      <li>Losses are settled <b>every day</b> (mark-to-market). If your balance drops below the margin, you get a <b>margin call</b> or a forced square-off.</li>
+      <li>A <b>stop-loss</b> caps normal moves. But <b>overnight gaps can jump past it</b> (slippage), so keep position sizes small enough to survive a gap.</li>
+      <li>Option <b>buyers</b> can't lose more than the premium. Futures traders and option <b>sellers</b> can lose far more.</li></ul>`)}
+    ${nextBtn("🏁 SEE MY RESULTS")}`);
+  await choose("#nx");
+}
+
+/* ---------- end ---------- */
+function end() {
+  const rank = G.pnl > 20000 ? "🧠 Disciplined trader" : G.pnl > 0 ? "📈 Learning fast" : G.pnl > -60000 ? "📚 Lessons learned" : "🔥 Burned by F&O";
+  $("#eP").textContent = sinr(G.pnl); $("#eP").style.color = G.pnl >= 0 ? "var(--up)" : "var(--down)";
+  $("#eRank").textContent = rank;
+  $("#eHist").innerHTML = G.hist.map(h => `<div><span>${h.name} · ${h.note}</span><b style="color:${h.pnl >= 0 ? "var(--up)" : "var(--down)"}">${sinr(h.pnl)}</b></div>`).join("");
+  $("#eBadges").innerHTML = G.badges.length ? G.badges.map(b => `<span>${b}</span>`).join("") : `<span style="opacity:.6">No badges this time, try again!</span>`;
+  G.rank = rank; $("#endOv").hidden = false; $("#endOv").scrollTop = 0; beep(880); setTimeout(() => beep(1100), 120);
+}
+const URL_ = /^https?:/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host) ? location.host + location.pathname.replace(/index\.html$/, "") : "manideepcs024.github.io/fno-game/";
+$("#shareBtn").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent([`📊 *F&O SURVIVAL*`, `I finished 6 missions with *${sinr(G.pnl)}* · ${G.rank}`, `Calls vs puts, theta, expiry to zero, liquidity and stop-losses, learned the safe way.`, ``, `Try it 👉 ${URL_}`, `_A learning game with a fictional index. Not investment advice._`].join("\n")), "_blank", "noopener");
+$("#cheatBtn").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent([`📒 *F&O CHEAT SHEET*`, ``, `📈 Expect a rise: buy *CE*. 📉 Expect a fall: buy *PE*. A buyer's max loss = premium paid.`, `🏦 *Futures*: ₹1 × lot size per point, both ways. Big margin. *No loss limit.*`, `⏳ Premium = intrinsic + time value. Time value melts daily (*theta*), fastest near expiry.`, `🎟️ At *expiry*, out-of-the-money options become *₹0*.`, `💰 *Book profits* or trail a stop-loss. Options can double and halve in days.`, `🌊 Trade *liquid* strikes: check volume, OI and the bid-ask spread.`, `🛡️ *Always use a stop-loss*, and size so a gap won't wipe you out.`, ``, `⚠️ SEBI's 2024 study found roughly 9 in 10 individual F&O traders lost money. Learn first, never trade with borrowed money.`, ``, `Learn by playing 👉 ${URL_}`, `— MANIMINDSMONEY Community`].join("\n")), "_blank", "noopener");
+async function run() { reset(); for (const m of [m1, m2, m3, m4, m5, m6]) await m(); G.m = 7; hud(); end(); }
+$("#goBtn").onclick = () => { $("#startOv").hidden = true; beep(700); run(); };
+$("#againBtn").onclick = () => { $("#endOv").hidden = true; run(); };
+reset();
+</script>
+</body>
+</html>
