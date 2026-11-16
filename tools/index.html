@@ -146,10 +146,13 @@
 /* Add new tools here: this list drives the whole page. */
 const GROUPS = {
   grow: { name: "Grow your community", blurb: "Bring in new members and get quiet ones talking." },
+  fam: { name: "Family & friends", blurb: "Personal 3D fun to share with the people you love." },
   card: { name: "Community cards", blurb: "Ready-to-post updates for WhatsApp groups and communities." },
   calc: { name: "Calculators", blurb: "Do the maths before you place the trade." },
 };
 const TOOLS = [
+  { href: "../wish/", g: "fam", ico: "🎁", c: "#ff4d8d", name: "3D Wishes", desc: "Send a personalised 3D surprise: a birthday cake to blow out (even with the mic), anniversary rings, a trophy for congratulations, good luck, thank you and get well soon.", tags: ["Birthday", "Anniversary", "Congrats"], fresh: true },
+  { href: "../house/", g: "fam", ico: "🏠", c: "#00e0b8", name: "Our Home in 3D", desc: "Our 45 × 20 ft row house in 3D with the family inside. Festival mode for Diwali, Christmas, New Year and Holi, with greeting cards and links.", tags: ["3D", "Festivals", "Greetings"], fresh: true },
   { href: "../status/", g: "grow", ico: "📲", c: "#25d366", name: "WhatsApp Status Maker", desc: "Vertical status images that bring people in: join invite with QR code, quiz and term teasers, market mood, quotes, event alerts and milestones. Each ends with your join link.", tags: ["Growth", "Status", "QR code"], fresh: true },
   { href: "../contest/", g: "grow", ico: "🎯", c: "#febc2e", name: "Guess the Close Contest", desc: "A weekly 'where will Nifty close?' contest. Paste replies from WhatsApp, get the closest guesses ranked automatically, post winners and a season leaderboard.", tags: ["Engagement", "Leaderboard", "Weekly"], fresh: true },
   { href: "../fundamentals-game/", g: "grow", ico: "🔍", c: "#5ec8ff", name: "Stock Detective Game", desc: "Hands-on labs for market cap, EPS and P/E, book value and P/B, shareholding and promoter pledging, then a 3-company case: flag the red flags, pick one and see 3 years play out. Learn which numbers matter for which business.", tags: ["Game", "Fundamentals", "P/E · P/B · pledge"], fresh: true },

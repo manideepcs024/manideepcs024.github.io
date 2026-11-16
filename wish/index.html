@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0a16" />
+<title>3D Wishes — birthdays, anniversaries &amp; congratulations</title>
+<meta name="description" content="Send a personalised 3D surprise: a birthday cake to blow out, anniversary rings, a trophy for congratulations, good luck, thank you and get well soon wishes. Free, no sign-up." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+<style>
+  :root { --fg: #f3f1fa; --muted: #9a97ad; --line: rgba(255,255,255,.12); --card: rgba(16,13,30,.84); --g1: #ff4d8d; --g2: #ffb020; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; background: #0b0a16; color: var(--fg); font-family: Inter, system-ui, sans-serif; }
+  [hidden] { display: none !important; }
+  #scene { position: fixed; inset: 0; }
+  #scene canvas { display: block; touch-action: none; }
+  .top { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 9px 13px; font: 700 .95rem "Space Grotesk"; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .nav { display: flex; gap: 6px; }
+  .nav a { font-size: .78rem; color: var(--fg); text-decoration: none; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); white-space: nowrap; }
+
+  .panel { position: fixed; left: 12px; top: 70px; width: 300px; max-height: calc(100% - 86px); overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 14px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 5; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+  .panel h4 { font: 600 .64rem "JetBrains Mono"; letter-spacing: .12em; color: #ffb3cf; text-transform: uppercase; margin: 12px 0 7px; }
+  .panel h4:first-of-type { margin-top: 0; }
+  .occ { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .occ button { border: 1.5px solid var(--line); background: rgba(255,255,255,.04); color: #d9d6e8; border-radius: 12px; padding: 9px 4px; font: 600 .72rem Inter; cursor: pointer; line-height: 1.2; }
+  .occ button i { display: block; font-style: normal; font-size: 1.3rem; margin-bottom: 2px; }
+  .occ button.on { border-color: #ff4d8d; background: rgba(255,77,141,.14); color: #fff; }
+  .in { width: 100%; background: rgba(0,0,0,.35); border: 1px solid var(--line); border-radius: 12px; color: #fff; padding: 10px 12px; font: 500 .9rem Inter; outline: 0; }
+  .in:focus { border-color: #ff4d8d; }
+  textarea.in { min-height: 76px; resize: vertical; line-height: 1.45; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .chips button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 999px; padding: 5px 10px; font: 500 .74rem Inter; cursor: pointer; }
+  .chips button:hover { color: #fff; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }
+  .btn { border: 1px solid var(--line); background: rgba(255,255,255,.06); color: #fff; border-radius: 12px; padding: 11px 8px; font: 700 .82rem Inter; cursor: pointer; text-decoration: none; text-align: center; }
+  .btn.wa { background: #25d366; color: #062e16; border: 0; grid-column: 1 / -1; font-size: .92rem; }
+  .btn.pri { background: linear-gradient(100deg, var(--g1), var(--g2)); border: 0; }
+  .note { font-size: .72rem; color: var(--muted); line-height: 1.45; margin-top: 10px; }
+  .toggleP { display: none; }
+
+  .card { position: fixed; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); width: min(420px, calc(100% - 340px)); z-index: 6; background: rgba(16,13,30,.86); border: 1px solid var(--line); border-radius: 22px; padding: 16px 18px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); text-align: center; box-shadow: 0 20px 60px -20px rgba(0,0,0,.8); }
+  .card .t { font: 800 clamp(1.4rem, 4.6vw, 2rem)/1.12 "Space Grotesk"; background: linear-gradient(100deg, var(--g1), var(--g2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .card .m { font-size: .92rem; color: #e8e6f2; line-height: 1.5; margin-top: 8px; white-space: pre-wrap; }
+  .card .f { font: 600 .84rem Inter; color: #cfcbe0; margin-top: 8px; }
+  .card .acts { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+  .card .acts button, .card .acts a { border: 0; border-radius: 12px; padding: 10px 14px; font: 700 .84rem Inter; cursor: pointer; background: rgba(255,255,255,.1); color: #fff; text-decoration: none; }
+  .card .acts .go { background: linear-gradient(100deg, var(--g1), var(--g2)); }
+  .card .st { font: 600 .78rem Inter; color: #ffd98a; margin-top: 8px; min-height: 1em; }
+
+  .intro { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at center, rgba(40,20,70,.92), rgba(8,6,16,.97)); transition: opacity .7s; text-align: center; }
+  .intro .gift { font-size: 5.5rem; animation: bounce 1.4s ease-in-out infinite; filter: drop-shadow(0 10px 30px rgba(255,77,141,.5)); }
+  @keyframes bounce { 50% { transform: translateY(-14px) rotate(-6deg); } }
+  .intro h2 { font: 800 clamp(1.5rem, 6vw, 2.2rem)/1.15 "Space Grotesk"; margin: 14px 0 6px; }
+  .intro p { color: #cfcbe0; font-size: 1rem; }
+  .intro button { margin-top: 22px; border: 0; border-radius: 999px; padding: 15px 34px; font: 800 1.05rem Inter; color: #fff; cursor: pointer; background: linear-gradient(100deg, #ff4d8d, #ffb020); box-shadow: 0 10px 30px -8px rgba(255,77,141,.7); }
+
+  .gmodal { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(3,3,8,.84); backdrop-filter: blur(8px); }
+  .gmodal .inner { width: 100%; max-width: 420px; max-height: 100%; overflow: auto; background: #16132a; border: 1px solid var(--line); border-radius: 20px; padding: 14px; text-align: center; }
+  .gmodal img { max-width: 100%; max-height: 62vh; border-radius: 14px; display: block; margin: 0 auto; }
+  .gmodal p { font-size: .85rem; color: #cfcbe0; margin: 10px 0; }
+  .gmodal a, .gmodal button { display: inline-block; margin: 4px; border: 0; border-radius: 12px; padding: 10px 16px; font: 700 .86rem Inter; cursor: pointer; text-decoration: none; background: rgba(255,255,255,.1); color: #fff; }
+  .gmodal a { background: linear-gradient(100deg, #7c5cff, #00e0b8); }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 120px); opacity: 0; background: #fff; color: #000; padding: 11px 18px; border-radius: 999px; font: 600 .88rem Inter; z-index: 40; transition: transform .35s, opacity .3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+  body.recipient .panel { display: none; }
+  body.recipient .card { left: 50%; right: auto; transform: translateX(-50%); width: min(480px, calc(100% - 24px)); }
+  @media (max-width: 760px) {
+    .panel { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 58%; border-radius: 20px 20px 16px 16px; }
+    .panel.closed { transform: translateY(calc(100% - 46px)); }
+    .toggleP { display: block; width: 100%; border: 0; background: none; color: #fff; font: 700 .86rem Inter; padding: 2px 0 10px; cursor: pointer; }
+    .card { left: 8px; right: 8px; width: auto; top: 64px; bottom: auto; padding: 12px 14px; }
+    body.recipient .card { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); }
+    .card .m { font-size: .86rem; }
+  }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+  <div id="scene"></div>
+  <div class="top">
+    <div class="brand">🎁 3D Wishes</div>
+    <nav class="nav"><a href="../house/">🏠 Our home</a><a href="../">← Manideep</a></nav>
+  </div>
+
+  <aside class="panel" id="panel">
+    <button class="toggleP" id="toggleP">✏️ Create your wish</button>
+    <h4>Occasion</h4>
+    <div class="occ" id="occ"></div>
+    <h4>For</h4>
+    <input class="in" id="to" maxlength="28" placeholder="Their name, e.g. Rahul" autocomplete="off" />
+    <div id="extraBox"><h4 id="extraLbl"></h4><input class="in" id="extra" maxlength="40" autocomplete="off" /></div>
+    <h4>From</h4>
+    <input class="in" id="from" maxlength="48" placeholder="Your name" autocomplete="off" />
+    <div class="chips" id="fromChips"></div>
+    <h4>Message</h4>
+    <textarea class="in" id="msg" maxlength="240"></textarea>
+    <div class="chips"><button id="resetMsg">↺ Default message</button></div>
+    <div class="btns">
+      <button class="btn wa" id="sendWa">💌 Send on WhatsApp</button>
+      <button class="btn" id="copyLink">🔗 Copy link</button>
+      <button class="btn" id="saveImg">📸 Card image</button>
+      <button class="btn pri" id="preview" style="grid-column:1/-1">👀 Preview what they'll see</button>
+    </div>
+    <p class="note">The name and message travel inside the link, so anyone with the link can read them. Nothing is stored on a server.</p>
+  </aside>
+
+  <div class="card" id="card">
+    <div class="t" id="cTitle"></div>
+    <div class="m" id="cMsg"></div>
+    <div class="f" id="cFrom"></div>
+    <div class="st" id="cStatus"></div>
+    <div class="acts" id="cActs"></div>
+  </div>
+
+  <div class="intro" id="intro" hidden>
+    <div>
+      <div class="gift">🎁</div>
+      <h2 id="iTitle"></h2>
+      <p id="iSub"></p>
+      <button id="openBtn">Open your surprise ✨</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const $ = s => document.querySelector(s);
+const FAMILY = "Narendra, Raghuvanshmani & Manideep Mittal";
+const clip = (s, n) => String(s || "").replace(/[\u0000-\u001f<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, n);
+const clipMsg = (s, n) => String(s || "").replace(/[<>]/g, "").replace(/\r/g, "").slice(0, n).trim();
+
+/* ---------- occasions ---------- */
+const OCC = {
+  birthday: { e: "🎂", n: "Birthday", g: ["#ff4d8d", "#ffb020"], bg: [0x2a0f3d, 0x0b0a16], extra: "Age (optional)", extraPh: "e.g. 25", num: true,
+    title: (to, x) => `Happy ${x ? ordinal(x) + " " : ""}Birthday${to ? ", " + to : ""}!`, msg: "Wishing you a year full of laughter, good health and big wins. Have the best day! 🎉",
+    act: "🕯️ Make a wish & blow out the candles" },
+  anniversary: { e: "💍", n: "Anniversary", g: ["#ff5c8a", "#ffd1dc"], bg: [0x3a0d1f, 0x0d0610], extra: "Years together (optional)", extraPh: "e.g. 25", num: true,
+    title: (to, x) => `Happy ${x ? ordinal(x) + " " : ""}Anniversary${to ? ", " + to : ""}!`, msg: "Wishing you both endless love, laughter and many more beautiful years together. ❤️",
+    act: "💞 Tap to celebrate" },
+  congrats: { e: "🏆", n: "Congrats", g: ["#ffd23f", "#ff8c1a"], bg: [0x2b1d05, 0x0b0906], extra: "What for? (optional)", extraPh: "e.g. on your new job",
+    title: (to, x) => `Congratulations${x ? " " + x : ""}${to ? ", " + to : ""}!`, msg: "So proud of you! All your hard work has paid off. Here's to many more successes! 🥂",
+    act: "🎊 Tap to celebrate" },
+  goodluck: { e: "🍀", n: "Good luck", g: ["#3bd16f", "#b2f7a1"], bg: [0x062a1a, 0x050b09], extra: "For what? (optional)", extraPh: "e.g. for your exams",
+    title: (to, x) => `Good luck${x ? " " + x : ""}${to ? ", " + to : ""}!`, msg: "You've got this! Believe in yourself and go shine. All the best! ✨",
+    act: "🌟 Tap for some luck" },
+  thanks: { e: "🙏", n: "Thank you", g: ["#ff6b6b", "#ffd166"], bg: [0x2d0d14, 0x0b0607], extra: "", num: false,
+    title: to => `Thank you${to ? ", " + to : ""}!`, msg: "Thank you for everything you do. It means more than you know. 💛",
+    act: "💖 Tap to send love" },
+  getwell: { e: "💐", n: "Get well", g: ["#ffb3c7", "#ffe08a"], bg: [0x2a1d2e, 0x0b0910], extra: "", num: false,
+    title: to => `Get well soon${to ? ", " + to : ""}!`, msg: "Sending healing wishes and lots of rest your way. Feel better very soon! 🌼",
+    act: "🌸 Tap for get-well petals" },
+};
+function ordinal(x) { const n = parseInt(x, 10); if (!(n > 0 && n < 200)) return ""; const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+
+/* ---------- state (creator) + URL (recipient) ---------- */
+const P = new URLSearchParams(location.search);
+const saved = (() => { try { return JSON.parse(localStorage.getItem("wish_v1") || "{}"); } catch { return {}; } })();
+const W = { o: "birthday", to: "", from: saved.from || "Manideep", extra: "", msg: "" };
+const RECIPIENT = !!OCC[P.get("o")];
+if (RECIPIENT) Object.assign(W, { o: P.get("o"), to: clip(P.get("to"), 28), from: clip(P.get("from"), 48), extra: clip(P.get("x"), 40), msg: clipMsg(P.get("m"), 240) });
+else if (OCC[saved.o]) W.o = saved.o;
+const save = () => { if (!RECIPIENT) try { localStorage.setItem("wish_v1", JSON.stringify({ from: W.from, o: W.o })); } catch {} };
+const occ = () => OCC[W.o];
+const extraVal = () => occ().num ? (parseInt(W.extra, 10) > 0 ? String(parseInt(W.extra, 10)) : "") : W.extra;
+const title = () => occ().title(W.to, extraVal());
+const message = () => W.msg || occ().msg;
+
+/* ---------- three.js setup ---------- */
+const host = $("#scene");
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+host.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, .1, 400);
+const controls = new OrbitControls(camera, renderer.domElement);
+Object.assign(controls, { enableDamping: true, enablePan: false, minDistance: 7, maxDistance: 30, maxPolarAngle: Math.PI * .49, autoRotate: true, autoRotateSpeed: .7 });
+renderer.domElement.addEventListener("pointerdown", () => controls.autoRotate = false);
+scene.add(new THREE.HemisphereLight(0xfff0ff, 0x302040, 1.0));
+const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(6, 14, 8); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); Object.assign(key.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10 }); scene.add(key);
+const rim = new THREE.PointLight(0xff9ad5, 30, 40, 1.5); rim.position.set(-8, 6, -6); scene.add(rim);
+
+const M = {}; const mat = (c, o = {}) => M[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: o.r ?? .5, metalness: o.m ?? 0, emissive: o.e ?? 0, emissiveIntensity: o.ei ?? 1, side: o.ds ? THREE.DoubleSide : THREE.FrontSide, transparent: o.op != null, opacity: o.op ?? 1 });
+const basic = c => new THREE.MeshBasicMaterial({ color: c });
+function mesh(geo, m, parent, x = 0, y = 0, z = 0) { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; parent.add(o); return o; }
+const cylB = (rt, rb, h, m, p, x, y, z, seg = 40) => mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m, p, x, y + h / 2, z);
+function heartGeo(size = 1, depth = .35) {
+  const s = new THREE.Shape(); s.moveTo(.25, .25); s.bezierCurveTo(.25, .25, .2, 0, 0, 0); s.bezierCurveTo(-.3, 0, -.3, .35, -.3, .35); s.bezierCurveTo(-.3, .55, -.1, .77, .25, .95); s.bezierCurveTo(.6, .77, .8, .55, .8, .35); s.bezierCurveTo(.8, .35, .8, 0, .5, 0); s.bezierCurveTo(.35, 0, .25, .25, .25, .25);
+  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: true, bevelThickness: .08, bevelSize: .08, bevelSegments: 4, curveSegments: 20 }); g.center(); g.rotateZ(Math.PI); g.scale(size, size, size); return g;
+}
+function softTex() { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"), r = x.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, "rgba(255,255,255,1)"); r.addColorStop(.5, "rgba(255,255,255,.35)"); r.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = r; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); }
+const SOFT = softTex();
+function textSprite(lines, g, w = 9) {
+  const c = document.createElement("canvas"); c.width = 1024; c.height = 140 * lines.length + 40; const x = c.getContext("2d");
+  lines.forEach((l, i) => {
+    const big = i === 0, gr = x.createLinearGradient(80, 0, 944, 0); gr.addColorStop(0, g[0]); gr.addColorStop(1, g[1]);
+    let fs = big ? 120 : 92; do { x.font = `800 ${fs}px Inter, "Space Grotesk", sans-serif`; fs -= 4; } while (x.measureText(l).width > 960);
+    x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = "rgba(0,0,0,.6)"; x.shadowBlur = 18; x.fillStyle = big ? gr : "#ffffff"; x.fillText(l, 512, 90 + i * 140);
+  });
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false })); sp.scale.set(w, w * c.height / 1024, 1); return sp;
+}
+
+/* ---------- shared effects ---------- */
+// confetti / petals: one instanced pool
+const CN = 600, conf = new THREE.InstancedMesh(new THREE.PlaneGeometry(.16, .3), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }), CN);
+conf.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(conf);
+const cp = Array.from({ length: CN }, () => ({ live: 0, p: new THREE.Vector3(), v: new THREE.Vector3(), r: new THREE.Euler(), w: new THREE.Vector3(), g: 3 }));
+const dummy = new THREE.Object3D(); let cIdx = 0;
+cp.forEach((_, i) => { dummy.scale.setScalar(0); dummy.updateMatrix(); conf.setMatrixAt(i, dummy.matrix); conf.setColorAt(i, new THREE.Color(1, 1, 1)); });
+function confetti(n, at, { spread = 4, up = 8, cols = [0xff4d8d, 0xffd23f, 0x00e0b8, 0x7c5cff, 0xff8c1a, 0xffffff], g = 6, life = 4, shape = 1 } = {}) {
+  for (let k = 0; k < n; k++) {
+    const i = cIdx = (cIdx + 1) % CN, q = cp[i];
+    q.live = life * (.7 + Math.random() * .5); q.g = g; q.s = shape;
+    q.p.set(at.x + (Math.random() - .5) * .6, at.y, at.z + (Math.random() - .5) * .6);
+    q.v.set((Math.random() - .5) * spread * 2, up * (.6 + Math.random() * .6), (Math.random() - .5) * spread * 2);
+    q.r.set(Math.random() * 6, Math.random() * 6, Math.random() * 6); q.w.set((Math.random() - .5) * 12, (Math.random() - .5) * 12, (Math.random() - .5) * 12);
+    conf.setColorAt(i, new THREE.Color(cols[k % cols.length]));
+  }
+  conf.instanceColor.needsUpdate = true;
+}
+function rain(n, cols, g = .9, s = 1.4) { for (let k = 0; k < n; k++) { confetti(1, new THREE.Vector3((Math.random() - .5) * 18, 12 + Math.random() * 6, (Math.random() - .5) * 18), { spread: .4, up: 0, cols, g, life: 9, shape: s }); } }
+function stepConfetti(dt, t) {
+  for (let i = 0; i < CN; i++) {
+    const q = cp[i]; if (q.live <= 0) continue; q.live -= dt;
+    q.v.y -= q.g * dt; q.v.multiplyScalar(1 - 1.4 * dt); q.v.x += Math.sin(t * 3 + i) * dt * 1.2;
+    q.p.addScaledVector(q.v, dt); q.r.x += q.w.x * dt; q.r.y += q.w.y * dt; q.r.z += q.w.z * dt;
+    dummy.position.copy(q.p); dummy.rotation.copy(q.r); dummy.scale.set(q.s, q.s * (q.s > 1 ? .55 : 1), q.s); if (q.live <= 0 || q.p.y < -.5) { dummy.scale.setScalar(0); q.live = 0; }
+    dummy.updateMatrix(); conf.setMatrixAt(i, dummy.matrix);
+  }
+  conf.instanceMatrix.needsUpdate = true;
+}
+// sparkles
+const SPN = 260, spPos = new Float32Array(SPN * 3);
+for (let i = 0; i < SPN; i++) spPos.set([(Math.random() - .5) * 26, Math.random() * 14, (Math.random() - .5) * 26], i * 3);
+const spGeo = new THREE.BufferGeometry(); spGeo.setAttribute("position", new THREE.BufferAttribute(spPos, 3));
+const sparkles = new THREE.Points(spGeo, new THREE.PointsMaterial({ size: .35, map: SOFT, color: 0xfff2c9, transparent: true, opacity: .7, depthWrite: false, blending: THREE.AdditiveBlending })); scene.add(sparkles);
+// floor
+const floor = mesh(new THREE.CircleGeometry(16, 64), mat(0x1a1528, { r: .9 }), scene); floor.rotation.x = -Math.PI / 2; floor.castShadow = false;
+const ring = mesh(new THREE.RingGeometry(5.6, 5.8, 64), basic(0xff4d8d), scene, 0, .01, 0); ring.rotation.x = -Math.PI / 2; ring.castShadow = false;
+
+/* ---------- scenes ---------- */
+const S = {}; let cur = null;
+const flames = [], bobs = [], spins = [];
+function balloon(p, x, y, z, c) { const b = new THREE.Group(); b.position.set(x, y, z); p.add(b); const s = mesh(new THREE.SphereGeometry(.7, 20, 16), mat(c, { r: .25, m: .1 }), b); s.scale.y = 1.2; mesh(new THREE.ConeGeometry(.12, .18, 8), mat(c), b, 0, -.88, 0); const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -.95, 0), new THREE.Vector3(.15, -2.6, .1), new THREE.Vector3(0, -4, 0)]), new THREE.LineBasicMaterial({ color: 0xdddddd })); b.add(l); b.userData = { y, ph: Math.random() * 6 }; bobs.push(b); return b; }
+function gift(p, x, z, c, s = 1) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = Math.random(); p.add(g); mesh(new THREE.BoxGeometry(1.2 * s, 1 * s, 1.2 * s), mat(c, { r: .5 }), g, 0, .5 * s, 0); mesh(new THREE.BoxGeometry(1.25 * s, 1.02 * s, .2 * s), mat(0xffffff, { r: .4 }), g, 0, .5 * s, 0); mesh(new THREE.BoxGeometry(.2 * s, 1.02 * s, 1.25 * s), mat(0xffffff, { r: .4 }), g, 0, .5 * s, 0); [-1, 1].forEach(d => { const bw = mesh(new THREE.TorusGeometry(.22 * s, .07 * s, 8, 16), mat(0xffffff), g, d * .2 * s, 1.08 * s, 0); bw.rotation.y = Math.PI / 2; }); }
+function candle(p, x, y, z, c, h = .9) { cylB(.08, .08, h, mat(c, { r: .4 }), p, x, y, z, 12); const f = mesh(new THREE.ConeGeometry(.09, .32, 10), basic(0xffc14d), p, x, y + h + .2, z); f.castShadow = false; const gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: SOFT, color: 0xffb347, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); gl.scale.setScalar(.9); gl.position.set(x, y + h + .22, z); p.add(gl); f.userData = { glow: gl, ph: Math.random() * 6, lit: true }; flames.push(f); return f; }
+
+function buildBirthday(n) {
+  const g = new THREE.Group(); scene.add(g);
+  cylB(3.4, 3.4, .18, mat(0xf4f1ea, { r: .3 }), g, 0, 0, 0);                               // plate
+  cylB(2.7, 2.7, 1.7, mat(0xf7a8c4, { r: .6 }), g, 0, .18, 0);                              // bottom tier
+  mesh(new THREE.TorusGeometry(2.62, .2, 12, 48), mat(0xffffff, { r: .4 }), g, 0, 1.88, 0).rotation.x = Math.PI / 2;
+  for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2; mesh(new THREE.CapsuleGeometry(.14, .35 + (i % 3) * .15, 4, 8), mat(0xffffff, { r: .4 }), g, Math.cos(a) * 2.7, 1.55 - (i % 3) * .08, Math.sin(a) * 2.7); }
+  cylB(1.85, 1.85, 1.25, mat(0xfff0d4, { r: .6 }), g, 0, 1.88, 0);                          // top tier
+  mesh(new THREE.TorusGeometry(1.8, .16, 12, 40), mat(0xff7aa8, { r: .4 }), g, 0, 3.13, 0).rotation.x = Math.PI / 2;
+  const sc = [0xff4d8d, 0x00e0b8, 0xffd23f, 0x7c5cff, 0xffffff];
+  for (let i = 0; i < 70; i++) { const a = Math.random() * Math.PI * 2, r = Math.random() * 1.6; const sp = mesh(new THREE.CapsuleGeometry(.03, .1, 2, 4), mat(sc[i % 5]), g, Math.cos(a) * r, 3.14, Math.sin(a) * r); sp.rotation.set(Math.PI / 2, 0, Math.random() * 3); sp.castShadow = false; }
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + .3; mesh(new THREE.SphereGeometry(.2, 12, 10), mat(0xd6002f, { r: .3 }), g, Math.cos(a) * 2.2, 2.0, Math.sin(a) * 2.2); }
+  const k = n > 0 ? Math.min(n, 12) : 5, cc = [0x4da3ff, 0xff4d8d, 0xffd23f, 0x3bd16f, 0xb18cff];
+  for (let i = 0; i < k; i++) { const a = i / k * Math.PI * 2; candle(g, Math.cos(a) * (k > 6 ? 1.3 : 1.0), 3.13, Math.sin(a) * (k > 6 ? 1.3 : 1.0), cc[i % 5]); }
+  if (n > 0) { const t = textSprite([String(n)], ["#ffd23f", "#ff8c1a"], 3.2); t.position.set(0, 5.6, 0); g.add(t); }
+  [[-4.6, 4, 1, 0xff4d8d], [4.4, 5, -1, 0x00e0b8], [-3.6, 6.2, -3, 0xffd23f], [3.8, 3.8, 2.8, 0x7c5cff], [0, 6.8, -4.5, 0xff8c1a], [-5.4, 5.4, -1.8, 0x4da3ff], [5.6, 6, 1.2, 0xffffff]].forEach(([x, y, z, c]) => balloon(g, x, y, z, c));
+  [[-4.4, 2.8, 0xd62839], [4.2, 3.2, 0x2f6fd6], [3.4, -3.6, 0xffd23f, .8]].forEach(([x, z, c, s]) => gift(g, x, z, c, s));
+  g.userData = { focus: new THREE.Vector3(0, 3, 0), lights: true }; return g;
+}
+function buildAnniversary(n) {
+  const g = new THREE.Group(); scene.add(g);
+  cylB(1.9, 2.2, 1.4, mat(0x7a0f2b, { r: .9 }), g, 0, 0, 0); cylB(2.0, 2.0, .15, mat(0xd4af37, { m: .9, r: .25 }), g, 0, 1.4, 0);
+  const rings = new THREE.Group(); rings.position.set(0, 3.4, 0); g.add(rings);
+  const gold = mat(0xf2c35b, { m: 1, r: .15 }), rose = mat(0xe8a593, { m: 1, r: .15 });
+  mesh(new THREE.TorusGeometry(1.1, .17, 24, 64), gold, rings, -.45, 0, 0);
+  const r2 = mesh(new THREE.TorusGeometry(1.1, .17, 24, 64), rose, rings, .45, 0, 0); r2.rotation.y = Math.PI / 2.4;
+  const dia = mesh(new THREE.OctahedronGeometry(.32, 0), mat(0xdff6ff, { m: .3, r: .05, e: 0x88c8ff, ei: .5 }), rings, -.45, 1.35, 0); dia.scale.y = 1.2;
+  spins.push(rings);
+  const hc = [0xff2e63, 0xff7aa2, 0xffc2d1, 0xe11d48];
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 4.4 + (i % 3) * 1.2; const h = mesh(heartGeo(.45 + (i % 4) * .12), mat(hc[i % 4], { r: .3, m: .1 }), g, Math.cos(a) * r, 1.6 + (i % 5) * 1.0, Math.sin(a) * r); h.userData = { y: h.position.y, ph: i, spin: true }; bobs.push(h); }
+  [[-1.6, 1.55, .9], [1.6, 1.55, .9]].forEach(([x, y, z]) => candle(g, x, y, z, 0xfff3e0, 1.4));
+  if (n > 0) { const t = textSprite([`${n} years`], ["#ffd1dc", "#ff5c8a"], 4.2); t.position.set(0, 6.2, 0); g.add(t); }
+  g.userData = { focus: new THREE.Vector3(0, 3, 0), petals: [0xd6002f, 0xff2e63, 0xff7aa2] }; return g;
+}
+function buildCongrats() {
+  const g = new THREE.Group(); scene.add(g);
+  [[0, 1.6, 0xd4af37], [-3.1, 1.0, 0xc0c0c0], [3.1, .7, 0xcd7f32]].forEach(([x, h, c]) => { cylB(1.5, 1.5, h, mat(0x2b2540, { r: .7 }), g, x, 0, 0, 6); cylB(1.52, 1.52, .1, mat(c, { m: .8, r: .3 }), g, x, h - .05, 0, 6); });
+  const gold = mat(0xf5c542, { m: 1, r: .18 }), tr = new THREE.Group(); tr.position.set(0, 1.6, 0); g.add(tr);
+  mesh(new THREE.BoxGeometry(1.6, .5, 1.6), mat(0x3a2a1a, { r: .5 }), tr, 0, .25, 0); mesh(new THREE.BoxGeometry(1.2, .4, 1.2), mat(0x3a2a1a, { r: .5 }), tr, 0, .7, 0);
+  const prof = [[0, 0], [.55, 0], [.35, .15], [.18, .5], [.15, 1.2], [.35, 1.45], [.95, 1.75], [1.15, 2.6], [1.2, 3.2], [1.1, 3.25], [0, 2.2]].map(([x, y]) => new THREE.Vector2(x, y));
+  mesh(new THREE.LatheGeometry(prof, 48), gold, tr, 0, .9, 0);
+  [-1, 1].forEach(s => { const h = mesh(new THREE.TorusGeometry(.5, .1, 12, 24, Math.PI * 1.2), gold, tr, s * 1.25, 3.2, 0); h.rotation.z = s > 0 ? -Math.PI * .6 : Math.PI * 1.6; });
+  const st = new THREE.Shape(); for (let i = 0; i < 10; i++) { const a = Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? .22 : .5; i ? st.lineTo(Math.cos(a) * r, Math.sin(a) * r) : st.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  const star = mesh(new THREE.ExtrudeGeometry(st, { depth: .15, bevelEnabled: false }), mat(0xffe27a, { m: .6, r: .2, e: 0xffc400, ei: .4 }), tr, 0, 4.7, -.07); spins.push(star);
+  spins.push(tr);
+  [[-5, 5, 2, 0xffd23f], [5, 5.5, -1, 0xff4d8d], [-4, 6.5, -3, 0x00e0b8], [4.5, 4.2, 2.5, 0x7c5cff], [0, 7, -4.5, 0xff8c1a]].forEach(([x, y, z, c]) => balloon(g, x, y, z, c));
+  g.userData = { focus: new THREE.Vector3(0, 3, 0) }; return g;
+}
+function buildGoodluck() {
+  const g = new THREE.Group(); scene.add(g);
+  cylB(1.6, 1.9, 1.2, mat(0x0f3d2a, { r: .8 }), g, 0, 0, 0); cylB(1.7, 1.7, .12, mat(0xd4af37, { m: .9, r: .25 }), g, 0, 1.2, 0);
+  const cl = new THREE.Group(); cl.position.set(0, 4.2, 0); g.add(cl);
+  const green = mat(0x2fbf62, { r: .35 }), dark = mat(0x1e8f47, { r: .4 });
+  for (let i = 0; i < 4; i++) { const h = mesh(heartGeo(1.4, .25), i % 2 ? green : dark, cl, 0, 0, 0); h.geometry = h.geometry.clone().translate(0, -.75, 0); h.rotation.z = i * Math.PI / 2 + Math.PI; }
+  mesh(new THREE.SphereGeometry(.28, 16, 12), mat(0x9be564), cl, 0, 0, .18);
+  const stem = mesh(new THREE.CylinderGeometry(.09, .11, 2.9, 10), dark, g, .25, 2.6, 0); stem.rotation.z = -.1;
+  cl.userData.sway = true; spins.push(cl);
+  for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; const s = mesh(new THREE.OctahedronGeometry(.28, 0), mat(0xfff1a8, { e: 0xffd23f, ei: .8, m: .3 }), g, Math.cos(a) * 4.2, 2.5 + (i % 3) * 1.4, Math.sin(a) * 4.2); s.userData = { y: s.position.y, ph: i, spin: true }; bobs.push(s); }
+  g.userData = { focus: new THREE.Vector3(0, 3.2, 0) }; return g;
+}
+function buildThanks() {
+  const g = new THREE.Group(); scene.add(g);
+  cylB(1.8, 2.1, 1.0, mat(0x3a1020, { r: .8 }), g, 0, 0, 0);
+  const h = mesh(heartGeo(3.3, .9), mat(0xe11d48, { r: .18, m: .25 }), g, 0, 3.6, 0); h.userData.pulse = true; h.userData.sway = true; spins.push(h); g.userData.heart = h;
+  const orb = new THREE.Group(); orb.position.set(0, 3.6, 0); g.add(orb); spins.push(orb);
+  for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; const s = mesh(heartGeo(.55), mat([0xff7aa2, 0xffd166, 0xff4d8d][i % 3], { r: .3 }), orb, Math.cos(a) * 3.4, Math.sin(a * 2) * .8, Math.sin(a) * 3.4); s.rotation.y = -a; }
+  g.userData.focus = new THREE.Vector3(0, 3.4, 0); return g;
+}
+function buildGetwell() {
+  const g = new THREE.Group(); scene.add(g);
+  const vase = mesh(new THREE.LatheGeometry([[0, 0], [.8, 0], [1.1, .6], [1.0, 1.6], [.6, 2.3], [.7, 2.6], [0, 2.6]].map(([x, y]) => new THREE.Vector2(x, y)), 40), mat(0x5ec8ff, { r: .15, m: .2 }), g, 0, 0, 0);
+  const fl = [[0, 5.6, 0, 0xff7aa2], [-1.1, 5.0, .4, 0xffd166], [1.1, 5.1, -.3, 0xffffff], [-.6, 4.6, -1, 0xb18cff], [.7, 4.5, 1, 0xff8c1a], [-1.5, 4.2, -.4, 0xff4d8d], [1.5, 4.3, .6, 0xffb3c7]];
+  fl.forEach(([x, y, z, c], i) => {
+    const st = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 2.4, 0), new THREE.Vector3(x * .5, (y + 2.4) / 2, z * .5), new THREE.Vector3(x, y, z)]), new THREE.LineBasicMaterial({ color: 0x2e8b57 })); g.add(st);
+    const f = new THREE.Group(); f.position.set(x, y, z); f.lookAt(x * 3, y + 2, z * 3 + 4); g.add(f);
+    for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, p = mesh(new THREE.SphereGeometry(.32, 12, 10), mat(c, { r: .6 }), f, Math.cos(a) * .36, Math.sin(a) * .36, 0); p.scale.set(1, 1, .35); }
+    mesh(new THREE.SphereGeometry(.2, 12, 10), mat(0xffc93c, { r: .5 }), f, 0, 0, .08);
+    [-1, 1].forEach(s => { const lf = mesh(new THREE.SphereGeometry(.28, 10, 8), mat(0x3bb273), g, x * .6 + s * .25, (y + 2.4) / 2 + .2, z * .6); lf.scale.set(.5, 1.3, .2); });
+  });
+  const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: SOFT, color: 0xffd36e, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); sun.scale.setScalar(9); sun.position.set(-5, 9, -6); g.add(sun);
+  g.userData = { focus: new THREE.Vector3(0, 3.6, 0), petals: [0xffb3c7, 0xffd166, 0xffffff, 0xb18cff] }; return g;
+}
+const BUILD = { birthday: buildBirthday, anniversary: buildAnniversary, congrats: buildCongrats, goodluck: buildGoodluck, thanks: buildThanks, getwell: buildGetwell };
+
+let banner = null;
+function setScene(rebuild = true) {
+  const o = occ();
+  if (rebuild || !cur) {
+    if (cur) { scene.remove(cur); cur.traverse(c => { if (c.geometry) c.geometry.dispose(); }); }
+    flames.length = bobs.length = spins.length = 0;
+    cur = BUILD[W.o](parseInt(extraVal(), 10) || 0);
+  }
+  if (banner) scene.remove(banner);
+  banner = textSprite([title().replace(/!$/, "") + "!"], o.g, 9.5); banner.position.set(0, 7.9, -1.5); banner.visible = !(RECIPIENT || innerWidth <= 760); scene.add(banner);   // the card already shows the title there
+  const bg = new THREE.Color(o.bg[0]); scene.background = bg; scene.fog = new THREE.Fog(bg, 30, 70);
+  ring.material.color.set(o.g[0]); rim.color.set(o.g[0]);
+  controls.target.copy(cur.userData.focus); if (RECIPIENT || innerWidth <= 760) controls.target.y -= 1.8;   // leave room for the message card
+  document.documentElement.style.setProperty("--g1", o.g[0]); document.documentElement.style.setProperty("--g2", o.g[1]);
+  done = false; drawCard();
+}
+
+/* ---------- actions ---------- */
+let done = false;
+function celebrate() {
+  const at = new THREE.Vector3(0, 3, 0);
+  if (W.o === "birthday") {
+    flames.forEach(f => { f.userData.lit = false; }); setTimeout(() => { confetti(260, new THREE.Vector3(0, 3.5, 0), { spread: 5, up: 10 }); }, 350);
+  } else if (W.o === "anniversary") { confetti(140, at, { cols: [0xff2e63, 0xff7aa2, 0xffd1dc, 0xffffff], up: 9, shape: 1.6 }); rain(120, cur.userData.petals); }
+  else if (W.o === "congrats") { [-5, 5].forEach(x => confetti(160, new THREE.Vector3(x, 0, 1), { spread: 2.2, up: 13 })); confetti(120, at, { cols: [0xffd23f, 0xffe27a, 0xffffff], up: 9 }); }
+  else if (W.o === "goodluck") { confetti(220, new THREE.Vector3(0, 4, 0), { cols: [0x3bd16f, 0xb2f7a1, 0xffd23f, 0xffffff], up: 9, spread: 5 }); }
+  else if (W.o === "thanks") { confetti(180, at, { cols: [0xff2e63, 0xff7aa2, 0xffd166], up: 10, shape: 1.6 }); if (cur.userData.heart) cur.userData.heart.userData.boom = performance.now(); }
+  else if (W.o === "getwell") { rain(160, cur.userData.petals); confetti(80, new THREE.Vector3(0, 5, 0), { cols: cur.userData.petals, up: 6, shape: 1.6 }); }
+  done = true; drawCard();
+  if (W.o === "birthday") $("#cStatus").textContent = "🎉 Yay! May all your wishes come true!";
+}
+// birthday: blow into the microphone
+let mic = null;
+async function listenForBlow() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ac = new (window.AudioContext || window.webkitAudioContext)(), an = ac.createAnalyser(); an.fftSize = 512; ac.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize); let loud = 0; mic = { stream, ac };
+    $("#cStatus").textContent = "🎤 Listening… blow into your microphone!";
+    const loop = () => {
+      if (!mic) return; an.getByteTimeDomainData(buf); let s = 0; for (const v of buf) s += ((v - 128) / 128) ** 2; const rms = Math.sqrt(s / buf.length);
+      loud = rms > .22 ? loud + 1 : Math.max(0, loud - 1);
+      if (loud > 8) { stopMic(); celebrate(); return; } requestAnimationFrame(loop);
+    }; loop();
+  } catch { $("#cStatus").textContent = "Microphone isn't available. Tap the button to blow instead 🙂"; }
+}
+function stopMic() { if (!mic) return; mic.stream.getTracks().forEach(t => t.stop()); mic.ac.close(); mic = null; }
+// a short "Happy Birthday" tune (public-domain melody)
+function playSong() {
+  const ac = new (window.AudioContext || window.webkitAudioContext)(), N = { C4: 261.6, D4: 293.7, E4: 329.6, F4: 349.2, G4: 392, A4: 440, Bb4: 466.2, C5: 523.3 };
+  const seq = [["C4", .75], ["C4", .25], ["D4", 1], ["C4", 1], ["F4", 1], ["E4", 2], ["C4", .75], ["C4", .25], ["D4", 1], ["C4", 1], ["G4", 1], ["F4", 2], ["C4", .75], ["C4", .25], ["C5", 1], ["A4", 1], ["F4", 1], ["E4", 1], ["D4", 2], ["Bb4", .75], ["Bb4", .25], ["A4", 1], ["F4", 1], ["G4", 1], ["F4", 2]];
+  let t = ac.currentTime + .05; const beat = .42;
+  seq.forEach(([n, d]) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = "triangle"; o.frequency.value = N[n]; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.22, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + d * beat * .95); o.connect(g).connect(ac.destination); o.start(t); o.stop(t + d * beat); t += d * beat; });
+  setTimeout(() => ac.close(), (t - ac.currentTime + .5) * 1000);
+}
+
+/* ---------- card ---------- */
+function drawCard() {
+  const o = occ();
+  $("#cTitle").textContent = `${title()} ${o.e}`; $("#cMsg").textContent = message(); $("#cFrom").textContent = W.from ? `— ${W.from}` : "";
+  if (!done) $("#cStatus").textContent = "";
+  const acts = [];
+  if (!done) { acts.push(`<button class="go" data-a="act">${o.act}</button>`); if (W.o === "birthday" && navigator.mediaDevices?.getUserMedia) acts.push(`<button data-a="mic">🎤 Blow into mic</button>`); }
+  else { acts.push(`<button data-a="again">🔁 Again</button>`); if (W.o === "birthday") acts.push(`<button class="go" data-a="song">🎵 Play birthday song</button>`); }
+  acts.push(`<button data-a="img">📸 Save card</button>`);
+  if (RECIPIENT) acts.push(`<a href="./" data-a="own">💌 Send your own</a>`);
+  $("#cActs").innerHTML = acts.join("");
+}
+$("#cActs").addEventListener("click", async e => {
+  const a = e.target.closest("[data-a]")?.dataset.a; if (!a || a === "own") return;
+  if (a === "act") celebrate();
+  if (a === "mic") listenForBlow();
+  if (a === "again") { stopMic(); setScene(true); }
+  if (a === "song") playSong();
+  if (a === "img") { const b = e.target, t0 = b.textContent; b.textContent = "Creating…"; try { await shareImage(); } finally { b.textContent = t0; } }
+});
+
+/* ---------- creator panel ---------- */
+$("#occ").innerHTML = Object.entries(OCC).map(([k, o]) => `<button data-k="${k}"><i>${o.e}</i>${o.n}</button>`).join("");
+$("#fromChips").innerHTML = [["Manideep", "Manideep"], ["Mittal family", FAMILY], ["Manideep & family", "Manideep & family"]].map(([l, v]) => `<button data-v="${v}">${l}</button>`).join("");
+function syncPanel() {
+  const o = occ();
+  document.querySelectorAll("#occ button").forEach(b => b.classList.toggle("on", b.dataset.k === W.o));
+  $("#extraBox").hidden = !o.extra; $("#extraLbl").textContent = o.extra; $("#extra").placeholder = o.extraPh || ""; $("#extra").inputMode = o.num ? "numeric" : "text";
+  $("#to").value = W.to; $("#from").value = W.from; $("#extra").value = W.extra; $("#msg").value = message();
+}
+$("#occ").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (!b) return; const wasDefault = !W.msg || Object.values(OCC).some(x => x.msg === W.msg); W.o = b.dataset.k; W.extra = ""; if (wasDefault) W.msg = ""; syncPanel(); setScene(true); save(); });
+$("#to").addEventListener("input", e => { W.to = clip(e.target.value, 28); setScene(false); });
+$("#extra").addEventListener("input", e => { W.extra = occ().num ? e.target.value.replace(/\D/g, "").slice(0, 3) : clip(e.target.value, 40); if (occ().num) e.target.value = W.extra; clearTimeout(window._xt); window._xt = setTimeout(() => setScene(true), 350); });
+$("#from").addEventListener("input", e => { W.from = clip(e.target.value, 48); drawCard(); save(); });
+$("#fromChips").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) { W.from = b.dataset.v; $("#from").value = W.from; drawCard(); save(); } });
+$("#msg").addEventListener("input", e => { W.msg = clipMsg(e.target.value, 240); if (W.msg === occ().msg) W.msg = ""; drawCard(); });
+$("#resetMsg").addEventListener("click", () => { W.msg = ""; $("#msg").value = occ().msg; drawCard(); });
+$("#toggleP").addEventListener("click", () => $("#panel").classList.toggle("closed"));
+
+function link() {
+  const base = /^https?:/.test(location.protocol) ? location.origin + location.pathname : "https://manideepcs024.github.io/wish/";
+  const q = new URLSearchParams({ o: W.o }); if (W.to) q.set("to", W.to); if (W.from) q.set("from", W.from); if (extraVal()) q.set("x", extraVal()); if (W.msg) q.set("m", W.msg);
+  return base + "?" + q.toString();
+}
+function waText() { const o = occ(); return `${o.e} *${title()}*\n\n🎁 Here's a little 3D surprise for you${W.from ? ` from ${W.from}` : ""}. Tap to open 👇\n${link()}`; }
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2000); }
+$("#sendWa").addEventListener("click", () => window.open("https://wa.me/?text=" + encodeURIComponent(waText()), "_blank", "noopener"));
+$("#copyLink").addEventListener("click", async () => { try { await navigator.clipboard.writeText(waText()); toast("🔗 Copied. Paste it in any chat"); } catch { prompt("Copy this:", waText()); } });
+$("#preview").addEventListener("click", () => window.open(link(), "_blank", "noopener"));
+$("#saveImg").addEventListener("click", async e => { const b = e.target, t0 = b.textContent; b.textContent = "Creating…"; try { await shareImage(); } finally { b.textContent = t0; } });
+
+/* ---------- card image ---------- */
+function wrap(x, text, maxW) { const out = []; String(text).split("\n").forEach(par => { let line = ""; par.split(/\s+/).filter(Boolean).forEach(w => { const t = line ? line + " " + w : w; if (x.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); }); return out; }
+async function cardCanvas() {
+  await Promise.all(["800 90px Inter", "500 34px Inter", "600 30px Inter"].map(f => document.fonts.load(f).catch(() => {})));
+  const o = occ(), CW = 1080, IH = 1080, prev = { pr: renderer.getPixelRatio(), aspect: camera.aspect }, bannerVis = banner.visible;
+  banner.visible = false; renderer.setPixelRatio(1); renderer.setSize(CW, IH, false); camera.aspect = 1; camera.updateProjectionMatrix(); renderer.render(scene, camera);
+  const c = document.createElement("canvas"), x = c.getContext("2d"); c.width = CW;
+  x.font = "500 34px Inter"; const ml = wrap(x, message(), CW - 160).slice(0, 5);
+  const H = IH + 150 + ml.length * 48 + 140; c.height = H;
+  const bg = x.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, "#" + new THREE.Color(o.bg[0]).getHexString()); bg.addColorStop(1, "#0b0a16"); x.fillStyle = bg; x.fillRect(0, 0, CW, H);
+  x.drawImage(renderer.domElement, 0, 0, CW, IH);
+  banner.visible = bannerVis; renderer.setPixelRatio(prev.pr); renderer.setSize(innerWidth, innerHeight); camera.aspect = prev.aspect; camera.updateProjectionMatrix();
+  const fade = x.createLinearGradient(0, IH - 260, 0, IH); fade.addColorStop(0, "rgba(11,10,22,0)"); fade.addColorStop(1, "rgba(11,10,22,1)"); x.fillStyle = fade; x.fillRect(0, IH - 260, CW, 260);
+  const gr = x.createLinearGradient(140, 0, CW - 140, 0); gr.addColorStop(0, o.g[0]); gr.addColorStop(1, o.g[1]);
+  const t = `${title()} ${o.e}`; let fs = 92; do { x.font = `800 ${fs}px Inter`; fs -= 4; } while (x.measureText(t).width > CW - 100 && fs > 40);
+  x.textAlign = "center"; x.fillStyle = gr; x.fillText(t, CW / 2, IH + 40);
+  x.fillStyle = "#ece9f6"; x.font = "500 34px Inter"; ml.forEach((l, i) => x.fillText(l, CW / 2, IH + 120 + i * 48));
+  x.fillStyle = "#cfcbe0"; x.font = "600 30px Inter"; if (W.from) x.fillText(`— ${W.from}`, CW / 2, IH + 120 + ml.length * 48 + 30);
+  x.fillStyle = "#6f6c85"; x.font = "500 22px 'JetBrains Mono', monospace"; x.fillText("Make your own 3D wish · manideepcs024.github.io/wish", CW / 2, H - 34);
+  return c;
+}
+async function shareImage() {
+  const c = await cardCanvas(), blob = await new Promise(r => c.toBlob(r, "image/jpeg", .92)), name = `${W.o}-wish${W.to ? "-" + W.to.toLowerCase().replace(/[^a-z0-9]+/g, "-") : ""}.jpg`, file = new File([blob], name, { type: "image/jpeg" });
+  if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file] }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  const url = URL.createObjectURL(blob), m = document.createElement("div"); m.className = "gmodal";
+  m.innerHTML = `<div class="inner"><img src="${url}" alt="Wish card" /><p>Download the card and share it, or long-press to save it.</p><a href="${url}" download="${name}">⬇ Download</a><button>Done</button></div>`;
+  m.addEventListener("click", e => { if (e.target === m || e.target.tagName === "BUTTON") m.remove(); }); document.body.appendChild(m);
+}
+
+/* ---------- animation ---------- */
+let last = 0;
+renderer.setAnimationLoop(now => {
+  const dt = Math.min(.05, (now - (last || now)) / 1000), t = now / 1000; last = now;
+  flames.forEach(f => { const u = f.userData, s = u.lit ? 1 + Math.sin(t * 12 + u.ph) * .12 + Math.random() * .06 : Math.max(0, f.scale.x - dt * 4); f.scale.set(u.lit ? 1 : s, s, u.lit ? 1 : s); u.glow.material.opacity = u.lit ? .8 + Math.sin(t * 9 + u.ph) * .2 : Math.max(0, u.glow.material.opacity - dt * 3); });
+  bobs.forEach(b => { b.position.y = b.userData.y + Math.sin(t * 1.2 + b.userData.ph) * .35; if (b.userData.spin) b.rotation.y += dt * .8; });
+  spins.forEach(s => { if (s.userData.sway) s.rotation.y = Math.sin(t * .8) * .5; else s.rotation.y += dt * .6; if (s.userData.pulse) { const k = s.userData.boom ? Math.max(0, 1 - (now - s.userData.boom) / 900) : 0; s.scale.setScalar(1 + Math.sin(t * 3) * .04 + k * .25); } });
+  sparkles.material.opacity = .5 + Math.sin(t * 2) * .2; sparkles.rotation.y += dt * .03;
+  if (done && cur?.userData.petals && Math.random() < .25) rain(1, cur.userData.petals);
+  stepConfetti(dt, t);
+  controls.update(); renderer.render(scene, camera);
+});
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+/* ---------- start ---------- */
+camera.position.set(0, 7, 16.5);
+setScene(true);
+if (RECIPIENT) {
+  document.body.classList.add("recipient");
+  const o = occ(); $("#iTitle").textContent = W.to ? `${W.to}, you have a surprise! ${o.e}` : `You have a surprise! ${o.e}`;
+  $("#iSub").textContent = W.from ? `From ${W.from}` : "Tap to open it";
+  $("#intro").hidden = false; $("#card").hidden = true; camera.position.set(0, 18, 34);
+  $("#openBtn").addEventListener("click", () => {
+    $("#intro").style.opacity = 0; setTimeout(() => $("#intro").hidden = true, 700); $("#card").hidden = false;
+    const p0 = camera.position.clone(), p1 = new THREE.Vector3(0, 5.5, 16.5), st = performance.now();
+    const fly = () => { const k = Math.min(1, (performance.now() - st) / 1600), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(p0, p1, e); if (k < 1) requestAnimationFrame(fly); }; fly();
+    confetti(200, new THREE.Vector3(0, 2, 2), { spread: 6, up: 11 });
+  });
+} else { syncPanel(); if (innerWidth <= 760) $("#panel").classList.add("closed"); }
+window.__wish = { W, setScene, celebrate, cardCanvas, link, waText, scene };
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
