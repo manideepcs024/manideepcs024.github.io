@@ -1,0 +1,27 @@
+/* Registers the service worker and exposes install helpers as window.MMM.
+ * Included on every page. Pages can listen for the "mmm:installable" event. */
+(function () {
+  const me = document.currentScript;
+  const ROOT = new URL("../", me ? me.src : location.href).href;            // site root (assets/ is one level down)
+  const MMM = window.MMM = window.MMM || {};
+  MMM.root = ROOT;
+  MMM.standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  MMM.ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  MMM.canInstall = false;
+
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+    addEventListener("load", () => {
+      navigator.serviceWorker.register(ROOT + "sw.js", { scope: ROOT }).then(reg => { MMM.reg = reg; document.dispatchEvent(new Event("mmm:sw")); }).catch(() => {});
+    });
+  }
+  addEventListener("beforeinstallprompt", e => {
+    e.preventDefault(); MMM.prompt = e; MMM.canInstall = true;
+    document.dispatchEvent(new Event("mmm:installable"));
+  });
+  addEventListener("appinstalled", () => { MMM.canInstall = false; MMM.prompt = null; MMM.standalone = true; document.dispatchEvent(new Event("mmm:installed")); });
+  MMM.install = async () => {
+    if (!MMM.prompt) return false;
+    MMM.prompt.prompt(); const r = await MMM.prompt.userChoice; MMM.prompt = null; MMM.canInstall = false;
+    return r && r.outcome === "accepted";
+  };
+})();

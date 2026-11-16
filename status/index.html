@@ -29,6 +29,13 @@
   .quotes button b { color: var(--muted); font-weight: 500; }
   .quotes button.on { border-color: var(--acc); color: #fff; }
 </style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
 </head>
 <body>
   <div class="wrap">
@@ -270,5 +277,6 @@ K.share({ text: caption, valid, draw: drawStatus, file: () => `status-${S.t}-${K
 document.querySelector("#copyBtn").innerHTML = "📋 Copy caption";
 drawFields(); upd();
 </script>
+<script src="../assets/pwa.js" defer></script>
 </body>
 </html>

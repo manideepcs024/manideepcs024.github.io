@@ -32,6 +32,13 @@
   .tbl .tot span:first-child { font-weight: 700; color: var(--fg); }
   .goodbox { margin-top: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(34,211,154,.3); background: rgba(34,211,154,.06); color: #b9eedb; font-size: .82rem; line-height: 1.5; }
 </style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
 </head>
 <body>
   <div class="wrap">
@@ -226,5 +233,6 @@ K.share({ text: buildText, valid, draw, file: () => "capital-gains-estimate" });
 
 showMode(); drawSales(); render();
 </script>
+<script src="../assets/pwa.js" defer></script>
 </body>
 </html>

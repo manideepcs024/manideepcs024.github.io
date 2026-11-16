@@ -44,6 +44,13 @@
   .ops .go { border-color: rgba(34,211,154,.5); color: var(--up); }
   .ops button[disabled] { opacity: .5; cursor: default; }
 </style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
 </head>
 <body>
   <div class="wrap">
@@ -281,5 +288,6 @@ async function draw() {
 K.share({ text, valid, draw, file: () => S.view === "score" ? `quiz-${S.num}-results` : `quiz-leaderboard-${curMonth()}` });
 syncInputs(); render();
 </script>
+<script src="../assets/pwa.js" defer></script>
 </body>
 </html>

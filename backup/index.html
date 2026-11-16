@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Backup, Restore &amp; App — MANIMINDSMONEY</title>
+<meta name="description" content="Back up everything you've saved in the MANIMINDSMONEY tools to one file, restore it on any phone or computer, and install the tools as an app that works offline." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #7c5cff; }
+  .data { display: grid; gap: 6px; }
+  .row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
+  .row .ic { font-size: 1.2rem; width: 28px; text-align: center; }
+  .row b { font: 600 .9rem Inter; display: block; }
+  .row small { color: var(--muted); font-size: .76rem; }
+  .row .sz { font: .72rem "JetBrains Mono"; color: var(--muted); text-align: right; }
+  .row input[type=checkbox] { width: 20px; height: 20px; accent-color: #00e0b8; }
+  .row.new b::after { content: " · not on this device"; color: var(--warn); font: 500 .7rem Inter; }
+  .acts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+  .acts .btn { white-space: normal; min-width: 0; line-height: 1.25; text-align: center; }
+  .acts .full { grid-column: 1 / -1; }
+  .status { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); margin-top: 8px; font-size: .86rem; }
+  .status i { font-style: normal; font-size: 1.1rem; }
+  .status small { display: block; color: var(--muted); font-size: .76rem; }
+  .status.ok { border-color: rgba(34,211,154,.45); } .status.warn { border-color: rgba(254,188,46,.45); }
+  .ios { margin-top: 10px; padding: 12px 14px; border-radius: 14px; background: rgba(124,92,255,.08); border: 1px solid rgba(124,92,255,.35); font-size: .84rem; line-height: 1.55; color: #d9cff5; }
+  textarea.code { min-height: 90px; font: .72rem/1.4 "JetBrains Mono"; }
+  .file { display: block; text-align: center; padding: 18px; border-radius: 16px; border: 1.5px dashed rgba(0,224,184,.5); background: rgba(0,224,184,.05); color: var(--a2); font: 600 .92rem Inter; cursor: pointer; }
+  .file:hover { background: rgba(0,224,184,.1); }
+  details summary { cursor: pointer; font: 600 .84rem Inter; color: #cfd3df; margin-top: 12px; }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Your data, <span class="grad">safe and portable.</span></h1>
+    <p class="sub">Everything you save in these tools (your journal, leaderboards, glossary progress, drafts and settings) lives only in this browser. Back it up to one file, restore it on a new phone, and install the tools as an app that works offline.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="res-head"><h2>💾 Back up</h2><span id="total"></span></div>
+        <div class="data" id="data"></div>
+        <div class="acts">
+          <button class="btn primary full" id="dlBtn">⬇ Download backup file</button>
+          <button class="btn" id="shareBtn">📤 Send to Drive / WhatsApp</button>
+          <button class="btn" id="copyBtn2">📋 Copy backup code</button>
+        </div>
+        <div class="status" id="lastB"></div>
+        <p class="hint">Tip: back up once a week, or before clearing your browser or changing phones. Sending the file to yourself on WhatsApp or saving it to Google Drive keeps it handy.</p>
+      </section>
+
+      <section class="card">
+        <div class="res-head"><h2>♻️ Restore</h2><span id="rMeta"></span></div>
+        <label class="file" for="fileIn">📂 Choose a backup file</label>
+        <input type="file" id="fileIn" accept=".json,application/json" hidden />
+        <details><summary>…or paste a backup code</summary>
+          <textarea class="code" id="codeIn" placeholder='{"app":"MANIMINDSMONEY",…}'></textarea>
+          <button class="btn" id="codeBtn" style="margin-top:8px;width:100%">Read backup code</button>
+        </details>
+        <div id="preview"></div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:20px">
+      <div class="res-head"><h2>📲 Install as an app</h2><span id="appMeta"></span></div>
+      <p class="sub" style="margin-bottom:6px">Add the tools to your home screen: they open full-screen like an app, start faster, and the pages you've used work even without internet.</p>
+      <div id="appStatus"></div>
+      <div class="acts"><button class="btn primary" id="installBtn" hidden>📲 Install app</button><button class="btn" id="persistBtn">🔒 Protect my data</button></div>
+      <div class="ios" id="iosHelp" hidden><b>On iPhone / iPad:</b> open this page in <b>Safari</b> → tap the <b>Share</b> button (square with an arrow) → <b>Add to Home Screen</b> → <b>Add</b>.</div>
+      <div class="ios" id="otherHelp" hidden><b>No install button?</b> In Chrome, open the <b>⋮ menu</b> → <b>Install app</b> or <b>Add to Home screen</b>. On a computer, look for the install icon at the right end of the address bar.</div>
+    </section>
+
+    <div class="disclaimer"><b>🔐 Privacy:</b> your data never leaves your device unless you send the backup file somewhere yourself. There's no account and no server: the backup file is the only copy outside this browser, so keep it somewhere safe. It may contain names from your community (leaderboards) and your trade journal.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const META = "mmm_last_backup";
+// friendly names for what each tool saves; anything else is still backed up
+const KNOWN = {
+  journal_v1: ["📒", "Trade journal", v => `${(v.trades || []).length} trades`],
+  review_v1: ["🔍", "Trade review draft"],
+  contest_v1: ["🎯", "Guess the Close contest", v => { const p = Object.keys(v.season || {}).length, c = (v.recorded || []).length; return `${p} player${p === 1 ? "" : "s"} · ${c} contest${c === 1 ? "" : "s"}`; }],
+  quizscore_v1: ["🏅", "Quiz scoreboard", v => `${Object.keys(v.months || {}).length} month(s) of leaderboards`],
+  gloss_form: ["📖", "Term of the Day", v => `${(v.posted || []).length} terms posted · day #${v.num || 1}`],
+  quiz_form: ["🧠", "Quiz card", v => v.num ? `quiz #${v.num}` : ""],
+  chart_v1: ["📈", "Read the Chart game", v => v.num ? `game #${v.num}` : ""],
+  cal_form: ["📅", "Results & events calendar", v => `${(v.events || []).length} events`],
+  close_v1: ["🔔", "Market close card"],
+  levels_form: ["📊", "Daily levels card"],
+  status_v1: ["📲", "Status maker"],
+  welcome_v1: ["👋", "Welcome & spotlight"],
+  mmm_invite: ["🔗", "Community invite link", v => typeof v === "string" ? K.shortLink(v) : ""],
+  msg_draft: ["💬", "Message card draft"], msg_recent: ["💬", "Recent messages"],
+  ipo_form: ["🚀", "IPO card"], options_v1: ["📈", "Options payoff"], tax_v1: ["🧾", "Capital gains tax"], avg_form: ["🧮", "Average price"],
+  slcalc: ["🎯", "Stop-loss calculator"], slcalc_note: ["🎯", "Stop-loss calculator note"], slcalc_pat: ["🎯", "Stop-loss calculator settings"], slcalc_sym: ["🎯", "Stop-loss calculator symbol"],
+  rush_scores: ["🏁", "Market Rush scores"], ipom_scores: ["🚀", "IPO Mania scores"], rush_sound: ["🔈", "Market Rush sound"], ipom_sound: ["🔈", "IPO Mania sound"],
+};
+const parseVal = s => { try { return JSON.parse(s); } catch { return s; } };
+const describe = (k, raw) => {
+  const kn = KNOWN[k]; let extra = "";
+  if (kn && kn[2]) { try { extra = kn[2](parseVal(raw)) || ""; } catch {} }
+  return { ic: kn ? kn[0] : "🗂️", name: kn ? kn[1] : `Other: ${k}`, extra };
+};
+const kb = n => n < 1024 ? n + " B" : (n / 1024).toFixed(n < 10240 ? 1 : 0) + " KB";
+
+/* ---------- current data ---------- */
+function snapshot() { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k !== META) o[k] = localStorage.getItem(k); } return o; }
+function drawData() {
+  const d = snapshot(), keys = Object.keys(d).sort((a, b) => (KNOWN[a] ? 0 : 1) - (KNOWN[b] ? 0 : 1) || describe(a, d[a]).name.localeCompare(describe(b, d[b]).name));
+  const total = keys.reduce((s, k) => s + d[k].length, 0);
+  $("#total").textContent = keys.length ? `${keys.length} item${keys.length === 1 ? "" : "s"} · ${kb(total)}` : "";
+  $("#data").innerHTML = keys.length ? keys.map(k => { const x = describe(k, d[k]); return `<div class="row"><span class="ic">${x.ic}</span><div><b>${K.esc(x.name)}</b><small>${K.esc(x.extra)}</small></div><span class="sz">${kb(d[k].length)}</span></div>`; }).join("")
+    : `<div class="placeholder">Nothing saved on this device yet. Use any tool and your work will show up here.</div>`;
+  ["dlBtn", "shareBtn", "copyBtn2"].forEach(id => $("#" + id).disabled = !keys.length);
+  const last = localStorage.getItem(META);
+  if (!last) $("#lastB").className = "status warn", $("#lastB").innerHTML = `<i>⚠️</i><div>No backup yet<small>${keys.length ? "Download one now so you don't lose your data." : "Nothing to back up yet."}</small></div>`;
+  else { const days = Math.floor((Date.now() - +last) / 864e5); $("#lastB").className = "status " + (days > 14 ? "warn" : "ok"); $("#lastB").innerHTML = `<i>${days > 14 ? "⏰" : "✅"}</i><div>Last backup: ${days === 0 ? "today" : days === 1 ? "yesterday" : days + " days ago"}<small>${new Date(+last).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</small></div>`; }
+}
+
+/* ---------- export ---------- */
+const fileName = () => `mmm-backup-${K.iso(K.istNow())}.json`;
+function backupJSON() { return JSON.stringify({ app: "MANIMINDSMONEY", format: 1, created: new Date().toISOString(), keys: snapshot() }); }
+const mark = () => { localStorage.setItem(META, String(Date.now())); drawData(); };
+$("#dlBtn").addEventListener("click", () => {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([backupJSON()], { type: "application/json" })); a.download = fileName(); a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000); mark(); K.toast("⬇ Backup downloaded");
+});
+$("#shareBtn").addEventListener("click", async () => {
+  const file = new File([backupJSON()], fileName(), { type: "application/json" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: "MANIMINDSMONEY backup" }); mark(); return; } catch (e) { if (e.name === "AbortError") return; }
+  }
+  $("#dlBtn").click(); K.toast("Sharing isn't supported here, so the file was downloaded instead");
+});
+$("#copyBtn2").addEventListener("click", async () => { if (await K.copyText(backupJSON())) { mark(); K.toast("📋 Backup code copied. Paste it somewhere safe"); } else K.toast("Couldn't copy"); });
+
+/* ---------- import ---------- */
+let incoming = null, undo = null;
+function readBackup(text) {
+  let o; try { o = JSON.parse(text); } catch { K.toast("That isn't a valid backup file"); return; }
+  if (!o || o.app !== "MANIMINDSMONEY" || typeof o.keys !== "object" || Array.isArray(o.keys)) { K.toast("This doesn't look like a MANIMINDSMONEY backup"); return; }
+  const keys = Object.entries(o.keys).filter(([k, v]) => typeof k === "string" && typeof v === "string" && k !== META);
+  if (!keys.length) { K.toast("The backup is empty"); return; }
+  incoming = { created: o.created, keys: Object.fromEntries(keys) }; drawPreview();
+}
+$("#fileIn").addEventListener("change", e => { const f = e.target.files[0]; if (!f) return; if (f.size > 5e6) { K.toast("File is too large"); return; } f.text().then(readBackup); e.target.value = ""; });
+$("#codeBtn").addEventListener("click", () => readBackup($("#codeIn").value.trim()));
+function drawPreview() {
+  if (!incoming) { $("#preview").innerHTML = ""; $("#rMeta").textContent = ""; return; }
+  const cur = snapshot(), ks = Object.keys(incoming.keys);
+  $("#rMeta").textContent = incoming.created ? "from " + new Date(incoming.created).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "";
+  $("#preview").innerHTML = `<div class="q" style="margin-top:16px">Choose what to restore <span class="opt">ticked items replace what's on this device</span></div>
+    <div class="data">${ks.map(k => { const x = describe(k, incoming.keys[k]); return `<label class="row ${k in cur ? "" : "new"}"><input type="checkbox" data-k="${K.esc(k)}" checked /><div><b>${K.esc(x.ic + " " + x.name)}</b><small>${K.esc(x.extra)}${k in cur && cur[k] === incoming.keys[k] ? " · same as this device" : ""}</small></div><span class="sz">${kb(incoming.keys[k].length)}</span></label>`; }).join("")}</div>
+    <div class="acts"><button class="btn primary" id="doRestore">♻️ Restore selected</button><button class="btn" id="cancelR">Cancel</button></div>`;
+  $("#doRestore").onclick = restore; $("#cancelR").onclick = () => { incoming = null; drawPreview(); };
+}
+function restore() {
+  const sel = [...document.querySelectorAll("#preview input[data-k]:checked")].map(i => i.dataset.k);
+  if (!sel.length) { K.toast("Tick at least one item"); return; }
+  const cur = snapshot(), overwrite = sel.filter(k => k in cur && cur[k] !== incoming.keys[k]).length;
+  if (overwrite && !confirm(`Restore ${sel.length} item(s)? ${overwrite} will replace what's currently on this device.`)) return;
+  undo = Object.fromEntries(sel.map(k => [k, k in cur ? cur[k] : null]));
+  try { sel.forEach(k => localStorage.setItem(k, incoming.keys[k])); }
+  catch { K.toast("Storage is full. Some items couldn't be restored"); }
+  incoming = null; drawData();
+  $("#preview").innerHTML = `<div class="status ok" style="margin-top:14px"><i>✅</i><div>Restored ${sel.length} item${sel.length === 1 ? "" : "s"}<small>Open any tool to see your data.</small></div></div>
+    <div class="acts"><a class="btn primary" href="../tools/">🧰 Open tools</a><button class="btn" id="undoBtn">↩️ Undo restore</button></div>`;
+  $("#undoBtn").onclick = () => { Object.entries(undo).forEach(([k, v]) => v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v)); undo = null; drawData(); $("#preview").innerHTML = ""; K.toast("↩️ Restore undone"); };
+  K.toast("♻️ Restored");
+}
+
+/* ---------- app ---------- */
+async function drawApp() {
+  const M = window.MMM || {}, rows = [];
+  rows.push(M.standalone ? ["✅", "Running as an installed app", "You opened this from your home screen.", "ok"] : M.canInstall ? ["📲", "Ready to install", "Tap Install app below.", "ok"] : ["ℹ️", "Not installed on this device", M.ios ? "Use Safari's Share → Add to Home Screen." : "Use the browser menu if no install button appears.", "warn"]);
+  let off = ["⏳", "Offline mode starting", "Open the site over the internet once to enable it.", "warn"];
+  if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+    let n = 0; try { const c = await caches.open((await caches.keys()).find(k => k.startsWith("mmm-")) || "x"); n = (await c.keys()).filter(r => !/\.(css|js|png|json|webmanifest)$/.test(new URL(r.url).pathname)).length; } catch {}
+    off = ["📴", "Works offline", `${n} pages saved for offline use.`, "ok"];
+  } else if (!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) off = ["⚠️", "Offline mode not available", "Your browser doesn't support it here.", "warn"];
+  rows.push(off);
+  let per = ["🔓", "Data may be cleared by the browser", "If storage runs low, browsers can delete site data. Tap Protect my data.", "warn"];
+  if (navigator.storage && navigator.storage.persisted && await navigator.storage.persisted()) per = ["🔒", "Data protected", "The browser won't clear your data automatically.", "ok"];
+  rows.push(per);
+  $("#appStatus").innerHTML = rows.map(([i, t, s, c]) => `<div class="status ${c}"><i>${i}</i><div>${t}<small>${s}</small></div></div>`).join("");
+  $("#installBtn").hidden = !M.canInstall;
+  $("#iosHelp").hidden = !(M.ios && !M.standalone); $("#otherHelp").hidden = !!(M.ios || M.standalone || M.canInstall);
+  $("#persistBtn").hidden = per[0] === "🔒" || !(navigator.storage && navigator.storage.persist);
+}
+$("#installBtn").addEventListener("click", async () => { if (await window.MMM.install()) K.toast("📲 Installed!"); drawApp(); });
+$("#persistBtn").addEventListener("click", async () => { const ok = await navigator.storage.persist(); K.toast(ok ? "🔒 Your data is protected" : "The browser didn't allow it. Installing the app usually helps"); drawApp(); });
+["mmm:installable", "mmm:installed", "mmm:sw"].forEach(ev => document.addEventListener(ev, drawApp));
+navigator.serviceWorker?.addEventListener("controllerchange", drawApp);
+
+drawData(); drawApp();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

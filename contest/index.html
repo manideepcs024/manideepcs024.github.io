@@ -26,6 +26,13 @@
   .season-ops button:hover { color: var(--fg); }
   .season-ops .go { border-color: rgba(254,188,46,.5); color: var(--warn); }
 </style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
 </head>
 <body>
   <div class="wrap">
@@ -241,5 +248,6 @@ async function draw() {
 K.share({ text, valid, draw, file: () => `contest-${S.num}-${S.step}` });
 render();
 </script>
+<script src="../assets/pwa.js" defer></script>
 </body>
 </html>

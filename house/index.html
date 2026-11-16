@@ -69,6 +69,13 @@
 <script type="importmap">
 { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
 </script>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
 </head>
 <body>
   <div class="loading" id="loading">Building the house…</div>
@@ -542,5 +549,6 @@ renderer.setAnimationLoop(now => { if (anim) anim(now); controls.update(); rende
 document.getElementById("loading").style.opacity = 0; setTimeout(() => document.getElementById("loading").remove(), 600);
 window.__house = { scene, camera, controls, ui, applyView, visit, ROOMS, renderer };
 </script>
+<script src="../assets/pwa.js" defer></script>
 </body>
 </html>

@@ -38,6 +38,14 @@
   .grad { background: linear-gradient(100deg, var(--a1), #5b8cff 45%, var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .sub { color: var(--muted); font-size: 1rem; max-width: 640px; line-height: 1.55; }
 
+  .appbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 22px; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(0,224,184,.35); background: linear-gradient(100deg, rgba(124,92,255,.12), rgba(0,224,184,.08)); }
+  .appbar b { display: block; font: 700 .98rem "Space Grotesk"; }
+  .appbar span { font-size: .82rem; color: #c9cfdb; }
+  .appbar.warn { border-color: rgba(254,188,46,.5); background: rgba(254,188,46,.07); }
+  .appbtns { display: flex; gap: 8px; }
+  .appbtns button, .appbtns a { border: 0; border-radius: 12px; padding: 10px 14px; font: 600 .84rem Inter; cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .appbtns button { background: linear-gradient(100deg, #7c5cff, #00e0b8); color: #fff; }
+  .appbtns a { background: rgba(255,255,255,.08); color: #eef0f6; border: 1px solid rgba(255,255,255,.12); }
   .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 26px 0 8px; }
   .filters button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--muted); padding: 9px 15px; border-radius: 999px; font: 600 .84rem Inter; cursor: pointer; transition: color .2s, background .2s, border-color .2s; }
   .filters button:hover { color: var(--fg); }
@@ -88,6 +96,13 @@
   footer a { color: var(--muted); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
 </head>
 <body>
   <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
@@ -96,13 +111,17 @@
   <div class="wrap">
     <header>
       <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
-      <nav class="nav"><a href="../">← Manideep.</a></nav>
+      <nav class="nav" style="display:flex;gap:8px"><a href="../backup/">💾 Backup</a><a href="../">← Manideep.</a></nav>
     </header>
 
     <span class="eyebrow">Free · No sign-up · Works on mobile</span>
     <h1>Every tool, <span class="grad">one place.</span></h1>
     <p class="sub">Calculators that help you size and manage trades, the cards I use to run the MANIMINDSMONEY WhatsApp community, and tools to grow it. Each one shares as text or an image in one tap. Scroll down for a weekly posting plan.</p>
 
+    <div class="appbar" id="appbar">
+      <div><b>📲 Use it like an app</b><span id="appTxt">Install on your phone: opens full-screen and works offline. Back up your saved data anytime.</span></div>
+      <div class="appbtns"><button id="installHub" hidden>Install app</button><a href="../backup/" id="backupHub">💾 Backup &amp; app</a></div>
+    </div>
     <div class="filters" id="filters"></div>
     <div id="groups"></div>
 
@@ -203,6 +222,20 @@ document.getElementById("planGrid").innerHTML = PLAN.map(([d, items], i) => `<di
 document.getElementById("tipsGrid").innerHTML = TIPS.map(([h, p]) => `<div class="tip-c"><b>${h}</b><p>${p}</p></div>`).join("");
 $("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; filter = b.dataset.f; drawFilters(); drawTools(); });
 drawFilters(); drawTools();
+/* app bar: install button + backup reminder */
+(function () {
+  const bar = document.getElementById("appbar"), txt = document.getElementById("appTxt"), btn = document.getElementById("installHub");
+  const upd = () => {
+    const M = window.MMM || {}; let n = 0; try { for (let i = 0; i < localStorage.length; i++) if (localStorage.key(i) !== "mmm_last_backup") n++; } catch {}
+    const last = +localStorage.getItem("mmm_last_backup") || 0, days = last ? Math.floor((Date.now() - last) / 864e5) : null;
+    btn.hidden = !M.canInstall;
+    if (n && (days === null || days > 14)) { bar.classList.add("warn"); txt.textContent = days === null ? "You have saved data in these tools but no backup yet. Back it up so you don't lose it." : `Your last backup was ${days} days ago. Time for a fresh one.`; }
+    else if (M.standalone) { bar.classList.remove("warn"); txt.textContent = "You're using the app. Pages you've opened work offline."; }
+  };
+  btn.addEventListener("click", async () => { await window.MMM.install(); upd(); });
+  ["mmm:installable", "mmm:installed"].forEach(e => document.addEventListener(e, upd)); upd();
+})();
 </script>
+<script src="../assets/pwa.js" defer></script>
 </body>
 </html>

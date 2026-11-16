@@ -32,6 +32,13 @@
   .probe span { font: 600 .7rem "JetBrains Mono"; color: var(--muted); letter-spacing: .06em; }
   .probe b { font: 700 1rem "JetBrains Mono"; }
 </style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
 </head>
 <body>
   <div class="wrap">
@@ -273,5 +280,6 @@ K.share({ text: buildText, valid, draw, file: () => "payoff-" + (S.name || "stra
 if (!S.legs.length) loadPreset(PRESETS[4]); else { drawLegs(); render(); }
 document.fonts.ready.then(() => cur && drawPageChart(cur.L, cur.A));
 </script>
+<script src="../assets/pwa.js" defer></script>
 </body>
 </html>
