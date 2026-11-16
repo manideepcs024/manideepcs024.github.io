@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>How Was Your Trading Day? — MANIMINDSMONEY</title>
+<meta name="description" content="A 1-minute evening check-in for traders: segments, trades, profit and loss, rules followed. Get a process grade, tips for tomorrow and a confidence boost, and share it as a card." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+<style>
+  :root { --acc: #febc2e; --acc2: #22d39a; }
+  .step { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 16px; animation: pop .35s cubic-bezier(.2,.8,.2,1); }
+  .step:first-child { border: 0; margin: 0; padding: 0; }
+  .yn { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .yn button { border: 1.5px solid var(--line); background: rgba(0,0,0,.28); color: #d5d9e4; border-radius: 18px; padding: 16px 10px; font: 700 1rem Inter; cursor: pointer; }
+  .yn button small { display: block; font: 400 .74rem Inter; color: var(--muted); margin-top: 4px; }
+  .yn button.on { border-color: var(--acc2); background: rgba(34,211,154,.1); color: #fff; }
+  .yn button.on.no { border-color: var(--acc); background: rgba(254,188,46,.1); }
+  .segs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .segs button { text-align: left; border: 1.5px solid var(--line); background: rgba(0,0,0,.25); color: #cfd3df; border-radius: 14px; padding: 10px 12px; font: 600 .84rem Inter; cursor: pointer; }
+  .segs button small { display: block; font: 400 .7rem Inter; color: var(--muted); }
+  .segs button.on { border-color: var(--acc); background: rgba(254,188,46,.08); color: #fff; }
+  .stepper { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 6px; align-items: center; }
+  .stepper button { height: 42px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.05); color: var(--fg); font: 700 1.1rem Inter; cursor: pointer; }
+  .stepper .field input { text-align: center; }
+  .trio { display: grid; gap: 8px; }
+  .trio > div { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 10px; align-items: center; font: 600 .9rem Inter; }
+  .checks { display: grid; gap: 6px; }
+  .ck { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.22); font-size: .88rem; }
+  .ck .yn2 { display: flex; gap: 4px; }
+  .ck .yn2 button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 9px; padding: 6px 12px; font: 600 .78rem Inter; cursor: pointer; }
+  .ck .yn2 button.good { background: rgba(34,211,154,.18); color: var(--up); border-color: rgba(34,211,154,.5); }
+  .ck .yn2 button.bad { background: rgba(255,84,112,.15); color: var(--down); border-color: rgba(255,84,112,.5); }
+  .moods { display: flex; gap: 6px; flex-wrap: wrap; }
+  .moods button { border: 1px solid var(--line); background: rgba(0,0,0,.22); color: #cfd3df; border-radius: 999px; padding: 8px 12px; font: 500 .82rem Inter; cursor: pointer; }
+  .moods button.on { background: var(--fg); color: #000; }
+  .grade { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; padding: 18px; border-radius: 22px; border: 1px solid; }
+  .grade .g { font: 800 3.4rem/1 "Space Grotesk"; width: 92px; text-align: center; }
+  .grade b { font: 700 1.05rem "Space Grotesk"; display: block; }
+  .grade span { font-size: .84rem; color: #cfd3df; }
+  .list { margin-top: 12px; border-radius: 16px; padding: 12px 14px; border: 1px solid; }
+  .list h4 { font: 700 .68rem "JetBrains Mono"; letter-spacing: .1em; margin-bottom: 6px; }
+  .list div { font-size: .86rem; line-height: 1.5; color: #e3e6ee; padding: 3px 0; }
+  .meter { margin-top: 12px; padding: 14px; border-radius: 16px; background: linear-gradient(100deg, rgba(124,92,255,.14), rgba(0,224,184,.1)); border: 1px solid rgba(124,92,255,.4); }
+  .meter .bar { height: 12px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin: 8px 0; }
+  .meter .bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #febc2e, #22d39a); transition: width .6s; }
+  .meter p { font-size: .9rem; color: #fff; line-height: 1.5; }
+  .meter small { font: 600 .68rem "JetBrains Mono"; letter-spacing: .1em; color: #c9bcff; }
+  .hist { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+  .hist div { text-align: center; font: .66rem "JetBrains Mono"; color: var(--muted); }
+  .hist b { display: grid; place-items: center; height: 34px; border-radius: 10px; margin-bottom: 4px; font: 700 .8rem "Space Grotesk"; color: #fff; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+  .loadj { margin-top: 10px; width: 100%; padding: 10px; border-radius: 12px; border: 1px dashed rgba(34,211,154,.5); background: rgba(34,211,154,.06); color: #9be8c9; font: 600 .82rem Inter; cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>How was your <span class="grad">trading day?</span></h1>
+    <p class="sub">A 1-minute check-in after the market closes. Answer a few questions and get a <b>process grade</b>, what you did well, <b>tips for tomorrow</b> and a confidence boost. Good traders review every day, win or lose.</p>
+
+    <div class="layout">
+      <section class="card" id="form">
+        <div class="step">
+          <div class="cols2" style="margin-bottom:12px">
+            <div><div class="q">Day</div><label class="field sm"><input id="date" class="txt" type="date" /></label></div>
+            <div><div class="q">Name on card <span class="opt">optional</span></div><label class="field sm"><input id="who" class="txt" type="text" maxlength="24" placeholder="e.g. Manideep" /></label></div>
+          </div>
+          <div class="q">1 · Did you trade today?</div>
+          <div class="yn" id="traded"><button data-v="yes">✅ Yes<small>I took trades</small></button><button data-v="no" class="no">🧘 No<small>sat out today</small></button></div>
+        </div>
+
+        <!-- NO-TRADE -->
+        <div class="step" id="noStep" hidden>
+          <div class="q">Why not?</div>
+          <div class="moods" id="noWhy"></div>
+          <div class="q">Note <span class="opt">optional</span></div>
+          <textarea id="noNote" maxlength="160" placeholder="e.g. Choppy market, no clean setup. Marked levels for tomorrow."></textarea>
+        </div>
+
+        <!-- TRADED -->
+        <div id="yesSteps" hidden>
+          <div class="step">
+            <div class="q">2 · Which segments? <span class="opt">tap all that apply</span></div>
+            <div class="segs" id="segs"></div>
+          </div>
+          <div class="step">
+            <div class="q">3 · Trades &amp; results</div>
+            <div class="trio">
+              <div><span>🔢 Trades taken</span><div class="stepper" data-k="n"><button>−</button><label class="field sm"><input id="n" type="text" inputmode="numeric" placeholder="0" /></label><button>＋</button></div></div>
+              <div><span style="color:var(--up)">✅ Winners</span><div class="stepper" data-k="w"><button>−</button><label class="field sm"><input id="w" type="text" inputmode="numeric" placeholder="0" /></label><button>＋</button></div></div>
+              <div><span style="color:var(--down)">❌ Losers</span><div class="stepper" data-k="l"><button>−</button><label class="field sm"><input id="l" type="text" inputmode="numeric" placeholder="0" /></label><button>＋</button></div></div>
+            </div>
+            <div class="cols2">
+              <div><div class="q" style="color:var(--up)">Profit made ₹</div><label class="field sm"><input id="profit" type="text" inputmode="decimal" placeholder="from winners" /></label></div>
+              <div><div class="q" style="color:var(--down)">Loss made ₹</div><label class="field sm"><input id="loss" type="text" inputmode="decimal" placeholder="from losers" /></label></div>
+              <div><div class="q">Charges ₹ <span class="opt">optional</span></div><label class="field sm"><input id="chg" type="text" inputmode="decimal" placeholder="brokerage, taxes" /></label></div>
+              <div><div class="q">My max daily loss ₹ <span class="opt">optional</span></div><label class="field sm"><input id="maxl" type="text" inputmode="decimal" placeholder="e.g. 3,000" /></label></div>
+            </div>
+            <div class="ierr" id="numErr"></div>
+            <button class="loadj" id="loadJ" hidden>📒 Fill from today's trades in my journal</button>
+          </div>
+          <div class="step">
+            <div class="q">4 · Honest check</div>
+            <div class="checks" id="checks"></div>
+            <div class="q">How did you feel?</div>
+            <div class="moods" id="mood"></div>
+            <div class="q">One line about today <span class="opt">optional</span></div>
+            <textarea id="note" maxlength="160" placeholder="e.g. Good entries, but I exited the Nifty trade too early."></textarea>
+          </div>
+        </div>
+        <label class="toggle"><span>Show ₹ amounts on the shared card<small>Off: share the grade, win rate and lessons, not money</small></span><input type="checkbox" id="optMoney" /><span class="sw"></span></label>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Your day</h2><span id="meta"></span></div>
+        <div id="out"></div>
+        <div class="share-row" id="shareRow"><button class="btn ghost" id="saveBtn">💾 Save today's review</button></div>
+        <div class="q" style="margin-top:16px">Last 7 days <span class="opt" id="streak"></span></div>
+        <div class="hist" id="hist"></div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This check-in gives <b>general, educational tips</b> based on the numbers you enter; it isn't investment advice. Trading, especially F&amp;O, carries high risk of loss. Never trade money you can't afford to lose.</div>
+    <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = Kit, $ = K.$;
+K.chrome();
+const SEGS = { intra: ["⚡ Intraday equity", "same-day stocks"], swing: ["📦 Delivery / swing", "holding stocks"], optb: ["🎟️ Options buying", "calls / puts"], opts: ["🛡️ Options selling", "writing options"], fut: ["📈 Futures", "index / stock"], comm: ["🛢️ Commodity", "MCX"], curr: ["💱 Currency", "USD-INR etc."] };
+const CHECKS = [["sl", "Respected every stop-loss", true], ["plan", "Traded only my planned setups", true], ["over", "Overtraded (more than planned)", false], ["revenge", "Took a revenge trade after a loss", false]];
+const MOODS = { calm: "😌 Calm", confident: "💪 Confident", anxious: "😰 Anxious", frustrated: "😤 Frustrated", greedy: "🤑 Excited / greedy", bored: "🥱 Bored" };
+const NOWHY = { nosetup: "🔍 No clean setup", choppy: "🌊 Choppy market", busy: "💼 Busy / work", plan: "🧘 Planned rest day", learn: "📚 Studying instead", fear: "😟 Scared after losses" };
+const blank = () => ({ traded: "", segs: [], n: "", w: "", l: "", profit: "", loss: "", chg: "", maxl: "", ck: { sl: null, plan: null, over: null, revenge: null }, mood: "", note: "", noWhy: "", noNote: "" });
+const S = K.store("dayreview_v1", { date: K.iso(K.istNow()), who: "", money: false, day: blank(), hist: {} });
+if (S.date < K.iso(K.istNow())) { S.date = K.iso(K.istNow()); S.day = S.hist[S.date] ? structuredClone(S.hist[S.date]) : blank(); }
+const D = () => S.day;
+
+/* ---------- UI build ---------- */
+$("#segs").innerHTML = Object.entries(SEGS).map(([k, [n, s]]) => `<button data-k="${k}">${n}<small>${s}</small></button>`).join("");
+$("#checks").innerHTML = CHECKS.map(([k, t]) => `<div class="ck" data-k="${k}"><span>${t}</span><span class="yn2"><button data-v="1">Yes</button><button data-v="0">No</button></span></div>`).join("");
+$("#mood").innerHTML = Object.entries(MOODS).map(([k, t]) => `<button data-k="${k}">${t}</button>`).join("");
+$("#noWhy").innerHTML = Object.entries(NOWHY).map(([k, t]) => `<button data-k="${k}">${t}</button>`).join("");
+
+function fill() {
+  $("#date").value = S.date; $("#who").value = S.who; $("#optMoney").checked = S.money;
+  ["n", "w", "l", "profit", "loss", "chg", "maxl"].forEach(k => $("#" + k).value = D()[k]);
+  $("#note").value = D().note; $("#noNote").value = D().noNote;
+  sync();
+}
+function sync() {
+  const d = D();
+  document.querySelectorAll("#traded button").forEach(b => b.classList.toggle("on", b.dataset.v === d.traded));
+  $("#yesSteps").hidden = d.traded !== "yes"; $("#noStep").hidden = d.traded !== "no";
+  document.querySelectorAll("#segs button").forEach(b => b.classList.toggle("on", d.segs.includes(b.dataset.k)));
+  document.querySelectorAll("#mood button").forEach(b => b.classList.toggle("on", b.dataset.k === d.mood));
+  document.querySelectorAll("#noWhy button").forEach(b => b.classList.toggle("on", b.dataset.k === d.noWhy));
+  document.querySelectorAll(".ck").forEach(r => { const k = r.dataset.k, v = d.ck[k], good = CHECKS.find(c => c[0] === k)[2];
+    r.querySelectorAll("button").forEach(b => { b.className = ""; if (v === (b.dataset.v === "1")) b.className = (v === good) ? "good" : "bad"; }); });
+  render();
+}
+$("#traded").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) { D().traded = b.dataset.v; sync(); } });
+$("#segs").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (!b) return; const s = D().segs, k = b.dataset.k; s.includes(k) ? s.splice(s.indexOf(k), 1) : s.push(k); sync(); });
+$("#checks").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; const k = b.closest(".ck").dataset.k, v = b.dataset.v === "1"; D().ck[k] = D().ck[k] === v ? null : v; sync(); });
+$("#mood").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) { D().mood = D().mood === b.dataset.k ? "" : b.dataset.k; sync(); } });
+$("#noWhy").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) { D().noWhy = D().noWhy === b.dataset.k ? "" : b.dataset.k; sync(); } });
+["profit", "loss", "chg", "maxl"].forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); D()[k] = e.target.value; render(); }));
+["n", "w", "l"].forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target, 0); D()[k] = e.target.value; render(); }));
+document.querySelectorAll(".stepper").forEach(st => st.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return; const k = st.dataset.k, d = D(); let v = (K.num(d[k]) || 0) + (b.textContent.includes("−") ? -1 : 1); v = Math.max(0, Math.min(99, v));
+  d[k] = String(v); if (k !== "n" && (K.num(d.w) || 0) + (K.num(d.l) || 0) > (K.num(d.n) || 0)) d.n = String((K.num(d.w) || 0) + (K.num(d.l) || 0));
+  ["n", "w", "l"].forEach(x => $("#" + x).value = d[x]); render();
+}));
+$("#note").addEventListener("input", e => { D().note = e.target.value; render(); });
+$("#noNote").addEventListener("input", e => { D().noNote = e.target.value; render(); });
+$("#who").addEventListener("input", e => { S.who = e.target.value; render(); });
+$("#optMoney").addEventListener("change", e => { S.money = e.target.checked; render(); });
+$("#date").addEventListener("change", e => { S.date = e.target.value || K.iso(K.istNow()); S.day = S.hist[S.date] ? structuredClone(S.hist[S.date]) : blank(); fill(); });
+
+// fill from the trade journal (closed trades on this date)
+function journalToday() {
+  let J = []; try { J = JSON.parse(localStorage.getItem("journal_v1") || "{}").trades || []; } catch {}
+  return J.filter(t => t.date === S.date && K.num(t.exit) > 0 && K.num(t.entry) > 0).map(t => { const dir = t.side === "short" ? -1 : 1, q = K.num(t.qty) > 0 ? K.num(t.qty) : (K.num(t.risk) > 0 ? Math.floor(K.num(t.risk) / Math.abs(K.num(t.entry) - K.num(t.sl))) : 0); return (K.num(t.exit) - K.num(t.entry)) * dir * q; });
+}
+$("#loadJ").addEventListener("click", () => {
+  const p = journalToday(); if (!p.length) { K.toast("No closed journal trades on this date"); return; }
+  const d = D(), win = p.filter(x => x > 0), los = p.filter(x => x <= 0);
+  Object.assign(d, { n: String(p.length), w: String(win.length), l: String(los.length), profit: K.nf(win.reduce((a, b) => a + b, 0), 0), loss: K.nf(Math.abs(los.reduce((a, b) => a + b, 0)), 0) });
+  ["n", "w", "l", "profit", "loss"].forEach(k => $("#" + k).value = d[k]); render(); K.toast(`📒 Loaded ${p.length} trade${p.length === 1 ? "" : "s"}`);
+});
+
+/* ---------- analysis ---------- */
+function analyse() {
+  const d = D();
+  if (d.traded === "no") {
+    const why = d.noWhy, fearful = why === "fear";
+    return { no: true, grade: fearful ? "B" : "A", gcol: fearful ? "#febc2e" : "#22d39a", gtxt: fearful ? "A rest day after losses" : "Discipline day",
+      gsub: fearful ? "Taking a break after losses is healthy. Use it to reset, not to fear the market." : "No trade is also a position. Skipping weak setups protects your capital.",
+      good: [why === "nosetup" || why === "choppy" ? "You waited instead of forcing trades in a poor market." : why === "plan" ? "You stuck to your planned rest day." : why === "learn" ? "You invested the day in learning." : "You protected your capital today."],
+      tips: [why === "fear" ? "Tomorrow, if you trade, use half your usual size until confidence returns." : "Mark tomorrow's key levels (pivots, CPR, previous high/low) tonight.", "Write down 1–2 setups you'll take tomorrow, and the max loss for the day.", "Review one past trade from your journal and note the lesson."],
+      conf: fearful ? 62 : 80, confMsg: fearful ? "Losses don't define you; how you come back does. Start small tomorrow and rebuild one good trade at a time." : "Patience is a trading edge most people don't have. You'll be fresh and ready when the right setup shows up." };
+  }
+  if (d.traded !== "yes") return null;
+  const n = K.num(d.n) || 0, w = K.num(d.w) || 0, l = K.num(d.l) || 0, P = K.num(d.profit) || 0, L = Math.abs(K.num(d.loss) || 0), C = K.num(d.chg) || 0, ML = K.num(d.maxl) || 0;
+  if (!n) return { need: "Enter how many trades you took." };
+  if (w + l > n) return { need: "Winners + losers can't be more than total trades." };
+  const net = P - L - C, closed = w + l, win = closed ? w / closed * 100 : 0, aw = w ? P / w : 0, al = l ? L / l : 0, payoff = al ? aw / al : null, pf = L ? P / L : null;
+  const ck = d.ck, segs = d.segs;
+  // process score: discipline matters more than profit
+  let sc = 0; sc += ck.sl === true ? 30 : ck.sl === false ? 0 : 15; sc += ck.plan === true ? 25 : ck.plan === false ? 5 : 12;
+  sc += ck.over === false ? 15 : ck.over === true ? 0 : 8; sc += ck.revenge === false ? 15 : ck.revenge === true ? 0 : 8;
+  const breached = ML > 0 && (L + C - P) > ML;   // net loss beyond the planned limit
+  sc += ML > 0 ? (breached ? 0 : 15) : 8;
+  const grade = sc >= 90 ? "A+" : sc >= 80 ? "A" : sc >= 65 ? "B" : sc >= 50 ? "C" : "D";
+  const gcol = { "A+": "#22d39a", A: "#22d39a", B: "#00e0b8", C: "#febc2e", D: "#ff5470" }[grade];
+  const good = [], tips = [], warn = [];
+  if (ck.sl === true) good.push("You respected every stop-loss. That's what keeps you in the game.");
+  if (ck.plan === true) good.push("You stuck to your planned setups.");
+  if (ck.over === false && ck.revenge === false) good.push("No overtrading or revenge trades. Great emotional control.");
+  if (ML > 0 && !breached) good.push("You stayed within your max daily loss.");
+  if (payoff && payoff >= 1.5) good.push(`Your average win was ${payoff.toFixed(1)}× your average loss. Good risk-reward.`);
+  if (closed >= 2 && win >= 60) good.push(`${win.toFixed(0)}% of your trades were winners.`);
+  if (net > 0 && sc >= 65) good.push("A profitable day earned with a good process.");
+  if (!good.length) good.push("You showed up and you're reviewing your day. Most traders never do this.");
+  // issues → tips (most important first)
+  if (ck.sl === false) tips.push("Put the stop-loss order in right after entry, not just in your head. One unprotected trade can undo a month.");
+  if (net > 0 && (ck.sl === false || ck.plan === false)) tips.push("You made money while breaking your rules. That's luck, not edge. Repeat the process, not the result.");
+  if (breached) tips.push(`You went past your max daily loss. Tomorrow, stop trading the moment you're down ${K.rs(ML)}. Decide it before the open.`);
+  if (ck.revenge === true) tips.push("After 2 losses in a row, stand up and take a 15-minute break before the next trade.");
+  if (ck.over === true || (n > 6 && segs.includes("intra")) || (n > 4 && segs.includes("optb"))) tips.push(`Set a trade limit for tomorrow (e.g. ${Math.max(2, Math.min(4, Math.round(n / 2)))} trades) and stop when you reach it.`);
+  if (payoff !== null && payoff < 1 && w && l) tips.push("Your losses were bigger than your wins. Aim for at least 1.5× reward for each ₹ of risk: use a target or trail your stop.");
+  if (closed >= 3 && win < 40 && payoff !== null && payoff >= 1.5) tips.push("A low win rate is fine when winners are big. Keep cutting losers quickly.");
+  if (C > 0 && P - L > 0 && C > (P - L) * .3) tips.push("Charges ate a big part of your profit. Fewer, better trades usually work out cheaper.");
+  if (net > 0 && P > 0 && (ML > 0 ? net > 2 * ML : net > 0 && win >= 70 && n >= 3)) tips.push("After a big day, trade a little smaller tomorrow. Overconfidence is the next trap.");
+  if (d.mood === "anxious" || d.mood === "frustrated") tips.push("Feeling stressed? Halve your position size tomorrow until you feel calm again.");
+  if (d.mood === "greedy") tips.push("Excitement leads to oversized trades. Stick to your normal size tomorrow.");
+  const SEGTIP = { optb: "Options buying: time decay eats premium every hour. Avoid holding far-OTM options without a move, and prefer liquid strikes near the money.",
+    opts: "Options selling: always hedge sold options. One gap can wipe out weeks of premium.",
+    intra: "Intraday: let the first 15 minutes settle unless that's your setup, and close before auto square-off.",
+    fut: "Futures: size by stop-loss distance × lot size, not by the margin available.",
+    swing: "Swing: judge trades on the daily close, not every tick. Keep your stop below the swing low.",
+    comm: "Commodity: the evening session moves on global data. Check the US calendar before trading.",
+    curr: "Currency: small moves with high leverage. Keep position sizes modest." };
+  segs.forEach(s => SEGTIP[s] && tips.push(SEGTIP[s]));
+  if (tips.length < 3) ["Write tomorrow's plan tonight: levels, setups and your max loss.", "Log today's trades in your journal while they're fresh.", "Sleep well. A rested mind makes better decisions than any indicator."].forEach(t => tips.length < 3 && tips.push(t));
+  const issues = (ck.sl === false) + breached + (ck.revenge === true) + (ck.over === true) + (ck.plan === false);
+  let conf = Math.round(Math.max(25, Math.min(98, 45 + sc * .45 + (net > 0 ? 5 : 0) - issues * 4)));
+  const confMsg = net > 0 && sc < 65 ? "You made money today, but the way you traded is risky. Fix the stop-loss habit and these profits become repeatable instead of lucky. 🎯"
+    : conf >= 80 ? "You traded like a professional today. Trust your process and show up the same way tomorrow. 💪"
+    : conf >= 65 ? "A solid day to build on. Fix one small thing tomorrow and you'll be even sharper. 🔥"
+    : conf >= 50 ? "Every great trader has days like this. You reviewed it honestly, and that's how you improve. Tomorrow is a fresh start. 🌱"
+    : "Tough day, but it's one day, not your career. Trade smaller tomorrow, follow your stop-loss, and rebuild one good trade at a time. 🙏";
+  const gtxt = { "A+": "Excellent process", A: "Strong discipline", B: "Good day, small leaks", C: "Rules slipped today", D: "Reset needed" }[grade];
+  const gsub = `Net ${K.srs(net)}${closed ? ` · ${win.toFixed(0)}% winners` : ""}`;
+  return { grade, gcol, gtxt, gsub, good: good.slice(0, 3), tips: tips.slice(0, 3), conf, confMsg, n, w, l, P, L, C, net, win, aw, al, payoff, pf, sc, closed, breached };
+}
+
+/* ---------- render ---------- */
+const GRADE_LABEL = "PROCESS GRADE";
+function render() {
+  const A = analyse(), d = D();
+  $("#numErr").textContent = A?.need || "";
+  $("#loadJ").hidden = !journalToday().length;
+  $("#meta").textContent = K.niceDate(S.date, { weekday: "short", day: "numeric", month: "short" });
+  if (!A || A.need) { $("#out").innerHTML = `<div class="placeholder">${d.traded ? (A?.need || "Fill in your numbers.") : "Start with: did you trade today?"}</div>`; S.save(); drawHist(); return; }
+  let h = `<div class="grade" style="border-color:${A.gcol}88;background:${A.gcol}14"><div class="g" style="color:${A.gcol}">${A.grade}</div><div><small style="font:600 .66rem 'JetBrains Mono';letter-spacing:.1em;color:var(--muted)">${A.no ? "TODAY" : GRADE_LABEL}</small><b>${A.gtxt}</b><span>${A.gsub}</span></div></div>`;
+  if (!A.no) {
+    const st = (k, v, c = "") => `<div class="stat"><span>${k}</span><b class="${c}">${v}</b></div>`;
+    h += `<div class="stats">${st("Net P&L", K.srs(A.net), A.net >= 0 ? "up" : "down")}${st("Win rate", A.closed ? `${A.win.toFixed(0)}% (${A.w}W/${A.l}L)` : "—")}${st("Avg win / loss", `${A.w ? K.rs(A.aw) : "—"} / ${A.l ? K.rs(A.al) : "—"}`)}${st("Payoff ratio", A.payoff ? A.payoff.toFixed(2) + "×" : "—", A.payoff >= 1.5 ? "up" : A.payoff && A.payoff < 1 ? "down" : "")}</div>`;
+    if (A.breached) h += `<div class="warnbox">⛔ You crossed your max daily loss of ${K.rs(K.num(d.maxl))}.</div>`;
+  }
+  h += `<div class="list" style="border-color:rgba(34,211,154,.4);background:rgba(34,211,154,.06)"><h4 style="color:var(--up)">✅ WHAT YOU DID WELL</h4>${A.good.map(g => `<div>• ${g}</div>`).join("")}</div>`;
+  h += `<div class="list" style="border-color:rgba(254,188,46,.4);background:rgba(254,188,46,.06)"><h4 style="color:var(--warn)">🎯 TIPS FOR TOMORROW</h4>${A.tips.map((t, i) => `<div>${i + 1}. ${t}</div>`).join("")}</div>`;
+  h += `<div class="meter"><small>CONFIDENCE FOR TOMORROW · ${A.conf}%</small><div class="bar"><i style="width:${A.conf}%"></i></div><p>${A.confMsg}</p></div>`;
+  $("#out").innerHTML = h; S.save(); drawHist();
+}
+function drawHist() {
+  const days = []; for (let i = 6; i >= 0; i--) { const dt = K.parseISO(S.date); dt.setDate(dt.getDate() - i); days.push(K.iso(dt)); }
+  $("#hist").innerHTML = days.map(k => { const r = S.hist[k]; let g = "·", col = ""; if (r) { const a = analyseSaved(r); g = a.grade; col = `background:${a.gcol}33;border-color:${a.gcol}88`; } return `<div><b style="${col}">${g}</b>${K.parseISO(k).toLocaleDateString("en-IN", { weekday: "short" })}</div>`; }).join("");
+  let s = 0; const dt = K.parseISO(K.iso(K.istNow())); if (!S.hist[K.iso(dt)]) dt.setDate(dt.getDate() - 1);
+  while (S.hist[K.iso(dt)] || [0, 6].includes(dt.getDay())) { if (S.hist[K.iso(dt)]) s++; dt.setDate(dt.getDate() - 1); if (s > 400) break; }
+  $("#streak").textContent = s ? `🔥 ${s}-day review streak` : "save a review to start a streak";
+}
+function analyseSaved(r) { const keep = S.day; S.day = r; const a = analyse() || { grade: "·", gcol: "#888" }; S.day = keep; return a.need ? { grade: "·", gcol: "#888" } : a; }
+$("#saveBtn").addEventListener("click", () => {
+  const A = analyse(); if (!A || A.need) { K.toast(A?.need || "Answer the questions first"); return; }
+  S.hist[S.date] = structuredClone(D()); S.save(); drawHist(); K.toast("💾 Saved. See you tomorrow!");
+});
+
+/* ---------- share ---------- */
+const DISC = "_Personal review for learning. Not investment advice. Not SEBI registered._";
+function valid() { const A = analyse(); if (A && !A.need) return true; K.toast(A?.need || "Answer the questions first"); return false; }
+function text() {
+  const A = analyse(), d = D(), who = S.who.trim(), out = [`📝 *${who ? who.toUpperCase() + "'S " : "MY "}TRADING DAY* · ${K.niceDate(S.date, { weekday: "short", day: "numeric", month: "short" })}`, ""];
+  if (A.no) out.push(`🧘 *No-trade day*${d.noWhy ? ` (${NOWHY[d.noWhy].replace(/^\S+\s/, "")})` : ""}`, A.gsub);
+  else {
+    out.push(`🏅 Process grade: *${A.grade}* (${A.gtxt})`);
+    if (d.segs.length) out.push(`📂 ${d.segs.map(s => SEGS[s][0]).join(" · ")}`);
+    out.push(`🔢 ${A.n} trade${A.n === 1 ? "" : "s"} · ${A.closed ? `${A.win.toFixed(0)}% winners (${A.w}W/${A.l}L)` : "no closed trades"}`);
+    if (A.payoff) out.push(`⚖️ Avg win is ${A.payoff.toFixed(1)}× avg loss`);
+    if (S.money) out.push(`💰 Net P&L: *${K.srs(A.net)}*`);
+  }
+  out.push("", "✅ *Went well*", ...A.good.map(g => "• " + g), "", "🎯 *Tomorrow*", ...A.tips.map((t, i) => `${i + 1}. ${t}`), "", `💪 Confidence for tomorrow: *${A.conf}%*`, `_${A.confMsg}_`);
+  const nt = (A.no ? d.noNote : d.note).trim(); if (nt) out.push("", `📝 ${K.clean(nt)}`);
+  return out.concat(K.signoff("day-review", "Review your day", DISC)).join("\n");
+}
+async function draw() {
+  await K.loadFonts(); await document.fonts.load(`800 120px ${K.F.GROT}`).catch(() => {});
+  const A = analyse(), d = D(), W = 1080, m = K.measure(); m.font = `400 28px ${K.F.INTER}`;
+  const wrapL = (arr, pre) => arr.map((t, i) => K.cap(K.wrap(m, (pre ? pre(i) : "• ") + t, W - 210), 3));
+  const good = wrapL(A.good), tips = wrapL(A.tips, i => `${i + 1}. `);
+  m.font = `500 28px ${K.F.INTER}`; const cm = K.cap(K.wrap(m, A.confMsg, W - 210), 3);
+  const lh = 40, block = L => 70 + L.reduce((a, l) => a + l.length * lh, 0) + 18;
+  const statsH = A.no ? 0 : 130 + 20, segH = !A.no && d.segs.length ? 60 : 0;
+  const H = 320 + 250 + 24 + segH + statsH + block(good) + 20 + block(tips) + 20 + (110 + cm.length * 40) + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H, [[A.gcol + "40", .9, .08, .6], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(254,188,46,0.10)", .95, .95, .55]]);
+  K.brand(ctx);
+  const who = S.who.trim();
+  K.txt(ctx, `${who ? who.toUpperCase() + "'S" : "MY"} TRADING DAY`, 70, 200, `600 26px ${K.F.MONO}`, "#febc2e");
+  K.txt(ctx, K.niceDate(S.date, { weekday: "long", day: "numeric", month: "short" }), 70, 282, `800 68px ${K.F.INTER}`, "#ffffff");
+  let y = 320;
+  K.panel(ctx, 70, y, W - 140, 250, 32, A.gcol + "1c", A.gcol + "99");
+  K.txt(ctx, A.grade, 200, y + 172, `800 150px ${K.F.GROT}`, A.gcol, "center");
+  K.txt(ctx, A.no ? "TODAY" : GRADE_LABEL, 340, y + 78, `700 22px ${K.F.MONO}`, "#c9cfdb");
+  ctx.font = K.fit(ctx, A.gtxt, 800, K.F.INTER, 50, W - 450); ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.fillText(A.gtxt, 340, y + 140);
+  const sub = A.no ? (d.noWhy ? NOWHY[d.noWhy] : "No-trade day") : `${A.n} trades · ${A.closed ? A.win.toFixed(0) + "% winners" : "—"}${S.money ? " · " + K.srs(A.net) : ""}`;
+  ctx.font = K.fit(ctx, sub, 500, K.F.INTER, 30, W - 450); ctx.fillStyle = "#c9cfdb"; ctx.fillText(sub, 340, y + 192);
+  y += 274;
+  if (segH) { let x = 70; d.segs.forEach(s => { const lab = SEGS[s][0]; ctx.font = `600 24px ${K.F.INTER}`; const w = ctx.measureText(lab).width + 30; if (x + w > W - 70) return; K.rr(ctx, x, y, w, 44, 22); ctx.fillStyle = "rgba(254,188,46,0.14)"; ctx.fill(); K.txt(ctx, lab, x + 15, y + 30, `600 24px ${K.F.INTER}`, "#ffd98a"); x += w + 10; }); y += segH; }
+  if (statsH) {
+    const cells = [["TRADES", String(A.n)], ["WIN RATE", A.closed ? A.win.toFixed(0) + "%" : "—"], ["PAYOFF", A.payoff ? A.payoff.toFixed(1) + "×" : "—"], [S.money ? "NET P&L" : "W / L", S.money ? K.srs(A.net).replace(".00", "") : `${A.w} / ${A.l}`]];
+    const cw = (W - 140 - 30) / 4;
+    cells.forEach(([k, v], i) => { const bx = 70 + i * (cw + 10); K.panel(ctx, bx, y, cw, 130, 22, "rgba(0,0,0,0.38)"); K.txt(ctx, k, bx + cw / 2, y + 42, `600 19px ${K.F.MONO}`, "#8a90a2", "center"); ctx.font = K.fit(ctx, v, 800, K.F.INTER, 44, cw - 20); ctx.fillStyle = k === "NET P&L" ? (A.net >= 0 ? "#22d39a" : "#ff5470") : "#ffffff"; ctx.textAlign = "center"; ctx.fillText(v, bx + cw / 2, y + 100); });
+    y += statsH;
+  }
+  [[good, "WHAT WENT WELL", "#22d39a"], [tips, "TIPS FOR TOMORROW", "#febc2e"]].forEach(([L, t, col]) => {
+    const h = block(L); K.panel(ctx, 70, y, W - 140, h, 26, col + "12", col + "66");
+    K.txt(ctx, t, 104, y + 48, `700 22px ${K.F.MONO}`, col);
+    let ly = y + 50; L.forEach(lines => lines.forEach(l => { ly += lh; K.txt(ctx, l, 104, ly, `400 28px ${K.F.INTER}`, "#e3e6ee"); }));
+    y += h + 20;
+  });
+  const ch = 110 + cm.length * 40; K.rr(ctx, 70, y, W - 140, ch, 26);
+  const g = ctx.createLinearGradient(70, y, W - 70, y + ch); g.addColorStop(0, "rgba(124,92,255,0.24)"); g.addColorStop(1, "rgba(0,224,184,0.16)"); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = "rgba(124,92,255,0.6)"; ctx.lineWidth = 2; ctx.stroke();
+  K.txt(ctx, `CONFIDENCE FOR TOMORROW · ${A.conf}%`, 104, y + 46, `700 22px ${K.F.MONO}`, "#c9bcff");
+  K.rr(ctx, 104, y + 62, W - 208, 14, 7); ctx.fillStyle = "rgba(255,255,255,0.1)"; ctx.fill();
+  const bg = ctx.createLinearGradient(104, 0, W - 104, 0); bg.addColorStop(0, "#febc2e"); bg.addColorStop(1, "#22d39a"); K.rr(ctx, 104, y + 62, (W - 208) * A.conf / 100, 14, 7); ctx.fillStyle = bg; ctx.fill();
+  cm.forEach((l, i) => K.txt(ctx, l, 104, y + 116 + i * 40, `500 28px ${K.F.INTER}`, "#ffffff"));
+  K.footer(ctx, W, H, K.toolUrl("day-review"), "Personal review for learning · Not investment advice · Not SEBI registered", true);
+  return c;
+}
+K.share({ text, valid, draw, file: () => `trading-day-${S.date}` });
+fill();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

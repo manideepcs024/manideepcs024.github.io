@@ -97,6 +97,7 @@ const META = "mmm_last_backup";
 // friendly names for what each tool saves; anything else is still backed up
 const KNOWN = {
   journal_v1: ["📒", "Trade journal", v => `${(v.trades || []).length} trades`],
+  dayreview_v1: ["📝", "Trading day reviews", v => `${Object.keys(v.hist || {}).length} days reviewed`],
   review_v1: ["🔍", "Trade review draft"],
   contest_v1: ["🎯", "Guess the Close contest", v => { const p = Object.keys(v.season || {}).length, c = (v.recorded || []).length; return `${p} player${p === 1 ? "" : "s"} · ${c} contest${c === 1 ? "" : "s"}`; }],
   quizscore_v1: ["🏅", "Quiz scoreboard", v => `${Object.keys(v.months || {}).length} month(s) of leaderboards`],
