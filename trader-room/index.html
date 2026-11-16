@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0c14" />
+<title>Inside Manideep's Trading Room — my process in 3D</title>
+<meta name="description" content="Walk through Manideep's trading process in a 3D room: screening the Nifty 500, fundamentals, events and news, technical strength, range and accumulation, execution, managing trades and finding the next one." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+<style>
+  :root { --fg: #eef0f6; --muted: #8f95a8; --line: rgba(255,255,255,.12); --card: rgba(12,14,24,.86); --a1: #7c5cff; --a2: #00e0b8; --up: #22d39a; --down: #ff5470; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; background: #0a0c14; color: var(--fg); font-family: Inter, system-ui, sans-serif; }
+  [hidden] { display: none !important; }
+  #scene { position: fixed; inset: 0; }
+  #scene canvas { display: block; touch-action: none; }
+  .top { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; z-index: 5; pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 9px 13px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .brand b { font: 700 .98rem "Space Grotesk"; display: block; }
+  .brand span { font: 500 .7rem "JetBrains Mono"; color: var(--muted); }
+  .nav { display: flex; gap: 6px; }
+  .nav a { font-size: .78rem; color: var(--fg); text-decoration: none; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); white-space: nowrap; }
+
+  .step { position: fixed; right: 16px; top: 84px; width: 380px; max-height: calc(100% - 100px); overflow: auto; z-index: 6; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 16px 18px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 20px 60px -20px rgba(0,0,0,.8); }
+  .step .k { font: 600 .66rem "JetBrains Mono"; letter-spacing: .12em; color: var(--a2); text-transform: uppercase; }
+  .step h2 { font: 800 1.45rem/1.15 "Space Grotesk"; margin: 4px 0 8px; }
+  .step .lead { font-size: .9rem; color: #d5d9e4; line-height: 1.5; }
+  .step ul { list-style: none; margin-top: 10px; display: grid; gap: 7px; }
+  .step li { font-size: .86rem; line-height: 1.45; color: #e3e6ee; padding-left: 22px; position: relative; animation: in .4s both; }
+  .step li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--up); font-weight: 800; }
+  @keyframes in { from { opacity: 0; transform: translateX(8px); } }
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tools span { font: 600 .72rem Inter; padding: 5px 10px; border-radius: 999px; background: rgba(124,92,255,.14); border: 1px solid rgba(124,92,255,.4); color: #d8ccff; }
+  .tools a { font: 600 .72rem Inter; padding: 5px 10px; border-radius: 999px; background: rgba(0,224,184,.12); border: 1px solid rgba(0,224,184,.45); color: #9ff3e1; text-decoration: none; }
+  .nav2 { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; margin-top: 14px; }
+  .nav2 button { border: 0; border-radius: 12px; padding: 11px 14px; font: 700 .86rem Inter; cursor: pointer; background: rgba(255,255,255,.08); color: #fff; }
+  .nav2 .next { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); }
+  .dots { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.18); cursor: pointer; }
+  .dots i.on { background: var(--a2); width: 22px; border-radius: 5px; }
+  .row { display: flex; gap: 6px; margin-top: 10px; }
+  .row button { flex: 1; border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 10px; padding: 8px; font: 600 .76rem Inter; cursor: pointer; }
+  .row button:hover, .row button.on { color: #fff; border-color: rgba(0,224,184,.5); }
+  .disc { font-size: .68rem; color: #7d8296; line-height: 1.45; margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .hint { position: fixed; left: 16px; bottom: max(14px, env(safe-area-inset-bottom)); font: 500 .72rem "JetBrains Mono"; color: var(--muted); background: rgba(0,0,0,.45); padding: 6px 12px; border-radius: 999px; z-index: 4; }
+  .loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 10; background: #0a0c14; color: var(--muted); font: 500 .9rem Inter; transition: opacity .5s; }
+  @media (max-width: 760px) {
+    .step { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 50%; padding: 12px 14px; border-radius: 20px; }
+    .step h2 { font-size: 1.15rem; margin: 2px 0 6px; }
+    .step .lead { font-size: .82rem; }
+    .step li { font-size: .8rem; }
+    .brand span, .hint { display: none; }
+  }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+  <div class="loading" id="loading">Setting up the trading desk…</div>
+  <div id="scene"></div>
+  <div class="top">
+    <div class="brand"><b>📈 Manideep's Trading Room</b><span>how I find, plan &amp; manage a trade</span></div>
+    <nav class="nav"><a href="../tools/">🧰 Tools</a><a href="../">← Home</a></nav>
+  </div>
+
+  <aside class="step" id="step">
+    <div class="k" id="sK"></div>
+    <h2 id="sT"></h2>
+    <p class="lead" id="sL"></p>
+    <ul id="sB"></ul>
+    <div class="tools" id="sTools"></div>
+    <div class="nav2"><button id="prev">←</button><div class="dots" id="dots"></div><button class="next" id="next">Next →</button></div>
+    <div class="row"><button id="play">▶ Auto-play</button><button id="explore">🖐 Free look</button></div>
+    <p class="disc">My personal process, shared for learning. Stock names and numbers on the screens are illustrative samples, not recommendations. I'm not SEBI-registered; this isn't investment advice.</p>
+  </aside>
+  <div class="hint">drag to look around · scroll to zoom</div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const $ = s => document.querySelector(s);
+
+/* ---------- renderer ---------- */
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+$("#scene").appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0d1020);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, .1, 300);
+const controls = new OrbitControls(camera, renderer.domElement);
+Object.assign(controls, { enableDamping: true, minDistance: 3, maxDistance: 34, maxPolarAngle: Math.PI * .49 });
+scene.add(new THREE.HemisphereLight(0xdfe6ff, 0x3a2f28, 1.05));
+const sun = new THREE.DirectionalLight(0xffe9cc, 1.2); sun.position.set(-14, 16, 6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14 }); scene.add(sun);
+const lamp = new THREE.PointLight(0xffc98a, 30, 24, 1.5); lamp.position.set(-8.3, 6.6, -6.2); lamp.castShadow = true; scene.add(lamp);
+const glow = new THREE.PointLight(0x7aa8ff, 14, 14, 1.6); glow.position.set(0, 4.5, -3.2); scene.add(glow);
+
+const MATS = {}; const mat = (c, o = {}) => MATS[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: o.r ?? .7, metalness: o.m ?? 0, emissive: o.e ?? 0, emissiveIntensity: o.ei ?? 1 });
+function mesh(geo, m, p, x = 0, y = 0, z = 0) { const o = new THREE.Mesh(geo, typeof m === "object" ? m : mat(m)); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; p.add(o); return o; }
+const box = (w, h, d, m, p, x, y, z) => mesh(new THREE.BoxGeometry(w, h, d), m, p, x, y + h / 2, z);
+const cyl = (rt, rb, h, m, p, x, y, z, s = 20) => mesh(new THREE.CylinderGeometry(rt, rb, h, s), m, p, x, y + h / 2, z);
+function tube(a, b, r, m, p) { const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), o = mesh(new THREE.CylinderGeometry(r, r, A.distanceTo(B), 10), m, p); o.position.copy(A).add(B).multiplyScalar(.5); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize()); return o; }
+function canvasTex(w, h) { const c = document.createElement("canvas"); c.width = w; c.height = h; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return { c, x: c.getContext("2d"), t }; }
+
+/* ---------- room (feet; x: left→right, z: back wall → you) ---------- */
+const R = new THREE.Group(); scene.add(R);
+const floor = mesh(new THREE.PlaneGeometry(20, 16), mat(0x8a5a3c, { r: .55 }), R); floor.rotation.x = -Math.PI / 2;
+for (let i = -9; i <= 9; i += 1.5) { const l = mesh(new THREE.PlaneGeometry(.04, 16), mat(0x6e4630), R, i, .005, 0); l.rotation.x = -Math.PI / 2; l.castShadow = false; }
+const rug = mesh(new THREE.CircleGeometry(4.2, 48), mat(0x2b3150, { r: 1 }), R, 0, .02, -1.5); rug.rotation.x = -Math.PI / 2;
+box(20, 10, .3, mat(0x2a3048, { r: .95 }), R, 0, 0, -8);                                   // back wall
+const leftWall = new THREE.Group(); R.add(leftWall);
+box(.3, 10, 16, mat(0x313856, { r: .95 }), leftWall, -10, 0, 0);
+box(.3, 10, 16, mat(0x313856, { r: .95 }), R, 10, 0, 0);                                     // right wall
+box(20, .4, .4, mat(0x1d2236), R, 0, 0, -7.8);                                               // skirting
+// window with a city skyline
+{
+  const { c, x, t } = canvasTex(512, 384);
+  const g = x.createLinearGradient(0, 0, 0, 384); g.addColorStop(0, "#1c2b5a"); g.addColorStop(.6, "#5b4a8a"); g.addColorStop(1, "#ff9a6b"); x.fillStyle = g; x.fillRect(0, 0, 512, 384);
+  for (let i = 0; i < 26; i++) { const w = 18 + Math.random() * 34, h = 60 + Math.random() * 200, bx = i * 20 - 10; x.fillStyle = `rgb(${18 + i % 3 * 6},${20 + i % 4 * 5},${40 + i % 5 * 6})`; x.fillRect(bx, 384 - h, w, h); x.fillStyle = "rgba(255,214,140,.8)"; for (let k = 0; k < h / 14; k++) if (Math.random() < .35) x.fillRect(bx + 4 + (k * 7) % (w - 8), 384 - h + 6 + k * 12, 3, 4); }
+  t.needsUpdate = true;
+  const win = mesh(new THREE.PlaneGeometry(5.2, 3.8), new THREE.MeshBasicMaterial({ map: t }), R, -9.82, 5.4, -3.2); win.rotation.y = Math.PI / 2; win.castShadow = false;
+  [[-9.8, 3.45, -3.2, .2, .2, 5.6], [-9.8, 7.35, -3.2, .2, .2, 5.6], [-9.8, 5.4, -6.0, .2, 4.1, .2], [-9.8, 5.4, -.4, .2, 4.1, .2], [-9.8, 5.4, -3.2, .12, 3.8, .12]].forEach(([px, py, pz, w, h, d]) => mesh(new THREE.BoxGeometry(w, h, d), mat(0xe8e4dc), R, px, py, pz));
+}
+// desk + chair
+const WOOD = mat(0x3b2a20, { r: .5 }), DARK = mat(0x1a1c24, { r: .4 }), STEEL = mat(0x9aa2ad, { m: .7, r: .3 });
+box(10, .22, 3, WOOD, R, 0, 2.6, -6.2); [[-4.7, -7.4], [4.7, -7.4], [-4.7, -5], [4.7, -5]].forEach(([x, z]) => box(.18, 2.6, .18, DARK, R, x, 0, z));
+box(2.6, .08, .9, DARK, R, 0, 2.82, -5.25);                                                // keyboard
+for (let i = 0; i < 4; i++) box(2.4, .02, .14, mat(0x2b2e38), R, 0, 2.9, -5.6 + i * .2);
+mesh(new THREE.SphereGeometry(.13, 12, 8), DARK, R, 1.7, 2.9, -5.2).scale.set(1, .55, 1.4);
+box(1.1, .03, .9, mat(0x222634), R, 1.75, 2.82, -5.2);
+const mug = cyl(.22, .19, .45, mat(0xf2efe8, { r: .4 }), R, -2.4, 2.82, -5.1); mesh(new THREE.TorusGeometry(.13, .035, 8, 14), mat(0xf2efe8), R, -2.64, 3.05, -5.1).rotation.y = Math.PI / 2;
+const phone = box(.42, .04, .8, DARK, R, 2.9, 2.82, -5.0); phone.rotation.y = -.3;
+// floor lamp in the corner
+cyl(.5, .6, .12, DARK, R, -8.3, 0, -6.6); tube([-8.3, .1, -6.6], [-8.3, 6.6, -6.6], .06, DARK, R);
+mesh(new THREE.CylinderGeometry(.55, .85, 1.0, 24, 1, true), mat(0xffd9a8, { e: 0xffb060, ei: .7, r: .6 }), R, -8.3, 7.0, -6.6);
+// office chair
+const chair = new THREE.Group(); chair.position.set(0, 0, -2.6); R.add(chair);
+cyl(.12, .12, 1.3, STEEL, chair, 0, .25, 0); for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; tube([0, .28, 0], [Math.cos(a) * 1.1, .2, Math.sin(a) * 1.1], .06, DARK, chair); mesh(new THREE.SphereGeometry(.1, 8, 6), DARK, chair, Math.cos(a) * 1.1, .12, Math.sin(a) * 1.1); }
+box(1.9, .3, 1.8, mat(0x222a3f, { r: .6 }), chair, 0, 1.45, 0); const back = box(1.8, 2.3, .25, mat(0x222a3f, { r: .6 }), chair, 0, 1.9, .95); back.rotation.x = -.08;
+// bookshelf
+{
+  const s = new THREE.Group(); s.position.set(-9.3, 0, 3.2); s.rotation.y = Math.PI / 2; R.add(s);
+  box(5, 7.5, 1.2, WOOD, s, 0, 0, 0); [1.6, 3.4, 5.2].forEach(y => box(4.7, .12, 1.1, mat(0x5a4030), s, 0, y, .05));
+  const bc = [0x7c5cff, 0x00e0b8, 0xff5470, 0xffd23f, 0x5b8cff, 0xf2efe8, 0x22d39a, 0xff8c1a];
+  [0, 1.72, 3.52, 5.32].forEach((y, r) => { let x = -2.2; for (let i = 0; x < 2.0; i++) { const w = .18 + Math.random() * .16, h = 1.1 + Math.random() * .45; box(w, h, .8, mat(bc[(i + r * 3) % 8], { r: .8 }), s, x + w / 2, y + .12, .1).rotation.z = i % 7 === 3 ? .18 : 0; x += w + .03; } });
+}
+// wall clock (live IST)
+const clock = canvasTex(256, 256); { const m = mesh(new THREE.CircleGeometry(1.1, 40), new THREE.MeshBasicMaterial({ map: clock.t }), R, 7.2, 8.0, -7.82); m.castShadow = false; mesh(new THREE.TorusGeometry(1.12, .08, 10, 40), DARK, R, 7.2, 8.0, -7.8); }
+function drawClock() {
+  const { x, t } = clock, d = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  x.fillStyle = "#f4f1ea"; x.fillRect(0, 0, 256, 256); x.translate(128, 128); x.fillStyle = "#222";
+  for (let i = 0; i < 12; i++) { x.save(); x.rotate(i * Math.PI / 6); x.fillRect(-3, -112, 6, 18); x.restore(); }
+  const hand = (a, l, w, c) => { x.save(); x.rotate(a); x.fillStyle = c; x.fillRect(-w / 2, -l, w, l + 12); x.restore(); };
+  hand((d.getHours() % 12 + d.getMinutes() / 60) * Math.PI / 6, 60, 9, "#222"); hand((d.getMinutes() + d.getSeconds() / 60) * Math.PI / 30, 88, 6, "#222"); hand(d.getSeconds() * Math.PI / 30, 96, 2, "#e0284f");
+  x.font = "600 18px Inter, sans-serif"; x.textAlign = "center"; x.fillStyle = "#888"; x.fillText("IST", 0, 44); x.setTransform(1, 0, 0, 1, 0, 0); t.needsUpdate = true;
+}
+// poster + plant
+{
+  const { x, t } = canvasTex(400, 520); x.fillStyle = "#15182a"; x.fillRect(0, 0, 400, 520);
+  x.fillStyle = "#00e0b8"; x.font = "800 34px Inter, sans-serif"; x.fillText("PLAN", 36, 110); x.fillStyle = "#7c5cff"; x.fillText("THE TRADE.", 36, 152); x.fillStyle = "#fff"; x.fillText("TRADE", 36, 230); x.fillStyle = "#ffd23f"; x.fillText("THE PLAN.", 36, 272);
+  x.fillStyle = "#8f95a8"; x.font = "500 20px Inter, sans-serif"; x.fillText("— my rule #1", 36, 340); t.needsUpdate = true;
+  mesh(new THREE.PlaneGeometry(2.4, 3.1), new THREE.MeshBasicMaterial({ map: t }), R, -6.5, 6.6, -7.83).castShadow = false; mesh(new THREE.BoxGeometry(2.6, 3.3, .08), DARK, R, -6.5, 6.6, -7.88);
+  cyl(.7, .5, 1.3, mat(0xd8d2c6), R, 8.6, 0, -6.8); [[0, 2.4, 0, 1.1], [-.5, 2.0, .3, .8], [.5, 2.1, -.2, .85], [0, 3.0, .2, .7]].forEach(([dx, y, dz, r]) => mesh(new THREE.SphereGeometry(r, 14, 10), mat(0x2f8f4e, { r: .9 }), R, 8.6 + dx, y, -6.8 + dz));
+}
+
+/* ---------- monitors ---------- */
+const SW = 1024, SH = 600;
+function monitor(x, z, ry, w = 3.4) {
+  const g = new THREE.Group(); g.position.set(x, 2.82, z); g.rotation.y = ry; R.add(g);
+  box(.9, .08, .6, DARK, g, 0, 0, 0); box(.14, 1.0, .14, DARK, g, 0, 0, -.05);
+  const h = w * SH / SW; box(w + .16, h + .16, .12, DARK, g, 0, .95, -.1);
+  const s = canvasTex(SW, SH); const scr = mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: s.t }), g, 0, .95 + (h + .16) / 2, -.03); scr.castShadow = false;
+  const n = new THREE.Vector3(Math.sin(ry), 0, Math.cos(ry)), c = new THREE.Vector3(x, 2.82 + .95 + (h + .16) / 2, z);
+  return { g, ...s, center: c, normal: n, w, h };
+}
+const MON = { left: monitor(-3.7, -6.0, .5), center: monitor(0, -6.55, 0, 3.8), right: monitor(3.7, -6.0, -.5) };
+// whiteboard on the right wall
+const WB = (() => { const s = canvasTex(1024, 640), g = new THREE.Group(); g.position.set(9.8, 5.5, -1.2); g.rotation.y = -Math.PI / 2; R.add(g);
+  mesh(new THREE.BoxGeometry(7.4, 4.8, .1), mat(0xb9bec8, { m: .6, r: .3 }), g, 0, 0, -.06); const p = mesh(new THREE.PlaneGeometry(7.1, 4.44), new THREE.MeshBasicMaterial({ map: s.t }), g, 0, 0, .01); p.castShadow = false;
+  box(3, .1, .3, mat(0x9aa2ad), g, 0, -2.5, .15);
+  return { ...s, center: new THREE.Vector3(9.8, 5.5, -1.2), normal: new THREE.Vector3(-1, 0, 0) }; })();
+
+/* ---------- me (simple cartoon figure) ---------- */
+const ME = (() => {
+  const root = new THREE.Group(), s = 5.75 / 5.5, shirt = mat(0x16a394, { r: .85 }), pants = mat(0x30343f, { r: .85 }), skin = mat(0xc68a5e), hair = mat(0x1b1512, { r: .95 });
+  root.scale.setScalar(s); chair.add(root); root.position.set(0, 0, .1); root.rotation.y = Math.PI;
+  const up = new THREE.Group(); up.position.y = 1.62 / s; root.add(up);
+  const torso = mesh(new THREE.CapsuleGeometry(.44, 1.05, 6, 14), shirt, up, 0, .95, 0); torso.scale.z = .7;
+  mesh(new THREE.CylinderGeometry(.13, .15, .25, 10), skin, up, 0, 2.0, 0); mesh(new THREE.SphereGeometry(.42, 20, 16), skin, up, 0, 2.45, 0);
+  const hr = mesh(new THREE.SphereGeometry(.45, 20, 10, 0, Math.PI * 2, 0, Math.PI * .55), hair, up, 0, 2.5, -.04); hr.rotation.x = -.28;
+  [-.15, .15].forEach(x => mesh(new THREE.SphereGeometry(.045, 8, 6), mat(0x111111), up, x, 2.5, .39)); const sm = mesh(new THREE.TorusGeometry(.12, .022, 6, 12, Math.PI), mat(0x7a2e2e), up, 0, 2.34, .37); sm.rotation.z = Math.PI;
+  const arm = sd => { const p = new THREE.Group(); p.position.set(sd * .58, 1.62, 0); up.add(p); mesh(new THREE.CapsuleGeometry(.12, .95, 4, 8), shirt, p, 0, -.6, 0); mesh(new THREE.SphereGeometry(.13, 10, 8), skin, p, 0, -1.25, 0); p.rotation.x = -1.05; return p; };
+  const aL = arm(-1), aR = arm(1); const hy = up.position.y;
+  [-.22, .22].forEach(x => { const th = mesh(new THREE.CylinderGeometry(.17, .16, 1.35, 10), pants, root, x, hy, .62); th.rotation.x = Math.PI / 2; mesh(new THREE.CylinderGeometry(.15, .14, hy, 10), pants, root, x, hy / 2, 1.28); box(.32, .2, .55, mat(0x2a2320), root, x, 0, 1.4); });
+  return { root, aL, aR, up };
+})();
+
+/* ---------- screen drawings (all values illustrative) ---------- */
+const C = { bg: "#0b1020", panel: "#121a30", line: "rgba(255,255,255,.08)", text: "#e8ecf6", mute: "#8b93a7", up: "#22d39a", down: "#ff5470", a1: "#7c5cff", a2: "#00e0b8", gold: "#ffd23f", blue: "#5b8cff", orange: "#ff9a3c" };
+const ease = p => 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
+function frame(x, title, sub) {
+  x.fillStyle = C.bg; x.fillRect(0, 0, SW, SH); x.fillStyle = "#151c33"; x.fillRect(0, 0, SW, 54);
+  ["#ff5f57", "#febc2e", "#28c840"].forEach((c, i) => { x.fillStyle = c; x.beginPath(); x.arc(24 + i * 22, 27, 7, 0, 7); x.fill(); });
+  x.fillStyle = C.text; x.font = "700 24px Inter, sans-serif"; x.textAlign = "left"; x.fillText(title, 100, 35);
+  if (sub) { x.fillStyle = C.mute; x.font = "500 17px 'JetBrains Mono', monospace"; x.textAlign = "right"; x.fillText(sub, SW - 20, 34); x.textAlign = "left"; }
+  x.fillStyle = "rgba(255,255,255,.28)"; x.font = "500 13px Inter, sans-serif"; x.textAlign = "right"; x.fillText("illustrative · not a recommendation", SW - 16, SH - 12); x.textAlign = "left";
+}
+const rr = (x, a, b, w, h, r) => { x.beginPath(); x.roundRect(a, b, w, h, r); };
+// a deterministic price path
+function series(n, seed, shape) { let s = seed, v = 100; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280; const out = []; for (let i = 0; i < n; i++) { const tr = shape(i / n); v = v + (tr - v) * .12 + (rnd() - .5) * 2.6; const o = v + (rnd() - .5) * 2, c = v + (rnd() - .5) * 2.4; out.push({ o, c, h: Math.max(o, c) + rnd() * 1.6, l: Math.min(o, c) - rnd() * 1.6 }); } return out; }
+const ema = (arr, n) => { const k = 2 / (n + 1); let e = arr[0].c; return arr.map(d => (e = d.c * k + e * (1 - k))); };
+function candles(x, data, X0, Y0, W, H, upto, lo, hi) {
+  const cw = W / data.length, Y = v => Y0 + (hi - v) / (hi - lo) * H;
+  data.slice(0, upto).forEach((d, i) => { const col = d.c >= d.o ? C.up : C.down; x.strokeStyle = x.fillStyle = col; x.lineWidth = 1.4; x.beginPath(); x.moveTo(X0 + i * cw + cw / 2, Y(d.h)); x.lineTo(X0 + i * cw + cw / 2, Y(d.l)); x.stroke(); x.fillRect(X0 + i * cw + cw * .2, Y(Math.max(d.o, d.c)), cw * .6, Math.max(1.5, Math.abs(Y(d.o) - Y(d.c)))); });
+  return { cw, Y };
+}
+function line(x, vals, X0, cw, Y, upto, col, w = 2.5) { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); vals.slice(0, upto).forEach((v, i) => i ? x.lineTo(X0 + i * cw + cw / 2, Y(v)) : x.moveTo(X0 + i * cw + cw / 2, Y(v))); x.stroke(); }
+const TREND = series(120, 7, t => 80 + t * 70 + Math.sin(t * 9) * 4);
+const RANGE = series(110, 11, t => t < .45 ? 70 + t / .45 * 55 : 125 + Math.sin((t - .45) * 40) * 6);
+const BREAK = series(110, 11, t => t < .45 ? 70 + t / .45 * 55 : t < .72 ? 125 + Math.sin((t - .45) * 40) * 6 : 125 + (t - .72) / .28 * 48);
+
+const DRAW = {
+  idleL(x) { frame(x, "Watchlist", "NIFTY 500"); ["ALPHA IND", "BETA TECH", "GAMMA POWER", "DELTA AUTO", "ZETA PHARMA", "OMEGA FIN"].forEach((n, i) => { const up = i % 3 !== 1; x.fillStyle = i % 2 ? C.panel : "#0f1629"; x.fillRect(20, 76 + i * 72, SW - 40, 64); x.fillStyle = C.text; x.font = "700 26px Inter"; x.fillText(n, 44, 116 + i * 72); x.fillStyle = up ? C.up : C.down; x.font = "700 24px 'JetBrains Mono'"; x.textAlign = "right"; x.fillText(`${up ? "+" : "−"}${(1 + i * .7).toFixed(2)}%`, SW - 44, 116 + i * 72); x.textAlign = "left"; }); },
+  idleC(x) { frame(x, "TradingView · daily", "SAMPLE STOCK"); const lo = 70, hi = 160; const { cw, Y } = candles(x, TREND, 30, 70, SW - 120, SH - 120, 120, lo, hi); line(x, ema(TREND, 50), 30, cw, Y, 120, C.blue); line(x, ema(TREND, 200).map((v, i) => v - 6 + i * .02), 30, cw, Y, 120, C.orange); },
+  idleR(x) { frame(x, "News & events", "Moneycontrol · NSE"); ["Q3 results date announced", "Board meeting: fund raising", "Sector outlook improves", "Dividend record date set"].forEach((h, i) => { rr(x, 24, 76 + i * 122, SW - 48, 106, 14); x.fillStyle = C.panel; x.fill(); x.fillStyle = C.mute; x.font = "600 16px 'JetBrains Mono'"; x.fillText(["10:42", "09:15", "Yesterday", "2 days ago"][i], 48, 110 + i * 122); x.fillStyle = C.text; x.font = "700 28px Inter"; x.fillText(h, 48, 152 + i * 122); }); },
+
+  screener(x, p) {
+    frame(x, "My custom screener + Screener", "UNIVERSE: NIFTY 500");
+    const F = ["EPS growing YoY", "PE below sector avg", "Market cap > ₹5,000 cr", "Debt / equity < 0.5", "Promoters > 50%, no pledge", "Price above 200 EMA"];
+    const shown = Math.floor(ease(p) * (F.length + .99));
+    F.forEach((f, i) => { if (i >= shown) return; const cx = 24 + (i % 3) * 330, cy = 72 + Math.floor(i / 3) * 56; rr(x, cx, cy, 316, 44, 22); x.fillStyle = "rgba(124,92,255,.22)"; x.fill(); x.fillStyle = "#d8ccff"; x.font = "600 19px Inter"; x.fillText("✓ " + f, cx + 16, cy + 29); });
+    const counts = [500, 312, 188, 121, 64, 31, 18], n = counts[Math.min(shown, 6)];
+    x.fillStyle = C.mute; x.font = "600 20px Inter"; x.fillText("Stocks passing", 24, 220); x.fillStyle = C.a2; x.font = "800 86px 'Space Grotesk', Inter"; x.fillText(String(n), 24, 306);
+    x.fillStyle = C.mute; x.font = "500 18px Inter"; x.fillText(shown >= 6 ? "→ shortlisted to my watchlist" : "applying filters…", 24, 340);
+    const rows = ["ALPHA IND", "BETA TECH", "GAMMA POWER", "DELTA AUTO", "ZETA PHARMA", "OMEGA FIN", "SIGMA LABS"];
+    x.font = "600 15px 'JetBrains Mono'"; x.fillStyle = C.mute; ["NAME", "PE", "EPS g", "MCAP cr"].forEach((h, i) => x.fillText(h, 470 + i * 135, 220));
+    rows.slice(0, Math.max(2, 7 - shown)).forEach((r, i) => { x.fillStyle = i % 2 ? C.panel : "#0f1629"; x.fillRect(460, 232 + i * 46, 540, 42); x.fillStyle = C.text; x.font = "700 18px Inter"; x.fillText(r, 470, 259 + i * 46); x.font = "600 18px 'JetBrains Mono'"; x.fillStyle = C.mute; x.fillText((18 + i * 3.4).toFixed(1), 605, 259 + i * 46); x.fillStyle = C.up; x.fillText(`+${(22 - i * 2)}%`, 740, 259 + i * 46); x.fillStyle = C.mute; x.fillText(`${(42 - i * 4.5).toFixed(0)}k`, 875, 259 + i * 46); });
+  },
+  fundamentals(x, p) {
+    frame(x, "Fundamentals · ALPHA IND (sample)", "Screener · Moneycontrol");
+    const card = (cx, cy, w, h, k, v, sub, col) => { rr(x, cx, cy, w, h, 16); x.fillStyle = C.panel; x.fill(); x.fillStyle = C.mute; x.font = "600 16px 'JetBrains Mono'"; x.fillText(k, cx + 18, cy + 30); x.fillStyle = col || C.text; x.font = "800 38px 'Space Grotesk', Inter"; x.fillText(v, cx + 18, cy + 76); x.fillStyle = C.mute; x.font = "500 15px Inter"; x.fillText(sub, cx + 18, cy + 102); };
+    const a = ease(p * 1.4);
+    card(24, 70, 230, 118, "P/E", (24 * a).toFixed(1), "sector avg 31.0", C.up); card(268, 70, 230, 118, "MARKET CAP", `₹${Math.round(48000 * a).toLocaleString("en-IN")} cr`, "large / mid cap"); card(24, 200, 230, 118, "NIFTY 500", a > .6 ? "✓ Member" : "…", "liquid & established", C.a2); card(268, 200, 230, 118, "DEBT / EQUITY", (0.18 * a).toFixed(2), "low leverage", C.up);
+    rr(x, 24, 332, 474, 244, 16); x.fillStyle = C.panel; x.fill(); x.fillStyle = C.mute; x.font = "600 16px 'JetBrains Mono'"; x.fillText("EPS · LAST 6 QUARTERS (₹)", 42, 362);
+    [8.1, 8.9, 9.4, 10.6, 11.2, 12.8].forEach((v, i) => { const bh = v / 13 * 150 * ease(p * 1.6 - i * .08); x.fillStyle = C.a2; rr(x, 52 + i * 72, 556 - bh, 46, bh, 8); x.fill(); x.fillStyle = C.mute; x.font = "600 14px Inter"; x.fillText(`Q${i + 1}`, 60 + i * 72, 572); });
+    x.fillStyle = C.up; x.font = "700 18px Inter"; x.fillText("↑ growing every quarter", 300, 362);
+    // shareholding donut
+    const parts = [["Promoters", 54, "#7c5cff"], ["FII", 18, "#00e0b8"], ["DII", 14, "#ffd23f"], ["Public", 14, "#ff8c1a"]]; let ang = -Math.PI / 2; const tot = ease(p * 1.2) * Math.PI * 2;
+    x.fillStyle = C.mute; x.font = "600 16px 'JetBrains Mono'"; x.fillText("SHAREHOLDING", 540, 100);
+    parts.forEach(([n, v, c], i) => { const s = v / 100 * Math.PI * 2, e = Math.min(ang + s, -Math.PI / 2 + tot); if (e > ang) { x.strokeStyle = c; x.lineWidth = 46; x.beginPath(); x.arc(690, 290, 120, ang, e); x.stroke(); } ang += s; x.fillStyle = c; x.fillRect(850, 180 + i * 50, 18, 18); x.fillStyle = C.text; x.font = "600 20px Inter"; x.fillText(`${n} ${v}%`, 878, 196 + i * 50); });
+    x.fillStyle = C.text; x.font = "800 34px 'Space Grotesk'"; x.textAlign = "center"; x.fillText("54%", 690, 290); x.font = "500 15px Inter"; x.fillStyle = C.mute; x.fillText("promoters", 690, 314); x.textAlign = "left";
+    x.fillStyle = C.up; x.font = "700 18px Inter"; x.fillText("✓ Pledge 0%   ✓ FII + DII rising", 540, 470);
+  },
+  events(x, p) {
+    frame(x, "Events, news & AI summary", "Moneycontrol · NSE/BSE · Gemini");
+    const ev = [["12 FEB", "Q3 results"], ["14 FEB", "Board meeting"], ["21 FEB", "Dividend record date"]];
+    x.fillStyle = C.mute; x.font = "600 16px 'JetBrains Mono'"; x.fillText("UPCOMING EVENTS", 24, 88);
+    ev.forEach(([d, t], i) => { if (p * 4 < i * .6) return; rr(x, 24, 102 + i * 74, 420, 62, 12); x.fillStyle = C.panel; x.fill(); x.fillStyle = C.gold; x.font = "800 20px 'JetBrains Mono'"; x.fillText(d, 42, 140 + i * 74); x.fillStyle = C.text; x.font = "700 22px Inter"; x.fillText(t, 160, 140 + i * 74); });
+    x.fillStyle = C.mute; x.font = "600 16px 'JetBrains Mono'"; x.fillText("LATEST NEWS", 24, 344);
+    ["Order book up 18% YoY", "New plant capacity on track", "Management commentary positive"].forEach((h, i) => { if (p * 4 < 1.4 + i * .5) return; x.fillStyle = C.text; x.font = "600 20px Inter"; x.fillText("• " + h, 34, 380 + i * 40); });
+    // AI chat
+    rr(x, 470, 72, 530, 504, 18); x.fillStyle = "#101833"; x.fill();
+    x.fillStyle = C.blue; x.font = "800 20px Inter"; x.fillText("✦ Gemini", 494, 106);
+    rr(x, 640, 124, 336, 52, 14); x.fillStyle = "#2b3a6b"; x.fill(); x.fillStyle = C.text; x.font = "500 18px Inter"; x.fillText("Summarise the latest results", 656, 157);
+    const ans = ["• Revenue +16% YoY, margins stable", "• Debt reduced for 3rd quarter", "• Guidance: capacity expansion", "• Watch: raw material costs", "", "I verify key numbers myself ✓"];
+    const chars = Math.floor(ease(Math.max(0, p - .25) / .75) * ans.join("").length); let used = 0;
+    rr(x, 494, 196, 470, 300, 14); x.fillStyle = "#18224a"; x.fill();
+    ans.forEach((l, i) => { const take = Math.max(0, Math.min(l.length, chars - used)); used += l.length; x.fillStyle = i === 5 ? C.up : C.text; x.font = `${i === 5 ? 700 : 500} 19px Inter`; x.fillText(l.slice(0, take), 512, 236 + i * 42); });
+  },
+  technical(x, p) {
+    frame(x, "TradingView · Minervini Trend Template", "DAILY · 50 & 200 EMA");
+    const lo = 70, hi = 162, W = 640, up = Math.max(12, Math.floor(ease(p * 1.3) * 120));
+    const { cw, Y } = candles(x, TREND, 24, 70, W, 330, up, lo, hi);
+    line(x, ema(TREND, 50), 24, cw, Y, up, C.blue, 3); line(x, ema(TREND, 200).map((v, i) => v - 6 + i * .02), 24, cw, Y, up, C.orange, 3);
+    x.font = "700 16px Inter"; x.fillStyle = C.blue; x.fillText("50 EMA", 30, 92); x.fillStyle = C.orange; x.fillText("200 EMA", 110, 92);
+    if (up > 100) { x.strokeStyle = C.gold; x.lineWidth = 3; x.beginPath(); x.arc(24 + 104 * cw, Y(TREND[104].c), 22, 0, 7); x.stroke(); x.fillStyle = C.gold; x.font = "700 16px Inter"; x.fillText("bullish engulfing", 24 + 104 * cw - 140, Y(TREND[104].c) + 50); }
+    // RSI
+    x.strokeStyle = C.line; x.strokeRect(24, 420, W, 140); x.fillStyle = C.mute; x.font = "600 15px 'JetBrains Mono'"; x.fillText("RSI 14", 30, 440);
+    [[70, "70"], [50, "50"], [30, "30"]].forEach(([v, t]) => { const yy = 420 + (100 - v) / 100 * 140; x.strokeStyle = "rgba(255,255,255,.15)"; x.setLineDash([6, 6]); x.beginPath(); x.moveTo(24, yy); x.lineTo(24 + W, yy); x.stroke(); x.setLineDash([]); x.fillText(t, 24 + W + 6, yy + 5); });
+    x.strokeStyle = C.a1; x.lineWidth = 2.5; x.beginPath(); for (let i = 0; i < up; i++) { const v = 52 + Math.sin(i / 7) * 9 + i / 12, yy = 420 + (100 - Math.min(78, v)) / 100 * 140; i ? x.lineTo(24 + i * cw, yy) : x.moveTo(24, yy); } x.stroke();
+    const T = ["Price above 150 & 200-day MA", "200-day MA rising", "50-day above 150 & 200-day", "Near 52-week high", "Well above 52-week low", "RSI above 50: momentum"]; const k = Math.floor(ease(Math.max(0, p - .35) / .65) * (T.length + .99));
+    rr(x, 690, 70, 316, 490, 16); x.fillStyle = C.panel; x.fill(); x.fillStyle = C.mute; x.font = "600 15px 'JetBrains Mono'"; x.fillText("TREND TEMPLATE", 710, 100);
+    T.forEach((t, i) => { const ok = i < k; x.fillStyle = ok ? C.up : "rgba(255,255,255,.2)"; x.font = "800 22px Inter"; x.fillText(ok ? "✓" : "○", 710, 146 + i * 64); x.fillStyle = ok ? C.text : C.mute; x.font = "600 17px Inter"; const words = t.split(" "), l1 = words.slice(0, 3).join(" "), l2 = words.slice(3).join(" "); x.fillText(l1, 742, 140 + i * 64); x.fillText(l2, 742, 162 + i * 64); });
+  },
+  range(x, p) {
+    frame(x, "Define the range · accumulate", "TradingView");
+    const lo = 60, hi = 145, data = RANGE.slice(0, 100), { cw, Y } = candles(x, data, 24, 70, 760, 480, 100, lo, hi);
+    const a = ease(p * 1.5), r0 = 24 + 48 * cw, r1 = 24 + 100 * cw, top = Y(132), bot = Y(118);
+    x.fillStyle = "rgba(91,140,255,.12)"; x.fillRect(r0, top, (r1 - r0) * a, bot - top); x.strokeStyle = C.blue; x.lineWidth = 2; x.setLineDash([8, 6]);
+    [[top, "Resistance (range top)", C.blue], [bot, "Support (range bottom)", C.blue]].forEach(([yy, t]) => { x.beginPath(); x.moveTo(r0, yy); x.lineTo(r0 + (r1 - r0) * a, yy); x.stroke(); x.fillStyle = C.blue; x.font = "700 16px Inter"; x.fillText(t, r0 + 6, yy - 8); });
+    x.setLineDash([]);
+    const buys = [[60, 119.5], [76, 120.2], [91, 118.8]], nb = Math.floor(ease(Math.max(0, p - .3) / .5) * 3.99);
+    buys.slice(0, nb).forEach(([i, v], k) => { const bx = 24 + i * cw, by = Y(v) + 28; x.fillStyle = C.up; x.beginPath(); x.moveTo(bx, by - 18); x.lineTo(bx - 11, by); x.lineTo(bx + 11, by); x.fill(); x.font = "800 16px Inter"; x.fillText(`B${k + 1}`, bx - 10, by + 20); });
+    if (nb >= 3) { x.strokeStyle = C.gold; x.lineWidth = 2; x.beginPath(); x.moveTo(r0, Y(119.5)); x.lineTo(r1, Y(119.5)); x.stroke(); x.fillStyle = C.gold; x.font = "700 15px Inter"; x.fillText("avg ₹119.5", r1 - 96, Y(119.5) - 6); }
+    if (p > .75) { const sl = Y(113.5); x.strokeStyle = C.down; x.lineWidth = 2.5; x.setLineDash([10, 6]); x.beginPath(); x.moveTo(r0, sl); x.lineTo(r1, sl); x.stroke(); x.setLineDash([]); x.fillStyle = C.down; x.font = "800 17px Inter"; x.fillText("Stop-loss below the range", r0 + 6, sl + 22); }
+    rr(x, 800, 70, 206, 480, 16); x.fillStyle = C.panel; x.fill(); x.fillStyle = C.mute; x.font = "600 14px 'JetBrains Mono'"; x.fillText("MY PLAN", 818, 98);
+    [["Buy in 3 parts", C.text], ["near support", C.mute], ["", 0], ["SL below range", C.down], ["", 0], ["Size by risk:", C.text], ["₹ risk ÷ SL gap", C.mute], ["", 0], ["Targets 1:2, 1:3", C.up]].forEach(([t, c], i) => { if (!c) return; x.fillStyle = c; x.font = "700 18px Inter"; x.fillText(t, 818, 136 + i * 34); });
+  },
+  orderbook(x, p) {
+    frame(x, "Order book · market depth", "BROKER TERMINAL");
+    const t = performance.now() / 600, mid = 120.4;
+    x.fillStyle = C.mute; x.font = "600 15px 'JetBrains Mono'"; ["BID QTY", "BID", "ASK", "ASK QTY"].forEach((h, i) => x.fillText(h, 30 + i * 130, 92));
+    for (let i = 0; i < 6; i++) { const bq = Math.round(800 + Math.abs(Math.sin(t + i)) * 2400), aq = Math.round(700 + Math.abs(Math.cos(t * .9 + i)) * 2300), yy = 110 + i * 62;
+      x.fillStyle = "rgba(34,211,154,.18)"; x.fillRect(30, yy, bq / 3200 * 240, 50); x.fillStyle = "rgba(255,84,112,.18)"; x.fillRect(290 + 240 - aq / 3200 * 240, yy, aq / 3200 * 240, 50);
+      x.fillStyle = C.text; x.font = "600 19px 'JetBrains Mono'"; x.fillText(bq.toLocaleString("en-IN"), 34, yy + 33); x.fillStyle = C.up; x.fillText((mid - .05 - i * .05).toFixed(2), 160, yy + 33); x.fillStyle = C.down; x.fillText((mid + .05 + i * .05).toFixed(2), 290, yy + 33); x.fillStyle = C.text; x.fillText(aq.toLocaleString("en-IN"), 420, yy + 33); }
+    x.fillStyle = C.mute; x.font = "600 16px Inter"; x.fillText("Spread ₹0.10 · Volume healthy → easy to enter & exit", 30, 520);
+    rr(x, 570, 72, 436, 500, 18); x.fillStyle = C.panel; x.fill();
+    x.fillStyle = C.text; x.font = "800 24px Inter"; x.fillText("Order ticket", 594, 110);
+    const rows = [["Side", "BUY", C.up], ["Type", "LIMIT", C.text], ["Price", "₹120.30", C.text], ["Qty", "150 (part 1 of 3)", C.text]];
+    rows.forEach(([k, v, c], i) => { x.fillStyle = C.mute; x.font = "600 17px Inter"; x.fillText(k, 594, 156 + i * 48); x.fillStyle = c; x.font = "700 19px 'JetBrains Mono'"; x.fillText(v, 720, 156 + i * 48); });
+    const placed = p > .35, slp = p > .65;
+    rr(x, 594, 360, 388, 56, 14); x.fillStyle = placed ? "rgba(34,211,154,.25)" : C.up; x.fill(); x.fillStyle = placed ? C.up : "#04140c"; x.font = "800 20px Inter"; x.fillText(placed ? "✓ Buy order placed" : "Place BUY", 620, 396);
+    rr(x, 594, 432, 388, 56, 14); x.fillStyle = slp ? "rgba(255,84,112,.22)" : "rgba(255,255,255,.06)"; x.fill(); x.fillStyle = slp ? C.down : C.mute; x.font = "800 20px Inter"; x.fillText(slp ? "✓ Stop-loss order set at ₹113.40" : "Stop-loss order…", 620, 468);
+    if (slp) { x.fillStyle = C.mute; x.font = "500 15px Inter"; x.fillText("SL goes in right after entry, not 'in my head'", 600, 530); }
+  },
+  manage(x, p) {
+    frame(x, "Manage the trade", "BOOK PROFIT · TRAIL SL");
+    const lo = 60, hi = 178, up = Math.max(80, Math.floor(80 + ease(p * 1.2) * 30)), { cw, Y } = candles(x, BREAK, 24, 70, 740, 480, up, lo, hi);
+    const tg = [[149, "T1 · book 1/3"], [163, "T2 · book 1/3"]];
+    tg.forEach(([v, t]) => { x.strokeStyle = C.up; x.setLineDash([8, 6]); x.lineWidth = 2; x.beginPath(); x.moveTo(24 + 70 * cw, Y(v)); x.lineTo(24 + 110 * cw, Y(v)); x.stroke(); x.setLineDash([]); x.fillStyle = C.up; x.font = "700 15px Inter"; x.fillText(t, 24 + 70 * cw + 4, Y(v) - 6); });
+    const sl = [[80, 113.5], [90, 120], [98, 136], [106, 150]]; x.strokeStyle = C.down; x.lineWidth = 2.5; x.beginPath();
+    sl.forEach(([i, v], k) => { if (i > up) return; const nx = sl[k + 1] && sl[k + 1][0] <= up ? sl[k + 1][0] : up; x.moveTo(24 + i * cw, Y(v)); x.lineTo(24 + nx * cw, Y(v)); }); x.stroke();
+    x.fillStyle = C.down; x.font = "700 15px Inter"; x.fillText("trailing stop-loss", 24 + 92 * cw, Y(118) + 22);
+    [[94, 149], [101, 163]].forEach(([i, v], k) => { if (i > up) return; x.fillStyle = C.gold; x.beginPath(); x.arc(24 + i * cw, Y(v), 9, 0, 7); x.fill(); x.font = "800 15px Inter"; x.fillText(`S${k + 1}`, 24 + i * cw - 10, Y(v) - 16); });
+    rr(x, 784, 70, 222, 480, 16); x.fillStyle = C.panel; x.fill();
+    const R = [["Entry avg", "₹119.5", C.text], ["Risk / share", "₹6.0", C.text], ["T1 booked", up >= 94 ? "+4.9R" : "…", C.up], ["T2 booked", up >= 101 ? "+7.3R" : "…", C.up], ["Rest", up >= 106 ? "trailing ↗" : "holding", C.blue]];
+    R.forEach(([k, v, c], i) => { x.fillStyle = C.mute; x.font = "600 15px 'JetBrains Mono'"; x.fillText(k.toUpperCase(), 802, 104 + i * 74); x.fillStyle = c; x.font = "800 26px 'Space Grotesk', Inter"; x.fillText(v, 802, 136 + i * 74); });
+    x.fillStyle = C.down; x.font = "700 15px Inter"; x.fillText("If SL hits: exit, no", 802, 500); x.fillText("averaging, no hoping.", 802, 522);
+  },
+  welcome(x) { frame(x, "Good morning, trader ☕", "MARKET OPENS 9:15 IST"); x.fillStyle = C.text; x.font = "800 64px 'Space Grotesk', Inter"; x.fillText("My process", 60, 230); x.fillStyle = C.a2; x.fillText("step by step.", 60, 310); x.fillStyle = C.mute; x.font = "500 26px Inter"; x.fillText("Screen → Fundamentals → Events → Technicals", 60, 390); x.fillText("→ Range → Execute → Manage → Repeat", 60, 430); },
+};
+function drawWhiteboard(active, p = 1) {
+  const { x, t } = WB; x.fillStyle = "#f7f8fa"; x.fillRect(0, 0, 1024, 640);
+  x.fillStyle = "#1f2a44"; x.font = "800 40px 'Space Grotesk', Inter"; x.fillText("MY TRADING LOOP", 40, 62);
+  const S = ["Screen", "Fundamentals", "Events & news", "Technicals", "Range & buy", "Execute", "Manage", "Review"], cx = 512, cy = 350, rx = 360, ry = 205;
+  x.strokeStyle = "#c9cfdd"; x.lineWidth = 4; x.setLineDash([12, 10]); x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); x.stroke(); x.setLineDash([]);
+  S.forEach((_, i) => { const b = -Math.PI / 2 + (i + .5) / S.length * Math.PI * 2, ax = cx + Math.cos(b) * rx, ay = cy + Math.sin(b) * ry, tang = Math.atan2(Math.cos(b) * ry, -Math.sin(b) * rx);
+    x.save(); x.translate(ax, ay); x.rotate(tang); x.fillStyle = "#7c5cff"; x.beginPath(); x.moveTo(12, 0); x.lineTo(-8, -9); x.lineTo(-8, 9); x.fill(); x.restore(); });
+  S.forEach((s, i) => { const a = -Math.PI / 2 + i / S.length * Math.PI * 2, nx = cx + Math.cos(a) * rx, ny = cy + Math.sin(a) * ry, on = active === i + 1, lit = active === 8 && i < Math.floor(p * 8.99);
+    x.fillStyle = on || lit ? "#7c5cff" : "#e3e7f0"; rr(x, nx - 100, ny - 26, 200, 52, 26); x.fill(); if (!on && !lit) { x.strokeStyle = "#c9cfdd"; x.lineWidth = 2; x.stroke(); }
+    x.fillStyle = on || lit ? "#fff" : "#36405e"; x.font = "700 22px Inter"; x.textAlign = "center"; x.fillText(`${i + 1}. ${s}`, nx, ny + 8); x.textAlign = "left"; });
+  x.fillStyle = "#e0284f"; x.font = "800 30px 'Space Grotesk', Inter"; x.textAlign = "center"; x.fillText("Plan the trade.", cx, cy - 8); x.fillStyle = "#1f2a44"; x.fillText("Trade the plan.", cx, cy + 30); x.textAlign = "left";
+  t.needsUpdate = true;
+}
+
+/* ---------- the steps ---------- */
+const MOBILE = () => innerWidth <= 760;
+// desktop: slide the shot so the screen sits left of the step card; phone: aim low so it sits above the card
+function view(m, dist = 5.4, dy = .1) {
+  const right = new THREE.Vector3(m.normal.z, 0, -m.normal.x), pos = m.center.clone().addScaledVector(m.normal, dist).add(new THREE.Vector3(0, dy, 0)), target = m.center.clone();
+  if (!MOBILE()) { const sh = dist * .2; pos.addScaledVector(right, sh); target.addScaledVector(right, sh); } else { target.y -= dist * .2; }
+  return { pos, target };
+}
+const OVER = { pos: new THREE.Vector3(9, 9.5, 9), target: new THREE.Vector3(0, 3.8, -3.5) };
+const STEPS = [
+  { k: "Welcome", t: "Inside my trading room", l: "This is how I find, plan and manage a trade, every single time. Tap Next to walk through it step by step.", b: ["A fixed process beats gut feeling", "Every trade is planned before I click buy", "Risk first, profit second"], tools: [], v: () => OVER, mon: "center", draw: "welcome", face: 0 },
+  { k: "Step 1", t: "Find ideas: screening", l: "I start with the Nifty 500 universe: liquid, established companies. Then my screener narrows 500 stocks down to a short watchlist.", b: ["Universe: Nifty 500", "Filters: EPS growth, PE vs sector, market cap, debt, promoter holding", "Shortlist 10–20 names to my watchlist"], tools: ["My custom screener", "Screener", "TradingView watchlist"], mon: "left", draw: "screener", face: .45 },
+  { k: "Step 2", t: "Fundamental check", l: "Before any chart, I make sure the business is strong.", b: ["P/E vs the sector and its own history", "EPS growing quarter after quarter", "Market cap: size & liquidity", "Part of the Nifty 500", "Shareholding: promoters, pledge, FII & DII trend"], tools: ["Screener", "Moneycontrol"], mon: "left", draw: "fundamentals", face: .45 },
+  { k: "Step 3", t: "Events, news & AI summary", l: "I check what's coming up so a result or announcement doesn't surprise me, and use AI to read faster.", b: ["Upcoming results, dividends, bonus, splits, board meetings", "Latest news & exchange announcements", "Gemini AI to summarise results, news and con-calls", "AI saves time, but I verify key numbers myself"], tools: ["Moneycontrol", "NSE / BSE announcements", "Gemini AI"], mon: "right", draw: "events", face: -.45 },
+  { k: "Step 4", t: "Technical strength", l: "A good company still needs a strong chart. I want the trend on my side.", b: ["Price above the 50 & 200 EMA, 50 above 200", "RSI above 50 for momentum; very high RSI warns of overextension", "Candlestick patterns at key levels (e.g. engulfing, hammer)", "Mark Minervini's Trend Template on TradingView"], tools: ["TradingView", "Minervini Trend Template"], mon: "center", draw: "technical", face: 0 },
+  { k: "Step 5", t: "Define the range & accumulate", l: "I mark the range, then build the position in parts instead of buying everything at once.", b: ["Mark support & resistance: the range", "Accumulate in 2–3 parts near support", "Stop-loss just below the range", "Size the position by how much I'm willing to lose"], tools: ["TradingView"], links: [["Stop-loss calculator", "../sl-calculator/"], ["Average price", "../average/"]], mon: "center", draw: "range", face: 0 },
+  { k: "Step 6", t: "Execution: the order book", l: "Before I place the order I check liquidity, then the stop-loss goes in immediately.", b: ["Check market depth, bid-ask spread & volume", "Use limit orders, not panic market orders", "Place the stop-loss order right after entry"], tools: ["Broker order book", "Market depth"], mon: "right", draw: "orderbook", face: -.45 },
+  { k: "Step 7", t: "Manage: book profit, respect the SL", l: "The plan doesn't end at entry. I book profits in parts and protect what I've made.", b: ["Book part of the profit at each target", "Trail the stop-loss up as the trade works", "If the stop-loss hits: exit, no averaging, no hoping", "Log the trade and the lesson in my journal"], tools: [], links: [["Trade journal", "../journal/"], ["Day review", "../day-review/"]], mon: "center", draw: "manage", face: 0 },
+  { k: "Step 8", t: "Repeat: find the next trade", l: "Win or lose, I review, then go back to the screener for the next opportunity. Same process, every time.", b: ["Review what worked and what didn't", "Back to the screener with fresh eyes", "Consistency over excitement"], tools: [], links: [["All my tools", "../tools/"], ["Daily levels", "../levels/"]], v: () => view(WB, MOBILE() ? 12 : 8.6, .2), mon: null, draw: null, face: -1.35 },
+];
+let cur = 0, stepStart = 0, playing = null, exploring = false;
+const idle = { left: "idleL", center: "idleC", right: "idleR" };
+function paintIdle() { Object.entries(MON).forEach(([k, m]) => { DRAW[idle[k]](m.x); m.t.needsUpdate = true; }); }
+let anim = null;
+function flyTo(pos, target, ms = 1300) { const p0 = camera.position.clone(), t0 = controls.target.clone(), st = performance.now(); anim = now => { const k = Math.min(1, (now - st) / ms), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; camera.position.lerpVectors(p0, pos, e); controls.target.lerpVectors(t0, target, e); if (k >= 1) anim = null; }; }
+let faceFrom = 0, faceTo = 0;
+function go(i) {
+  cur = Math.max(0, Math.min(STEPS.length - 1, i)); const s = STEPS[cur]; stepStart = performance.now();
+  $("#sK").textContent = `${s.k} · ${cur}/${STEPS.length - 1}`; $("#sT").textContent = s.t; $("#sL").textContent = s.l;
+  $("#sB").innerHTML = s.b.map((b, k) => `<li style="animation-delay:${.15 + k * .12}s">${b}</li>`).join("");
+  $("#sTools").innerHTML = s.tools.map(t => `<span>${t}</span>`).join("") + (s.links || []).map(([t, h]) => `<a href="${h}">↗ ${t}</a>`).join("");
+  $("#dots").innerHTML = STEPS.map((_, k) => `<i class="${k === cur ? "on" : ""}" data-i="${k}"></i>`).join("");
+  $("#prev").disabled = cur === 0; $("#next").textContent = cur === STEPS.length - 1 ? "↺ Start over" : "Next →";
+  paintIdle();
+  const v = s.v ? s.v() : view(MON[s.mon], MOBILE() ? 8.6 : 5.6);
+  if (!exploring) flyTo(v.pos, v.target);
+  faceFrom = ME.rootYaw ?? 0; faceTo = s.face;
+}
+$("#next").addEventListener("click", () => { stopPlay(); go(cur === STEPS.length - 1 ? 0 : cur + 1); });
+$("#prev").addEventListener("click", () => { stopPlay(); go(cur - 1); });
+$("#dots").addEventListener("click", e => { const d = e.target.closest("[data-i]"); if (d) { stopPlay(); go(+d.dataset.i); } });
+addEventListener("keydown", e => { if (e.key === "ArrowRight") $("#next").click(); if (e.key === "ArrowLeft") $("#prev").click(); });
+function stopPlay() { if (playing) { clearInterval(playing); playing = null; $("#play").textContent = "▶ Auto-play"; $("#play").classList.remove("on"); } }
+$("#play").addEventListener("click", () => { if (playing) { stopPlay(); return; } exploring = false; $("#explore").classList.remove("on"); $("#play").textContent = "⏸ Pause"; $("#play").classList.add("on"); go(cur === STEPS.length - 1 ? 0 : cur); playing = setInterval(() => { if (cur >= STEPS.length - 1) { stopPlay(); return; } go(cur + 1); }, 7500); });
+$("#explore").addEventListener("click", () => { exploring = !exploring; $("#explore").classList.toggle("on", exploring); if (exploring) { stopPlay(); flyTo(OVER.pos, OVER.target); } else go(cur); });
+renderer.domElement.addEventListener("pointerdown", () => { anim = null; stopPlay(); });
+
+/* ---------- loop ---------- */
+let lastDraw = 0, lastClock = 0;
+renderer.setAnimationLoop(now => {
+  if (anim) anim(now);
+  const s = STEPS[cur], p = Math.min(1, (now - stepStart) / 4200);
+  if (now - lastDraw > 50) {   // ~20 fps for screen animations
+    lastDraw = now;
+    if (s.mon && s.draw) { const m = MON[s.mon]; DRAW[s.draw](m.x, p); m.t.needsUpdate = true; }
+    drawWhiteboard(cur, s.mon ? 1 : p);
+  }
+  if (now - lastClock > 1000) { lastClock = now; drawClock(); }
+  // turn the chair toward the active screen; type on the keyboard
+  const k = Math.min(1, (now - stepStart) / 900); ME.rootYaw = faceFrom + (faceTo - faceFrom) * (1 - Math.pow(1 - k, 3)); chair.rotation.y = ME.rootYaw;
+  const t = now / 1000; ME.aL.rotation.x = -1.05 + Math.sin(t * 14) * .05; ME.aR.rotation.x = -1.05 + Math.cos(t * 13) * .05; ME.up.rotation.y = Math.sin(t * .7) * .05;
+  glow.intensity = 12 + Math.sin(t * 2) * 1.5;
+  controls.update(); renderer.render(scene, camera);
+});
+function setFov() { camera.fov = MOBILE() ? 62 : 45; }
+addEventListener("resize", () => { setFov(); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+setFov(); camera.updateProjectionMatrix(); camera.position.set(16, 13, 16); controls.target.copy(OVER.target);
+paintIdle(); drawWhiteboard(0); drawClock(); go(0);
+document.fonts?.ready.then(() => { paintIdle(); drawWhiteboard(cur); });
+$("#loading").style.opacity = 0; setTimeout(() => $("#loading").remove(), 600);
+window.__room = { go, STEPS, camera, controls, scene };
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
