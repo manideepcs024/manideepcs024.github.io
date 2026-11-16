@@ -55,6 +55,31 @@
   .lbl:hover { background: rgba(0,224,184,.85); color: #001; }
   .lbl.dim { font: 600 10px "JetBrains Mono"; background: rgba(254,188,46,.9); color: #1a1200; border: 0; cursor: default; }
   .lbl.item { font: 500 9.5px Inter; background: rgba(255,255,255,.88); color: #111; border: 0; padding: 2px 6px; cursor: default; }
+  .fest { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .fest button { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: #d5d9e4; border-radius: 10px; padding: 7px 2px; font: 600 .68rem Inter; cursor: pointer; line-height: 1.2; }
+  .fest button i { display: block; font-style: normal; font-size: 1.1rem; }
+  .fest button.on { border-color: #ffb020; background: rgba(255,176,32,.16); color: #fff; }
+  .lbl.fam { background: rgba(255,77,141,.92); border: 0; color: #fff; font: 700 11px Inter; }
+  .greet { position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(540px, calc(100% - 24px)); z-index: 6; background: rgba(12,10,22,.88); border: 1px solid rgba(255,255,255,.14); border-radius: 22px; padding: 16px 18px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); text-align: center; box-shadow: 0 20px 60px -20px rgba(0,0,0,.8); }
+  .greet .to { font: 600 .95rem Inter; color: #ffd98a; }
+  .greet .gt { font: 800 clamp(1.6rem, 5vw, 2.2rem)/1.1 "Space Grotesk"; margin: 2px 0 6px; background: linear-gradient(100deg, var(--g1, #ffb020), var(--g2, #ff5b2e)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .greet .gm { font-size: .92rem; color: #e3e6ee; line-height: 1.5; }
+  .greet .gs { font: 600 .82rem Inter; color: #c9cfdb; margin-top: 8px; }
+  .greet [hidden] { display: none !important; }
+  .greet .gform { display: grid; gap: 6px; margin-top: 10px; text-align: left; }
+  .greet .gform input, .greet .gform textarea { width: 100%; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.14); border-radius: 12px; color: #fff; padding: 9px 12px; font: 500 .86rem Inter; outline: 0; resize: none; }
+  .greet .gform textarea { min-height: 54px; }
+  .greet .gb { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+  .greet .gb button { border: 0; border-radius: 12px; padding: 10px 14px; font: 700 .84rem Inter; cursor: pointer; background: rgba(255,255,255,.1); color: #fff; }
+  .greet .gb .pri { background: linear-gradient(100deg, #ff9a3c, #ff4d8d); }
+  .greet .gb .wa { background: #25d366; color: #062e16; }
+  .greet .x { position: absolute; top: 8px; right: 10px; border: 0; background: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; }
+  .gmodal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px; background: rgba(3,4,8,.82); backdrop-filter: blur(8px); }
+  .gmodal .in { width: 100%; max-width: 420px; max-height: 100%; overflow: auto; background: #14121f; border: 1px solid rgba(255,255,255,.12); border-radius: 20px; padding: 14px; text-align: center; }
+  .gmodal img { max-width: 100%; max-height: 62vh; border-radius: 14px; display: block; margin: 0 auto; }
+  .gmodal p { font-size: .85rem; color: #cfd3df; margin: 10px 0; }
+  .gmodal a, .gmodal button { display: inline-block; margin: 4px; border: 0; border-radius: 12px; padding: 10px 16px; font: 700 .86rem Inter; cursor: pointer; text-decoration: none; background: rgba(255,255,255,.1); color: #fff; }
+  .gmodal a { background: linear-gradient(100deg, #7c5cff, #00e0b8); }
   .loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 10; background: #0b0d14; font: 500 .9rem Inter; color: var(--muted); transition: opacity .5s; }
 
   @media (max-width: 760px) {
@@ -64,6 +89,7 @@
     .info { left: 8px; right: 8px; bottom: auto; top: 76px; max-width: none; }
     .hint { display: none; }
     .title span { display: none; }
+    .greet { top: 70px; bottom: auto; padding: 12px 14px; }
   }
 </style>
 <script type="importmap">
@@ -96,6 +122,11 @@
     <label class="tg">Furniture labels<input type="checkbox" id="optItems" /><span class="sw"></span></label>
     <label class="tg">Night mode 🌙<input type="checkbox" id="optNight" /><span class="sw"></span></label>
     <label class="tg">Neighbouring houses<input type="checkbox" id="optNb" checked /><span class="sw"></span></label>
+    <label class="tg">Show family 👨‍👦‍👦<input type="checkbox" id="optFam" checked /><span class="sw"></span></label>
+    <h4>Festival mode 🎉</h4>
+    <div class="fest" id="festBtns"></div>
+    <h4>Family · tap to visit</h4>
+    <div class="rooms" id="famBtns"></div>
     <h4>Rooms · tap to visit</h4>
     <div class="rooms" id="rooms"></div>
     <div class="btns"><button class="btn primary" id="tourBtn">▶ Take a tour</button><button class="btn" id="resetBtn">⟲ Reset view</button></div>
@@ -103,6 +134,18 @@
   </aside>
 
   <div class="info" id="info"><b>Welcome home 👋</b><span>Pick a floor or tap a room to look inside.</span></div>
+  <div class="greet" id="greet" hidden>
+    <button class="x" id="gClose" title="Close">✕</button>
+    <div class="to" id="gTo"></div>
+    <div class="gt" id="gTitle"></div>
+    <div class="gm" id="gMsg"></div>
+    <div class="gs">— Narendra, Raghuvanshmani &amp; Manideep Mittal</div>
+    <div class="gform" id="gForm" hidden>
+      <input id="inTo" maxlength="24" placeholder="To (optional), e.g. Rahul" autocomplete="off" />
+      <textarea id="inMsg" maxlength="200"></textarea>
+    </div>
+    <div class="gb" id="gBtns"></div>
+  </div>
   <div class="hint">drag to rotate · scroll to zoom · right-drag to pan</div>
 
 <script type="module">
@@ -502,6 +545,7 @@ function applyView() {
   lamps.forEach(l => { const on = ui.night && l.userData.floor <= top; if (l.isLight) l.intensity = on ? 38 : 0; else l.material.emissiveIntensity = on ? 2 : 0; });
   GLASS.emissive.set(ui.night ? 0xffb54d : 0x000000); GLASS.emissiveIntensity = ui.night ? .55 : 0;
   document.querySelectorAll("#floorSeg button").forEach(b => b.classList.toggle("on", b.dataset.f === f));
+  afterApply(top);
 }
 document.querySelectorAll("#floorSeg button").forEach(b => b.addEventListener("click", () => { ui.floor = b.dataset.f; applyView(); frameFloor(); }));
 [["#optCut", "cut"], ["#optLabels", "labels"], ["#optItems", "items"], ["#optNight", "night"], ["#optNb", "nb"]].forEach(([s, k]) => $(s).addEventListener("change", e => { ui[k] = e.target.checked; applyView(); }));
@@ -539,15 +583,357 @@ $("#tourBtn").addEventListener("click", () => {
   let i = 0; visit(ROOMS[0]); $("#tourBtn").textContent = "⏸ Stop tour";
   tour = setInterval(() => { i++; if (i >= ROOMS.length) { stopTour(); $("#resetBtn").click(); return; } visit(ROOMS[i]); }, 3200);
 });
-renderer.domElement.addEventListener("pointerdown", () => { anim = null; stopTour(); });
+renderer.domElement.addEventListener("pointerdown", () => { anim = null; stopTour(); controls.autoRotate = false; });
+
+/* =====================================================================
+   FAMILY — simple cartoon figures (not likenesses). Front of a figure = +z.
+   ===================================================================== */
+const FAMILY_SIGN = "Narendra, Raghuvanshmani & Manideep Mittal";
+const FAM = [
+  { id: "papa", name: "Mr. Narendra Mittal", short: "Narendra Mittal", rel: "Papa", o: { shirt: 0xf1e4c6, pants: 0xe6dfcc, hair: 0xb9b9b9, glasses: true, kurta: true, h: 5.6 } },
+  { id: "ragh", name: "Raghuvanshmani Mittal", short: "Raghuvanshmani", rel: "Elder son", o: { shirt: 0x2f6fd6, pants: 0x2b2f3a, hair: 0x1b1512, h: 5.85 } },
+  { id: "mani", name: "Manideep Mittal", short: "Manideep", rel: "Younger son", o: { shirt: 0x16a394, pants: 0x30343f, hair: 0x1b1512, h: 5.75 } },
+];
+// where everyone is on a normal day, and on festival days (all three on the balcony, waving)
+const POSES = {
+  home: { papa: { f: 0, x: 11.0, z: 19, ry: -Math.PI / 2, sit: y0 + 1.85, txt: "Relaxing on the pink sofa in front of the TV" },
+          ragh: { f: 1, x: 13.6, z: 16.3, ry: Math.PI, sit: 2.0, txt: "In the first-floor front room" },
+          mani: { f: 1, x: 3.2, z: 28.55, ry: Math.PI, sit: 1.5, type: true, txt: "At the study desk upstairs, checking the charts" } },
+  fest: { papa: { f: 1, x: 10, z: 3.0, ry: Math.PI, wave: 0, ly: 1.1, txt: "On the balcony, celebrating" },
+          ragh: { f: 1, x: 6.6, z: 3.2, ry: Math.PI + .12, wave: 1.3, txt: "On the balcony, celebrating" },
+          mani: { f: 1, x: 13.4, z: 3.2, ry: Math.PI - .12, wave: 2.6, txt: "On the balcony, celebrating" } },
+};
+const SKIN = 0xc68a5e, SHOE = mat(0x2a2320, { r: .6 });
+function person(m) {
+  const o = m.o, s = o.h / 5.5, root = new THREE.Group(); root.scale.setScalar(s);
+  const shirt = mat(o.shirt, { r: .85 }), pants = mat(o.pants, { r: .85 }), skin = mat(SKIN, { r: .7 }), hair = mat(o.hair, { r: .95 });
+  const up = new THREE.Group(); root.add(up);
+  const torso = mesh(new THREE.CapsuleGeometry(.44, 1.05, 6, 14), shirt, up, 0, .95, 0); torso.scale.z = .7;
+  if (o.kurta) { const k = mesh(new THREE.CylinderGeometry(.47, .55, .95, 16), shirt, up, 0, .15, 0); k.scale.z = .74; }
+  mesh(new THREE.CylinderGeometry(.13, .15, .25, 10), skin, up, 0, 2.0, 0);
+  mesh(new THREE.SphereGeometry(.42, 20, 16), skin, up, 0, 2.45, 0);
+  const hr = mesh(new THREE.SphereGeometry(.45, 20, 10, 0, Math.PI * 2, 0, Math.PI * .55), hair, up, 0, 2.5, -.04); hr.rotation.x = -.28;
+  [-.15, .15].forEach(x => mesh(new THREE.SphereGeometry(.045, 8, 6), mat(0x1a1a1a), up, x, 2.5, .39, false));
+  const sm = mesh(new THREE.TorusGeometry(.12, .022, 6, 12, Math.PI), mat(0x7a2e2e), up, 0, 2.34, .37, false); sm.rotation.z = Math.PI;
+  if (o.glasses) { const gm = mat(0x222222, { m: .5, r: .3 }); [-.16, .16].forEach(x => mesh(new THREE.TorusGeometry(.1, .018, 6, 14), gm, up, x, 2.5, .41, false)); tube([-.06, 2.5, .42], [.06, 2.5, .42], .015, gm, up); }
+  const arm = side => { const p = new THREE.Group(); p.position.set(side * .58, 1.62, 0); up.add(p); mesh(new THREE.CapsuleGeometry(.12, .95, 4, 8), shirt, p, 0, -.6, 0); mesh(new THREE.SphereGeometry(.13, 10, 8), skin, p, 0, -1.25, 0); return p; };
+  const armL = arm(-1), armR = arm(1);
+  const stand = new THREE.Group(), sit = new THREE.Group(); root.add(stand, sit);
+  [-.22, .22].forEach(x => { mesh(new THREE.CylinderGeometry(.17, .15, 2.55, 10), pants, stand, x, 1.3, 0); bs(.32, .2, .55, SHOE, stand, x, 0, .08); });
+  const extras = new THREE.Group(); up.add(extras);                 // festival hats / Holi colours live here
+  const d = document.createElement("div"); d.className = "lbl fam"; d.textContent = `${m.short} · ${m.rel}`;
+  d.addEventListener("pointerdown", e => { e.stopPropagation(); focusPerson(m); });
+  const lab = new CSS2DObject(d); root.add(lab);
+  root.userData = { up, armL, armR, stand, sit, s, pants, label: lab, extras, m };
+  root.traverse(c => { if (c.isMesh) c.castShadow = true; });
+  return root;
+}
+function setPose(p, ps) {
+  const u = p.userData;
+  F[ps.f].add(p); p.position.set(ps.x, floorsY[ps.f] + (ps.f === 0 ? y0 : 0), ps.z); p.rotation.y = ps.ry;   // standing on the floor finish
+  if (ps.sit) {
+    const hy = (ps.sit) / u.s; u.up.position.y = hy; u.stand.visible = false; u.sit.visible = true; u.sit.clear();
+    [-.22, .22].forEach(x => { const th = mesh(new THREE.CylinderGeometry(.17, .16, 1.35, 10), u.pants, u.sit, x, hy, .62); th.rotation.x = Math.PI / 2; mesh(new THREE.CylinderGeometry(.15, .14, hy, 10), u.pants, u.sit, x, hy / 2, 1.28); bs(.32, .2, .55, SHOE, u.sit, x, 0, 1.4); });
+    p.position.y = floorsY[ps.f];
+  } else { u.up.position.y = 2.6; u.stand.visible = true; u.sit.visible = false; }
+  u.wave = ps.wave; u.type = !!ps.type; u.pose = ps;
+  u.armL.rotation.set(u.type ? -1.05 : 0, 0, u.type ? 0 : -.12); u.armR.rotation.set(u.type ? -1.05 : 0, 0, u.type ? 0 : .12);
+  u.label.position.set(0, u.up.position.y + 3.35 + (ps.ly || 0) / u.s, 0);
+}
+FAM.forEach(m => { m.p = person(m); });
+// Manideep's laptop with a chart on screen
+{
+  const cv = document.createElement("canvas"); cv.width = 512; cv.height = 320; const x = cv.getContext("2d");
+  x.fillStyle = "#0b1020"; x.fillRect(0, 0, 512, 320); x.strokeStyle = "rgba(255,255,255,.06)";
+  for (let i = 0; i < 512; i += 32) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 320); x.stroke(); }
+  let p = 200; for (let i = 0; i < 30; i++) { const o = p, c = p + (Math.sin(i * 1.7) * 18 - 6), hi = Math.min(o, c) - 10, lo = Math.max(o, c) + 10; x.strokeStyle = x.fillStyle = c < o ? "#22d39a" : "#ff5470"; x.beginPath(); x.moveTo(20 + i * 16, hi); x.lineTo(20 + i * 16, lo); x.stroke(); x.fillRect(15 + i * 16, Math.min(o, c), 10, Math.max(3, Math.abs(c - o))); p = c; }
+  x.fillStyle = "#fff"; x.font = "bold 24px sans-serif"; x.fillText("NIFTY 50", 14, 32);
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  bs(1.25, .05, .85, 0x2b2f36, g1, 3.2, y1 + 2.5, 27.35);
+  const back = bs(1.25, .8, .04, 0x2b2f36, g1, 3.2, y1 + 2.55, 26.93); back.rotation.x = -.22;
+  const scr = mesh(new THREE.PlaneGeometry(1.15, .72), new THREE.MeshBasicMaterial({ map: tex }), g1, 3.2, y1 + 2.95, 26.97, false); scr.rotation.x = -.22;
+}
+
+/* =====================================================================
+   FESTIVALS
+   ===================================================================== */
+const ist = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+const NY = ist.getMonth() >= 6 ? ist.getFullYear() + 1 : ist.getFullYear();
+const FEST = {
+  diwali: { n: "Diwali", e: "🪔", title: "Happy Diwali", msg: "May this festival of lights fill your home with happiness, good health and prosperity. ✨", night: true, g: ["#ffb020", "#ff5b2e"], bulbs: [0xffc04d, 0xff7a1a, 0xff3b3b, 0x3bd16f, 0x4da3ff, 0xfff1c9], fw: 1.1 },
+  christmas: { n: "Christmas", e: "🎄", title: "Merry Christmas", msg: "Wishing you joy, peace, warm hugs and lots of cake this Christmas. 🎁", night: true, g: ["#ff4d6d", "#22d39a"], bulbs: [0xfff2cc, 0xff3b3b, 0x3bd16f, 0xfff2cc, 0xffd700], fw: 0 },
+  newyear: { n: "New Year", e: "🎆", title: `Happy New Year ${NY}`, msg: "Wishing you a year full of good health, new goals and great memories. 🥂", night: true, g: ["#9d7bff", "#00e0b8"], bulbs: [0xffd700, 0xff4d8d, 0x7c5cff, 0x00e0b8, 0xffffff], fw: .45 },
+  holi: { n: "Holi", e: "🎨", title: "Happy Holi", msg: "May your life be as bright and colourful as the colours of Holi! 🌈", night: false, g: ["#ff4d8d", "#ffd166"], bulbs: null, fw: 0 },
+};
+const FESTG = {};                               // decorations per festival (built on first use)
+const flames = [], twinkles = [], festLights = [];
+let fest = "", snow = null, clouds = null, prevNight = false, prevLabels = true;
+const basic = c => new THREE.MeshBasicMaterial({ color: c });
+
+function textPlane(text, g, w, h) {
+  const cv = document.createElement("canvas"); cv.width = 1024; cv.height = Math.round(1024 * h / w); const x = cv.getContext("2d");
+  const gr = x.createLinearGradient(0, 0, cv.width, 0); gr.addColorStop(0, g[0]); gr.addColorStop(1, g[1]);
+  x.fillStyle = gr; x.fillRect(0, 0, cv.width, cv.height);
+  x.strokeStyle = "rgba(255,255,255,.7)"; x.lineWidth = 8; x.strokeRect(10, 10, cv.width - 20, cv.height - 20);
+  x.fillStyle = "#fff"; x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = "rgba(0,0,0,.45)"; x.shadowBlur = 12;
+  let fs = cv.height * .52; do { x.font = `800 ${fs}px Inter, "Space Grotesk", sans-serif`; fs -= 4; } while (x.measureText(text).width > cv.width - 80);
+  x.fillText(text, cv.width / 2, cv.height / 2 + 4);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, side: THREE.DoubleSide }));
+}
+function stringLights(g, cols, paths) {
+  const pts = []; paths.forEach(([a, b, step]) => { const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), n = Math.max(1, Math.round(A.distanceTo(B) / step)); for (let i = 0; i <= n; i++) pts.push(A.clone().lerp(B, i / n)); });
+  const im = new THREE.InstancedMesh(new THREE.SphereGeometry(.13, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }), pts.length);
+  const base = [], m4 = new THREE.Matrix4();
+  pts.forEach((p, i) => { m4.makeTranslation(p.x, p.y, p.z); im.setMatrixAt(i, m4); const c = new THREE.Color(cols[i % cols.length]); base.push(c); im.setColorAt(i, c); });
+  im.userData.base = base; g.add(im); twinkles.push(im); return im;
+}
+function diya(g, x, y, z) {
+  cyl(.24, .14, .16, mat(0xa0522d, { r: .9 }), g, x, y, z, 12);
+  const f = mesh(new THREE.ConeGeometry(.08, .3, 8), basic(0xffb347), g, x, y + .3, z, false); f.userData.ph = Math.random() * 6; flames.push(f);
+}
+function star(g, x, y, z, r, color) {
+  const sh = new THREE.Shape(); for (let i = 0; i < 10; i++) { const a = Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; i ? sh.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : sh.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  return mesh(new THREE.ExtrudeGeometry(sh, { depth: .12, bevelEnabled: false }), basic(color), g, x, y, z, false);
+}
+function hatFor(key, i) {
+  const h = new THREE.Group(); h.position.set(0, 2.78, -.02);
+  if (key === "christmas") { const c = mesh(new THREE.ConeGeometry(.4, .75, 16), mat(0xd62839, { r: .8 }), h, 0, .3, 0); c.rotation.z = -.25; mesh(new THREE.TorusGeometry(.4, .09, 8, 18), mat(0xffffff), h, 0, -.04, 0).rotation.x = Math.PI / 2; mesh(new THREE.SphereGeometry(.1, 8, 6), mat(0xffffff), h, .17, .62, 0); }
+  if (key === "newyear") { const cols = [0xffd700, 0xff4d8d, 0x00e0b8]; mesh(new THREE.ConeGeometry(.3, .7, 14), mat(cols[i % 3], { r: .5 }), h, 0, .3, 0); mesh(new THREE.SphereGeometry(.09, 8, 6), mat(0xffffff), h, 0, .68, 0); }
+  if (key === "diwali") return null;
+  return h;
+}
+function holiSpots(i) {
+  const g = new THREE.Group(), cols = [0xff4d8d, 0xffd166, 0x3bd16f, 0x4da3ff, 0xb18cff];
+  for (let k = 0; k < 7; k++) { const a = Math.random() * Math.PI * 2, y = .4 + Math.random() * 1.2; mesh(new THREE.SphereGeometry(.13 + Math.random() * .1, 8, 6), mat(cols[(k + i) % 5], { r: 1 }), g, Math.cos(a) * .4, y, Math.abs(Math.sin(a)) * .3 + .02, false).scale.z = .35; }
+  [[-.18, 2.62, .33], [.2, 2.3, .34]].forEach(([x, y, z], k) => mesh(new THREE.SphereGeometry(.09, 8, 6), mat(cols[(k + i + 2) % 5]), g, x, y, z, false));
+  return g;
+}
+function softTex() { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"); const r = x.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, "rgba(255,255,255,1)"); r.addColorStop(.6, "rgba(255,255,255,.35)"); r.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = r; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); }
+
+function buildFest(key) {
+  const F0 = FEST[key], g = group(scene); g.visible = false;
+  const yb = y1 + 1.2, yp = y2 + PARAPET;
+  // banner on the balcony railing, facing the street
+  const ban = textPlane(`${F0.title}`, F0.g, 14, 1.8); ban.position.set(W / 2, y1 + 2.2, -.12); ban.rotation.y = Math.PI; g.add(ban);
+  if (F0.bulbs) stringLights(g, F0.bulbs, [[[0, y1 + 3.45, .25], [W, y1 + 3.45, .25], .55], [[0, yp + .15, Z.park + .3], [W, yp + .15, Z.park + .3], .55], [[.4, FH + .2, -.1], [W - .4, FH + .2, -.1], .55], [[.3, yp + .15, Z.park + .3], [.3, y1 + 3.45, .25], .7], [[W - .3, yp + .15, Z.park + .3], [W - .3, y1 + 3.45, .25], .7]]);
+  if (F0.night) [[4, y1 + 5, 2], [16, y1 + 5, 2], [10, yp + 2, Z.park + 2]].forEach(([x, y, z]) => { const l = new THREE.PointLight(F0.bulbs[0], 0, 22, 1.6); l.position.set(x, y, z); g.add(l); festLights.push(l); l.userData.fest = key; });
+  if (key === "diwali") {
+    for (let x = 1.2; x < W - .5; x += 1.6) { diya(g, x, yp, Z.park + .3); diya(g, x, yb, .25); }
+    // rangoli on the footpath outside the gate
+    const rg = group(g, W / 2, .41, -4.4), ring = (r0, r1, c, y) => { const m2 = mesh(new THREE.RingGeometry(r0, r1, 48), mat(c, { r: 1 }), rg, 0, y, 0, false); m2.rotation.x = -Math.PI / 2; m2.receiveShadow = true; };
+    ring(0, 2.7, 0xd6246e, .001); ring(0, 2.2, 0xff8c1a, .003); ring(0, 1.7, 0xffd23f, .005); ring(0, .95, 0x2f6fd6, .007); ring(0, .45, 0xffffff, .009);
+    for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, pe = mesh(new THREE.CircleGeometry(.5, 20), mat(k % 2 ? 0x22b573 : 0xb18cff, { r: 1 }), rg, Math.cos(a) * 1.95, .011, Math.sin(a) * 1.95, false); pe.rotation.x = -Math.PI / 2; pe.scale.y = .55; pe.rotation.z = -a; }
+    for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4 + .39; diya(rg, Math.cos(a) * 2.95, 0, Math.sin(a) * 2.95); }
+    // hanging lanterns (kandil)
+    [4, 16].forEach(x => { const k = group(g, x, y1 + 6.4, Z.park - .9); cyl(.5, .5, .8, basic(0xff8c1a), k, 0, 0, 0, 8); mesh(new THREE.ConeGeometry(.5, .45, 8), basic(0xffc04d), k, 0, 1.02, 0, false); const b = mesh(new THREE.ConeGeometry(.5, .45, 8), basic(0xffc04d), k, 0, -.22, 0, false); b.rotation.x = Math.PI; tube([0, 1.2, 0], [0, 3.4, .6], .02, mat(0x333333), k); for (let t = -2; t <= 2; t++) tube([t * .15, -.45, 0], [t * .15, -1.1, 0], .015, basic(0xffd23f), k); });
+  }
+  if (key === "christmas") {
+    const t = group(g, 16.8, y1, 9);
+    cyl(.25, .3, .8, mat(0x6b4226), t, 0, 0, 0, 10);
+    [[2.1, 2.6, .8], [1.7, 2.2, 2.3], [1.15, 1.9, 3.7]].forEach(([r, h, y]) => cyl(0, r, h, mat(0x1e7a46, { r: .9 }), t, 0, y, 0, 18));
+    star(t, -.42, 5.45, -.06, .55, 0xffd700);
+    const bc = [0xff3b3b, 0xffd700, 0x4da3ff, 0xffffff, 0xff4d8d];
+    for (let k = 0; k < 34; k++) { const y = 1 + Math.random() * 4.3, rr = (5.6 - y) / 4.6 * 1.9 + .05, a = Math.random() * Math.PI * 2; const b = mesh(new THREE.SphereGeometry(.13, 8, 6), basic(bc[k % 5]), t, Math.cos(a) * rr, y, Math.sin(a) * rr, false); if (k % 3 === 0) { b.userData.ph = k; flames.push(b); } }
+    [[-1.6, .6, 0xd62839], [-.6, 1.5, 0x2f6fd6], [1.3, 1.2, 0xffd700]].forEach(([dx, dz, c]) => { const gb = group(t, dx, 0, dz); bs(.9, .8, .9, mat(c, { r: .6 }), gb, 0, 0, 0); bs(.95, .82, .14, mat(0xffffff), gb, 0, 0, 0); bs(.14, .82, .95, mat(0xffffff), gb, 0, 0, 0); });
+    const fs = star(g, 4.5, y1 + 7.2, Z.park - .5, 1.1, 0xffe27a); fs.rotation.y = Math.PI;
+    // snow
+    const n = 1600, pos = new Float32Array(n * 3); for (let i = 0; i < n; i++) { pos[i * 3] = -30 + Math.random() * 80; pos[i * 3 + 1] = Math.random() * 70; pos[i * 3 + 2] = -40 + Math.random() * 90; }
+    const sg = new THREE.BufferGeometry(); sg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    snow = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: .35, transparent: true, opacity: .9, depthWrite: false })); snow.userData.fest = "christmas"; g.add(snow);
+  }
+  if (key === "newyear") {
+    const bcol = [0xffd700, 0xff4d8d, 0x7c5cff, 0x00e0b8, 0xffffff];
+    [[1.4, 1.2], [2.4, 1.9], [17.6, 1.2], [18.6, 1.9], [1.9, 12], [18.1, 12]].forEach(([x, z], k) => { const b = group(g, x, y1, z); tube([0, 1.2, 0], [0, 4.6, 0], .015, mat(0xdddddd), b); const s2 = mesh(new THREE.SphereGeometry(.55, 16, 12), mat(bcol[k % 5], { r: .25, m: .2 }), b, 0, 5.1, 0); s2.scale.y = 1.2; s2.userData.ph = k; s2.userData.bob = true; flames.push(s2); });
+  }
+  if (key === "holi") {
+    const cols = [0xff4d8d, 0xffd166, 0x3bd16f, 0x4da3ff, 0xb18cff, 0xff8c1a];
+    const splash = (x, y, z, c, sc = 1, flat = false) => { const sg2 = group(g, x, y, z); for (let k = 0; k < 6; k++) { const r = (.3 + Math.random() * .6) * sc, cm = mesh(new THREE.CircleGeometry(r, 18), mat(c, { r: 1, ds: true }), sg2, (Math.random() - .5) * 1.6 * sc, flat ? .01 : (Math.random() - .5) * 1.2 * sc, flat ? (Math.random() - .5) * 1.6 * sc : 0, false); if (flat) cm.rotation.x = -Math.PI / 2; } return sg2; };
+    [[3, 5, 13.55], [8, 3.2, 13.55], [15, 6, 13.55], [2.5, y1 + 6, 13.55], [10, y1 + 7.8, 13.55], [17, y1 + 5, 13.55], [5, y1 + .7, -.04], [15.5, y1 + .6, -.04]].forEach(([x, y, z], k) => splash(x, y, z, cols[k % 6]));
+    [[4, -4], [10, -5.5], [15, -3.5], [7, -12], [13, -14]].forEach(([x, z], k) => splash(x, .42, z, cols[(k + 2) % 6], 1.3, true));
+    for (let k = 0; k < 5; k++) { const x = 2.5 + k * 3.7; cyl(.45, .35, .12, mat(0xc0c0c0, { m: .6, r: .3 }), g, x, yb, .25, 14); const mo = mesh(new THREE.ConeGeometry(.35, .3, 14), mat(cols[k], { r: 1 }), g, x, yb + .24, .25, false); }
+    // drifting colour clouds
+    const n = 90, pos = new Float32Array(n * 3), col = new Float32Array(n * 3), c3 = new THREE.Color();
+    for (let i = 0; i < n; i++) { pos[i * 3] = -4 + Math.random() * 28; pos[i * 3 + 1] = 1 + Math.random() * 26; pos[i * 3 + 2] = -6 + Math.random() * 10; c3.set(cols[i % 6]); col.set([c3.r, c3.g, c3.b], i * 3); }
+    const cg = new THREE.BufferGeometry(); cg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); cg.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    clouds = new THREE.Points(cg, new THREE.PointsMaterial({ size: 5, map: softTex(), vertexColors: true, transparent: true, opacity: .4, depthWrite: false })); clouds.userData.fest = "holi"; g.add(clouds);
+  }
+  FESTG[key] = g; return g;
+}
+
+/* ---------- fireworks ---------- */
+const fireworks = []; let fwNext = 0, SPARK = null;
+function burst(now) {
+  const n = 80, pos = new Float32Array(n * 3), vel = [], c = new THREE.Color().setHSL(Math.random(), 1, .62);
+  const cx = -6 + Math.random() * 32, cy = 30 + Math.random() * 7, cz = 24 + Math.random() * 18, sp = 7 + Math.random() * 4;
+  for (let i = 0; i < n; i++) { pos.set([cx, cy, cz], i * 3); vel.push(new THREE.Vector3().randomDirection().multiplyScalar(sp * (.75 + Math.random() * .3))); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const p = new THREE.Points(geo, new THREE.PointsMaterial({ color: c, size: 1.6, map: SPARK || (SPARK = softTex()), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  p.userData = { vel, born: now }; scene.add(p); fireworks.push(p);
+}
+
+function fwStep(dt, now, only) {
+  for (let i = fireworks.length - 1; i >= 0; i--) {
+    const p = fireworks[i]; if (only && !only.includes(p)) continue;
+    const age = (now - p.userData.born) / 1000, a = p.geometry.attributes.position;
+    if (age > 1.9) { scene.remove(p); p.geometry.dispose(); p.material.dispose(); fireworks.splice(i, 1); continue; }
+    p.userData.vel.forEach((v, k) => { v.y -= 7 * dt; v.multiplyScalar(1 - .8 * dt); a.setXYZ(k, a.getX(k) + v.x * dt, a.getY(k) + v.y * dt, a.getZ(k) + v.z * dt); });
+    a.needsUpdate = true; p.material.opacity = Math.max(0, 1 - age / 1.9);
+  }
+}
+// launch a few bursts and fast-forward them so a captured image always shows fireworks
+function primeFireworks() {
+  const now = performance.now(), fresh = [];
+  for (let k = 0; k < 3; k++) { burst(now - 550 - k * 150); fresh.push(fireworks[fireworks.length - 1]); }
+  for (let k = 0; k < 12; k++) fwStep(.05, now, fresh);
+}
+/* ---------- per-frame animation ---------- */
+let lastT = 0, twT = 0;
+function tick(now) {
+  const dt = Math.min(.05, (now - (lastT || now)) / 1000), t = now / 1000; lastT = now;
+  FAM.forEach((m, i) => { const u = m.p.userData; if (u.wave != null) { u.armR.rotation.z = 2.55 + Math.sin(t * 6 + u.wave) * .35; u.armL.rotation.z = -.12; } else if (u.type) { u.armL.rotation.x = -1.05 + Math.sin(t * 14 + i) * .05; u.armR.rotation.x = -1.05 + Math.cos(t * 13) * .05; } });
+  if (!fest) return;
+  flames.forEach(f => { if (!f.visible) return; if (f.userData.bob) { f.position.y = 5.1 + Math.sin(t * 1.5 + f.userData.ph) * .15; return; } const k = 1 + Math.sin(t * 11 + f.userData.ph) * .14 + Math.random() * .08; f.scale.set(1, k, 1); });
+  if (now - twT > 260) { twT = now; twinkles.forEach(im => { if (!im.parent?.visible) return; im.userData.base.forEach((c, i) => im.setColorAt(i, Math.random() < .22 ? c.clone().multiplyScalar(.2) : c)); im.instanceColor.needsUpdate = true; }); }
+  const rate = FEST[fest].fw;
+  if (rate && now > fwNext) { burst(now); fwNext = now + rate * 1000 * (.6 + Math.random() * .8); }
+  fwStep(dt, now);
+  if (snow && fest === "christmas") {
+ const a = snow.geometry.attributes.position; for (let i = 0; i < a.count; i++) { let y = a.getY(i) - dt * (2.5 + (i % 7) * .4); if (y < 0) y = 70; a.setY(i, y); a.setX(i, a.getX(i) + Math.sin(t + i) * dt * .3); } a.needsUpdate = true; }
+  if (clouds && fest === "holi") { const a = clouds.geometry.attributes.position; for (let i = 0; i < a.count; i++) { let y = a.getY(i) + dt * (.6 + (i % 5) * .2); if (y > 28) y = 1; a.setY(i, y); a.setX(i, a.getX(i) + Math.sin(t * .5 + i) * dt * .5); } a.needsUpdate = true; }
+}
+
+/* ---------- switching ---------- */
+function applyFamily() { const pose = fest ? POSES.fest : POSES.home; FAM.forEach(m => setPose(m.p, pose[m.id])); }
+function setFestival(key, opts = {}) {
+  key = FEST[key] ? key : "";
+  if (key && !fest) { prevNight = ui.night; prevLabels = ui.labels; }
+  Object.values(FESTG).forEach(g => g.visible = false);
+  FAM.forEach((m, i) => { const ex = m.p.userData.extras; ex.clear(); if (!key) return; const h = hatFor(key, i); if (h) ex.add(h); if (key === "holi") ex.add(holiSpots(i)); });
+  fest = key;
+  if (key) {
+    (FESTG[key] || buildFest(key)).visible = true;
+    festLights.forEach(l => l.intensity = l.userData.fest === key ? 30 : 0);
+    ui.night = FEST[key].night; ui.labels = false; ui.floor = "all"; ui.cut = false; ui.family = true;
+    fwNext = performance.now() + 400;
+  } else { ui.night = prevNight; ui.labels = prevLabels; festLights.forEach(l => l.intensity = 0); }
+  ["Night", "Labels", "Cut", "Fam"].forEach(k => { const el = $("#opt" + k); if (el) el.checked = ui[k === "Fam" ? "family" : k.toLowerCase()]; });
+  applyFamily(); applyView();
+  document.querySelectorAll("#festBtns button").forEach(b => b.classList.toggle("on", b.dataset.k === key));
+  if (key) { stopTour(); flyTo(GREET.pos, GREET.target, opts.instant ? 1 : 1600); controls.autoRotate = false; setTimeout(() => { if (fest === key && !anim) { controls.autoRotate = true; controls.autoRotateSpeed = .45; } }, opts.instant ? 50 : 1700); showGreet(opts); }
+  else { $("#greet").hidden = true; $("#info").hidden = false; controls.autoRotate = false; frameFloor(); }
+}
+const GREET = { pos: new THREE.Vector3(-2, 15, -27), target: new THREE.Vector3(W / 2, 15.5, 6) };
+ui.family = true;
+function afterApply(top) {
+  FAM.forEach(m => { const u = m.p.userData, fl = u.pose ? u.pose.f : 0; m.p.visible = ui.family; u.label.visible = ui.family && fl <= top && (ui.floor === "all" || fl === top); });
+}
+function focusPerson(m) {
+  const ps = m.p.userData.pose; if (!ps) return;
+  if (!fest) { ui.floor = String(ps.f); ui.cut = true; $("#optCut").checked = true; applyView(); }
+  const wp = new THREE.Vector3(); m.p.getWorldPosition(wp);
+  flyTo(new THREE.Vector3(wp.x - 9, wp.y + 9, wp.z - 11), new THREE.Vector3(wp.x, wp.y + 3, wp.z));
+  setInfo(`${m.name}`, `${m.rel} · ${ps.txt}`); $("#info").hidden = false;
+  if (innerWidth <= 760) $("#panel").classList.add("closed");
+}
+
+/* ---------- greeting card ---------- */
+const params = new URLSearchParams(location.search);
+const G = { to: "", msg: "", recipient: false };
+const clip = (s, n) => String(s || "").replace(/[\u0000-\u001f<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, n);
+function greetURL() {
+  const base = /^https?:/.test(location.protocol) ? location.origin + location.pathname : "https://manideepcs024.github.io/house/";
+  const q = new URLSearchParams({ f: fest }); if (G.to) q.set("to", G.to); if (G.msg && G.msg !== FEST[fest].msg) q.set("m", G.msg);
+  return base + "?" + q.toString();
+}
+function greetText() {
+  const F0 = FEST[fest];
+  return `${F0.e} *${F0.title}${G.to ? ", " + G.to : ""}!*\n\n${G.msg || F0.msg}\n\n— ${FAMILY_SIGN}\n\n✨ See our home decorated for ${F0.n} in 3D 👇\n${greetURL()}`;
+}
+function showGreet(opts = {}) {
+  const F0 = FEST[fest], el = $("#greet"); el.hidden = false; $("#info").hidden = true;
+  el.style.setProperty("--g1", F0.g[0]); el.style.setProperty("--g2", F0.g[1]);
+  if (!opts.keep) { G.msg = G.msg && FEST_MSGS.has(G.msg) ? "" : G.msg; }
+  const msg = G.msg || F0.msg;
+  $("#gTo").textContent = G.to ? `Dear ${G.to},` : ""; $("#gTitle").textContent = `${F0.title} ${F0.e}`; $("#gMsg").textContent = msg;
+  $("#gForm").hidden = G.recipient; $("#inTo").value = G.to; $("#inMsg").value = msg;
+  $("#gBtns").innerHTML = G.recipient
+    ? `<button class="pri" data-a="explore">🏠 Explore our home</button><button data-a="img">📸 Save greeting</button><button data-a="mine">💌 Send your own</button>`
+    : `<button class="pri" data-a="img">📸 Greeting image</button><button class="wa" data-a="wa">💌 Send on WhatsApp</button><button data-a="copy">🔗 Copy link</button>`;
+}
+const FEST_MSGS = new Set(Object.values(FEST).map(f => f.msg));
+$("#inTo").addEventListener("input", e => { G.to = clip(e.target.value, 24); $("#gTo").textContent = G.to ? `Dear ${G.to},` : ""; });
+$("#inMsg").addEventListener("input", e => { G.msg = clip(e.target.value, 200); $("#gMsg").textContent = G.msg || FEST[fest].msg; });
+$("#gClose").addEventListener("click", () => { $("#greet").hidden = true; $("#info").hidden = false; });
+$("#gBtns").addEventListener("click", async e => {
+  const a = e.target.closest("[data-a]")?.dataset.a; if (!a) return;
+  if (a === "explore") { $("#greet").hidden = true; ui.labels = true; applyView(); setInfo("Welcome to our home 🏠", "Drag to look around, tap the family's name tags, or open the menu to visit each room."); $("#info").hidden = false; return; }
+  if (a === "mine") { G.recipient = false; G.to = ""; showGreet(); return; }
+  if (a === "wa") { window.open("https://wa.me/?text=" + encodeURIComponent(greetText()), "_blank", "noopener"); return; }
+  if (a === "copy") { try { await navigator.clipboard.writeText(greetText()); e.target.textContent = "✓ Copied"; } catch { prompt("Copy this greeting:", greetText()); } return; }
+  if (a === "img") { const btn = e.target, t0 = btn.textContent; btn.textContent = "Creating…"; try { await shareGreeting(); } finally { btn.textContent = t0; } }
+});
+function wrapText(x, text, maxW) { const out = []; let line = ""; text.split(/\s+/).forEach(w => { const t = line ? line + " " + w : w; if (x.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; }
+async function greetingCanvas() {
+  await Promise.all(["800 90px Inter", "600 34px Inter", "500 22px 'JetBrains Mono'"].map(f => document.fonts.load(f).catch(() => {})));
+  const F0 = FEST[fest], CW = 1080, IH = 1080;
+  const prev = { pr: renderer.getPixelRatio(), pos: camera.position.clone(), tgt: controls.target.clone(), aspect: camera.aspect, rot: controls.autoRotate };
+  camera.position.copy(GREET.pos); controls.target.copy(GREET.target); camera.lookAt(GREET.target);
+  if (F0.fw) primeFireworks();
+  renderer.setPixelRatio(1); renderer.setSize(CW, IH, false); camera.aspect = CW / IH; camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+  const c = document.createElement("canvas"), x = c.getContext("2d"); c.width = CW;
+  x.font = "500 34px Inter"; const msgL = wrapText(x, G.msg || F0.msg, CW - 160).slice(0, 4);
+  const H = IH + 70 + (G.to ? 56 : 0) + 100 + msgL.length * 48 + 70 + 90; c.height = H;
+  const bg = x.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, "#0d0b1a"); bg.addColorStop(1, "#05060a"); x.fillStyle = bg; x.fillRect(0, 0, CW, H);
+  x.drawImage(renderer.domElement, 0, 0, CW, IH);
+  // restore the live view
+  renderer.setPixelRatio(prev.pr); renderer.setSize(innerWidth, innerHeight); camera.aspect = prev.aspect; camera.updateProjectionMatrix();
+  camera.position.copy(prev.pos); controls.target.copy(prev.tgt); controls.autoRotate = prev.rot;
+  const fade = x.createLinearGradient(0, IH - 220, 0, IH); fade.addColorStop(0, "rgba(13,11,26,0)"); fade.addColorStop(1, "rgba(13,11,26,1)"); x.fillStyle = fade; x.fillRect(0, IH - 220, CW, 220);
+  x.fillStyle = "rgba(0,0,0,.45)"; x.beginPath(); x.roundRect(40, 40, 360, 64, 32); x.fill();
+  x.fillStyle = "#fff"; x.font = "700 28px Inter"; x.textAlign = "left"; x.fillText("🏠  The Mittal Home", 66, 82);
+  let y = IH + 30; x.textAlign = "center";
+  if (G.to) { x.fillStyle = "#ffd98a"; x.font = "600 38px Inter"; x.fillText(`Dear ${G.to},`, CW / 2, y + 20); y += 56; }
+  const gr = x.createLinearGradient(160, 0, CW - 160, 0); gr.addColorStop(0, F0.g[0]); gr.addColorStop(1, F0.g[1]);
+  let fs = 96; do { x.font = `800 ${fs}px Inter`; fs -= 4; } while (x.measureText(`${F0.title} ${F0.e}`).width > CW - 120);
+  x.fillStyle = gr; x.fillText(`${F0.title} ${F0.e}`, CW / 2, y + 80); y += 110;
+  x.fillStyle = "#e3e6ee"; x.font = "500 34px Inter"; msgL.forEach((l, i) => x.fillText(l, CW / 2, y + 20 + i * 48)); y += msgL.length * 48 + 40;
+  x.fillStyle = "#c9cfdb"; x.font = "600 30px Inter"; x.fillText(`— ${FAMILY_SIGN}`, CW / 2, y + 20);
+  x.fillStyle = "#6c7285"; x.font = "500 22px 'JetBrains Mono', monospace"; x.fillText("See our home in 3D · manideepcs024.github.io/house", CW / 2, H - 36);
+  return c;
+}
+async function shareGreeting() {
+  const c = await greetingCanvas(), blob = await new Promise(r => c.toBlob(r, "image/jpeg", .92));
+  const name = `${fest}-greeting-mittal-family.jpg`, file = new File([blob], name, { type: "image/jpeg" });
+  if (matchMedia("(hover: none)").matches && navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text: greetText() }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  const url = URL.createObjectURL(blob), m = document.createElement("div"); m.className = "gmodal";
+  m.innerHTML = `<div class="in"><img src="${url}" alt="Greeting card" /><p>Download the card and send it on WhatsApp, or long-press to save it.</p><a href="${url}" download="${name}">⬇ Download</a><button>Done</button></div>`;
+  m.addEventListener("click", e => { if (e.target === m || e.target.tagName === "BUTTON") m.remove(); }); document.body.appendChild(m);
+}
+
+/* ---------- panel: festival + family buttons ---------- */
+$("#festBtns").innerHTML = `<button data-k=""><i>🏠</i>None</button>` + Object.entries(FEST).map(([k, f]) => `<button data-k="${k}"><i>${f.e}</i>${f.n}</button>`).join("");
+$("#festBtns").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { G.recipient = false; setFestival(b.dataset.k); if (innerWidth <= 760) $("#panel").classList.add("closed"); } });
+$("#famBtns").innerHTML = FAM.map(m => `<button data-p="${m.id}">${m.short}<small>${m.rel}</small></button>`).join("");
+$("#famBtns").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (b) focusPerson(FAM.find(m => m.id === b.dataset.p)); });
+$("#optFam").addEventListener("change", e => { ui.family = e.target.checked; applyView(); });
+applyFamily();
+function initFromURL() {
+  const f = params.get("f"); if (!FEST[f]) return;
+  G.recipient = true; G.to = clip(params.get("to"), 24); G.msg = clip(params.get("m"), 200);
+  $("#panel").classList.add("closed");
+  setFestival(f, { keep: true });
+}
 
 /* ---------- go ---------- */
 camera.position.copy(HOME.pos); controls.target.copy(HOME.target);
 applyView();
+initFromURL();
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); labelR.setSize(innerWidth, innerHeight); });
-renderer.setAnimationLoop(now => { if (anim) anim(now); controls.update(); renderer.render(scene, camera); labelR.render(scene, camera); });
+renderer.setAnimationLoop(now => { if (anim) anim(now); tick(now); controls.update(); renderer.render(scene, camera); labelR.render(scene, camera); });
 document.getElementById("loading").style.opacity = 0; setTimeout(() => document.getElementById("loading").remove(), 600);
-window.__house = { scene, camera, controls, ui, applyView, visit, ROOMS, renderer };
+window.__house = { scene, camera, controls, ui, applyView, visit, ROOMS, renderer, setFestival, greetingCanvas, FAM, greetURL, greetText };
 </script>
 <script src="../assets/pwa.js" defer></script>
 </body>
