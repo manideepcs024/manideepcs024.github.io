@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0c14" />
+<title>Up ₹6,200 by 10:30… then what? — a 3D story about overtrading</title>
+<meta name="description" content="An interactive 3D short film: a trader hits his target early, then chooses. Keep trading and give it all back, or log off and go out. Learn the rules that stop overtrading." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+<style>
+  :root { --fg: #eef0f6; --muted: #8f95a8; --line: rgba(255,255,255,.12); --card: rgba(12,14,24,.88); --up: #22d39a; --down: #ff5470; --a1: #7c5cff; --a2: #00e0b8; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; background: #0a0c14; color: var(--fg); font-family: Inter, system-ui, sans-serif; }
+  [hidden] { display: none !important; }
+  #scene { position: fixed; inset: 0; }
+  #scene canvas { display: block; touch-action: none; }
+  .top { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; z-index: 5; pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 9px 13px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .brand b { font: 700 .95rem "Space Grotesk"; display: block; }
+  .brand span { font: 500 .7rem "JetBrains Mono"; color: var(--muted); }
+  .nav { display: flex; gap: 6px; }
+  .nav a { font-size: .78rem; color: var(--fg); text-decoration: none; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); backdrop-filter: blur(14px); white-space: nowrap; }
+
+  .chap { position: fixed; top: 76px; left: 12px; z-index: 5; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; font: 600 .78rem "JetBrains Mono"; color: #cfd3df; backdrop-filter: blur(14px); }
+  .chap b { color: #fff; }
+  .sub { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); width: min(820px, calc(100% - 24px)); z-index: 5; text-align: center; pointer-events: none; }
+  .sub span { display: inline; font: 700 clamp(1rem, 2.6vw, 1.45rem)/1.55 Inter; color: #fff; background: rgba(0,0,0,.62); padding: 4px 12px; border-radius: 10px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .sub i { font-style: normal; color: #ffd98a; }
+  .bar { position: fixed; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 6; display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .bar button { border: 0; border-radius: 10px; width: 40px; height: 36px; font: 700 1rem Inter; cursor: pointer; background: rgba(255,255,255,.1); color: #fff; }
+  .prog { position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,.12); cursor: pointer; }
+  .prog i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: linear-gradient(90deg, var(--a1), var(--a2)); }
+  .prog b { position: absolute; top: -3px; width: 2px; height: 14px; background: rgba(255,255,255,.5); }
+  .bar .t { font: 600 .74rem "JetBrains Mono"; color: var(--muted); white-space: nowrap; }
+
+  .choice { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; padding: 20px; background: rgba(5,6,12,.55); backdrop-filter: blur(3px); }
+  .choice .in { width: min(560px, 100%); background: rgba(14,16,28,.94); border: 1px solid var(--line); border-radius: 24px; padding: 22px; text-align: center; box-shadow: 0 30px 80px -20px rgba(0,0,0,.9); animation: pop .4s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pop { from { opacity: 0; transform: scale(.94) translateY(10px); } }
+  .choice .k { font: 700 .7rem "JetBrains Mono"; letter-spacing: .14em; color: #ffd98a; }
+  .choice h2 { font: 800 clamp(1.3rem, 4vw, 1.8rem)/1.2 "Space Grotesk"; margin: 8px 0; }
+  .choice p { color: #cfd3df; font-size: .95rem; }
+  .choice .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .choice .opts button { border: 1.5px solid var(--line); border-radius: 18px; padding: 16px 10px; font: 800 1rem Inter; cursor: pointer; color: #fff; background: rgba(255,255,255,.05); }
+  .choice .opts button small { display: block; font: 500 .78rem Inter; color: var(--muted); margin-top: 4px; }
+  .choice .opts .a:hover { border-color: var(--down); background: rgba(255,84,112,.12); }
+  .choice .opts .b:hover { border-color: var(--up); background: rgba(34,211,154,.12); }
+
+  .lesson { position: fixed; inset: 0; z-index: 9; overflow: auto; padding: 70px 14px 24px; background: rgba(6,7,13,.9); backdrop-filter: blur(6px); }
+  .lesson .in { width: min(860px, 100%); margin: 0 auto; }
+  .lesson h2 { font: 800 clamp(1.5rem, 4.5vw, 2.3rem)/1.15 "Space Grotesk"; }
+  .lesson h2 em { font-style: normal; background: linear-gradient(100deg, #ff5470, #ffd23f 50%, #22d39a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lesson .lead { color: #cfd3df; margin: 8px 0 16px; line-height: 1.55; }
+  .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .cmp div { border-radius: 16px; padding: 14px; border: 1px solid; }
+  .cmp div span { font: 600 .7rem "JetBrains Mono"; letter-spacing: .08em; display: block; }
+  .cmp div b { font: 800 1.6rem "Space Grotesk"; display: block; margin: 4px 0; }
+  .cmp div small { color: #cfd3df; font-size: .8rem; }
+  #cmpChart { width: 100%; height: 220px; display: block; border-radius: 16px; background: #0f1427; border: 1px solid var(--line); }
+  .rules { display: grid; gap: 8px; margin-top: 16px; }
+  .rules div { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--line); font-size: .92rem; line-height: 1.45; }
+  .rules div i { font-style: normal; font-size: 1.3rem; }
+  .rules div b { color: #fff; }
+  .mine { margin-top: 18px; padding: 16px; border-radius: 18px; border: 1px solid rgba(124,92,255,.45); background: rgba(124,92,255,.08); }
+  .mine h3 { font: 800 1.1rem "Space Grotesk"; margin-bottom: 10px; }
+  .mine .g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .mine label { font: 600 .7rem "JetBrains Mono"; color: var(--muted); letter-spacing: .06em; }
+  .mine input { width: 100%; margin-top: 4px; background: rgba(0,0,0,.35); border: 1px solid var(--line); border-radius: 10px; color: #fff; padding: 9px 10px; font: 700 .95rem "JetBrains Mono"; outline: 0; }
+  .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .acts button, .acts a { border: 0; border-radius: 12px; padding: 11px 14px; font: 700 .86rem Inter; cursor: pointer; text-decoration: none; color: #fff; background: rgba(255,255,255,.1); }
+  .acts .pri { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); }
+  .acts .wa { background: #25d366; color: #062e16; }
+  .disc { font-size: .72rem; color: #7d8296; margin-top: 16px; line-height: 1.5; }
+  .start { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; text-align: center; background: radial-gradient(ellipse at center, rgba(30,24,60,.9), rgba(6,7,13,.97)); transition: opacity .6s; }
+  .start h1 { font: 800 clamp(1.7rem, 6vw, 3rem)/1.1 "Space Grotesk"; }
+  .start h1 em { font-style: normal; color: #22d39a; }
+  .start p { color: #cfd3df; margin-top: 10px; font-size: 1rem; }
+  .start button { margin-top: 22px; border: 0; border-radius: 999px; padding: 15px 34px; font: 800 1.05rem Inter; color: #fff; cursor: pointer; background: linear-gradient(100deg, #7c5cff, #00e0b8); }
+  .toast { position: fixed; left: 50%; bottom: 80px; transform: translate(-50%, 40px); opacity: 0; background: #fff; color: #000; padding: 10px 16px; border-radius: 999px; font: 600 .86rem Inter; z-index: 20; transition: .3s; pointer-events: none; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+  @media (max-width: 760px) { .brand span { display: none; } .sub { bottom: 84px; } .cmp, .mine .g { grid-template-columns: 1fr; } .choice .opts { grid-template-columns: 1fr; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+  <div id="scene"></div>
+  <div class="top">
+    <div class="brand"><b>🎬 The 10:30 Decision</b><span>a 3D story about overtrading</span></div>
+    <nav class="nav"><a href="../trader-room/">🖥️ Trading room</a><a href="../">← Home</a></nav>
+  </div>
+  <div class="chap" id="chap"></div>
+  <div class="sub" id="sub"></div>
+  <div class="bar"><button id="pp" title="Play / pause">⏸</button><button id="rw" title="Restart">↺</button><div class="prog" id="prog"><i id="progI"></i></div><span class="t" id="tm"></span></div>
+
+  <div class="start" id="start">
+    <div>
+      <div style="font-size:3.4rem">📈 → 📉 ?</div>
+      <h1>Up <em>₹6,200</em> by 10:30…<br/>then what?</h1>
+      <p>A 2-minute 3D story. At 10:30, <b>you</b> decide what Manideep does next.</p>
+      <button id="go">▶ Play the story</button>
+    </div>
+  </div>
+  <div class="choice" id="choice" hidden>
+    <div class="in">
+      <div class="k">⏸ 10:30 AM · YOUR CALL</div>
+      <h2>He's up ₹6,200. Target was ₹5,000.</h2>
+      <p>The plan says: target hit → stop for the day. But the market is moving and he feels unstoppable…</p>
+      <div class="opts"><button class="a" data-p="A">😎 Keep trading<small>"I'm on fire today!"</small></button><button class="b" data-p="B">🌳 Log off &amp; go out<small>"Plan done. Day done."</small></button></div>
+    </div>
+  </div>
+  <div class="lesson" id="lesson" hidden>
+    <div class="in">
+      <h2 id="lTitle"></h2>
+      <p class="lead" id="lLead"></p>
+      <canvas id="cmpChart"></canvas>
+      <div class="cmp">
+        <div style="border-color:rgba(255,84,112,.5);background:rgba(255,84,112,.08)"><span style="color:#ff9aab">😎 KEPT TRADING</span><b style="color:#ff5470">−₹5,400</b><small>Peak +₹7,100 · 9 trades · 4 rules broken</small></div>
+        <div style="border-color:rgba(34,211,154,.5);background:rgba(34,211,154,.08)"><span style="color:#9be8c9">🌳 LOGGED OFF</span><b style="color:#22d39a">+₹6,200</b><small>2 trades · plan followed · evening off</small></div>
+      </div>
+      <h3 style="font:800 1.2rem 'Space Grotesk';margin-top:18px">How to stop overtrading</h3>
+      <div class="rules">
+        <div><i>🎯</i><span><b>Decide before 9:15:</b> daily profit target, max loss and max number of trades. Write them down.</span></div>
+        <div><i>🔒</i><span><b>Target hit → log off.</b> Close the trading app, close the charts, and leave the desk.</span></div>
+        <div><i>🌳</i><span><b>Go out.</b> A walk, chai, the gym, family time. Distance from the screen protects the profit.</span></div>
+        <div><i>✋</i><span><b>Two losses in a row → stop for the day.</b> The third trade is usually the angry one.</span></div>
+        <div><i>⚖️</i><span><b>Never increase size to "win it back"</b>, never move the stop-loss, never average a loser.</span></div>
+        <div><i>📉</i><span><b>Protect the peak:</b> if you give back 30% of the day's best P&amp;L, stop.</span></div>
+        <div><i>📝</i><span><b>Review the day</b> in the evening. Good days and bad days both teach.</span></div>
+      </div>
+      <div class="mine">
+        <h3>✍️ Make my trading rules</h3>
+        <div class="g">
+          <div><label>DAILY TARGET ₹</label><input id="rT" inputmode="numeric" value="5000" /></div>
+          <div><label>MAX LOSS ₹</label><input id="rL" inputmode="numeric" value="2000" /></div>
+          <div><label>MAX TRADES</label><input id="rN" inputmode="numeric" value="2" /></div>
+        </div>
+        <div class="acts"><button class="wa" id="rWa">💌 Share my rules on WhatsApp</button><button id="rCopy">📋 Copy</button></div>
+      </div>
+      <div class="acts">
+        <button class="pri" id="other">▶ Watch the other path</button><button id="replay">↺ Replay from start</button>
+        <a href="../day-review/">📝 Review my day</a><a href="../journal/">📒 Trade journal</a><a href="../sl-calculator/">🎯 Stop-loss calculator</a>
+        <button id="shareStory">🔗 Share this story</button>
+      </div>
+      <p class="disc">A fictional, illustrative story for learning. Amounts are examples. I'm not SEBI-registered and this isn't investment advice. Trading, especially intraday and F&amp;O, carries a high risk of loss.</p>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const $ = s => document.querySelector(s);
+
+/* ---------- renderer ---------- */
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.toneMapping = THREE.ACESFilmicToneMapping;
+$("#scene").appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0d1020);
+const camera = new THREE.PerspectiveCamera(innerWidth <= 760 ? 62 : 45, innerWidth / innerHeight, .1, 300);
+const controls = new OrbitControls(camera, renderer.domElement); Object.assign(controls, { enableDamping: true, enabled: false });
+const hemi = new THREE.HemisphereLight(0xdfe6ff, 0x3a2f28, 1.0); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffe9cc, 1.1); sun.position.set(-14, 16, 6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 20, bottom: -20 }); scene.add(sun);
+const mood = new THREE.PointLight(0x88aaff, 16, 22, 1.4); mood.position.set(0, 6, -3.5); scene.add(mood);
+const fill = new THREE.PointLight(0xffe2c4, 0, 16, 1.2); fill.position.set(20, 5, -1); scene.add(fill);
+
+const MATS = {}; const mat = (c, o = {}) => MATS[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: o.r ?? .7, metalness: o.m ?? 0, emissive: o.e ?? 0, emissiveIntensity: o.ei ?? 1, transparent: o.op != null, opacity: o.op ?? 1 });
+function mesh(geo, m, p, x = 0, y = 0, z = 0) { const o = new THREE.Mesh(geo, typeof m === "object" ? m : mat(m)); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; p.add(o); return o; }
+const box = (w, h, d, m, p, x, y, z) => mesh(new THREE.BoxGeometry(w, h, d), m, p, x, y + h / 2, z);
+const cyl = (rt, rb, h, m, p, x, y, z, s = 20) => mesh(new THREE.CylinderGeometry(rt, rb, h, s), m, p, x, y + h / 2, z);
+function tube(a, b, r, m, p) { const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), o = mesh(new THREE.CylinderGeometry(r, r, A.distanceTo(B), 10), m, p); o.position.copy(A).add(B).multiplyScalar(.5); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize()); return o; }
+function ctex(w, h) { const c = document.createElement("canvas"); c.width = w; c.height = h; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return { c, x: c.getContext("2d"), t }; }
+const rr = (x, a, b, w, h, r) => { x.beginPath(); x.roundRect(a, b, w, h, r); };
+
+/* ---------- room ---------- */
+const R = new THREE.Group(); scene.add(R);
+const WOOD = mat(0x3b2a20, { r: .5 }), DARK = mat(0x1a1c24, { r: .4 });
+mesh(new THREE.PlaneGeometry(20, 16), mat(0x8a5a3c, { r: .55 }), R).rotation.x = -Math.PI / 2;
+box(20, 10, .3, mat(0x2a3048, { r: .95 }), R, 0, 0, -8); box(.3, 10, 16, mat(0x313856, { r: .95 }), R, -10, 0, 0);
+// right wall with a door to the garden
+box(.3, 10, 9.5, mat(0x313856, { r: .95 }), R, 10, 0, -3.25); box(.3, 10, 3, mat(0x313856, { r: .95 }), R, 10, 0, 6.5); box(.3, 2.6, 3.5, mat(0x313856, { r: .95 }), R, 10, 7.4, 3.25);
+const door = new THREE.Group(); door.position.set(10, 0, 1.55); R.add(door); box(.18, 7.3, 3.4, mat(0x6b4a32, { r: .5 }), door, 0, 0, 1.7); mesh(new THREE.SphereGeometry(.12, 10, 8), mat(0xd4af37, { m: .9 }), door, -.18, 3.6, 3.0);
+mesh(new THREE.CircleGeometry(4.2, 48), mat(0x2b3150, { r: 1 }), R, 0, .02, -1.5).rotation.x = -Math.PI / 2;
+box(10, .22, 3, WOOD, R, 0, 2.6, -6.2); [[-4.7, -7.4], [4.7, -7.4], [-4.7, -5], [4.7, -5]].forEach(([x, z]) => box(.18, 2.6, .18, DARK, R, x, 0, z));
+box(2.6, .08, .9, DARK, R, 0, 2.82, -5.25); cyl(.22, .19, .45, mat(0xf2efe8), R, -2.6, 2.82, -5.1);
+// window
+{ const { x, t } = ctex(512, 384); const g = x.createLinearGradient(0, 0, 0, 384); g.addColorStop(0, "#1c2b5a"); g.addColorStop(.6, "#5b4a8a"); g.addColorStop(1, "#ff9a6b"); x.fillStyle = g; x.fillRect(0, 0, 512, 384); for (let i = 0; i < 26; i++) { const w = 18 + Math.random() * 34, h = 60 + Math.random() * 200; x.fillStyle = "#16192e"; x.fillRect(i * 20 - 10, 384 - h, w, h); } t.needsUpdate = true;
+  const w = mesh(new THREE.PlaneGeometry(5.2, 3.8), new THREE.MeshBasicMaterial({ map: t }), R, -9.82, 5.4, -3.2); w.rotation.y = Math.PI / 2; }
+// chair
+const chair = new THREE.Group(); chair.position.set(0, 0, -2.6); R.add(chair);
+cyl(.12, .12, 1.3, mat(0x9aa2ad, { m: .7 }), chair, 0, .25, 0); for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; tube([0, .28, 0], [Math.cos(a) * 1.1, .2, Math.sin(a) * 1.1], .06, DARK, chair); }
+box(1.9, .3, 1.8, mat(0x222a3f), chair, 0, 1.45, 0); box(1.8, 2.3, .25, mat(0x222a3f), chair, 0, 1.9, .95);
+// monitors
+const SW = 1024, SH = 600;
+function monitor(x, z, ry, w) { const g = new THREE.Group(); g.position.set(x, 2.82, z); g.rotation.y = ry; R.add(g); box(.9, .08, .6, DARK, g, 0, 0, 0); box(.14, 1.0, .14, DARK, g, 0, 0, -.05); const h = w * SH / SW; box(w + .16, h + .16, .12, DARK, g, 0, .95, -.1); const s = ctex(SW, SH); mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: s.t }), g, 0, .95 + (h + .16) / 2, -.03); return s; }
+const MC = monitor(.6, -6.55, 0, 4.0), ML = monitor(-3.9, -6.0, .5, 3.0);
+// big P&L board on the wall + the plan sticky note + clock
+const BOARD = ctex(1024, 380); mesh(new THREE.PlaneGeometry(8.2, 3.04), new THREE.MeshBasicMaterial({ map: BOARD.t }), R, 0, 7.6, -7.82); box(8.5, 3.3, .1, DARK, R, 0, 5.95, -7.9);
+const NOTE = ctex(420, 420); { const n = mesh(new THREE.PlaneGeometry(2.1, 2.1), new THREE.MeshBasicMaterial({ map: NOTE.t }), R, 4.25, 4.3, -6.35); n.rotation.y = -.25; n.rotation.z = -.05; }
+const CLK = ctex(256, 256); mesh(new THREE.CircleGeometry(1.0, 40), new THREE.MeshBasicMaterial({ map: CLK.t }), R, -6.8, 7.4, -7.82); mesh(new THREE.TorusGeometry(1.02, .08, 10, 40), DARK, R, -6.8, 7.4, -7.8);
+
+/* ---------- garden (path B) ---------- */
+const G = new THREE.Group(); scene.add(G);
+mesh(new THREE.PlaneGeometry(26, 26), mat(0x4f8a3c, { r: 1 }), G, 23, .01, 2).rotation.x = -Math.PI / 2;
+const footpath = mesh(new THREE.PlaneGeometry(14, 2.2), mat(0xc9b28f, { r: 1 }), G, 16, .02, 3.2); footpath.rotation.x = -Math.PI / 2;
+[[16, -6], [26, -4], [29, 8], [14, 11], [22, 12], [31, 1]].forEach(([x, z], i) => { cyl(.3, .4, 3, mat(0x6b4226), G, x, 0, z, 8); mesh(new THREE.SphereGeometry(2 + (i % 3) * .5, 14, 10), mat([0x2f8f4e, 0x3aa35a, 0x26794a][i % 3], { r: .9 }), G, x, 4.4, z); });
+const bench = new THREE.Group(); bench.position.set(21, 0, 3.6); G.add(bench);
+box(4, .2, 1.3, mat(0x8b5a3c), bench, 0, 1.5, 0); box(4, 1.2, .18, mat(0x8b5a3c), bench, 0, 1.9, .6); [[-1.8], [1.8]].forEach(([x]) => box(.15, 1.5, 1.2, DARK, bench, x, 0, 0));
+cyl(.16, .13, .32, mat(0xf2efe8), bench, 1.2, 1.7, -.1); const steam = []; for (let i = 0; i < 4; i++) { const s = mesh(new THREE.SphereGeometry(.08, 8, 6), mat(0xffffff, { op: .5 }), bench, 1.2, 2.2 + i * .25, -.1); s.castShadow = false; steam.push(s); }
+[[18, 5.2, 0xff7aa2], [23.5, 5.4, 0xffd166], [19, 1.6, 0xb18cff], [24, 1.8, 0xff8c1a]].forEach(([x, z, c]) => { for (let k = 0; k < 5; k++) mesh(new THREE.SphereGeometry(.22, 8, 6), mat(c), G, x + (k % 3) * .4, .25, z + Math.floor(k / 3) * .4); });
+const sunset = new THREE.Mesh(new THREE.SphereGeometry(3, 24, 16), new THREE.MeshBasicMaterial({ color: 0xffb347 })); sunset.position.set(25, 9, 40); G.add(sunset);
+
+/* ---------- Manideep (cartoon) ---------- */
+function person() {
+  const root = new THREE.Group(), s = 5.75 / 5.5, shirt = mat(0x16a394, { r: .85 }), pants = mat(0x30343f, { r: .85 }), skin = mat(0xc68a5e);
+  root.scale.setScalar(s); const up = new THREE.Group(); root.add(up);
+  const torso = mesh(new THREE.CapsuleGeometry(.44, 1.05, 6, 14), shirt, up, 0, .95, 0); torso.scale.z = .7;
+  mesh(new THREE.CylinderGeometry(.13, .15, .25, 10), skin, up, 0, 2.0, 0);
+  const head = new THREE.Group(); head.position.y = 2.45; up.add(head);
+  mesh(new THREE.SphereGeometry(.42, 20, 16), skin, head, 0, 0, 0); const hr = mesh(new THREE.SphereGeometry(.45, 20, 10, 0, Math.PI * 2, 0, Math.PI * .55), mat(0x1b1512), head, 0, .05, -.04); hr.rotation.x = -.28;
+  [-.15, .15].forEach(x => mesh(new THREE.SphereGeometry(.045, 8, 6), mat(0x111111), head, x, .05, .39));
+  const mouth = mesh(new THREE.TorusGeometry(.12, .024, 6, 14, Math.PI), mat(0x7a2e2e), head, 0, -.11, .37);
+  const brows = [-.15, .15].map(x => box(.16, .03, .03, mat(0x1b1512), head, x, .16, .39));
+  const sweat = mesh(new THREE.SphereGeometry(.07, 8, 6), mat(0x8fd3ff, { r: .1, m: .2 }), head, .36, .12, .25); sweat.scale.y = 1.4; sweat.visible = false;
+  const arm = sd => { const p = new THREE.Group(); p.position.set(sd * .58, 1.62, 0); up.add(p); mesh(new THREE.CapsuleGeometry(.12, .95, 4, 8), shirt, p, 0, -.6, 0); mesh(new THREE.SphereGeometry(.13, 10, 8), skin, p, 0, -1.25, 0); return p; };
+  const aL = arm(-1), aR = arm(1);
+  const leg = sd => { const p = new THREE.Group(); p.position.set(sd * .22, 0, 0); up.add(p); mesh(new THREE.CylinderGeometry(.17, .15, 2.5, 10), pants, p, 0, -1.25, 0); box(.32, .2, .55, mat(0x2a2320), p, 0, -2.6, .08); return p; };
+  const lL = leg(-1), lR = leg(1);
+  return { root, up, head, mouth, brows, sweat, aL, aR, lL, lR, s };
+}
+const ME = person(); chair.add(ME.root); ME.root.rotation.y = Math.PI; ME.root.position.z = .1;
+function sitPose(P, hipY) { P.up.position.y = hipY / P.s; P.lL.rotation.x = P.lR.rotation.x = -Math.PI / 2; }
+function standPose(P) { P.up.position.y = 2.6; P.lL.rotation.x = P.lR.rotation.x = 0; }
+sitPose(ME, 1.62);
+// how he looks: m from -1 (miserable) to +1 (happy)
+function setMood(m, t) {
+  ME.mouth.rotation.z = m >= 0 ? Math.PI : 0; ME.mouth.position.y = m >= 0 ? -.11 : -.16; ME.mouth.scale.set(1, Math.max(.25, Math.abs(m)), 1);
+  ME.brows[0].rotation.z = -m * .35 + (m < 0 ? .25 : 0); ME.brows[1].rotation.z = m * .35 - (m < 0 ? .25 : 0);
+  ME.sweat.visible = m < -.3; if (ME.sweat.visible) ME.sweat.position.y = .12 - ((t * .6) % 1) * .35;
+}
+
+/* ---------- screens ---------- */
+const C = { bg: "#0b1020", up: "#22d39a", down: "#ff5470", text: "#e8ecf6", mute: "#8b93a7", gold: "#ffd23f" };
+const money = v => (v < 0 ? "−" : v > 0 ? "+" : "") + "₹" + Math.abs(Math.round(v)).toLocaleString("en-IN");
+const clockTxt = m => { const h = Math.floor(9 + (15 + m) / 60), mm = (15 + m) % 60; return `${((h - 1) % 12) + 1}:${String(mm).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}`; };
+let hist = [], trades = [], broken = 0, screensOff = false, peak = 0;
+function drawBoard(pnl, mins, off) {
+  const { x, t } = BOARD; x.fillStyle = "#0b0e1a"; x.fillRect(0, 0, 1024, 380);
+  x.fillStyle = C.mute; x.font = "700 30px 'JetBrains Mono', monospace"; x.fillText("TODAY'S P&L", 40, 64); x.textAlign = "right"; x.fillText(clockTxt(mins), 984, 64); x.textAlign = "left";
+  x.fillStyle = off ? C.up : pnl >= 0 ? C.up : C.down; x.font = "800 150px 'Space Grotesk', Inter"; x.fillText(money(pnl), 40, 222);
+  if (off) { x.fillStyle = C.up; x.font = "800 40px Inter"; x.fillText("🔒 LOCKED IN · DAY DONE", 44, 300); }
+  else { x.fillStyle = C.mute; x.font = "600 30px Inter"; x.fillText(`Peak ${money(peak)}   ·   Trades ${trades.length}`, 44, 300); }
+  x.fillStyle = "rgba(255,255,255,.3)"; x.font = "500 20px Inter"; x.fillText("illustrative story", 44, 350); t.needsUpdate = true;
+}
+function drawCurve(off) {
+  const { x, t } = MC; x.fillStyle = C.bg; x.fillRect(0, 0, SW, SH);
+  if (off) { x.fillStyle = "#05060a"; x.fillRect(0, 0, SW, SH); x.fillStyle = "#333a4e"; x.font = "700 34px Inter"; x.textAlign = "center"; x.fillText("Logged off ✓", SW / 2, SH / 2); x.textAlign = "left"; t.needsUpdate = true; return; }
+  x.fillStyle = C.text; x.font = "700 26px Inter"; x.fillText("P&L through the day", 24, 44);
+  const X = m => 40 + m / 375 * (SW - 80), Y = v => SH / 2 - v / 9000 * (SH / 2 - 60);
+  x.strokeStyle = "rgba(255,255,255,.18)"; x.setLineDash([8, 8]); x.beginPath(); x.moveTo(40, Y(0)); x.lineTo(SW - 40, Y(0)); x.stroke();
+  x.strokeStyle = "rgba(34,211,154,.5)"; x.beginPath(); x.moveTo(40, Y(5000)); x.lineTo(SW - 40, Y(5000)); x.stroke(); x.fillStyle = C.up; x.font = "600 18px Inter"; x.fillText("target ₹5,000", SW - 180, Y(5000) - 8);
+  x.strokeStyle = "rgba(255,84,112,.5)"; x.beginPath(); x.moveTo(40, Y(-2000)); x.lineTo(SW - 40, Y(-2000)); x.stroke(); x.fillStyle = C.down; x.fillText("max loss ₹2,000", SW - 190, Y(-2000) + 24); x.setLineDash([]);
+  x.lineWidth = 4; for (let i = 1; i < hist.length; i++) { const [m0, v0] = hist[i - 1], [m1, v1] = hist[i]; x.strokeStyle = v1 >= 0 ? C.up : C.down; x.beginPath(); x.moveTo(X(m0), Y(v0)); x.lineTo(X(m1), Y(v1)); x.stroke(); }
+  trades.forEach(([m, w]) => { x.fillStyle = w ? C.up : C.down; x.beginPath(); x.arc(X(m), Y(hist.find(h => h[0] >= m)?.[1] ?? 0), 8, 0, 7); x.fill(); });
+  t.needsUpdate = true;
+}
+function drawLog(off) {
+  const { x, t } = ML; x.fillStyle = off ? "#05060a" : C.bg; x.fillRect(0, 0, SW, SH); if (off) { t.needsUpdate = true; return; }
+  x.fillStyle = C.text; x.font = "700 26px Inter"; x.fillText("Trade log", 24, 44);
+  trades.slice(-7).forEach(([m, w, label, amt], i) => { x.fillStyle = i % 2 ? "#121a30" : "#0f1629"; x.fillRect(16, 66 + i * 74, SW - 32, 66); x.fillStyle = C.mute; x.font = "600 20px 'JetBrains Mono'"; x.fillText(clockTxt(m), 32, 106 + i * 74); x.fillStyle = C.text; x.font = "700 24px Inter"; x.fillText(label, 170, 106 + i * 74); x.fillStyle = w ? C.up : C.down; x.textAlign = "right"; x.fillText(money(amt), SW - 34, 106 + i * 74); x.textAlign = "left"; });
+  t.needsUpdate = true;
+}
+const RULES = ["Max 2 trades", "Target ₹5,000 → stop", "Max loss ₹2,000", "Never move the SL"];
+function drawNote() {
+  const { x, t } = NOTE; x.fillStyle = "#ffe98a"; x.fillRect(0, 0, 420, 420);
+  x.fillStyle = "#3a2e00"; x.font = "800 36px 'Space Grotesk', Inter"; x.fillText("MY PLAN", 30, 58);
+  RULES.forEach((r, i) => { x.fillStyle = "#3a2e00"; x.font = "700 27px Inter"; x.fillText("• " + r, 30, 120 + i * 70); if (i < broken) { x.strokeStyle = "#d1001f"; x.lineWidth = 6; x.beginPath(); x.moveTo(26, 110 + i * 70); x.lineTo(390, 110 + i * 70); x.stroke(); x.fillStyle = "#d1001f"; x.font = "800 40px Inter"; x.fillText("✗", 360, 126 + i * 70); } });
+  t.needsUpdate = true;
+}
+function drawClock(mins) {
+  const { x, t } = CLK, h = (9 + (15 + mins) / 60) % 12, m = (15 + mins) % 60;
+  x.fillStyle = "#f4f1ea"; x.fillRect(0, 0, 256, 256); x.translate(128, 128); x.fillStyle = "#222";
+  for (let i = 0; i < 12; i++) { x.save(); x.rotate(i * Math.PI / 6); x.fillRect(-3, -112, 6, 18); x.restore(); }
+  const hand = (a, l, w) => { x.save(); x.rotate(a); x.fillRect(-w / 2, -l, w, l + 12); x.restore(); }; hand(h * Math.PI / 6, 60, 9); hand(m * Math.PI / 30, 90, 6);
+  x.setTransform(1, 0, 0, 1, 0, 0); t.needsUpdate = true;
+}
+
+/* ---------- the story ---------- */
+const V = (...a) => new THREE.Vector3(...a);
+const DESK = { pos: V(6, 6.5, 5), target: V(0, 4.8, -5) }, FACE = { pos: V(1.6, 4.5, -4.75), target: V(0, 4.1, -2.4) }, BOARDV = { pos: V(0, 5.8, 3.5), target: V(0, 6.6, -7.5) };
+// each chapter: seconds, caption, P&L from→to, clock minutes from→to, mood, trades [minute, win, label, amount], camera
+const INTRO = [
+  { id: "plan", sec: 9, cap: "9:15 AM. Manideep has a plan: <i>max 2 trades</i>, <i>target ₹5,000</i>, <i>max loss ₹2,000</i>.", p: [0, 0], m: [0, 15], mood: .5, cam: { pos: V(5, 5.6, 1.8), target: V(3.4, 4.4, -6) } },
+  { id: "good", sec: 12, cap: "The plan works. Two clean setups, two winners. <i>+₹6,200</i> by 10:30.", p: [0, 6200], m: [15, 75], mood: 1, tr: [[35, 1, "Trade 1 · breakout", 2600], [70, 1, "Trade 2 · pullback", 3600]], cam: BOARDV },
+  { id: "decide", sec: 0, cap: "10:30 AM. Target hit. Now comes the hardest part of trading…", p: [6200, 6200], m: [75, 75], mood: 1, cam: FACE, choice: true },
+];
+const PATH = {
+  A: [
+    { id: "a1", sec: 10, cap: "\"I'm on fire today!\" A third trade: <i>no setup, double the size</i>. A small win makes it feel right.", p: [6200, 7100], m: [75, 120], mood: .9, tr: [[110, 1, "Trade 3 · no setup, 2× size", 900]], brk: 1, cam: DESK },
+    { id: "a2", sec: 10, cap: "The market turns choppy. Two losses. He <i>doubles the size again</i> to win it back.", p: [7100, 2500], m: [120, 190], mood: -.3, tr: [[150, 0, "Trade 4 · chased", -2100], [185, 0, "Trade 5 · 2× size", -2500]], brk: 2, cam: FACE },
+    { id: "a3", sec: 10, cap: "Revenge trades. He <i>moves the stop-loss</i> and averages a loser. \"It has to come back…\"", p: [2500, -1800], m: [190, 285], mood: -.7, tr: [[230, 0, "Trade 6 · revenge", -1900], [270, 1, "Trade 7 · scalp", 300], [280, 0, "Trade 8 · SL moved", -2700]], brk: 3, cam: BOARDV },
+    { id: "a4", sec: 11, cap: "One big bet to recover it all… it fails. <i>Up ₹6,200 at 10:30. Down ₹5,400 at the close.</i>", p: [-1800, -5400], m: [285, 375], mood: -1, tr: [[330, 0, "Trade 9 · all-in", -3600]], brk: 4, cam: { pos: V(5.6, 5.4, -1.2), target: V(0, 3.6, -3.6) }, slump: true },
+  ],
+  B: [
+    { id: "b1", sec: 8, cap: "He closes the terminal. <i>When the plan is done, the day is done.</i>", p: [6200, 6200], m: [75, 80], mood: 1, off: true, cam: DESK },
+    { id: "b2", sec: 11, cap: "He gets up and goes out. A walk, fresh air, a cup of chai.", p: [6200, 6200], m: [80, 150], mood: 1, off: true, walk: true },
+    { id: "b3", sec: 10, cap: "3:30 PM. The market closed. Many gave their profits back. <i>He kept his +₹6,200</i>, and a calm mind for tomorrow.", p: [6200, 6200], m: [150, 375], mood: 1, off: true, bench: true, cam: { pos: V(19.2, 4.4, -3.2), target: V(21, 2.9, 3.4) } },
+  ],
+};
+let path = null, seq = INTRO, ci = 0, cT = 0, playing = false, total = 0, seen = { A: false, B: false };
+const walker = person(); standPose(walker); walker.root.visible = false; scene.add(walker.root);
+const WALK = [V(0, 0, -1.4), V(5, 0, 1.6), V(9.6, 0, 3.2), V(14, 0, 3.4), V(19.6, 0, 3.0)];
+function walkAt(k) { const n = WALK.length - 1, f = Math.min(n - .0001, k * n), i = Math.floor(f), a = WALK[i], b = WALK[i + 1], p = a.clone().lerp(b, f - i); return { p, dir: Math.atan2(b.x - a.x, b.z - a.z) }; }
+function totalSec() { return seq.reduce((s, c) => s + c.sec, 0); }
+function chapterStart(c) {
+  if (c.tr) { /* trades are revealed during the chapter */ }
+  if (c.brk) broken = Math.max(broken, c.brk); drawNote();
+  screensOff = !!c.off;
+  if (c.walk) { ME.root.visible = false; walker.root.visible = true; door.rotation.y = 0; } else if (!c.bench) { ME.root.visible = true; walker.root.visible = false; }
+  if (c.bench) { walker.root.visible = true; ME.root.visible = false; walker.root.position.set(20.6, 0, 3.35); walker.root.rotation.y = Math.PI; sitPose(walker, 1.75); walker.aL.rotation.x = walker.aR.rotation.x = -.6; walker.mouth.rotation.z = Math.PI; }
+  $("#chap").innerHTML = `<b>${path ? (path === "A" ? "😎 Kept trading" : "🌳 Logged off") : "The plan"}</b> · ${clockTxt(c.m[0])}`;
+  $("#sub").innerHTML = `<span>${c.cap}</span>`;
+  if (c.cam) camGo(c.cam.pos, c.cam.target, 1400);
+  if (c.choice) { playing = false; setTimeout(() => $("#choice").hidden = false, 1600); }
+}
+let cam = null;
+function camGo(pos, target, ms) { const p0 = camera.position.clone(), t0 = controls.target.clone(), st = performance.now(); cam = now => { const k = Math.min(1, (now - st) / ms), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; camera.position.lerpVectors(p0, pos, e); controls.target.lerpVectors(t0, target, e); if (k >= 1) cam = null; }; }
+function resetDay() { hist = [[0, 0]]; trades = []; broken = 0; peak = 0; screensOff = false; ME.root.visible = true; walker.root.visible = false; standPose(walker); ME.up.rotation.x = 0; drawNote(); }
+function startStory(fromChoice) {
+  $("#lesson").hidden = true; $("#choice").hidden = true;
+  if (!fromChoice) { path = null; seq = INTRO; resetDay(); camera.position.set(14, 11, 12); controls.target.set(0, 4, -4); }
+  ci = 0; cT = 0; playing = true; chapterStart(seq[0]); $("#pp").textContent = "⏸";
+}
+function choose(p) {
+  path = p; seen[p] = true; $("#choice").hidden = true; $("#lesson").hidden = true;
+  // restore the state at 10:30 (used when watching the other path)
+  resetDay(); INTRO.slice(0, 2).forEach(c => { (c.tr || []).forEach(t => trades.push(t)); }); hist = [[0, 0], [35, 2600], [70, 6200], [75, 6200]]; peak = 6200;
+  seq = PATH[p]; ci = 0; cT = 0; playing = true; chapterStart(seq[0]); $("#pp").textContent = "⏸";
+}
+document.querySelectorAll("#choice [data-p]").forEach(b => b.addEventListener("click", () => choose(b.dataset.p)));
+function endStory() {
+  playing = false; $("#pp").textContent = "▶";
+  const A = path === "A";
+  $("#lTitle").innerHTML = A ? `From <em>+₹7,100</em> to −₹5,400.` : `+₹6,200, <em>locked in.</em>`;
+  $("#lLead").textContent = A ? "Same trader, same morning, same skill. One decision at 10:30, to keep going, turned a great day into a terrible one. Overtrading rarely starts with a loss; it starts with a win that makes you feel unstoppable." : "The best trade of the day was the one he didn't take. Hitting your target and walking away isn't missing out; it's how good days stay good days.";
+  $("#other").textContent = seen.A && seen.B ? "↺ Watch both again" : `▶ Watch the other path: ${A ? "🌳 log off" : "😎 keep trading"}`;
+  $("#lesson").hidden = false; drawCompare();
+}
+function drawCompare() {
+  const cv = $("#cmpChart"), r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; const x = cv.getContext("2d"); x.scale(r, r);
+  const X = m => 30 + m / 375 * (w - 60), Y = v => h / 2 - v / 9000 * (h / 2 - 26);
+  x.strokeStyle = "rgba(255,255,255,.15)"; x.setLineDash([5, 5]); x.beginPath(); x.moveTo(30, Y(0)); x.lineTo(w - 30, Y(0)); x.stroke(); x.setLineDash([]);
+  const A = [[0, 0], [35, 2600], [70, 6200], [75, 6200], [110, 7100], [150, 5000], [185, 2500], [230, 600], [270, 900], [285, -1800], [330, -5400], [375, -5400]], B = [[0, 0], [35, 2600], [70, 6200], [75, 6200], [375, 6200]];
+  [[A, "#ff5470"], [B, "#22d39a"]].forEach(([pts, c]) => { x.strokeStyle = c; x.lineWidth = 3; x.beginPath(); pts.forEach(([m, v], i) => i ? x.lineTo(X(m), Y(v)) : x.moveTo(X(m), Y(v))); x.stroke(); });
+  x.fillStyle = "#ffd23f"; x.beginPath(); x.arc(X(75), Y(6200), 6, 0, 7); x.fill(); x.font = "700 12px Inter"; x.fillText("10:30 · the decision", X(75) + 10, Y(6200) - 10);
+  x.fillStyle = "#8f95a8"; x.font = "600 11px 'JetBrains Mono'"; x.fillText("9:15", 22, h - 8); x.fillText("3:30", w - 50, h - 8);
+}
+$("#other").addEventListener("click", () => { if (seen.A && seen.B) { seen = { A: false, B: false }; startStory(false); return; } choose(path === "A" ? "B" : "A"); });
+$("#replay").addEventListener("click", () => startStory(false));
+$("#go").addEventListener("click", () => { $("#start").style.opacity = 0; setTimeout(() => $("#start").hidden = true, 600); startStory(false); });
+$("#pp").addEventListener("click", () => { if (!$("#start").hidden || !$("#choice").hidden) return; if (!$("#lesson").hidden) { startStory(false); return; } playing = !playing; $("#pp").textContent = playing ? "⏸" : "▶"; });
+$("#rw").addEventListener("click", () => startStory(false));
+// my rules
+const rulesText = () => { const T = +$("#rT").value.replace(/\D/g, "") || 0, L = +$("#rL").value.replace(/\D/g, "") || 0, N = +$("#rN").value.replace(/\D/g, "") || 0; return `🧭 *My trading rules*\n\n🎯 Daily target: ₹${T.toLocaleString("en-IN")} → log off\n🛑 Max loss: ₹${L.toLocaleString("en-IN")} → stop\n🔢 Max trades: ${N}\n✋ 2 losses in a row → done for the day\n⚖️ No size-up to "win it back", never move the SL\n🌳 Target hit = close the app & go out\n\n_Watch "The 10:30 Decision", a 3D story about overtrading 👇_\n${shareURL()}`; };
+const shareURL = () => /^https?:/.test(location.protocol) ? location.origin + location.pathname : "https://manideepcs024.github.io/overtrading/";
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1800); }
+$("#rWa").addEventListener("click", () => window.open("https://wa.me/?text=" + encodeURIComponent(rulesText()), "_blank", "noopener"));
+$("#rCopy").addEventListener("click", async () => { try { await navigator.clipboard.writeText(rulesText()); toast("📋 Copied. Pin it somewhere you'll see at 9:15"); } catch { prompt("Copy:", rulesText()); } });
+$("#shareStory").addEventListener("click", () => window.open("https://wa.me/?text=" + encodeURIComponent(`📈→📉 *Up ₹6,200 by 10:30… then what?*\nA 2-minute 3D story about overtrading. You decide what happens 👇\n${shareURL()}`), "_blank", "noopener"));
+$("#prog").addEventListener("click", e => { if (!playing && $("#choice").hidden === false) return; const r = e.currentTarget.getBoundingClientRect(), k = (e.clientX - r.left) / r.width; let s = k * totalSec(); for (let i = 0; i < seq.length; i++) { if (s < seq[i].sec || i === seq.length - 1) { jump(i); break; } s -= seq[i].sec; } });
+function jump(i) { if (path === null && i > 1) i = 1; // replay to the chapter start with the right state
+  if (path) choose(path); else startStory(false); for (let k = 0; k < i; k++) { const c = seq[k]; (c.tr || []).forEach(t => trades.push(t)); hist.push([c.m[1], c.p[1]]); peak = Math.max(peak, c.p[1]); if (c.brk) broken = c.brk; } ci = i; cT = 0; chapterStart(seq[i]); }
+
+/* ---------- animation ---------- */
+let last = 0, drawT = 0;
+renderer.setAnimationLoop(now => {
+  const raw = (now - (last || now)) / 1000, dt = Math.min(.05, raw), sdt = Math.min(.5, raw), t = now / 1000; last = now;   // sdt: story clock follows real time even on slow devices
+  if (cam) cam(now);
+  let c = seq[ci];
+  let k = c && c.sec ? Math.min(1, cT / c.sec) : 0;
+  if (playing && c) {
+    cT += sdt; k = c.sec ? Math.min(1, cT / c.sec) : 0;
+    (c.tr || []).forEach(tr => { const at = (tr[0] - c.m[0]) / (c.m[1] - c.m[0]); if (k >= at && !trades.includes(tr)) trades.push(tr); });
+    if (c.sec && cT >= c.sec) { ci++; cT = 0; if (ci >= seq.length) { ci = seq.length - 1; cT = c.sec; if (path) endStory(); else playing = false; } else { chapterStart(seq[ci]); c = seq[ci]; k = 0; } }   // continue this frame with the new chapter
+  }
+  if (c) {
+    const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, wig = Math.sin(k * 23) * 380 * Math.sin(k * Math.PI) * (c.p[0] === c.p[1] ? 0 : 1);
+    const pnl = c.p[0] + (c.p[1] - c.p[0]) * e + wig, mins = Math.round(c.m[0] + (c.m[1] - c.m[0]) * k);
+    if (playing && (!hist.length || mins > hist[hist.length - 1][0])) hist.push([mins, pnl]);
+    peak = Math.max(peak, pnl);
+    if (now - drawT > 60) { drawT = now; drawBoard(pnl, mins, screensOff); drawCurve(screensOff); drawLog(screensOff); drawClock(mins); }
+    const m = c.mood; setMood(m, t);
+    mood.color.setHSL(pnl >= 0 ? .38 : 0, .8, .55); mood.intensity = screensOff ? 4 : 10 + Math.min(14, Math.abs(pnl) / 600);
+    ME.up.rotation.x = c.slump ? Math.min(.55, k * 1.2) : 0; ME.head.rotation.x = c.slump ? Math.min(.35, k) : 0;
+    const typing = !screensOff && !c.slump, sp = m < 0 ? 22 : 13; ME.aL.rotation.x = typing ? -1.05 + Math.sin(t * sp) * .07 : (c.slump ? -1.4 : -.3); ME.aR.rotation.x = typing ? -1.05 + Math.cos(t * sp) * .07 : (c.slump ? -1.4 : -.3);
+    if (c.walk) {
+      const w = walkAt(Math.min(1, k * 1.05)); walker.root.position.copy(w.p); walker.root.rotation.y = w.dir;
+      const sw = Math.sin(t * 8) * .5; walker.lL.rotation.x = sw; walker.lR.rotation.x = -sw; walker.aL.rotation.x = -sw * .6; walker.aR.rotation.x = sw * .6;
+      door.rotation.y = w.p.x > 7 && w.p.x < 12.5 ? -1.4 : Math.max(-1.4, door.rotation.y);
+      const tgt = w.p.clone().add(V(0, 3.2, 0)); controls.target.lerp(tgt, .08); camera.position.lerp(tgt.clone().add(V(-7, 3.5, 9)), .05);
+      walker.mouth.rotation.z = Math.PI;   // smile
+    }
+    steam.forEach((s, i) => { s.position.y = 2.2 + ((t * .4 + i * .25) % 1) * 1.1; s.material.opacity = .5 * (1 - ((t * .4 + i * .25) % 1)); });
+    scene.background.lerp(new THREE.Color(path === "B" && ci >= 1 ? 0xf2a65a : path === "A" && ci >= 2 ? 0x1a0a10 : 0x0d1020), .02);
+    hemi.intensity = path === "B" && ci >= 1 ? 1.25 : 1.0; fill.intensity = path === "B" && ci >= 2 ? 22 : 0;
+    const tot = totalSec(), done = seq.slice(0, ci).reduce((s, x) => s + x.sec, 0) + (c.sec ? cT : 0);
+    $("#progI").style.width = `${Math.min(100, tot ? done / tot * 100 : 0)}%`; $("#tm").textContent = clockTxt(mins);
+  }
+  controls.update(); renderer.render(scene, camera);
+});
+addEventListener("resize", () => { camera.fov = innerWidth <= 760 ? 62 : 45; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (!$("#lesson").hidden) drawCompare(); });
+camera.position.set(14, 11, 12); controls.target.set(0, 4, -4); resetDay(); drawBoard(0, 0); drawCurve(); drawLog(); drawClock(0);
+window.__story = { choose, startStory, endStory, get state() { return { path, ci, playing, trades: trades.length, broken }; } };
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
