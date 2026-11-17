@@ -99,6 +99,7 @@ const KNOWN = {
   checklist_v1: ["✅", "Pre-trade checklist", v => `${(v.log || []).length} trades checked · ${(v.custom || []).length} own rules`],
   optplan_v1: ["🧾", "Option selling planner", v => `${(v.log || []).length} option trades logged`],
   bounce_v1: ["💙", "Recovery Room", v => `${(v.lessons || []).length} lessons · ${(v.proud || []).length} proud moments`],
+  goals_v1: ["🎯", "Goal & SIP planner", v => `${(v.goals || []).length} goals`],
   accountspnl_v1: ["🏦", "Family accounts P&L", v => `${(v.accounts || []).length} accounts · ${Object.keys(v.months || {}).length} month(s)`],
   reportcard_v1: ["📅", "Report card settings"],
   journal_v1: ["📒", "Trade journal", v => `${(v.trades || []).length} trades`],

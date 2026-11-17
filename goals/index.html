@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Goal &amp; SIP Planner — plan every family goal</title>
+<meta name="description" content="Plan your family's goals: house, child education, marriage, car, travel, emergency fund and retirement. Inflation-adjusted targets, SIP needed (flat or step-up), suggested asset mix, cost of delay and an on-track check. Private, on your device." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #7c5cff; }
+  .tpl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .tpl button { border: 1.5px dashed rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: #fff; border-radius: 16px; padding: 12px 6px; font: 700 .82rem Inter; cursor: pointer; }
+  .tpl button i { display: block; font-style: normal; font-size: 1.5rem; margin-bottom: 4px; }
+  .tpl button:hover { border-color: var(--acc); background: rgba(34,211,154,.08); }
+  .goal { border: 1px solid var(--line); border-radius: 20px; background: rgba(0,0,0,.24); margin-top: 12px; overflow: hidden; }
+  .goal.sel { border-color: rgba(124,92,255,.6); box-shadow: 0 0 0 3px rgba(124,92,255,.12); }
+  .gh { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px; cursor: pointer; }
+  .gh .ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.4rem; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+  .gh b { font: 700 1rem "Space Grotesk"; display: block; }
+  .gh small { color: var(--muted); font: .72rem "JetBrains Mono"; }
+  .gh .r { text-align: right; }
+  .gh .r b { font: 700 1rem "JetBrains Mono"; }
+  .st { font: 700 .62rem "JetBrains Mono"; padding: 2px 7px; border-radius: 6px; border: 1px solid; display: inline-block; margin-top: 3px; }
+  .st.ok { color: var(--up); border-color: rgba(34,211,154,.5); } .st.no { color: var(--down); border-color: rgba(255,84,112,.5); } .st.na { color: var(--muted); border-color: var(--line); }
+  .gb { padding: 0 14px 14px; border-top: 1px dashed var(--line); }
+  .gb .cols3, .gb .cols2 { margin-top: 2px; }
+  .pbar { height: 8px; border-radius: 5px; background: rgba(255,255,255,.07); overflow: hidden; margin: 0 14px 12px; }
+  .pbar i { display: block; height: 100%; background: linear-gradient(90deg, #7c5cff, #22d39a); }
+  .gops { display: flex; gap: 6px; justify-content: flex-end; margin-top: 10px; }
+  .gops button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 9px; padding: 6px 10px; font: 600 .74rem Inter; cursor: pointer; }
+  .tot { border-radius: 22px; padding: 18px; text-align: center; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.14), rgba(34,211,154,.06)); }
+  .tot span { font: 700 .7rem "JetBrains Mono"; letter-spacing: .12em; color: var(--muted); }
+  .tot strong { display: block; font: 800 clamp(1.9rem, 6vw, 2.5rem)/1.1 "Space Grotesk"; margin: 6px 0; }
+  .tot em { font-style: normal; color: #cfd3df; font-size: .84rem; }
+  .gl { display: grid; gap: 6px; margin-top: 12px; }
+  .gl div { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: .84rem; padding: 8px 10px; border-radius: 12px; background: rgba(0,0,0,.22); border: 1px solid var(--line); cursor: pointer; }
+  .gl div b { font: 700 .82rem "JetBrains Mono"; text-align: right; }
+  .gl div small { display: block; color: var(--muted); font-size: .7rem; }
+  .det { margin-top: 20px; }
+  .det h2 { font: 800 1.3rem "Space Grotesk"; display: flex; gap: 10px; align-items: center; }
+  .kp { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .kp div { border-radius: 16px; padding: 12px; border: 1px solid var(--line); background: var(--card); }
+  .kp span { display: block; font: 600 .62rem "JetBrains Mono"; letter-spacing: .07em; color: var(--muted); text-transform: uppercase; }
+  .kp b { display: block; font: 700 1.2rem "Space Grotesk"; margin-top: 4px; overflow-wrap: anywhere; }
+  .kp small { color: var(--muted); font-size: .72rem; }
+  canvas#chart { width: 100%; height: 260px; display: block; margin-top: 12px; border-radius: 16px; background: rgba(0,0,0,.28); border: 1px solid var(--line); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .76rem; color: var(--muted); margin-top: 6px; }
+  .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: 3px; }
+  .advice { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .advice > div { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); font-size: .85rem; line-height: 1.5; color: #d5d9e4; }
+  .advice b.h { display: block; color: #fff; font: 700 .95rem "Space Grotesk"; margin-bottom: 4px; } .advice b { color: #fff; }
+  .mix { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 8px 0 6px; }
+  .mix i { display: block; height: 100%; }
+  .statusbox { margin-top: 12px; border-radius: 18px; padding: 14px 16px; border: 1px solid; font-size: .9rem; line-height: 1.55; }
+  .statusbox.ok { border-color: rgba(34,211,154,.5); background: rgba(34,211,154,.07); } .statusbox.no { border-color: rgba(254,188,46,.55); background: rgba(254,188,46,.07); } .statusbox.na { border-color: var(--line); background: rgba(255,255,255,.03); color: var(--muted); }
+  .statusbox b { color: #fff; }
+  .empty { text-align: center; color: var(--muted); padding: 22px 10px; border: 1px dashed var(--line); border-radius: 18px; margin-top: 12px; font-size: .9rem; }
+  @media (max-width: 860px) { .kp { grid-template-columns: repeat(2, minmax(0, 1fr)); } .advice { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .tpl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../accounts-pnl/">🏦 Accounts P&amp;L</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Every goal, <span class="grad">a plan.</span></h1>
+    <p class="sub">A house, your child's education, a wedding, retirement. Add your family's goals, and see what each will <b>really</b> cost after inflation, how much to invest every month, where to invest it, and whether you're on track. Everything stays on this device.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="q">Add a goal</div>
+        <div class="tpl" id="tpl"></div>
+        <div id="goals"></div>
+        <div class="cols2" style="margin-top:14px">
+          <div><div class="q">Family monthly income ₹ <span class="opt">optional</span></div><label class="field sm"><input id="income" type="text" inputmode="decimal" placeholder="1,50,000" /></label></div>
+          <div><div class="q">Monthly expenses ₹ <span class="opt">for emergency fund</span></div><label class="field sm"><input id="expenses" type="text" inputmode="decimal" placeholder="60,000" /></label></div>
+        </div>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Family plan</h2><span id="meta"></span></div>
+        <div id="sum"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="cols2" style="margin-top:12px">
+          <div><div class="q">Plan name</div><label class="field sm"><input id="pname" class="txt" type="text" maxlength="40" placeholder="Mittal family goals" /></label></div>
+          <div><div class="q">Equity return % <span class="opt">long term</span></div><label class="field sm"><input id="eqret" type="text" inputmode="decimal" placeholder="12" /></label></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="det card" id="det" hidden></section>
+
+    <div class="learn" style="max-width:920px;margin:22px auto 0"><b>How it's worked out:</b> Future cost = today's cost × (1 + inflation)<sup>years</sup>. Your existing savings grow at the expected return. <b>SIP needed</b> assumes you invest at the start of every month (monthly compounding). <b>Step-up</b> raises the SIP every year by the % you choose, so it starts lower and grows with your income. <b>Retirement</b>: your monthly expenses are inflated to retirement age, then the corpus must fund them (still rising with inflation) until the life expectancy you set, earning the post-retirement return. Expected returns are assumptions, not promises: equity is volatile year to year.</div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser. This planner does maths on assumptions you set, for <b>education and personal planning</b> only. Returns are not guaranteed; mutual fund investments are subject to market risks. For a full financial plan, consult a SEBI-registered investment adviser.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const TPL = {
+  house: { ico: "🏠", name: "House down payment", target: "20,00,000", years: "7", infl: "7" },
+  edu: { ico: "🎓", name: "Child's higher education", target: "25,00,000", years: "15", infl: "10" },
+  wed: { ico: "💍", name: "Wedding", target: "15,00,000", years: "10", infl: "7" },
+  car: { ico: "🚗", name: "New car", target: "8,00,000", years: "3", infl: "5" },
+  travel: { ico: "✈️", name: "Family trip", target: "2,00,000", years: "1", infl: "6" },
+  emerg: { ico: "🛡️", name: "Emergency fund", target: "", years: "1", infl: "6" },
+  retire: { ico: "🧓", name: "Retirement", target: "", years: "", infl: "6" },
+  custom: { ico: "✨", name: "My goal", target: "5,00,000", years: "5", infl: "6" },
+};
+const S = K.store("goals_v1", { goals: [], sel: null, income: "", expenses: "", pname: "", eqret: "12" });
+const uid = () => "g" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+$("#tpl").innerHTML = Object.entries(TPL).map(([k, t]) => `<button data-t="${k}"><i>${t.ico}</i>${t.name.replace("Child's higher education", "Education").replace("House down payment", "House")}</button>`).join("");
+
+/* ---------- maths ---------- */
+const eq = () => (num(S.eqret) || 12) / 100;
+function mixFor(y) { // suggested allocation & expected return by horizon
+  const E = eq();
+  if (y < 3) return { eq: 0, label: "Debt / liquid funds, FDs, RDs", note: "Money needed within 3 years shouldn't be in equity: a market fall could hit just when you need it.", r: .07 };
+  if (y < 5) return { eq: 35, label: "Conservative hybrid: ~35% equity", note: "Some equity for growth, mostly debt for safety.", r: .65 * .07 + .35 * E };
+  if (y < 8) return { eq: 60, label: "Balanced: ~60% equity, 40% debt", note: "Equity does the heavy lifting; debt cushions the falls.", r: .4 * .07 + .6 * E };
+  return { eq: 85, label: "Growth: ~85% equity (index funds) + debt", note: "Long horizons smooth out market ups and downs.", r: .15 * .07 + .85 * E };
+}
+const mr = R => Math.pow(1 + R, 1 / 12) - 1;
+function corpusPath(S0, sip, step, R, years) { // value at end of each year, SIP at start of each month
+  const r = mr(R), out = [S0]; let v = S0, s = sip;
+  for (let y = 0; y < years; y++) { for (let m = 0; m < 12; m++) v = (v + s) * (1 + r); out.push(v); s *= 1 + step; }
+  return out;
+}
+function solveSip(need, step, R, years) { // linear in SIP → value of 1 rupee SIP
+  if (need <= 0) return 0; const unit = corpusPath(0, 1, step, R, years)[years]; return need / unit;
+}
+function plan(g) {
+  const o = { g };
+  if (g.type === "retire") {
+    const age = num(g.age), ra = num(g.retAge), life = num(g.life) || 85, exp = num(g.mexp), infl = (num(g.infl) || 6) / 100, post = (num(g.post) || 7) / 100;
+    if (!(age > 0 && ra > age && exp > 0)) return { ...o, err: "Enter your age, retirement age and monthly expenses." };
+    if (!(life > ra)) return { ...o, err: "Life expectancy must be after retirement age." };
+    o.years = Math.round(ra - age); const yrsRet = life - ra, E0 = exp * 12 * Math.pow(1 + infl, o.years), real = (1 + post) / (1 + infl) - 1;
+    o.target = real === 0 ? E0 * yrsRet : E0 * (1 - Math.pow(1 + real, -yrsRet)) / real * (1 + real);
+    o.today = exp; o.retDetail = { E0, yrsRet, ra, life };
+  } else if (g.type === "emerg") {
+    const months = num(g.months) || 6, exp = num(S.expenses) || num(g.target);
+    if (!(exp > 0)) return { ...o, err: "Enter your monthly expenses (below the goals) to size the emergency fund." };
+    o.years = Math.max(1, Math.round(num(g.years) || 1)); o.today = exp * months; o.target = o.today * Math.pow(1 + (num(g.infl) || 6) / 100, o.years); o.months = months;
+  } else {
+    const t = num(g.target), y = num(g.years);
+    if (!(t > 0 && y > 0)) return { ...o, err: "Enter the cost in today's ₹ and years to the goal." };
+    o.years = Math.max(1, Math.round(y)); o.today = t; o.target = t * Math.pow(1 + (num(g.infl) || 6) / 100, o.years);
+  }
+  o.mix = mixFor(o.years); o.R = num(g.ret) > 0 ? num(g.ret) / 100 : o.mix.r; o.step = o.years > 1 ? (num(g.step) || 0) / 100 : 0;
+  o.saved = num(g.saved) || 0; o.fvSaved = o.saved * Math.pow(1 + o.R, o.years); o.need = Math.max(0, o.target - o.fvSaved);
+  o.sipFlat = solveSip(o.need, 0, o.R, o.years); o.sipStep = solveSip(o.need, o.step, o.R, o.years);
+  o.delay = o.years > 1 ? solveSip(Math.max(0, o.target - o.saved * Math.pow(1 + o.R, o.years)) , o.step, o.R, o.years - 1) - o.sipStep : null; // start 1 yr later, same deadline
+  o.actual = num(g.sip) || 0;
+  if (o.actual > 0 || o.saved > 0) {
+    const path = corpusPath(o.saved, o.actual, o.step, o.R, Math.max(o.years, 40)); o.path = path;
+    o.atGoal = path[o.years]; o.pct = Math.min(1, o.atGoal / o.target); o.onTrack = o.atGoal >= o.target * .995;
+    if (!o.onTrack) { const infl = o.target / o.today; let yr = null; for (let y = o.years + 1; y <= 40; y++) { const tgt = o.today * Math.pow(infl, y / o.years); if (path[y] >= tgt) { yr = y; break; } } o.reachYr = yr; o.gap = Math.max(0, (o.step ? o.sipStep : o.sipFlat) - o.actual); }
+  }
+  o.invested = (() => { let s = o.step ? o.sipStep : o.sipFlat, t = 0; for (let y = 0; y < o.years; y++) { t += s * 12; s *= 1 + o.step; } return t; })();
+  return o;
+}
+
+/* ---------- goals UI ---------- */
+const money = v => "₹" + Math.round(v).toLocaleString("en-IN");
+const shortM = v => v >= 1e7 ? "₹" + (v / 1e7).toFixed(2) + " Cr" : v >= 1e5 ? "₹" + (v / 1e5).toFixed(1) + " L" : money(v);
+function addGoal(type) {
+  const t = TPL[type], g = { id: uid(), type, ico: t.ico, name: t.name, who: "", target: t.target, years: t.years, infl: t.infl, ret: "", step: "10", saved: "", sip: "", open: true };
+  if (type === "retire") Object.assign(g, { age: "30", retAge: "60", life: "85", mexp: num(S.expenses) ? S.expenses : "50,000", post: "7", step: "10" });
+  if (type === "emerg") Object.assign(g, { months: "6", step: "0" });
+  S.goals.forEach(x => x.open = false); S.goals.push(g); S.sel = g.id; drawGoals(); render();
+  setTimeout(() => $(`[data-id="${g.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+}
+$("#tpl").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) addGoal(b.dataset.t); });
+const fld = (g, k, lab, ph, opt = "", mode = "decimal", unit = "") => `<div><div class="q">${lab}${opt ? ` <span class="opt">${opt}</span>` : ""}</div><label class="field sm">${unit ? `<span class="unit">${unit}</span>` : ""}<input data-k="${k}" type="text" inputmode="${mode}" placeholder="${ph}" value="${esc(g[k] ?? "")}" /></label></div>`;
+function body(g) {
+  const p = plan(g), autoR = p.mix ? (p.mix.r * 100).toFixed(1) : "";
+  let h = `<div class="cols2"><div><div class="q">Goal name</div><label class="field sm"><input data-k="name" class="txt" type="text" maxlength="40" value="${esc(g.name)}" /></label></div><div><div class="q">For <span class="opt">optional</span></div><label class="field sm"><input data-k="who" class="txt" type="text" maxlength="24" placeholder="e.g. Manideep" value="${esc(g.who)}" /></label></div></div>`;
+  if (g.type === "retire") h += `<div class="cols3">${fld(g, "age", "Current age", "30", "", "numeric")}${fld(g, "retAge", "Retire at", "60", "", "numeric")}${fld(g, "life", "Plan till age", "85", "", "numeric")}</div><div class="cols3">${fld(g, "mexp", "Monthly expenses today", "50,000", "", "decimal", "₹")}${fld(g, "infl", "Inflation %", "6")}${fld(g, "post", "Return after retiring %", "7")}</div>`;
+  else if (g.type === "emerg") h += `<div class="cols3">${fld(g, "months", "Months of expenses", "6", "", "numeric")}${fld(g, "years", "Build it in (years)", "1", "", "numeric")}${fld(g, "infl", "Inflation %", "6")}</div>`;
+  else h += `<div class="cols3">${fld(g, "target", "Cost in today's ₹", "10,00,000", "", "decimal", "₹")}${fld(g, "years", "Years to goal", "5", "", "numeric")}${fld(g, "infl", "Inflation %", "6", g.type === "edu" ? "education ~10%" : "")}</div>`;
+  h += `<div class="cols2">${fld(g, "saved", "Already saved for it", "0", "", "decimal", "₹")}${fld(g, "sip", "SIP I'm doing now", "0", "per month", "decimal", "₹")}</div>
+    <div class="cols2">${fld(g, "step", "Step-up SIP yearly %", "10", "0 = flat")}${fld(g, "ret", "Expected return %", autoR ? `auto ${autoR}` : "auto", "blank = auto by horizon")}</div>
+    ${p.err ? `<div class="ierr">${esc(p.err)}</div>` : ""}<div class="gops"><button data-op="dup">Duplicate</button><button data-op="del">🗑 Delete</button></div>`;
+  return h;
+}
+function head(g) {
+  const p = plan(g), st = p.err ? `<span class="st na">fill details</span>` : p.actual > 0 || p.saved > 0 ? (p.onTrack ? `<span class="st ok">ON TRACK</span>` : `<span class="st no">${Math.round(p.pct * 100)}% FUNDED</span>`) : `<span class="st na">not started</span>`;
+  return `<div class="gh" data-tog="${g.id}"><span class="ic">${g.ico}</span><div><b>${esc(g.name || "Goal")}${g.who ? ` · <span style="color:var(--muted);font-weight:500">${esc(g.who)}</span>` : ""}</b><small>${p.err ? "—" : `${shortM(p.target)} in ${p.years} yr${p.years > 1 ? "s" : ""}`}</small></div><div class="r">${p.err ? "" : `<b>${money(p.step ? p.sipStep : p.sipFlat)}</b><small>/month</small><br/>`}${st}</div></div>`;
+}
+function drawGoals() {
+  $("#goals").innerHTML = S.goals.length ? S.goals.map(g => { const p = plan(g); return `<div class="goal ${S.sel === g.id ? "sel" : ""}" data-id="${g.id}">${head(g)}${!p.err && (p.actual > 0 || p.saved > 0) ? `<div class="pbar"><i style="width:${Math.round(p.pct * 100)}%"></i></div>` : ""}${g.open ? `<div class="gb">${body(g)}</div>` : ""}</div>`; }).join("")
+    : `<div class="empty">👆 Tap a goal above to add it. Start with the one that matters most, then add the rest.</div>`;
+}
+$("#goals").addEventListener("click", e => {
+  const t = e.target.closest("[data-tog]"); if (t) { const g = S.goals.find(x => x.id === t.dataset.tog); g.open = !g.open; S.sel = g.id; drawGoals(); render(); return; }
+  const o = e.target.closest("[data-op]"); if (!o) return; const id = o.closest(".goal").dataset.id, g = S.goals.find(x => x.id === id);
+  if (o.dataset.op === "del" && confirm(`Delete "${g.name}"?`)) { S.goals = S.goals.filter(x => x.id !== id); if (S.sel === id) S.sel = S.goals[0]?.id || null; }
+  if (o.dataset.op === "dup") { const c = { ...structuredClone(g), id: uid(), name: g.name + " (copy)" }; S.goals.forEach(x => x.open = false); S.goals.push(c); S.sel = c.id; }
+  drawGoals(); render();
+});
+$("#goals").addEventListener("input", e => {
+  const t = e.target, k = t.dataset.k; if (!k) return; const card = t.closest(".goal"), g = S.goals.find(x => x.id === card.dataset.id);
+  if (!["name", "who"].includes(k)) K.fmtNum(t, ["years", "age", "retAge", "life", "months"].includes(k) ? 0 : 2);
+  g[k] = t.value; S.sel = g.id;
+  card.querySelector(".gh").outerHTML = head(g);
+  const ie = card.querySelector(".ierr"), p = plan(g); if (ie && !p.err) ie.remove(); else if (!ie && p.err) card.querySelector(".gops").insertAdjacentHTML("beforebegin", `<div class="ierr">${esc(p.err)}</div>`); else if (ie) ie.textContent = p.err;
+  const pb = card.querySelector(".pbar"); if (!p.err && (p.actual > 0 || p.saved > 0)) { if (pb) pb.firstElementChild.style.width = Math.round(p.pct * 100) + "%"; else card.querySelector(".gh").insertAdjacentHTML("afterend", `<div class="pbar"><i style="width:${Math.round(p.pct * 100)}%"></i></div>`); } else pb?.remove();
+  render();
+});
+["income", "expenses", "eqret"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); S[k] = e.target.value; drawGoals(); render(); }); });
+$("#pname").value = S.pname; $("#pname").addEventListener("input", e => { S.pname = e.target.value; S.save(); });
+
+/* ---------- summary + detail ---------- */
+function render() {
+  const P = S.goals.map(plan).filter(p => !p.err), need = P.reduce((a, p) => a + (p.step ? p.sipStep : p.sipFlat), 0), doing = P.reduce((a, p) => a + p.actual, 0), inc = num(S.income);
+  $("#meta").textContent = `${S.goals.length} goal${S.goals.length === 1 ? "" : "s"}`;
+  if (!P.length) { $("#sum").innerHTML = `<div class="empty" style="margin-top:0">Add a goal to see your family's monthly SIP plan.</div>`; $("#det").hidden = true; S.save(); return; }
+  const gap = need - doing;
+  $("#sum").innerHTML = `<div class="tot"><span>MONTHLY SIP NEEDED · ALL GOALS</span><strong>${money(need)}</strong><em>${doing ? `You're investing ${money(doing)} · ${gap > 0 ? `short by <b style="color:#ffd98a">${money(gap)}</b>` : `<b style="color:var(--up)">fully covered ✓</b>`}` : "starting this month (with step-up where set)"}${inc ? `<br/>${Math.round(need / inc * 100)}% of monthly income${need / inc > .4 ? " ⚠️ high: stretch timelines or trim goals" : ""}` : ""}</em></div>
+    <div class="gl">${P.map(p => `<div data-pick="${p.g.id}"><span>${p.g.ico}</span><span>${esc(p.g.name)}<small>${shortM(p.target)} · ${p.years}y · ${p.mix.label.split(":")[0]}</small></span><b>${money(p.step ? p.sipStep : p.sipFlat)}</b></div>`).join("")}</div>`;
+  const sel = P.find(p => p.g.id === S.sel) || P[0]; S.sel = sel.g.id; detail(sel); S.save();
+}
+$("#sum").addEventListener("click", e => { const b = e.target.closest("[data-pick]"); if (!b) return; S.sel = b.dataset.pick; S.goals.forEach(g => g.open = g.id === S.sel); drawGoals(); render(); $("#det").scrollIntoView({ behavior: "smooth" }); });
+function detail(p) {
+  const g = p.g, sipNow = p.step ? p.sipStep : p.sipFlat, d = $("#det"); d.hidden = false;
+  const kp = (k, v, s = "") => `<div><span>${k}</span><b>${v}</b>${s ? `<small>${s}</small>` : ""}</div>`;
+  let status;
+  if (!(p.actual > 0 || p.saved > 0)) status = `<div class="statusbox na">Enter <b>"SIP I'm doing now"</b> and <b>"Already saved"</b> in the goal to check if you're on track.</div>`;
+  else if (p.onTrack) status = `<div class="statusbox ok">✅ <b>On track.</b> At ${money(p.actual)}/month${p.step ? ` (rising ${Math.round(p.step * 100)}% a year)` : ""}, you should have about <b>${shortM(p.atGoal)}</b> in ${p.years} years, enough for the ${shortM(p.target)} target.</div>`;
+  else status = `<div class="statusbox no">⚠️ <b>Behind.</b> At your current SIP you'd have about <b>${shortM(p.atGoal)}</b> (${Math.round(p.pct * 100)}% of the target) in ${p.years} years. Add <b>${money(p.gap)}/month</b> to close the gap${p.reachYr ? `, or keep the same SIP and reach it in about <b>${p.reachYr} years</b>` : ""}.</div>`;
+  const R = (p.R * 100).toFixed(1), mixE = p.mix.eq;
+  d.innerHTML = `<h2><span>${g.ico}</span>${esc(g.name)}${g.who ? `<span style="font:500 .9rem Inter;color:var(--muted)">for ${esc(g.who)}</span>` : ""}</h2>
+    <div class="kp">${kp(g.type === "retire" ? "Corpus needed at " + p.retDetail.ra : "Future cost", shortM(p.target), g.type === "retire" ? `to cover ${money(p.today)}/month of today's expenses for ${p.retDetail.yrsRet} years` : `${shortM(p.today)} today, at ${num(g.infl) || 6}% inflation`)}
+      ${kp(p.step ? `SIP to start (+${Math.round(p.step * 100)}%/yr)` : "SIP needed", money(sipNow) + "/mo", p.step ? `flat SIP would be ${money(p.sipFlat)}/mo` : "same amount every month")}
+      ${kp("You'll invest in total", shortM(p.invested + p.saved), `growth adds ~${shortM(Math.max(0, p.target - p.invested - p.saved))}`)}
+      ${kp("Cost of waiting 1 year", p.delay != null ? "+" + money(p.delay) + "/mo" : "—", p.delay != null ? "more SIP to hit the same date" : "")}</div>
+    ${status}
+    <canvas id="chart"></canvas>
+    <div class="legend"><span><i style="background:#22d39a"></i>Plan: needed SIP</span>${p.path ? `<span><i style="background:#febc2e"></i>Your current SIP</span>` : ""}<span><i style="background:#ff5470;height:2px"></i>Target (rises with inflation)</span><span><i style="background:#7c5cff"></i>Amount you invest</span></div>
+    <div class="advice">
+      <div><b class="h">📊 Where to invest</b>${esc(p.mix.label)}<div class="mix"><i style="width:${mixE}%;background:#7c5cff"></i><i style="width:${100 - mixE}%;background:#00e0b8"></i></div><small style="color:var(--muted)">${mixE}% equity · ${100 - mixE}% debt · assumed ${R}% a year${num(g.ret) ? " (your setting)" : ""}</small><br/><span style="font-size:.8rem">${esc(p.mix.note)}</span></div>
+      <div><b class="h">🛬 Glide path</b>${p.years >= 4 ? `About <b>2–3 years before</b> the goal (around year ${p.years - 3}), start moving money from equity to debt funds, so a market crash in the final year can't derail it.` : `This goal is close, so keep the money safe: liquid or short-term debt funds, FDs or RDs.`}</div>
+      <div><b class="h">💡 Make it easier</b>${p.step ? `A ${Math.round(p.step * 100)}% yearly step-up starts you at <b>${money(p.sipStep)}</b> instead of ${money(p.sipFlat)}, and grows with your income.` : `Try a 10% yearly step-up: you'd start at about <b>${money(solveSip(p.need, .1, p.R, p.years))}</b> instead of ${money(p.sipFlat)}.`}${p.delay != null && p.delay > 0 ? ` Starting today matters: waiting a year costs <b>${money(p.delay)}/month</b> more.` : ""}</div>
+    </div>`;
+  drawChart(p);
+}
+function drawChart(p) {
+  const cv = $("#chart"), r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; const x = cv.getContext("2d"); x.scale(r, r);
+  const Y = p.years, plan1 = corpusPath(p.saved, p.step ? p.sipStep : p.sipFlat, p.step, p.R, Y), mine = p.path ? p.path.slice(0, Y + 1) : null;
+  const tgt = Array.from({ length: Y + 1 }, (_, y) => p.today * Math.pow(p.target / p.today, y / Y));
+  const inv = [p.saved]; { let s = p.step ? p.sipStep : p.sipFlat, t = p.saved; for (let y = 0; y < Y; y++) { t += s * 12; s *= 1 + p.step; inv.push(t); } }
+  if (p.g.type === "retire") tgt.fill(p.target);
+  const mx = Math.max(...plan1, ...(mine || []), p.target) * 1.08, pad = 44, X = i => pad + i / Y * (w - pad - 16), Yv = v => 14 + (1 - v / mx) * (h - 40);
+  x.font = "600 10px 'JetBrains Mono', monospace"; x.fillStyle = "#6c7285"; x.strokeStyle = "rgba(255,255,255,.06)";
+  for (let i = 0; i <= 4; i++) { const v = mx * i / 4, yy = Yv(v); x.beginPath(); x.moveTo(pad, yy); x.lineTo(w - 16, yy); x.stroke(); x.fillText(v >= 1e7 ? (v / 1e7).toFixed(1) + "Cr" : (v / 1e5).toFixed(0) + "L", 4, yy + 3); }
+  const step = Math.max(1, Math.ceil(Y / 8)); for (let i = 0; i <= Y; i += step) x.fillText("Y" + i, X(i) - 6, h - 8);
+  const line = (arr, col, wdt, dash) => { x.setLineDash(dash || []); x.strokeStyle = col; x.lineWidth = wdt; x.beginPath(); arr.forEach((v, i) => i ? x.lineTo(X(i), Yv(v)) : x.moveTo(X(i), Yv(v))); x.stroke(); x.setLineDash([]); };
+  x.fillStyle = "rgba(124,92,255,.18)"; x.beginPath(); x.moveTo(X(0), Yv(0)); inv.forEach((v, i) => x.lineTo(X(i), Yv(v))); x.lineTo(X(Y), Yv(0)); x.fill();
+  line(inv, "#7c5cff", 1.5); line(tgt, "#ff5470", 2, [6, 5]); line(plan1, "#22d39a", 3); if (mine) line(mine, "#febc2e", 2.5);
+  x.fillStyle = "#22d39a"; x.beginPath(); x.arc(X(Y), Yv(plan1[Y]), 5, 0, 7); x.fill();
+}
+addEventListener("resize", () => { const P = S.goals.map(plan).filter(p => !p.err); const p = P.find(q => q.g.id === S.sel); if (p) drawChart(p); });
+
+/* ---------- share ---------- */
+const valid = () => { if (!S.goals.map(plan).some(p => !p.err)) { K.toast("Add a goal with its details first"); return false; } return true; };
+function buildText() {
+  const P = S.goals.map(plan).filter(p => !p.err), need = P.reduce((a, p) => a + (p.step ? p.sipStep : p.sipFlat), 0);
+  const out = [`🎯 *${S.pname.trim() || "Our family goals"}*`, ""];
+  P.forEach(p => { out.push(`${p.g.ico} *${p.g.name}*${p.g.who ? ` (${p.g.who})` : ""}`, `   Needs ${shortM(p.target)} in ${p.years} yr${p.years > 1 ? "s" : ""} · SIP ${money(p.step ? p.sipStep : p.sipFlat)}/mo${p.step ? ` (+${Math.round(p.step * 100)}%/yr)` : ""}`, `   ${p.mix.label}${p.actual || p.saved ? ` · ${p.onTrack ? "✅ on track" : `⚠️ ${Math.round(p.pct * 100)}% funded`}` : ""}`, ""); });
+  out.push(`💰 *Total monthly SIP needed: ${money(need)}*`, "", "_Assumed returns are not guaranteed. Mutual funds are subject to market risk._");
+  return [...out, ...K.signoff("goals", "Plan your goals", "")].filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n");
+}
+async function draw() {
+  await K.loadFonts?.();
+  const P = S.goals.map(plan).filter(p => !p.err), need = P.reduce((a, p) => a + (p.step ? p.sipStep : p.sipFlat), 0), W = 1080, H = Math.max(1350, 520 + P.length * 150 + K.footerH(true));
+  const { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "GOAL & SIP PLAN", 70, 182, `700 24px ${K.F.MONO}`, "#8b93a7");
+  const t = S.pname.trim() || "Our family goals"; K.txt(ctx, t, 70, 240, K.fit(ctx, t, 700, K.F.GROT, 54, W - 140), "#fff");
+  K.panel(ctx, 70, 280, W - 140, 140, 26, "rgba(124,92,255,.14)", "rgba(124,92,255,.55)");
+  K.txt(ctx, "MONTHLY SIP NEEDED · ALL GOALS", 100, 328, `700 22px ${K.F.MONO}`, "#8b93a7"); K.txt(ctx, money(need), 100, 396, `800 60px ${K.F.GROT}`, "#fff");
+  let y = 460;
+  P.forEach(p => {
+    K.panel(ctx, 70, y, W - 140, 130, 22);
+    K.txt(ctx, p.g.ico, 96, y + 78, `52px ${K.F.INTER}`, "#fff");
+    const nm = p.g.name + (p.g.who ? ` · ${p.g.who}` : ""); K.txt(ctx, nm, 176, y + 54, K.fit(ctx, nm, 700, K.F.INTER, 30, 520), "#fff");
+    K.txt(ctx, `${shortM(p.target)} in ${p.years} yrs · ${p.mix.label.split(":")[0]}`, 176, y + 94, K.fit(ctx, `${shortM(p.target)} in ${p.years} yrs · ${p.mix.label.split(":")[0]}`, 500, K.F.MONO, 21, 520), "#8b93a7");
+    K.txt(ctx, money(p.step ? p.sipStep : p.sipFlat), W - 100, y + 62, `800 36px ${K.F.MONO}`, "#22d39a", "right"); K.txt(ctx, p.step ? `/mo · +${Math.round(p.step * 100)}%/yr` : "/month", W - 100, y + 98, `500 20px ${K.F.INTER}`, "#8b93a7", "right");
+    y += 150;
+  });
+  K.footer(ctx, W, H, K.toolUrl("goals"), "Assumed returns, not guaranteed · Not SEBI registered", true);
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => "goal-plan", imgLabel: "Share goal plan card" });
+drawGoals(); render();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
