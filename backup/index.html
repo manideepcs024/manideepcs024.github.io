@@ -97,6 +97,7 @@ const META = "mmm_last_backup";
 // friendly names for what each tool saves; anything else is still backed up
 const KNOWN = {
   checklist_v1: ["✅", "Pre-trade checklist", v => `${(v.log || []).length} trades checked · ${(v.custom || []).length} own rules`],
+  optplan_v1: ["🧾", "Option selling planner", v => `${(v.log || []).length} option trades logged`],
   journal_v1: ["📒", "Trade journal", v => `${(v.trades || []).length} trades`],
   wish_v1: ["🎁", "3D wishes (your name)"],
   dayreview_v1: ["📝", "Trading day reviews", v => `${Object.keys(v.hist || {}).length} days reviewed`],

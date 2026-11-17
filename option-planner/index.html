@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Option Selling Planner — MANIMINDSMONEY</title>
+<meta name="description" content="Plan option selling trades on NSE stocks: covered calls, cash-secured puts, credit spreads and iron condors. See max profit and loss, break-even, probability, margin, a gap test and an exit plan, and track your monthly option income." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #7c5cff; }
+  .strat { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .strat button { border: 1.5px solid var(--line); background: rgba(255,255,255,.03); color: #c3c8d6; border-radius: 14px; padding: 10px 8px; font: 700 .82rem Inter; cursor: pointer; text-align: left; line-height: 1.25; }
+  .strat button small { display: block; font: 500 .68rem Inter; color: var(--muted); margin-top: 3px; }
+  .strat button.on { border-color: var(--acc); background: rgba(0,224,184,.1); color: #fff; }
+  .strat button .rk { float: right; font: 700 .6rem "JetBrains Mono"; padding: 1px 5px; border-radius: 5px; }
+  .rk.d { color: var(--up); border: 1px solid rgba(34,211,154,.45); } .rk.u { color: var(--warn); border: 1px solid rgba(254,188,46,.45); }
+  .legs { margin-top: 6px; display: grid; gap: 8px; }
+  .leg { display: grid; grid-template-columns: 112px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: end; padding: 10px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.22); }
+  .leg .lab { font: 700 .76rem "JetBrains Mono"; padding-bottom: 10px; line-height: 1.3; }
+  .leg .lab small { display: block; font: 500 .66rem Inter; color: var(--muted); }
+  .leg .q { margin-top: 0 !important; }
+  .sell { color: var(--down); } .buy { color: var(--up); }
+  .est { font: 600 .64rem "JetBrains Mono"; color: var(--muted); margin-top: 4px; }
+  .minirow { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .minirow .btn { padding: 10px 12px; font-size: .84rem; flex: 1; }
+  #payoff { width: 100%; height: 220px; display: block; margin-top: 12px; border-radius: 16px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .checks { display: grid; gap: 6px; margin-top: 12px; }
+  .chk { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; align-items: start; padding: 9px 11px; border-radius: 12px; font-size: .83rem; line-height: 1.4; border: 1px solid var(--line); background: rgba(0,0,0,.2); }
+  .chk.ok { border-color: rgba(34,211,154,.35); } .chk.warn { border-color: rgba(254,188,46,.45); background: rgba(254,188,46,.06); } .chk.bad { border-color: rgba(255,84,112,.5); background: rgba(255,84,112,.07); }
+  .chk small { display: block; color: var(--muted); font-size: .74rem; }
+  .exit { margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .exit div { border-radius: 14px; padding: 10px 12px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
+  .exit span { display: block; font: 600 .6rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+  .exit b { font: 700 .95rem "JetBrains Mono"; }
+  .exit small { display: block; color: var(--muted); font-size: .7rem; margin-top: 2px; }
+  .logcard { margin-top: 20px; }
+  .lrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); margin-top: 8px; }
+  .lrow b { font: 700 .95rem "Space Grotesk"; }
+  .lrow small { display: block; color: var(--muted); font: .72rem "JetBrains Mono"; margin-top: 2px; overflow-wrap: anywhere; }
+  .lrow .r { text-align: right; font: 700 .95rem "JetBrains Mono"; }
+  .lrow .ops { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .lrow .ops button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 8px; padding: 5px 10px; font: 600 .74rem Inter; cursor: pointer; }
+  .lrow .ops button:hover { color: var(--fg); }
+  .lrow .ops input { width: 110px; background: rgba(0,0,0,.35); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; color: var(--fg); font: 600 .78rem "JetBrains Mono"; }
+  .mstats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  .mstats .stat { padding: 10px; } .mstats .stat b { font-size: .95rem; }
+  .tag-open { font: 700 .62rem "JetBrains Mono"; color: var(--warn); border: 1px solid rgba(254,188,46,.4); border-radius: 6px; padding: 1px 6px; margin-left: 6px; }
+  @media (max-width: 860px) { .mstats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .mstats .stat:first-child { grid-column: 1 / -1; } }
+  @media (max-width: 520px) { .strat { grid-template-columns: 1fr 1fr; } .leg { grid-template-columns: 1fr 1fr; } .leg .lab { grid-column: 1 / -1; padding-bottom: 0; } .exit { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../options/">📈 Payoff calculator</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Sell options <span class="grad">with a plan.</span></h1>
+    <p class="sub">Plan a covered call, cash-secured put, credit spread or iron condor on an NSE stock. See your max profit and loss, break-even, rough probability, margin and what a 15% gap would do <b>before</b> you sell, get an exit plan, and track your monthly option income. Everything stays on this device.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="q">Strategy</div>
+        <div class="strat" id="strat"></div>
+
+        <div class="cols2">
+          <div><div class="q">Stock</div><label class="field"><input id="sym" class="name" type="text" maxlength="20" placeholder="e.g. RELIANCE" autocomplete="off" /></label></div>
+          <div><div class="q">Spot price ₹</div><label class="field"><input id="spot" type="text" inputmode="decimal" placeholder="1,400" /></label></div>
+        </div>
+        <div class="cols3">
+          <div><div class="q">Lot size</div><label class="field sm"><input id="lot" type="text" inputmode="numeric" placeholder="500" /></label></div>
+          <div><div class="q">Lots</div><label class="field sm"><input id="lots" type="text" inputmode="numeric" placeholder="1" /></label></div>
+          <div><div class="q">IV % <span class="opt">approx</span></div><label class="field sm"><input id="iv" type="text" inputmode="decimal" placeholder="28" /></label></div>
+        </div>
+        <div class="cols2">
+          <div><div class="q">Expiry</div><label class="field sm"><input id="exp" class="txt" type="date" /></label></div>
+          <div><div class="q">Next results <span class="opt">optional</span></div><label class="field sm"><input id="res" class="txt" type="date" /></label></div>
+        </div>
+        <div class="hint" id="dteHint"></div>
+
+        <div class="q" style="margin-top:18px">Legs <span class="opt">premium = live LTP from your broker</span></div>
+        <div class="legs" id="legs"></div>
+        <div class="minirow"><button class="btn" id="suggest">🎯 Suggest strikes (~0.2 delta)</button><button class="btn" id="estPrem">🧮 Fill estimated premiums</button></div>
+        <div class="ierr" id="err"></div>
+
+        <details class="set" style="margin-top:14px;border:1px solid var(--line);border-radius:16px;padding:10px 14px;background:rgba(0,0,0,.2)"><summary style="cursor:pointer;font:600 .86rem Inter;color:#cfd3df">⚙️ My capital &amp; rules</summary>
+          <div class="cols3">
+            <div><div class="q">F&amp;O capital ₹</div><label class="field sm"><input id="cap" type="text" inputmode="decimal" placeholder="5,00,000" /></label></div>
+            <div><div class="q">Max loss / trade %</div><label class="field sm"><input id="maxL" type="text" inputmode="decimal" placeholder="2" /></label></div>
+            <div><div class="q">Broker margin ₹ <span class="opt">optional</span></div><label class="field sm"><input id="mOver" type="text" inputmode="decimal" placeholder="auto" /></label></div>
+          </div>
+          <p class="hint">Margin shown here is a rough estimate. For the exact figure, use your broker's margin calculator and enter it above.</p>
+        </details>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>The plan</h2><span id="meta"></span></div>
+        <div id="out"></div>
+        <canvas id="payoff"></canvas>
+        <div class="checks" id="checks"></div>
+        <div class="exit" id="exit"></div>
+        <div class="share-row" id="shareRow"><button class="btn primary full" id="saveBtn">💾 Save to my income log</button></div>
+        <div id="invite" style="margin-top:12px"></div>
+        <div class="learn"><b>How it's worked out:</b> payoff is at expiry, per share × lots × lot size. <b>Probability of profit</b> uses a simple log-normal model from your IV and days to expiry; real moves have fatter tails, so treat it as a rough guide. <b>Gap test</b> shows the P&amp;L if the stock opens 15% away tomorrow. Estimated premiums use Black-Scholes; always trade on live prices. Charges and taxes aren't included.</div>
+      </section>
+    </div>
+
+    <section class="card logcard">
+      <div class="res-head"><h2>📒 Monthly option income</h2><span id="logMeta"></span></div>
+      <div class="seg mb" id="periodSeg"><div class="pill"></div><button data-v="month">This month</button><button data-v="year">This year</button><button data-v="all">All time</button></div>
+      <div class="mstats" id="mstats"></div>
+      <div id="log"></div>
+    </section>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This planner does calculations on numbers you enter, for <b>education and personal record-keeping only</b>. It is not a recommendation to buy or sell any option. F&amp;O trading is high-risk; SEBI's studies found most individual F&amp;O traders lose money. Stock options on NSE are physically settled; check current lot sizes, expiry dates and margins with your broker.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$; K.chrome();
+const esc = K.esc, num = K.num;
+
+/* ---------- strategies: legs = [type C/P/S, side +1 buy / -1 sell, role] ---------- */
+const STRATS = {
+  cc: { name: "Covered call", sub: "own shares + sell call", risk: "u", legs: [["S", 1, "Shares you own"], ["C", -1, "Sell call"]], view: "Neutral to mildly bullish on a stock you hold" },
+  csp: { name: "Cash-secured put", sub: "get paid to buy lower", risk: "u", legs: [["P", -1, "Sell put"]], view: "Happy to own the stock at the strike" },
+  bps: { name: "Bull put spread", sub: "uptrend · defined risk", risk: "d", legs: [["P", -1, "Sell put"], ["P", 1, "Buy put (hedge)"]], view: "Bullish: stays above the short put" },
+  bcs: { name: "Bear call spread", sub: "downtrend · defined risk", risk: "d", legs: [["C", -1, "Sell call"], ["C", 1, "Buy call (hedge)"]], view: "Bearish: stays below the short call" },
+  ic: { name: "Iron condor", sub: "range-bound · defined", risk: "d", legs: [["P", -1, "Sell put"], ["P", 1, "Buy put (hedge)"], ["C", -1, "Sell call"], ["C", 1, "Buy call (hedge)"]], view: "Stays inside a range" },
+};
+$("#strat").innerHTML = Object.entries(STRATS).map(([k, s]) => `<button data-s="${k}"><span class="rk ${s.risk}">${s.risk === "d" ? "DEFINED" : "STOCK RISK"}</span>${s.name}<small>${s.sub}</small></button>`).join("");
+
+/* ---------- dates ---------- */
+function lastTuesday(y, m) { const d = new Date(y, m + 1, 0); while (d.getDay() !== 2) d.setDate(d.getDate() - 1); return d; }
+function defaultExpiry() { const t = K.istNow(); t.setHours(0, 0, 0, 0); let e = lastTuesday(t.getFullYear(), t.getMonth()); if ((e - t) / 864e5 < 10) e = lastTuesday(t.getFullYear(), t.getMonth() + 1); return K.iso(e); }
+const daysTo = s => { if (!s) return 0; const t = K.istNow(); t.setHours(0, 0, 0, 0); return Math.round((K.parseISO(s) - t) / 864e5); };
+
+const S = K.store("optplan_v1", { st: "bps", sym: "", spot: "", lot: "", lots: "1", iv: "", exp: "", res: "", legs: {}, cap: "5,00,000", maxL: "2", mOver: "", log: [], period: "month" });
+if (!S.exp || daysTo(S.exp) < 0) S.exp = defaultExpiry();
+const legState = () => (S.legs[S.st] ||= STRATS[S.st].legs.map(() => ({ k: "", p: "" })));
+
+/* ---------- maths ---------- */
+const N = x => { const a = Math.abs(x) / Math.SQRT2, t = 1 / (1 + .3275911 * a), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - .284496736) * t + .254829592) * t * Math.exp(-a * a); return .5 * (1 + (x < 0 ? -y : y)); };
+const R = .065;
+function bs(type, S0, Kk, T, v) { if (T <= 0 || v <= 0) return Math.max(0, type === "C" ? S0 - Kk : Kk - S0); const d1 = (Math.log(S0 / Kk) + (R + v * v / 2) * T) / (v * Math.sqrt(T)), d2 = d1 - v * Math.sqrt(T); return type === "C" ? S0 * N(d1) - Kk * Math.exp(-R * T) * N(d2) : Kk * Math.exp(-R * T) * N(-d2) - S0 * N(-d1); }
+const delta = (type, S0, Kk, T, v) => { const d1 = (Math.log(S0 / Kk) + (R + v * v / 2) * T) / (v * Math.sqrt(T)); return type === "C" ? N(d1) : N(d1) - 1; };
+const probAbove = (S0, x, T, v) => x <= 0 ? 1 : N((Math.log(S0 / x) - v * v / 2 * T) / (v * Math.sqrt(T)));
+const step = s => s < 100 ? 1 : s < 250 ? 2.5 : s < 500 ? 5 : s < 1000 ? 10 : s < 2500 ? 20 : s < 5000 ? 50 : 100;
+const roundK = (x, st) => Math.round(x / st) * st;
+
+function model() {
+  const st = STRATS[S.st], L = legState(), spot = num(S.spot), lot = Math.floor(num(S.lot)), lots = Math.max(1, Math.floor(num(S.lots)) || 1), iv = num(S.iv) / 100, dte = daysTo(S.exp), T = Math.max(dte, 0) / 365;
+  const o = { st, spot, lot, lots, iv, dte, T, qty: lot * lots, legs: [] };
+  if (!(spot > 0)) return { ...o, err: "Enter the spot price." };
+  if (!(lot > 0)) return { ...o, err: "Enter the lot size (check NSE's current lot size for the stock)." };
+  for (let i = 0; i < st.legs.length; i++) {
+    const [type, side, role] = st.legs[i], k = type === "S" ? (num(L[i].k) || spot) : num(L[i].k), p = num(L[i].p);
+    if (type !== "S" && !(k > 0 && p >= 0 && L[i].p !== "")) return { ...o, err: `Enter the strike and premium for "${role}".`, partial: true };
+    o.legs.push({ type, side, role, k, p: type === "S" ? 0 : p });
+  }
+  const lg = o.legs, g = t => lg.filter(l => l.type === t);
+  if (S.st === "bps" && !(lg[1].k < lg[0].k)) return { ...o, err: "The hedge put must be a LOWER strike than the put you sell." };
+  if (S.st === "bcs" && !(lg[1].k > lg[0].k)) return { ...o, err: "The hedge call must be a HIGHER strike than the call you sell." };
+  if (S.st === "ic" && !(lg[1].k < lg[0].k && lg[0].k < lg[2].k && lg[2].k < lg[3].k)) return { ...o, err: "Strikes must go: buy put < sell put < sell call < buy call." };
+  // payoff per share at expiry
+  const pay = x => lg.reduce((a, l) => a + l.side * (l.type === "S" ? x - l.k : (l.type === "C" ? Math.max(0, x - l.k) : Math.max(0, l.k - x)) - l.p), 0);
+  o.pay = pay;
+  o.credit = lg.filter(l => l.type !== "S").reduce((a, l) => a - l.side * l.p, 0); // net premium received per share
+  const pts = [0, ...lg.map(l => l.k), spot * 4]; for (let x = 0; x <= spot * 4; x += spot / 400) pts.push(x);
+  const vals = pts.map(pay); o.maxP = Math.max(...vals); o.maxL = Math.min(...vals);
+  o.unlimitedUp = pay(spot * 4) - pay(spot * 3.9) > 1e-9;
+  // break-evens: sign changes
+  const xs = []; for (let x = .01; x <= spot * 3; x += spot / 2000) xs.push(x);
+  o.be = []; for (let i = 1; i < xs.length; i++) { const a = pay(xs[i - 1]), b = pay(xs[i]); if ((a < 0) !== (b < 0)) o.be.push(xs[i - 1] + (xs[i] - xs[i - 1]) * (-a) / (b - a)); }
+  // probability of profit
+  if (iv > 0 && T > 0) {
+    let pop = 0; const bounds = [0, ...o.be, Infinity];
+    for (let i = 0; i < bounds.length - 1; i++) { const mid = bounds[i + 1] === Infinity ? bounds[i] * 1.5 + 1 : (bounds[i] + bounds[i + 1]) / 2; if (pay(mid) > 0) pop += probAbove(spot, bounds[i], T, iv) - (bounds[i + 1] === Infinity ? 0 : probAbove(spot, bounds[i + 1], T, iv)); }
+    o.pop = pop;
+    o.shorts = lg.filter(l => l.side < 0 && l.type !== "S").map(l => ({ ...l, d: Math.abs(delta(l.type, spot, l.k, T, iv)) }));
+  }
+  // margin estimate (rough)
+  const qty = o.qty, shortP = g("P").filter(l => l.side < 0), shortC = g("C").filter(l => l.side < 0);
+  if (S.st === "cc") o.margin = { v: lg[0].k * qty, note: "value of the shares you hold (can be pledged)" };
+  else if (S.st === "csp") o.margin = { v: lg[0].k * qty, note: "cash-secured: full strike value. Broker SPAN margin is lower (~20%), but that's leverage, not cash-secured" };
+  else { const w = S.st === "ic" ? Math.max(lg[0].k - lg[1].k, lg[3].k - lg[2].k) : Math.abs(lg[0].k - lg[1].k); o.margin = { v: w * qty * 1.1, note: "hedged spread: roughly the spread width × qty" }; }
+  if (num(S.mOver) > 0) o.margin = { v: num(S.mOver), note: "from your broker" };
+  o.gap = { down: pay(spot * .85), up: pay(spot * 1.15) };
+  o.width = S.st === "bps" || S.st === "bcs" ? Math.abs(lg[0].k - lg[1].k) : S.st === "ic" ? Math.max(lg[0].k - lg[1].k, lg[3].k - lg[2].k) : 0;
+  return o;
+}
+
+/* ---------- UI: legs ---------- */
+function drawLegs() {
+  const st = STRATS[S.st], L = legState();
+  $("#strat").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.s === S.st));
+  $("#legs").innerHTML = st.legs.map(([type, side, role], i) => type === "S"
+    ? `<div class="leg"><div class="lab buy">SHARES<small>${role}</small></div><div><div class="q">Your buy price ₹</div><label class="field sm"><input data-i="${i}" data-f="k" type="text" inputmode="decimal" placeholder="spot" value="${esc(L[i].k)}" /></label></div><div><div class="q">Shares</div><label class="field sm"><input type="text" disabled value="= lot × lots" /></label></div></div>`
+    : `<div class="leg"><div class="lab ${side < 0 ? "sell" : "buy"}">${side < 0 ? "SELL" : "BUY"} ${type === "C" ? "CALL (CE)" : "PUT (PE)"}<small>${role}</small></div><div><div class="q">Strike ₹</div><label class="field sm"><input data-i="${i}" data-f="k" type="text" inputmode="decimal" placeholder="—" value="${esc(L[i].k)}" /></label></div><div><div class="q">Premium ₹</div><label class="field sm"><input data-i="${i}" data-f="p" type="text" inputmode="decimal" placeholder="—" value="${esc(L[i].p)}" /></label><div class="est" id="est${i}"></div></div></div>`).join("");
+}
+$("#legs").addEventListener("input", e => { const t = e.target; if (!t.dataset.f) return; K.fmtNum(t); legState()[+t.dataset.i][t.dataset.f] = t.value; render(); });
+$("#strat").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; S.st = b.dataset.s; drawLegs(); render(); });
+
+function suggest() {
+  const spot = num(S.spot), iv = (num(S.iv) || 28) / 100, T = Math.max(daysTo(S.exp), 1) / 365; if (!(spot > 0)) { K.shake($("#spot").closest(".field")); K.toast("Enter the spot price first"); return; }
+  const stp = step(spot), sd = iv * Math.sqrt(T), z = .84; // ~0.2 delta
+  const pS = roundK(spot * Math.exp(-z * sd), stp), cS = roundK(spot * Math.exp(z * sd), stp), w = Math.max(stp, roundK(spot * .03, stp)), L = legState();
+  const set = (i, k) => { L[i].k = K.nf(k, k % 1 ? 1 : 0).replace(/\.0$/, ""); L[i].p = ""; };
+  if (S.st === "cc") set(1, cS); if (S.st === "csp") set(0, pS);
+  if (S.st === "bps") { set(0, pS); set(1, pS - w); } if (S.st === "bcs") { set(0, cS); set(1, cS + w); }
+  if (S.st === "ic") { set(0, pS); set(1, pS - w); set(2, cS); set(3, cS + w); }
+  if (!num(S.iv)) { S.iv = "28"; $("#iv").value = "28"; }
+  drawLegs(); estimate(); K.toast("Strikes suggested. Check they're liquid strikes");
+}
+function estimate() {
+  const spot = num(S.spot), iv = (num(S.iv) || 28) / 100, T = Math.max(daysTo(S.exp), 1) / 365, L = legState(); if (!(spot > 0)) { K.toast("Enter the spot price first"); return; }
+  STRATS[S.st].legs.forEach(([type], i) => { if (type === "S" || !(num(L[i].k) > 0)) return; L[i].p = bs(type, spot, num(L[i].k), T, iv).toFixed(2); });
+  drawLegs(); render(); STRATS[S.st].legs.forEach(([type], i) => { const e = $("#est" + i); if (e && type !== "S") e.textContent = "estimate · use live LTP"; });
+}
+$("#suggest").addEventListener("click", suggest); $("#estPrem").addEventListener("click", estimate);
+
+/* ---------- render ---------- */
+const money = n => n == null ? "—" : K.rs(n), smoney = n => K.srs(n);
+function render() {
+  const m = model(), dte = daysTo(S.exp);
+  $("#dteHint").innerHTML = S.exp ? `${dte >= 0 ? `<b>${dte} days</b> to expiry` : "<b>Expiry date has passed</b>"} · NSE stock options expire on the <b>last Tuesday</b> of the month (moved to the previous trading day for holidays).` : "";
+  $("#err").textContent = m.err && !m.partial ? m.err : "";
+  $("#meta").textContent = S.sym ? `${S.sym} · ${STRATS[S.st].name}` : STRATS[S.st].name;
+  S.save();
+  if (m.err) { $("#out").innerHTML = `<div class="placeholder">${esc(m.err)}<br/><small>Tip: tap <b>Suggest strikes</b>, then replace the premiums with live prices.</small></div>`; $("#checks").innerHTML = $("#exit").innerHTML = ""; drawChart(null); return; }
+  const q = m.qty, mp = m.maxP * q, ml = m.maxL * q, rom = m.margin.v ? m.credit * q / m.margin.v : 0, ann = m.dte > 0 ? rom * 365 / m.dte : 0;
+  const cell = (k, v, cls = "") => `<div class="stat"><span>${k}</span><b class="${cls}">${v}</b></div>`;
+  $("#out").innerHTML = `<div class="hero-res"><span>Premium you collect</span><strong>${money(m.credit * q)}</strong><em>${K.money(m.credit)} per share × ${K.qty(q)} · ${STRATS[S.st].view}</em></div>
+    <div class="stats">
+      ${cell("Max profit", m.unlimitedUp ? "Unlimited" : money(mp), "up")}
+      ${cell("Max loss", S.st === "cc" || S.st === "csp" ? money(-ml) + " <small style='font-size:.7rem;color:var(--muted)'>if stock → 0</small>" : money(-ml), "down")}
+      ${cell("Break-even", m.be.length ? m.be.map(b => K.money(b)).join(" · ") : "—")}
+      ${cell("Prob. of profit", m.pop != null ? Math.round(m.pop * 100) + "%" : "add IV", m.pop >= .65 ? "up" : m.pop != null && m.pop < .5 ? "down" : "")}
+      ${cell("Margin / capital used", money(m.margin.v) + `<small style="display:block;font:400 .66rem Inter;color:var(--muted);margin-top:2px">${esc(m.margin.note)}</small>`)}
+      ${cell("Premium yield", rom ? `${(rom * 100).toFixed(1)}% <small style="font-size:.7rem;color:var(--muted)">(${(ann * 100).toFixed(0)}%/yr)</small>` : "—")}
+      ${cell("Gap −15% tomorrow", smoney(m.gap.down * q), m.gap.down >= 0 ? "up" : "down")}
+      ${cell("Gap +15% tomorrow", smoney(m.gap.up * q), m.gap.up >= 0 ? "up" : "down")}
+    </div>`;
+  // checks
+  const cap = num(S.cap), maxLp = num(S.maxL) || 2, C = [];
+  const add = (lvl, t, s) => C.push([lvl, t, s]);
+  const realLoss = S.st === "cc" || S.st === "csp" ? -Math.min(m.gap.down, 0) * q : -ml;
+  if (cap > 0) { const pc = realLoss / cap * 100; add(pc <= maxLp ? "ok" : pc <= maxLp * 2 ? "warn" : "bad", `${S.st === "cc" || S.st === "csp" ? "15% gap loss" : "Max loss"} is ${pc.toFixed(1)}% of capital`, `Your rule: at most ${maxLp}% per trade.${pc > maxLp ? " Reduce lots or widen less." : ""}`); }
+  if (cap > 0) { const mu = m.margin.v / cap * 100; add(mu <= 50 ? "ok" : mu <= 80 ? "warn" : "bad", `Uses ${mu.toFixed(0)}% of your capital`, "Keep total margin use under 40–50% so a bad day can't force you out."); }
+  if (m.shorts?.length) m.shorts.forEach(s => add(s.d <= .3 ? "ok" : s.d <= .4 ? "warn" : "bad", `Short ${s.type === "C" ? "call" : "put"} ${K.nf(s.k, s.k % 1 ? 1 : 0)} ≈ ${s.d.toFixed(2)} delta`, s.d <= .3 ? "About " + Math.round((1 - s.d) * 100) + "% chance it expires worthless." : "Close to the money: higher premium, much higher chance of being tested."));
+  else add("warn", "Add IV to check delta and probability", "Find IV on the option chain (NSE or your broker).");
+  if (S.res) { const r = daysTo(S.res); if (r >= 0 && r <= dte) add("bad", `Results on ${K.niceDate(S.res, { day: "numeric", month: "short" })}, before expiry`, "A results gap can blow through any strike. Skip, or wait until after results."); else add("ok", "No results before expiry", ""); }
+  else add("warn", "Check the results date", 'Look it up in your <a href="../calendar/" style="color:inherit">results calendar</a> before selling.');
+  if (m.width) { const cr = m.credit / m.width; add(cr >= .25 ? "ok" : cr >= .15 ? "warn" : "bad", `Credit is ${(cr * 100).toFixed(0)}% of the spread width`, cr >= .25 ? "Decent reward for the risk." : "Thin reward: risking a lot to make a little. Move strikes or skip."); }
+  if (S.st === "csp") add("warn", "Undefined risk: the stock can gap far below your strike", "Only sell puts on stocks you'd happily hold, with the full cash ready.");
+  if (S.st === "cc") add("ok", "Covered: your shares cover the call", "Worst case the shares get sold at the strike. Your loss risk is the shares themselves.");
+  if (dte >= 0 && dte < 7) add("bad", "Inside expiry week", "Physical settlement: close or roll now, or you may have to take or give delivery.");
+  else if (dte > 50) add("warn", `${dte} days is a long time`, "Time decay speeds up in the last 30–45 days. Next month's expiry is usually better.");
+  $("#checks").innerHTML = C.map(([l, t, s]) => `<div class="chk ${l}"><span>${{ ok: "✅", warn: "⚠️", bad: "🛑" }[l]}</span><div>${t}${s ? `<small>${s}</small>` : ""}</div></div>`).join("");
+  // exit plan
+  const tp = m.credit * .5, sl = m.credit * 3, exitBy = new Date(K.parseISO(S.exp)); exitBy.setDate(exitBy.getDate() - 7);
+  $("#exit").innerHTML = `<div><span>🎯 Book profit</span><b class="up">buy back at ${K.money(tp)}</b><small>at 50% of max, ≈ ${money(tp * q)} profit</small></div>
+    <div><span>🛑 Stop-loss</span><b class="down">buy back at ${K.money(sl)}</b><small>premium 3× (loss = 2× credit, ≈ ${money(2 * m.credit * q)}) or a short strike breaks</small></div>
+    <div><span>📅 Exit by</span><b>${K.niceDate(K.iso(exitBy), { day: "numeric", month: "short" })}</b><small>before expiry week: physical settlement</small></div>`;
+  drawChart(m);
+}
+
+/* ---------- payoff chart ---------- */
+function drawChart(m) {
+  const cv = $("#payoff"), r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; const x = cv.getContext("2d"); x.scale(r, r); x.clearRect(0, 0, w, h);
+  if (!m || !m.pay) { x.fillStyle = "#5a6072"; x.font = "500 13px Inter"; x.textAlign = "center"; x.fillText("Payoff chart appears here", w / 2, h / 2); return; }
+  const sd = Math.max(.12, (m.iv || .28) * Math.sqrt(Math.max(m.T, 7 / 365)) * 2.2), lo = m.spot * (1 - sd), hi = m.spot * (1 + sd), q = m.qty;
+  const xs = Array.from({ length: 241 }, (_, i) => lo + (hi - lo) * i / 240), ys = xs.map(v => m.pay(v) * q);
+  const ymax = Math.max(...ys, 1), ymin = Math.min(...ys, -1), pad = 26, X = v => pad + (v - lo) / (hi - lo) * (w - pad * 2), Y = v => 14 + (ymax - v) / (ymax - ymin) * (h - 40);
+  x.fillStyle = "rgba(34,211,154,.12)"; x.beginPath(); x.moveTo(X(lo), Y(0)); xs.forEach((v, i) => x.lineTo(X(v), Y(Math.max(0, ys[i])))); x.lineTo(X(hi), Y(0)); x.fill();
+  x.fillStyle = "rgba(255,84,112,.14)"; x.beginPath(); x.moveTo(X(lo), Y(0)); xs.forEach((v, i) => x.lineTo(X(v), Y(Math.min(0, ys[i])))); x.lineTo(X(hi), Y(0)); x.fill();
+  x.strokeStyle = "rgba(255,255,255,.25)"; x.lineWidth = 1; x.beginPath(); x.moveTo(pad, Y(0)); x.lineTo(w - pad, Y(0)); x.stroke();
+  x.lineWidth = 2.5; x.beginPath(); xs.forEach((v, i) => { const yy = Y(ys[i]); i ? x.lineTo(X(v), yy) : x.moveTo(X(v), yy); }); x.strokeStyle = "#e8ecf6"; x.stroke();
+  x.setLineDash([4, 4]); x.strokeStyle = "#ffd23f"; x.beginPath(); x.moveTo(X(m.spot), 10); x.lineTo(X(m.spot), h - 22); x.stroke(); x.setLineDash([]);
+  x.font = "600 11px 'JetBrains Mono', monospace"; x.textAlign = "center"; x.fillStyle = "#ffd23f"; x.fillText("spot " + K.nf(m.spot, 0), X(m.spot), h - 8);
+  m.legs.filter(l => l.type !== "S").forEach(l => { if (l.k < lo || l.k > hi) return; x.fillStyle = l.side < 0 ? "#ff5470" : "#22d39a"; x.beginPath(); x.arc(X(l.k), Y(m.pay(l.k) * q), 4, 0, 7); x.fill(); });
+  x.textAlign = "left"; x.fillStyle = "#22d39a"; x.fillText("+" + K.rs(ymax).replace("₹", "₹"), 4, 14); x.fillStyle = "#ff5470"; x.fillText("−" + K.rs(-ymin), 4, h - 26);
+}
+
+/* ---------- inputs ---------- */
+function fill() {
+  ["sym", "spot", "lot", "lots", "iv", "exp", "res", "cap", "maxL", "mOver"].forEach(k => $("#" + k).value = S[k] ?? "");
+  drawLegs(); render();
+}
+$("#sym").addEventListener("input", e => { S.sym = e.target.value.toUpperCase(); render(); });
+["spot", "iv", "cap", "maxL", "mOver"].forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); S[k] = e.target.value; render(); }));
+["lot", "lots"].forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target, 0); S[k] = e.target.value; render(); }));
+["exp", "res"].forEach(k => $("#" + k).addEventListener("input", e => { S[k] = e.target.value; render(); }));
+addEventListener("resize", () => render());
+
+/* ---------- income log ---------- */
+$("#saveBtn").addEventListener("click", () => {
+  const m = model();
+  if (!S.sym.trim()) { K.shake($("#sym").closest(".field")); K.toast("Add the stock name"); return; }
+  if (m.err) { K.toast(m.err); return; }
+  S.log.unshift({ id: Date.now(), date: K.iso(K.istNow()), sym: S.sym, st: S.st, exp: S.exp, qty: m.qty, credit: +m.credit.toFixed(2), strikes: m.legs.filter(l => l.type !== "S").map(l => `${l.side < 0 ? "S" : "B"} ${K.nf(l.k, l.k % 1 ? 1 : 0)}${l.type === "C" ? "CE" : "PE"}`).join(" / "), maxLoss: +(-m.maxL * m.qty).toFixed(0), margin: +m.margin.v.toFixed(0), close: null, closeDate: null });
+  K.toast("💾 Saved as an open trade. Close it here when you exit", 2600); renderLog();
+});
+const placePeriod = K.seg("#periodSeg", () => S.period, v => { S.period = v; renderLog(); });
+const pl = t => t.close == null ? null : (t.credit - t.close) * t.qty;
+function renderLog() {
+  const now = K.iso(K.istNow()), inP = t => { const d = t.closeDate || t.date; return S.period === "all" || (S.period === "month" ? d.slice(0, 7) === now.slice(0, 7) : d.slice(0, 4) === now.slice(0, 4)); };
+  const closed = S.log.filter(t => t.close != null && inP(t)), open = S.log.filter(t => t.close == null);
+  const tot = closed.reduce((a, t) => a + pl(t), 0), wins = closed.filter(t => pl(t) > 0), worst = closed.reduce((a, t) => Math.min(a, pl(t)), 0), cap = num(S.cap);
+  const st = (k, v, c = "") => `<div class="stat"><span>${k}</span><b class="${c}">${v}</b></div>`;
+  $("#mstats").innerHTML = st("Net option income", closed.length ? K.srs(tot) : "—", tot >= 0 ? "up" : "down") + st("Closed trades", closed.length) + st("Win rate", closed.length ? Math.round(wins.length / closed.length * 100) + "%" : "—") + st("Biggest loss", worst < 0 ? K.srs(worst) : "—", worst < 0 ? "down" : "") + st("On capital", closed.length && cap ? K.pct(tot / cap * 100, 1) : "—", tot >= 0 ? "up" : "down");
+  $("#logMeta").textContent = `${open.length} open · ${S.log.length} total`;
+  const list = [...open, ...S.log.filter(t => t.close != null && inP(t))];
+  $("#log").innerHTML = list.length ? list.map(t => `<div class="lrow" data-id="${t.id}"><div><b>${esc(t.sym)}</b> · ${STRATS[t.st].name}${t.close == null ? '<span class="tag-open">OPEN</span>' : ""}<small>${esc(t.strikes)} · ${K.qty(t.qty)} qty · credit ${K.money(t.credit)} · exp ${K.niceDate(t.exp, { day: "numeric", month: "short" })}</small></div>
+      <div class="r ${t.close == null ? "" : pl(t) >= 0 ? "up" : "down"}">${t.close == null ? `<small>max loss ${K.rs(t.maxLoss)}</small>` : K.srs(pl(t))}</div>
+      <div class="ops">${t.close == null ? `<input data-cl="${t.id}" type="text" inputmode="decimal" placeholder="buy-back ₹/sh" /><button data-op="close">✓ Close</button><button data-op="exp">Expired worthless</button>` : `<span style="font-size:.72rem;color:var(--muted)">closed ${K.niceDate(t.closeDate, { day: "numeric", month: "short" })} at ${K.money(t.close)}</span><button data-op="reopen">Reopen</button>`}<button data-op="del">Delete</button></div></div>`).join("")
+    : `<div class="placeholder">Plan a trade above and tap <b>Save to my income log</b>. Close it here when you buy it back, and your monthly income adds up automatically.</div>`;
+  S.save();
+}
+$("#log").addEventListener("input", e => { if (e.target.dataset.cl) K.fmtNum(e.target); });
+$("#log").addEventListener("click", e => {
+  const b = e.target.closest("[data-op]"); if (!b) return; const id = +b.closest(".lrow").dataset.id, t = S.log.find(x => x.id === id), op = b.dataset.op;
+  if (op === "del") { if (confirm(`Delete the ${t.sym} trade?`)) S.log = S.log.filter(x => x.id !== id); }
+  if (op === "exp") { t.close = 0; t.closeDate = K.iso(K.istNow()); K.toast("✅ Full premium kept"); }
+  if (op === "close") { const v = $(`[data-cl="${id}"]`).value; if (v === "" || !(num(v) >= 0)) { K.toast("Enter the net price you paid to buy it back"); return; } t.close = num(v); t.closeDate = K.iso(K.istNow()); K.toast(pl(t) >= 0 ? "✅ Closed in profit" : "Closed. Losses are part of the plan if they're small"); }
+  if (op === "reopen") { t.close = null; t.closeDate = null; }
+  renderLog();
+});
+
+/* ---------- share ---------- */
+function buildText() {
+  const m = model(), q = m.qty, L = m.legs || [];
+  const out = [`🧾 *Option selling plan: ${S.sym || "stock"}*`, `_${STRATS[S.st].name}: ${STRATS[S.st].view}_`, ""];
+  L.filter(l => l.type !== "S").forEach(l => out.push(`${l.side < 0 ? "🔴 Sell" : "🟢 Buy"} ${K.nf(l.k, l.k % 1 ? 1 : 0)} ${l.type === "C" ? "CE" : "PE"} @ ₹${K.nf(l.p)}`));
+  if (!m.err) {
+    out.push("", `💰 Premium: ${K.rs(m.credit * q)}`, `📈 Max profit: ${m.unlimitedUp ? "unlimited" : K.rs(m.maxP * q)}`, `📉 Max loss: ${K.rs(-m.maxL * q)}${S.st === "cc" || S.st === "csp" ? " (if the stock goes to 0)" : ""}`, `⚖️ Break-even: ${m.be.map(b => "₹" + K.nf(b)).join(" / ") || "—"}`);
+    if (m.pop != null) out.push(`🎲 Rough probability of profit: ${Math.round(m.pop * 100)}%`);
+    out.push("", "*Exit plan*", `🎯 Book at 50%: buy back at ₹${K.nf(m.credit * .5)}`, `🛑 Stop: buy back at ₹${K.nf(m.credit * 3)}`, "📅 Exit before expiry week (physical settlement)");
+  }
+  return [...out, ...K.signoff("option-planner", "Plan yours", "Education only · Not a recommendation · Not SEBI registered")].join("\n");
+}
+const valid = () => { const m = model(); if (m.err) { K.toast(m.err); return false; } return true; };
+async function draw() {
+  await K.loadFonts?.();
+  const m = model(), q = m.qty, W = 1080, nl = m.legs.filter(l => l.type !== "S").length, H = 976 + nl * 62 + 50 + K.footerH(true), { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "Option selling plan", 70, 186, `700 56px ${K.F.GROT}`, "#fff");
+  K.txt(ctx, `${S.sym || "STOCK"} · ${STRATS[S.st].name}`, 70, 240, K.fit(ctx, `${S.sym || "STOCK"} · ${STRATS[S.st].name}`, 700, K.F.MONO, 32, W - 140), "#00e0b8");
+  let y = 290;
+  m.legs.filter(l => l.type !== "S").forEach(l => { K.pill(ctx, `${l.side < 0 ? "SELL" : "BUY"} ${K.nf(l.k, l.k % 1 ? 1 : 0)} ${l.type === "C" ? "CE" : "PE"} @ ₹${K.nf(l.p)}`, 70, y, l.side < 0 ? "#ff5470" : "#22d39a", 24); y += 62; });
+  y += 10;
+  // chart
+  K.panel(ctx, 70, y, W - 140, 330, 24); const cx = 100, cw = W - 200, cyy = y + 30, chh = 270;
+  const sd = Math.max(.12, (m.iv || .28) * Math.sqrt(Math.max(m.T, 7 / 365)) * 2.2), lo = m.spot * (1 - sd), hi = m.spot * (1 + sd);
+  const xs = Array.from({ length: 200 }, (_, i) => lo + (hi - lo) * i / 199), ys = xs.map(v => m.pay(v) * q), ymax = Math.max(...ys, 1), ymin = Math.min(...ys, -1);
+  const X = v => cx + (v - lo) / (hi - lo) * cw, Y = v => cyy + (ymax - v) / (ymax - ymin) * chh;
+  ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx, Y(0)); ctx.lineTo(cx + cw, Y(0)); ctx.stroke();
+  ctx.lineWidth = 6; for (let i = 1; i < xs.length; i++) { ctx.strokeStyle = ys[i] >= 0 ? "#22d39a" : "#ff5470"; ctx.beginPath(); ctx.moveTo(X(xs[i - 1]), Y(ys[i - 1])); ctx.lineTo(X(xs[i]), Y(ys[i])); ctx.stroke(); }
+  ctx.setLineDash([10, 8]); ctx.strokeStyle = "#ffd23f"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(X(m.spot), cyy); ctx.lineTo(X(m.spot), cyy + chh); ctx.stroke(); ctx.setLineDash([]);
+  K.txt(ctx, `spot ₹${K.nf(m.spot, 0)}`, X(m.spot), cyy + chh + 24, `600 20px ${K.F.MONO}`, "#ffd23f", "center");
+  y += 360;
+  const box = (lab, val, col, x0, y0) => { K.panel(ctx, x0, y0, 455, 110, 20); K.txt(ctx, lab, x0 + 24, y0 + 38, `600 20px ${K.F.MONO}`, "#8b93a7"); K.txt(ctx, val, x0 + 24, y0 + 86, K.fit(ctx, val, 700, K.F.GROT, 40, 410), col); };
+  box("PREMIUM", K.rs(m.credit * q), "#fff", 70, y); box("MAX PROFIT", m.unlimitedUp ? "Unlimited" : K.rs(m.maxP * q), "#22d39a", 555, y); y += 130;
+  box("MAX LOSS", K.rs(-m.maxL * q) + (S.st === "cc" || S.st === "csp" ? "*" : ""), "#ff5470", 70, y); box("BREAK-EVEN", m.be.map(b => "₹" + K.nf(b, 0)).join(" · ") || "—", "#e8ecf6", 555, y); y += 140;
+  K.txt(ctx, `🎯 Book at ₹${K.nf(m.credit * .5)}   🛑 Stop at ₹${K.nf(m.credit * 3)}   📅 Out before expiry week`, W / 2, y, K.fit(ctx, `🎯 Book at ₹${K.nf(m.credit * .5)}   🛑 Stop at ₹${K.nf(m.credit * 3)}   📅 Out before expiry week`, 600, K.F.INTER, 28, W - 140), "#cfd3df", "center");
+  if (m.pop != null) K.txt(ctx, `Rough probability of profit: ${Math.round(m.pop * 100)}%${S.st === "cc" || S.st === "csp" ? "   ·   *if the stock goes to 0" : ""}`, W / 2, y + 46, `500 24px ${K.F.INTER}`, "#8b93a7", "center");
+  K.footer(ctx, W, H, K.toolUrl("option-planner"), "Education only · Not a recommendation · Not SEBI registered", true);
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => `option-plan-${(S.sym || "stock").toLowerCase()}`, imgLabel: "Share plan as image" });
+K.inviteField("#invite");
+fill(); renderLog();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
