@@ -257,7 +257,8 @@ const SUGG = ["stop-loss", "tax", "average", "options", "quiz", "levels", "birth
 const norm = s => String(s).toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/&amp;/g, "&").replace(/<[^>]+>/g, " ");
 const slug = t => t.href.replace(/^\.\.\/|\/$/g, "");
 function score(t, toks) {
-  const name = norm(t.name), tags = norm(t.tags.join(" ")), desc = norm(t.desc), grp = norm(GROUPS[t.g]?.name || ""), also = norm(ALSO[slug(t)] || "");
+  const tr = s => window.MMMi18n && MMMi18n.lang === "hi" ? s + " " + MMMi18n.t(s) : s;
+  const name = norm(tr(t.name)), tags = norm(t.tags.map(tr).join(" ")), desc = norm(tr(t.desc)), grp = norm(GROUPS[t.g]?.name || ""), also = norm(ALSO[slug(t)] || "");
   let s = 0;
   for (const k of toks) {
     const wb = new RegExp("(^|[^a-z0-9])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));

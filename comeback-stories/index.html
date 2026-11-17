@@ -226,6 +226,8 @@ const ST = [
    more: "Brilliant people, wrong assumption: that the past would repeat neatly.",
    les: "<b>Leverage turns a small mistake into a fatal one.</b> No model, tip or degree removes risk." },
 ];
+window.ST = ST; // for the Hindi dictionary
+const HI = () => window.MMMi18n && MMMi18n.lang === "hi", T = s => window.MMMi18n ? MMMi18n.t(s) : s;
 const FILTERS = [["all", "All stories"], ["india", "🇮🇳 India"], ["world", "🌍 World"], ["markets", "📈 Markets & investors"], ["business", "🏢 Business"], ["life", "🎬 Film, sport & life"], ["composite", "🧑 Everyday traders"], ["caution", "⚠️ Falls without a comeback"]];
 let flt = "all";
 const match = s => flt === "all" || s.g === flt || s.f === flt;
@@ -250,8 +252,11 @@ $("#flt").addEventListener("click", e => { const b = e.target.closest("[data-k]"
 /* story of the day + inspire */
 const good = ST.filter(s => s.f !== "caution" && s.f !== "composite");
 const dayIdx = Math.floor(Date.now() / 864e5) % good.length;
-function hero(s) { $("#dayQ").innerHTML = `${s.av} ${esc(s.name)}: ${esc(s.fall.split(". ")[0].replace(/\.$/, ""))}. Then: ${esc(s.rise.split(". ")[0].replace(/<[^>]+>/g, "").replace(/\.$/, ""))}.`; $("#dayN").innerHTML = `Story of the day · <a href="#${s.id}" data-go="${s.id}" style="color:var(--acc)">read it →</a>`; }
-hero(good[dayIdx]);
+function hero(s) {
+  const first = t => t.replace(/<[^>]+>/g, "").split(/(?<=[.।])\s/)[0].replace(/[.।]$/, "");
+  $("#dayQ").innerHTML = HI() ? `${s.av} ${esc(T(s.name))}: ${esc(first(T(s.fall)))}। फिर: ${esc(first(T(s.rise)))}।` : `${s.av} ${esc(s.name)}: ${esc(first(s.fall))}. Then: ${esc(first(s.rise))}.`;
+  $("#dayN").innerHTML = `Story of the day · <a href="#${s.id}" data-go="${s.id}" style="color:var(--acc)">read it →</a>`; }
+hero(good[dayIdx]); document.addEventListener("mmm:i18n", () => hero(good[dayIdx]));
 function go(id) { if (!ST.find(s => s.id === id)) return; if (!match(ST.find(s => s.id === id))) { flt = "all"; drawF(); draw(); } const el = $("#" + id); el.scrollIntoView({ behavior: "smooth", block: "center" }); el.classList.add("hl"); setTimeout(() => el.classList.remove("hl"), 2200); history.replaceState(null, "", "#" + id); }
 $("#inspire").addEventListener("click", () => { const s = good[Math.floor(Math.random() * good.length)]; hero(s); go(s.id); });
 document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); go(g.dataset.go); } });
@@ -259,18 +264,20 @@ document.addEventListener("click", e => { const g = e.target.closest("[data-go]"
 /* share */
 const pageURL = id => (/^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/comeback-stories/") + (id ? "#" + id : "");
 const strip = t => t.replace(/<[^>]+>/g, "");
+const loc = s => HI() ? { ...s, name: T(s.name), role: T(s.role), fall: T(s.fall), rise: T(s.rise), les: T(s.les) } : s;
+const L = (en, hi) => HI() ? hi : en;
 function text(s) {
-  const warn = s.f === "caution";
-  return [`${warn ? "⚠️" : "🔥"} *${s.name}*: ${warn ? "a cautionary tale" : "they fell, they rose"}`, `_${s.role} · ${s.yrs}_`, "", `⬇ *The fall:* ${s.fall}`, "", `${warn ? "✖ *The end:*" : "⬆ *The comeback:*"} ${strip(s.rise)}`, "", `💡 *For traders:* ${strip(s.les)}`, "", `📚 ${ST.length} stories of falling and rising 👇`, pageURL(s.id), "", "— MANIMINDSMONEY Community"].join("\n");
+  s = loc(s); const warn = s.f === "caution";
+  return [`${warn ? "⚠️" : "🔥"} *${s.name}*: ${warn ? L("a cautionary tale", "एक चेतावनी भरी कहानी") : L("they fell, they rose", "गिरे, फिर उठे")}`, `_${s.role} · ${s.yrs}_`, "", `⬇ *${L("The fall", "गिरावट")}:* ${s.fall}`, "", `${warn ? `✖ *${L("The end", "अंत")}:*` : `⬆ *${L("The comeback", "वापसी")}:*`} ${strip(s.rise)}`, "", `💡 *${L("For traders", "ट्रेडर्स के लिए")}:* ${strip(s.les)}`, "", `📚 ${L(`${ST.length} stories of falling and rising`, `गिरने और उठने की ${ST.length} कहानियाँ`)} 👇`, pageURL(s.id), "", "— MANIMINDSMONEY Community"].join("\n");
 }
 async function img(s) {
-  await K.loadFonts?.();
+  await K.loadFonts?.(); s = loc(s);
   const W = 1080, H = 1350, warn = s.f === "caution", { c, ctx } = K.canvas(W, H, [[s.c + "55", .1, .05, .6], [warn ? "rgba(255,84,112,0.12)" : "rgba(34,211,154,0.12)", .95, .95, .5]]); K.brand(ctx);
-  K.txt(ctx, warn ? "A CAUTIONARY TALE" : "THEY FELL. THEY ROSE.", 70, 182, `700 24px ${K.F.MONO}`, warn ? "#ff9aab" : "#febc2e");
+  K.txt(ctx, warn ? L("A CAUTIONARY TALE", "चेतावनी भरी कहानी") : L("THEY FELL. THEY ROSE.", "वे गिरे। फिर उठे।"), 70, 182, `700 24px ${K.F.MONO}`, warn ? "#ff9aab" : "#febc2e");
   K.txt(ctx, s.av, 70, 278, `84px ${K.F.INTER}`, "#fff"); K.txt(ctx, s.name, 180, 252, K.fit(ctx, s.name, 800, K.F.GROT, 58, W - 250), "#fff"); K.txt(ctx, `${s.role} · ${s.yrs}`, 182, 296, K.fit(ctx, `${s.role} · ${s.yrs}`, 500, K.F.MONO, 22, W - 250), "#8b93a7");
   let y = 350; const block = (lab, t, col, bg) => { ctx.font = `500 27px ${K.F.INTER}`; const lines = K.cap(K.wrap(ctx, t, W - 200), 6), h = 70 + lines.length * 38; K.panel(ctx, 70, y, W - 140, h, 22, bg, col + "66"); K.txt(ctx, lab, 100, y + 44, `700 22px ${K.F.MONO}`, col); lines.forEach((l, i) => K.txt(ctx, l, 100, y + 86 + i * 38, `500 27px ${K.F.INTER}`, "#e8ecf6")); y += h + 20; };
-  block("⬇ THE FALL", s.fall, "#ff9aab", "rgba(255,84,112,0.08)"); block(warn ? "✖ THE END" : "⬆ THE COMEBACK", strip(s.rise), warn ? "#ff9aab" : "#7be3bf", warn ? "rgba(255,84,112,0.06)" : "rgba(34,211,154,0.08)"); block("💡 FOR TRADERS", strip(s.les), "#ffd98a", "rgba(254,188,46,0.08)");
-  K.footer(ctx, W, H, K.toolUrl("comeback-stories"), "Based on public accounts · For learning", true);
+  block(L("⬇ THE FALL", "⬇ गिरावट"), s.fall, "#ff9aab", "rgba(255,84,112,0.08)"); block(warn ? L("✖ THE END", "✖ अंत") : L("⬆ THE COMEBACK", "⬆ वापसी"), strip(s.rise), warn ? "#ff9aab" : "#7be3bf", warn ? "rgba(255,84,112,0.06)" : "rgba(34,211,154,0.08)"); block(L("💡 FOR TRADERS", "💡 ट्रेडर्स के लिए"), strip(s.les), "#ffd98a", "rgba(254,188,46,0.08)");
+  K.footer(ctx, W, H, K.toolUrl("comeback-stories"), L("Based on public accounts · For learning", "सार्वजनिक जानकारी पर आधारित · सीखने के लिए"), true);
   await K.shareCanvas(c, `comeback-${s.id}.png`, text(s));
 }
 $("#grid").addEventListener("click", async e => {

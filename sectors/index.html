@@ -408,6 +408,8 @@ const PHASES = {
   3: ["🔥 Peak", "Growth is hot, inflation rises and central banks start hiking rates. Commodities and energy often do best as prices rise.", "#febc2e"],
   4: ["🧊 Slowdown", "Growth falls, rates are high, markets get nervous. Money hides in defensive sectors with steady demand.", "#ff5470"],
 };
+window.SECTORS = SECTORS; window.PHASES = PHASES; window.TYPES = TYPES; // for the Hindi dictionary
+const HI = () => window.MMMi18n && MMMi18n.lang === "hi", T = s => window.MMMi18n ? MMMi18n.t(s) : s, L = (en, hi) => HI() ? hi : en;
 let curPhase = 1;
 function drawPhase() {
   const [h, p, c] = PHASES[curPhase], list = SECTORS.filter(s => s.ph.includes(curPhase));
@@ -481,28 +483,30 @@ $("#dr").addEventListener("click", e => {
 });
 addEventListener("keydown", e => { if (e.key === "Escape" && !$("#dr").hidden) closeSector(); });
 const pageURL = id => (/^https?:/.test(location.protocol) ? location.origin + location.pathname : "https://manideepcs024.github.io/sectors/") + (id ? "#" + id : "");
+const locS = s => HI() ? { ...s, name: T(s.name), one: T(s.one), up: s.up.map(T), dn: s.dn.map(T), m: s.m.map(([a, b]) => [T(a), T(b)]), note: T(s.note) } : s;
 function sectorText(s) {
-  return [`${s.ico} *Sector of the day: ${s.name}*`, `_${s.one}_`, "", "*▲ What lifts it*", ...s.up.slice(0, 3).map(x => "• " + x), "", "*▼ What hurts it*", ...s.dn.slice(0, 3).map(x => "• " + x), "",
-    "*🔍 Numbers to check*", ...s.m.slice(0, 3).map(([a, b]) => `• ${a}: ${b}`), "", `*🏢 Popular names:* ${allStocks(s).slice(0, 6).join(", ")}`, "", `💡 ${s.note.replace(/<[^>]+>/g, "")}`, "",
-    `📚 All sectors explained 👇`, pageURL(s.id), "", ...K.signoff("sectors", "Explore sectors", "Education only · Not a recommendation · Not SEBI registered").slice(1, -2), "_Education only · Not a recommendation · Not SEBI registered_"].join("\n");
+  s = locS(s);
+  return [`${s.ico} *${L("Sector of the day", "आज का सेक्टर")}: ${s.name}*`, `_${s.one}_`, "", `*▲ ${L("What lifts it", "क्या इसे ऊपर ले जाता है")}*`, ...s.up.slice(0, 3).map(x => "• " + x), "", `*▼ ${L("What hurts it", "क्या इसे नुकसान पहुँचाता है")}*`, ...s.dn.slice(0, 3).map(x => "• " + x), "",
+    `*🔍 ${L("Numbers to check", "कौन-से नंबर देखें")}*`, ...s.m.slice(0, 3).map(([a, b]) => `• ${a}: ${b}`), "", `*🏢 ${L("Popular names", "मशहूर नाम")}:* ${allStocks(s).slice(0, 6).join(", ")}`, "", `💡 ${s.note.replace(/<[^>]+>/g, "")}`, "",
+    `📚 ${L("All sectors explained", "सभी सेक्टर आसान भाषा में")} 👇`, pageURL(s.id), "", ...K.signoff("sectors", "Explore sectors", "Education only · Not a recommendation · Not SEBI registered").slice(1, -2), "_Education only · Not a recommendation · Not SEBI registered_"].join("\n");
 }
-async function shareImg(s) {
-  await K.loadFonts?.();
+async function shareImg(s0) {
+  await K.loadFonts?.(); const s = locS(s0);
   const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H, [[s.c + "55", .1, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .5]]); K.brand(ctx);
-  K.txt(ctx, "SECTOR OF THE DAY", 70, 180, `700 24px ${K.F.MONO}`, "#8b93a7");
+  K.txt(ctx, L("SECTOR OF THE DAY", "आज का सेक्टर"), 70, 180, `700 24px ${K.F.MONO}`, "#8b93a7");
   K.txt(ctx, s.ico, 70, 270, `80px ${K.F.INTER}`, "#fff");
   K.txt(ctx, s.name, 180, 262, K.fit(ctx, s.name, 700, K.F.GROT, 62, W - 260), "#fff");
-  let x = 70; s.t.forEach(t => { x += K.pill(ctx, TYPES[t][0].replace(/^\S+\s/, ""), x, 300, TYPES[t][1], 20) + 10; });
+  let x = 70; s.t.forEach(t => { x += K.pill(ctx, T(TYPES[t][0]).replace(/^\S+\s/, ""), x, 300, TYPES[t][1], 20) + 10; });
   ctx.font = `500 30px ${K.F.INTER}`; let y = 410; K.cap(K.wrap(ctx, s.one, W - 140), 3).forEach(l => { K.txt(ctx, l, 70, y, `500 30px ${K.F.INTER}`, "#d5d9e4"); y += 42; });
   y += 20;
   const col = (title, items, colr, x0) => { K.panel(ctx, x0, y, 455, 330, 22, colr + "14", colr + "55"); K.txt(ctx, title, x0 + 24, y + 46, `700 24px ${K.F.MONO}`, colr); let yy = y + 92; items.slice(0, 4).forEach(it => { ctx.font = `500 24px ${K.F.INTER}`; K.cap(K.wrap(ctx, "• " + it, 410), 2).forEach(l => { K.txt(ctx, l, x0 + 24, yy, `500 24px ${K.F.INTER}`, "#e8ecf6"); yy += 32; }); yy += 8; }); };
-  col("▲ LIFTS IT", s.up, "#22d39a", 70); col("▼ HURTS IT", s.dn, "#ff5470", 555); y += 370;
-  K.txt(ctx, "POPULAR COMPANIES", 70, y, `700 22px ${K.F.MONO}`, "#8b93a7"); y += 22;
+  col(L("▲ LIFTS IT", "▲ ऊपर ले जाता है"), s.up, "#22d39a", 70); col(L("▼ HURTS IT", "▼ नुकसान पहुँचाता है"), s.dn, "#ff5470", 555); y += 370;
+  K.txt(ctx, L("POPULAR COMPANIES", "मशहूर कंपनियाँ"), 70, y, `700 22px ${K.F.MONO}`, "#8b93a7"); y += 22;
   let px = 70, py = y; allStocks(s).slice(0, 8).forEach(n => { ctx.font = `600 24px ${K.F.INTER}`; const w = ctx.measureText(n).width + 30; if (px + w > W - 70) { px = 70; py += 54; } K.panel(ctx, px, py, w, 42, 12, "rgba(255,255,255,.06)", "rgba(255,255,255,.14)"); K.txt(ctx, n, px + 15, py + 29, `600 24px ${K.F.INTER}`, "#e8ecf6"); px += w + 10; });
   y = py + 90;
   ctx.font = `500 24px ${K.F.INTER}`; K.cap(K.wrap(ctx, "💡 " + s.note.replace(/<[^>]+>/g, ""), W - 140), 3).forEach(l => { K.txt(ctx, l, 70, y, `500 24px ${K.F.INTER}`, "#f1e3c4"); y += 34; });
   K.footer(ctx, W, H, K.toolUrl("sectors"), "Examples for learning · Not recommendations · Not SEBI registered", true);
-  await K.shareCanvas(c, `sector-${s.id}.png`, sectorText(s));
+  await K.shareCanvas(c, `sector-${s.id}.png`, sectorText(s0));
 }
 
 /* ---------- guess the sector ---------- */

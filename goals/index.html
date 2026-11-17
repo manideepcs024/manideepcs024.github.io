@@ -180,7 +180,7 @@ function plan(g) {
 const money = v => "₹" + Math.round(v).toLocaleString("en-IN");
 const shortM = v => v >= 1e7 ? "₹" + (v / 1e7).toFixed(2) + " Cr" : v >= 1e5 ? "₹" + (v / 1e5).toFixed(1) + " L" : money(v);
 function addGoal(type) {
-  const t = TPL[type], g = { id: uid(), type, ico: t.ico, name: t.name, who: "", target: t.target, years: t.years, infl: t.infl, ret: "", step: "10", saved: "", sip: "", open: true };
+  const t = TPL[type], g = { id: uid(), type, ico: t.ico, name: window.MMMi18n ? MMMi18n.t(t.name) : t.name, who: "", target: t.target, years: t.years, infl: t.infl, ret: "", step: "10", saved: "", sip: "", open: true };
   if (type === "retire") Object.assign(g, { age: "30", retAge: "60", life: "85", mexp: num(S.expenses) ? S.expenses : "50,000", post: "7", step: "10" });
   if (type === "emerg") Object.assign(g, { months: "6", step: "0" });
   S.goals.forEach(x => x.open = false); S.goals.push(g); S.sel = g.id; drawGoals(); render();
@@ -256,7 +256,7 @@ function detail(p) {
     <div class="advice">
       <div><b class="h">📊 Where to invest</b>${esc(p.mix.label)}<div class="mix"><i style="width:${mixE}%;background:#7c5cff"></i><i style="width:${100 - mixE}%;background:#00e0b8"></i></div><small style="color:var(--muted)">${mixE}% equity · ${100 - mixE}% debt · assumed ${R}% a year${num(g.ret) ? " (your setting)" : ""}</small><br/><span style="font-size:.8rem">${esc(p.mix.note)}</span></div>
       <div><b class="h">🛬 Glide path</b>${p.years >= 4 ? `About <b>2–3 years before</b> the goal (around year ${p.years - 3}), start moving money from equity to debt funds, so a market crash in the final year can't derail it.` : `This goal is close, so keep the money safe: liquid or short-term debt funds, FDs or RDs.`}</div>
-      <div><b class="h">💡 Make it easier</b>${p.step ? `A ${Math.round(p.step * 100)}% yearly step-up starts you at <b>${money(p.sipStep)}</b> instead of ${money(p.sipFlat)}, and grows with your income.` : `Try a 10% yearly step-up: you'd start at about <b>${money(solveSip(p.need, .1, p.R, p.years))}</b> instead of ${money(p.sipFlat)}.`}${p.delay != null && p.delay > 0 ? ` Starting today matters: waiting a year costs <b>${money(p.delay)}/month</b> more.` : ""}</div>
+      <div><b class="h">💡 Make it easier</b>${p.years <= 1 ? `It's a short goal, so a fixed monthly amount in a liquid fund or RD works best.` : p.step ? `A ${Math.round(p.step * 100)}% yearly step-up starts you at <b>${money(p.sipStep)}</b> instead of ${money(p.sipFlat)}, and grows with your income.` : `Try a 10% yearly step-up: you'd start at about <b>${money(solveSip(p.need, .1, p.R, p.years))}</b> instead of ${money(p.sipFlat)}.`}${p.delay != null && p.delay > 0 ? ` Starting today matters: waiting a year costs <b>${money(p.delay)}/month</b> more.` : ""}</div>
     </div>`;
   drawChart(p);
 }

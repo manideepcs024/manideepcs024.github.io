@@ -1,0 +1,19 @@
+MMMi18n.add({
+  "✅ Checklist first": "✅ पहले चेकलिस्ट", "📅 Report card": "📅 रिपोर्ट कार्ड",
+  "Plan the risk, <span class=\"grad\">log the result.</span>": "रिस्क प्लान करें, <span class=\"grad\">नतीजा दर्ज करें।</span>",
+  "Check a trade's risk-reward before you take it, then log the exit. Your journal tracks win rate and R-multiples (profit or loss measured in units of the risk you planned), so you learn from your own trades. Everything stays on this device.": "ट्रेड लेने से पहले उसका रिस्क-रिवॉर्ड जाँचें, फिर एग्ज़िट दर्ज करें। आपका जर्नल विन रेट और R-मल्टीपल (प्लान किए रिस्क की इकाई में मुनाफ़ा या नुकसान) ट्रैक करता है, ताकि आप अपने ही ट्रेड से सीखें। सब कुछ इसी डिवाइस पर रहता है।",
+  "Quantity <span class=\"opt\">or use risk</span>": "मात्रा <span class=\"opt\">या रिस्क से</span>", "Max risk ₹ <span class=\"opt\">optional</span>": "अधिकतम रिस्क ₹ <span class=\"opt\">ज़रूरी नहीं</span>",
+  "Break-even win %": "ब्रेक-ईवन जीत %", "Quantity": "मात्रा", "Capital": "पूँजी", "Max loss": "अधिकतम नुकसान", "Result": "नतीजा", "P&L": "P&L", "add qty": "मात्रा डालें", "Closed": "बंद",
+  "Exit ₹ <span class=\"opt\">leave blank if open</span>": "एग्ज़िट ₹ <span class=\"opt\">खुला हो तो ख़ाली छोड़ें</span>", "Note / lesson <span class=\"opt\">optional</span>": "नोट / सीख <span class=\"opt\">ज़रूरी नहीं</span>",
+  "e.g. Waited for the candle close before entry. Followed the stop-loss.": "जैसे: एंट्री से पहले कैंडल बंद होने का इंतज़ार किया। स्टॉप-लॉस माना।",
+  "💾 Save to journal": "💾 जर्नल में सेव करें", "💾 Update trade": "💾 ट्रेड अपडेट करें", "Clear the form": "फ़ॉर्म साफ़ करें", "Journal": "जर्नल",
+  "Plan a trade on the left and tap <b>Save to journal</b>. Add the exit price when you close it.": "बाईं ओर ट्रेड प्लान करें और <b>जर्नल में सेव करें</b> दबाएँ। बंद करने पर एग्ज़िट भाव जोड़ें।",
+  "No trades in this period.": "इस अवधि में कोई ट्रेड नहीं।",
+  "Show ₹ amounts on the shared card<small>Off by default: share R-multiples and lessons, not money</small>": "शेयर कार्ड पर ₹ रकम दिखाएँ<small>डिफ़ॉल्ट बंद: R-मल्टीपल और सीख शेयर होगी, पैसा नहीं</small>",
+  "📸 Share journal summary": "📸 जर्नल सारांश शेयर करें", "⬇ Export journal (CSV)": "⬇ जर्नल डाउनलोड (CSV)",
+  "<b>How it's calculated:</b> Risk per share = |entry − stop-loss|. <b>R:R</b> = |target − entry| ÷ risk. <b>Result in R</b> = profit per share ÷ risk per share, so +2R means you made twice what you risked and −1R means you lost exactly what you planned. Break-even win rate for an R:R of 1:x is 1 ÷ (1 + x). Charges and taxes aren't included.": "<b>हिसाब कैसे लगता है:</b> प्रति शेयर रिस्क = |एंट्री − स्टॉप-लॉस|। <b>R:R</b> = |टारगेट − एंट्री| ÷ रिस्क। <b>R में नतीजा</b> = प्रति शेयर मुनाफ़ा ÷ प्रति शेयर रिस्क, यानी +2R का मतलब आपने रिस्क का दोगुना कमाया और −1R का मतलब ठीक उतना गँवाया जितना प्लान था। 1:x के R:R पर ब्रेक-ईवन विन रेट 1 ÷ (1 + x) है। चार्ज और टैक्स शामिल नहीं हैं।",
+  "<b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This journal does calculations on numbers you enter, for <b>personal record-keeping and education only</b>. It is not a trading signal, a recommendation or a claim of returns. Trading involves risk, including loss of capital.": "<b>⚠️ डिस्क्लेमर:</b> मैं <b>SEBI-रजिस्टर्ड</b> निवेश सलाहकार या रिसर्च एनालिस्ट <b>नहीं हूँ</b>। यह जर्नल आपके डाले नंबरों पर हिसाब लगाता है, <b>सिर्फ़ निजी रिकॉर्ड और शिक्षा</b> के लिए। यह ट्रेडिंग सिग्नल, सिफ़ारिश या रिटर्न का दावा नहीं है। ट्रेडिंग में जोखिम है, पूँजी का नुकसान भी हो सकता है।",
+  "Edit": "बदलें", "Delete": "डिलीट", "OPEN": "खुला", "Add the stock name": "शेयर का नाम डालें", "✅ Trade updated": "✅ ट्रेड अपडेट हुआ", "✅ Closed trade saved": "✅ बंद ट्रेड सेव हुआ", "✅ Open trade saved. Add the exit later": "✅ खुला ट्रेड सेव हुआ। एग्ज़िट बाद में जोड़ें", "No trades to export": "डाउनलोड करने को कोई ट्रेड नहीं",
+}, [
+  [/^(\d+) trades? saved$/, "$1 ट्रेड सेव"],
+]);

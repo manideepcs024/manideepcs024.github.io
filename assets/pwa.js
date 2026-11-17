@@ -5,6 +5,7 @@
   const ROOT = new URL("../", me ? me.src : location.href).href;            // site root (assets/ is one level down)
   const MMM = window.MMM = window.MMM || {};
   MMM.root = ROOT;
+  if (!window.MMMi18n && !document.querySelector('script[src$="assets/i18n.js"]')) { const s = document.createElement("script"); s.src = ROOT + "assets/i18n.js"; document.head.appendChild(s); }
   MMM.standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
   MMM.ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   MMM.canInstall = false;
