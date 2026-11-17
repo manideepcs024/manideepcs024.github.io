@@ -38,6 +38,8 @@ MMMi18n.add({
 }, [
   /* partial / pattern translations: [regex, replacement] */
   [/^(\d+) tools?$/, "$1 टूल"],
+  [/^(\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)( \d{4})?$/, (m, d, mo, y) => `${d} ${MMMi18n.t(mo)}${y || ""}`],
+  [/^\((\d+)%\/yr\)$/, "($1%/साल)"],
   [/^(January|February|March|April|May|June|July|August|September|October|November|December) (\d{4})$/, (m, mo, y) => ({ January: "जनवरी", February: "फ़रवरी", March: "मार्च", April: "अप्रैल", May: "मई", June: "जून", July: "जुलाई", August: "अगस्त", September: "सितंबर", October: "अक्टूबर", November: "नवंबर", December: "दिसंबर" })[mo] + " " + y],
   [/^(\d+) of (\d+)$/, "$2 में से $1"],
 ]);

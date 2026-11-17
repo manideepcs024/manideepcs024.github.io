@@ -90,7 +90,7 @@ html[lang=hi] h1,html[lang=hi] h2,html[lang=hi] h3{font-family:"Space Grotesk","
     const OPT = { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS };
     const obs = new MutationObserver(ms => {
       for (const m of ms) {
-        if (m.type === "childList") m.addedNodes.forEach(n => q.add(n.nodeType === 3 ? (n.parentElement && inlineOnly(n.parentElement) ? n.parentElement : n) : n));
+        if (m.type === "childList") m.addedNodes.forEach(n => { const p = n.parentElement; q.add(p && p !== document.body && inlineOnly(p) ? p : n); });
         else if (m.type === "characterData") q.add(m.target.parentElement && inlineOnly(m.target.parentElement) ? m.target.parentElement : m.target);
         else if (m.type === "attributes") doAttrsSafe(m.target);
       }
