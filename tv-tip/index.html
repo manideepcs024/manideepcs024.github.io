@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0c14" />
+<title>The TV Tip Trap — how front-running works (3D story)</title>
+<meta name="description" content="An interactive 3D story: a small-cap is recommended on TV, viewers rush to buy, and the people who bought before the show sell to them. Learn how front-running works and the red flags to check before you chase a tip." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+<style>
+  :root { --fg: #eef0f6; --muted: #8f95a8; --line: rgba(255,255,255,.12); --card: rgba(12,14,24,.88); --up: #22d39a; --down: #ff5470; --a1: #7c5cff; --a2: #00e0b8; --warn: #ffb020; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; background: #0a0c14; color: var(--fg); font-family: Inter, system-ui, sans-serif; }
+  [hidden] { display: none !important; }
+  #scene { position: fixed; inset: 0; }
+  #scene canvas { display: block; touch-action: none; }
+  .top { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; z-index: 5; pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 9px 13px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .brand b { font: 700 .95rem "Space Grotesk"; display: block; }
+  .brand span { font: 500 .7rem "JetBrains Mono"; color: var(--muted); }
+  .nav { display: flex; gap: 6px; }
+  .nav a { font-size: .78rem; color: var(--fg); text-decoration: none; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); backdrop-filter: blur(14px); white-space: nowrap; }
+  .chap { position: fixed; top: 76px; left: 12px; z-index: 5; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; font: 600 .78rem "JetBrains Mono"; color: #cfd3df; backdrop-filter: blur(14px); }
+  .chap b { color: #fff; }
+  .sub { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); width: min(840px, calc(100% - 24px)); z-index: 5; text-align: center; pointer-events: none; }
+  .sub span { display: inline; font: 700 clamp(1rem, 2.6vw, 1.42rem)/1.55 Inter; color: #fff; background: rgba(0,0,0,.64); padding: 4px 12px; border-radius: 10px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .sub i { font-style: normal; color: #ffd98a; }
+  .bar { position: fixed; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 6; display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .bar button { border: 0; border-radius: 10px; width: 40px; height: 36px; font: 700 1rem Inter; cursor: pointer; background: rgba(255,255,255,.1); color: #fff; }
+  .prog { height: 8px; border-radius: 4px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--warn), var(--down)); }
+  .bar .t { font: 600 .74rem "JetBrains Mono"; color: var(--muted); white-space: nowrap; }
+  .choice { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; padding: 20px; background: rgba(5,6,12,.55); backdrop-filter: blur(3px); }
+  .choice .in { width: min(560px, 100%); background: rgba(14,16,28,.95); border: 1px solid var(--line); border-radius: 24px; padding: 22px; text-align: center; animation: pop .4s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pop { from { opacity: 0; transform: scale(.94) translateY(10px); } }
+  .choice .k { font: 700 .7rem "JetBrains Mono"; letter-spacing: .14em; color: #ffd98a; }
+  .choice h2 { font: 800 clamp(1.3rem, 4vw, 1.8rem)/1.2 "Space Grotesk"; margin: 8px 0; }
+  .choice p { color: #cfd3df; font-size: .95rem; }
+  .choice .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .choice .opts button { border: 1.5px solid var(--line); border-radius: 18px; padding: 16px 10px; font: 800 1rem Inter; cursor: pointer; color: #fff; background: rgba(255,255,255,.05); }
+  .choice .opts button small { display: block; font: 500 .78rem Inter; color: var(--muted); margin-top: 4px; }
+  .choice .opts .a:hover { border-color: var(--down); background: rgba(255,84,112,.12); }
+  .choice .opts .b:hover { border-color: var(--up); background: rgba(34,211,154,.12); }
+  .lesson { position: fixed; inset: 0; z-index: 9; overflow: auto; padding: 70px 14px 24px; background: rgba(6,7,13,.92); backdrop-filter: blur(6px); }
+  .lesson .in { width: min(880px, 100%); margin: 0 auto; }
+  .lesson h2 { font: 800 clamp(1.5rem, 4.5vw, 2.3rem)/1.15 "Space Grotesk"; }
+  .lesson h2 em { font-style: normal; background: linear-gradient(100deg, #ffb020, #ff5470); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lesson h3 { font: 800 1.2rem "Space Grotesk"; margin-top: 20px; }
+  .lesson .lead { color: #cfd3df; margin: 8px 0 14px; line-height: 1.55; }
+  #cmpChart { width: 100%; height: 230px; display: block; border-radius: 16px; background: #0f1427; border: 1px solid var(--line); }
+  .cmp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+  .cmp div { border-radius: 16px; padding: 12px 14px; border: 1px solid; }
+  .cmp div span { font: 600 .68rem "JetBrains Mono"; letter-spacing: .08em; display: block; }
+  .cmp div b { font: 800 1.4rem "Space Grotesk"; display: block; margin: 3px 0; }
+  .cmp div small { color: #cfd3df; font-size: .78rem; }
+  .what { padding: 14px 16px; border-radius: 16px; background: rgba(255,176,32,.07); border: 1px solid rgba(255,176,32,.4); line-height: 1.6; font-size: .93rem; color: #f1e3c4; margin-top: 10px; }
+  .what b { color: #fff; }
+  .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .rules div { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; padding: 11px 13px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--line); font-size: .88rem; line-height: 1.45; }
+  .rules div i { font-style: normal; font-size: 1.2rem; }
+  .rules div b { color: #fff; }
+  .chk { margin-top: 18px; padding: 16px; border-radius: 18px; border: 1px solid rgba(255,84,112,.45); background: rgba(255,84,112,.06); }
+  .chk h3 { margin: 0 0 4px; }
+  .chk p { color: #cfd3df; font-size: .86rem; margin-bottom: 10px; }
+  .q { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); margin-top: 6px; font-size: .88rem; }
+  .q .yn { display: flex; gap: 4px; }
+  .q .yn button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 9px; padding: 6px 12px; font: 700 .78rem Inter; cursor: pointer; }
+  .q .yn button.y { background: rgba(255,84,112,.2); color: var(--down); border-color: rgba(255,84,112,.6); }
+  .q .yn button.n { background: rgba(34,211,154,.16); color: var(--up); border-color: rgba(34,211,154,.5); }
+  .verdict { margin-top: 12px; padding: 14px; border-radius: 14px; text-align: center; font: 800 1.05rem Inter; }
+  .meter { height: 12px; border-radius: 6px; background: rgba(255,255,255,.1); overflow: hidden; margin: 8px 0; }
+  .meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #22d39a, #ffb020, #ff5470); transition: width .4s; }
+  .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .acts button, .acts a { border: 0; border-radius: 12px; padding: 11px 14px; font: 700 .86rem Inter; cursor: pointer; text-decoration: none; color: #fff; background: rgba(255,255,255,.1); }
+  .acts .pri { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); }
+  .acts .wa { background: #25d366; color: #062e16; }
+  .disc { font-size: .72rem; color: #7d8296; margin-top: 16px; line-height: 1.5; }
+  .start { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; text-align: center; background: radial-gradient(ellipse at center, rgba(60,20,30,.9), rgba(6,7,13,.97)); transition: opacity .6s; }
+  .start h1 { font: 800 clamp(1.7rem, 6vw, 3rem)/1.1 "Space Grotesk"; }
+  .start h1 em { font-style: normal; color: #ffb020; }
+  .start p { color: #cfd3df; margin-top: 10px; font-size: 1rem; }
+  .start button { margin-top: 22px; border: 0; border-radius: 999px; padding: 15px 34px; font: 800 1.05rem Inter; color: #fff; cursor: pointer; background: linear-gradient(100deg, #ff5470, #ffb020); }
+  .toast { position: fixed; left: 50%; bottom: 80px; transform: translate(-50%, 40px); opacity: 0; background: #fff; color: #000; padding: 10px 16px; border-radius: 999px; font: 600 .86rem Inter; z-index: 20; transition: .3s; pointer-events: none; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+  @media (max-width: 760px) { .brand span { display: none; } .sub { bottom: 84px; } .cmp, .rules { grid-template-columns: 1fr; } .choice .opts { grid-template-columns: 1fr; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+  <div id="scene"></div>
+  <div class="top">
+    <div class="brand"><b>📺 The TV Tip Trap</b><span>how front-running works · a 3D story</span></div>
+    <nav class="nav"><a href="../overtrading/">🎬 10:30 Decision</a><a href="../">← Home</a></nav>
+  </div>
+  <div class="chap" id="chap"></div>
+  <div class="sub" id="sub"></div>
+  <div class="bar"><button id="pp" title="Play / pause">⏸</button><button id="rw" title="Restart">↺</button><div class="prog"><i id="progI"></i></div><span class="t" id="tm"></span></div>
+
+  <div class="start" id="start">
+    <div>
+      <div style="font-size:3.4rem">📺 → 🚀 → 📉</div>
+      <h1>"Stock to buy <em>NOW!</em>"<br/>Who's really making money?</h1>
+      <p>A 2-minute 3D story about TV tips and front-running. At the peak, <b>you</b> decide.</p>
+      <button id="go">▶ Play the story</button>
+    </div>
+  </div>
+  <div class="choice" id="choice" hidden>
+    <div class="in">
+      <div class="k">⏸ 10:05 AM · YOUR CALL</div>
+      <h2>XYZ is up 20% today. ₹141 and rising.</h2>
+      <p>Your friend messages: "It was on TV! Target ₹160. Buy now before it's too late 🚀"</p>
+      <div class="opts"><button class="a" data-p="A">🚀 Buy now<small>at market price</small></button><button class="b" data-p="B">🔍 Wait &amp; check<small>look at the chart first</small></button></div>
+    </div>
+  </div>
+  <div class="lesson" id="lesson" hidden>
+    <div class="in">
+      <h2 id="lTitle"></h2>
+      <p class="lead" id="lLead"></p>
+      <canvas id="cmpChart"></canvas>
+      <div class="cmp">
+        <div style="border-color:rgba(124,92,255,.5);background:rgba(124,92,255,.08)"><span style="color:#cbbcff">🕶️ BOUGHT BEFORE THE SHOW</span><b style="color:#b9a6ff">+18% to +40%</b><small>bought ~₹100–118, sold ~₹135–141 to TV buyers</small></div>
+        <div style="border-color:rgba(255,84,112,.5);background:rgba(255,84,112,.08)"><span style="color:#ff9aab">🚀 BOUGHT ON THE TV TIP</span><b style="color:#ff5470">−32%</b><small>bought ₹141, a week later ₹96</small></div>
+        <div style="border-color:rgba(34,211,154,.5);background:rgba(34,211,154,.08)"><span style="color:#9be8c9">🔍 WAITED &amp; CHECKED</span><b style="color:#22d39a">₹0 lost</b><small>saw the red flags and skipped</small></div>
+      </div>
+      <h3>What is front-running?</h3>
+      <div class="what"><b>Front-running</b> means buying (or selling) ahead of information you know will move the price, then trading against the people who act on it. With TV or social-media tips, someone who knows a stock will be recommended buys it <b>before</b> the tip goes public, then <b>sells to the viewers</b> who rush in after it. It is market manipulation and <b>illegal in India</b>; SEBI has investigated and penalised people for exactly this pattern.</div>
+      <h3>🚩 Red flags of a tip trap</h3>
+      <div class="rules">
+        <div><i>📈</i><span><b>Already up a lot</b> in the days before the tip, often 15% or more.</span></div>
+        <div><i>📊</i><span><b>Volume spike before</b> the news was public.</span></div>
+        <div><i>🐜</i><span><b>Small or illiquid stock:</b> easy to push up and hard to exit.</span></div>
+        <div><i>⏰</i><span><b>Urgency + big target:</b> "buy NOW", "target ₹160 soon".</span></div>
+        <div><i>🧱</i><span><b>Big sell orders</b> waiting above the price while it gaps up.</span></div>
+        <div><i>🪪</i><span><b>No SEBI registration:</b> check an adviser's or analyst's registration on SEBI's website.</span></div>
+      </div>
+      <h3>What to do instead</h3>
+      <div class="rules">
+        <div><i>⏳</i><span><b>Never buy at market</b> into a TV or WhatsApp spike. Wait a few days; real opportunities don't vanish in an hour.</span></div>
+        <div><i>🔍</i><span><b>Run your own checks:</b> fundamentals, the chart before the tip, volume and events.</span></div>
+        <div><i>🎯</i><span><b>Limit orders + stop-loss</b>, always, and a size you can afford to be wrong on.</span></div>
+        <div><i>📣</i><span><b>Suspect manipulation?</b> Don't forward it. You can report it to SEBI.</span></div>
+      </div>
+      <div class="chk">
+        <h3>🚩 Tip Trap Checker</h3>
+        <p>Got a hot tip on TV, Telegram or WhatsApp? Answer honestly:</p>
+        <div id="qs"></div>
+        <div class="meter"><i id="mI"></i></div>
+        <div class="verdict" id="verdict"></div>
+        <div class="acts"><button class="wa" id="shareChk">💌 Share the checker</button></div>
+      </div>
+      <div class="acts">
+        <button class="pri" id="other">▶ Watch the other path</button><button id="replay">↺ Replay from start</button>
+        <a href="../trader-room/">🖥️ How I actually analyse a stock</a><a href="../overtrading/">🎬 The 10:30 Decision</a>
+        <button id="shareStory">🔗 Share this story</button>
+      </div>
+      <p class="disc">A fictional story for learning. "XYZ Ltd", "Channel X" and all prices are made up; no real person, company or channel is shown. I'm not SEBI-registered and this isn't investment advice.</p>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const $ = s => document.querySelector(s);
+
+/* ---------- renderer ---------- */
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.toneMapping = THREE.ACESFilmicToneMapping;
+$("#scene").appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0c0e1a); scene.fog = new THREE.Fog(0x0c0e1a, 40, 80);
+const camera = new THREE.PerspectiveCamera(innerWidth <= 760 ? 64 : 46, innerWidth / innerHeight, .1, 300);
+const controls = new OrbitControls(camera, renderer.domElement); controls.enabled = false;
+scene.add(new THREE.HemisphereLight(0xdfe6ff, 0x3a2f28, .9));
+const key = new THREE.DirectionalLight(0xfff0dc, 1.0); key.position.set(-10, 18, 10); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -24, right: 24, top: 18, bottom: -18 }); scene.add(key);
+const tvLight = new THREE.PointLight(0x88aaff, 18, 18, 1.4); tvLight.position.set(-9, 5, -3); scene.add(tvLight);
+const backLight = new THREE.PointLight(0x9b5cff, 16, 16, 1.4); backLight.position.set(9, 6, -1); scene.add(backLight);
+
+const MATS = {}; const mat = (c, o = {}) => MATS[c + JSON.stringify(o)] ||= new THREE.MeshStandardMaterial({ color: c, roughness: o.r ?? .7, metalness: o.m ?? 0, emissive: o.e ?? 0, emissiveIntensity: o.ei ?? 1 });
+function mesh(geo, m, p, x = 0, y = 0, z = 0) { const o = new THREE.Mesh(geo, typeof m === "object" ? m : mat(m)); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; p.add(o); return o; }
+const box = (w, h, d, m, p, x, y, z) => mesh(new THREE.BoxGeometry(w, h, d), m, p, x, y + h / 2, z);
+const cyl = (rt, rb, h, m, p, x, y, z, s = 20) => mesh(new THREE.CylinderGeometry(rt, rb, h, s), m, p, x, y + h / 2, z);
+function ctex(w, h) { const c = document.createElement("canvas"); c.width = w; c.height = h; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return { c, x: c.getContext("2d"), t }; }
+const DARK = mat(0x1a1c24, { r: .4 });
+
+/* ---------- world ---------- */
+mesh(new THREE.PlaneGeometry(60, 40), mat(0x262a3d, { r: .95 }), scene, 0, 0, 0).rotation.x = -Math.PI / 2;
+// living room (left)
+const LR = new THREE.Group(); scene.add(LR);
+mesh(new THREE.PlaneGeometry(15, 13), mat(0x8a5a3c, { r: .55 }), LR, -9, .01, 1).rotation.x = -Math.PI / 2;
+box(15, 9, .3, mat(0x3d4566, { r: .95 }), LR, -9, 0, -6.4); box(.3, 9, 13, mat(0x3a4262, { r: .95 }), LR, -16.5, 0, 0.5);
+mesh(new THREE.CircleGeometry(3.6, 40), mat(0x6c3b3b, { r: 1 }), LR, -9, .02, -.6).rotation.x = -Math.PI / 2;
+box(6, 1.2, 1.4, mat(0x4a3526, { r: .5 }), LR, -9, 0, -5.6);                              // TV unit
+const TV = ctex(1024, 576); box(7.6, 4.5, .2, DARK, LR, -9, 2.6, -6.15); mesh(new THREE.PlaneGeometry(7.3, 4.1), new THREE.MeshBasicMaterial({ map: TV.t }), LR, -9, 4.85, -6.03);
+// sofa
+const sofa = new THREE.Group(); sofa.position.set(-9, 0, 2.6); LR.add(sofa);
+const sofaM = mat(0x2f4a7a, { r: .85 }); box(7, 1.4, 2.4, sofaM, sofa, 0, 0, 0); box(7, 2.4, .6, sofaM, sofa, 0, 0, .95); box(.6, 2, 2.4, sofaM, sofa, -3.5, 0, 0); box(.6, 2, 2.4, sofaM, sofa, 3.5, 0, 0);
+cyl(.5, .4, 1.2, mat(0xd8d2c6), LR, -15, 0, -4.8); mesh(new THREE.SphereGeometry(1, 12, 10), mat(0x2f8f4e), LR, -15, 2.2, -4.8);
+// back room (right): dark, behind the scenes
+const BR = new THREE.Group(); scene.add(BR);
+mesh(new THREE.PlaneGeometry(11, 11), mat(0x15131f, { r: .9 }), BR, 9, .012, -.5).rotation.x = -Math.PI / 2;
+box(11, 8, .3, mat(0x2e2846, { r: .95 }), BR, 9, 0, -6.2); box(.3, 8, 11, mat(0x2e2846, { r: .95 }), BR, 3.4, 0, -.5); box(.3, 8, 11, mat(0x2e2846), BR, 14.6, 0, -.5);
+const lamp = new THREE.PointLight(0xffd9a0, 14, 10, 1.4); lamp.position.set(10.5, 6, -4.4); BR.add(lamp); cyl(.05, .05, 2.4, DARK, BR, 10.5, 5.6, -4.4); mesh(new THREE.ConeGeometry(.6, .5, 16, 1, true), mat(0xffcf80, { e: 0xffb050, ei: .8 }), BR, 10.5, 5.9, -4.4);
+box(5, .2, 2.4, mat(0x2a2333), BR, 9, 2.6, -3.6); [[6.7, -4.6], [11.3, -4.6], [6.7, -2.6], [11.3, -2.6]].forEach(([x, z]) => box(.15, 2.6, .15, DARK, BR, x, 0, z));
+const LAP = ctex(512, 320); box(2.2, .06, 1.4, DARK, BR, 9, 2.8, -3.3); const lb = box(2.2, 1.35, .06, DARK, BR, 9, 2.86, -4.0); lb.rotation.x = -.25;
+const lapScr = mesh(new THREE.PlaneGeometry(2.05, 1.25), new THREE.MeshBasicMaterial({ map: LAP.t }), BR, 9, 3.55, -3.94); lapScr.rotation.x = -.25;
+box(1.8, 2.8, .2, mat(0x0c0b12), BR, 12.6, 0, -6); // safe-like cabinet
+const sign = (() => { const s = ctex(512, 128); s.x.fillStyle = "#2a1838"; s.x.fillRect(0, 0, 512, 128); s.x.fillStyle = "#c9a6ff"; s.x.font = "800 52px Inter, sans-serif"; s.x.textAlign = "center"; s.x.fillText("BEHIND THE SCENES", 256, 82); s.t.needsUpdate = true; const m = mesh(new THREE.PlaneGeometry(5, 1.25), new THREE.MeshBasicMaterial({ map: s.t }), BR, 9, 7, -6.03); return m; })();
+// giant chart + order book (floating above)
+const CH = ctex(1400, 640); const chartM = mesh(new THREE.PlaneGeometry(13.2, 6.03), new THREE.MeshBasicMaterial({ map: CH.t, transparent: true }), scene, -1.6, 12.4, -9);
+const OB = ctex(600, 640); const obM = mesh(new THREE.PlaneGeometry(5.6, 5.97), new THREE.MeshBasicMaterial({ map: OB.t, transparent: true }), scene, 8.6, 12.4, -9);
+
+/* ---------- people ---------- */
+function person(o = {}) {
+  const root = new THREE.Group(), s = (o.h || 5.6) / 5.5, shirt = mat(o.shirt || 0x16a394, { r: .85 }), pants = mat(o.pants || 0x30343f, { r: .85 }), skin = mat(o.skin || 0xc68a5e);
+  root.scale.setScalar(s); const up = new THREE.Group(); root.add(up);
+  const torso = mesh(new THREE.CapsuleGeometry(.44, 1.05, 6, 14), shirt, up, 0, .95, 0); torso.scale.z = .7;
+  mesh(new THREE.CylinderGeometry(.13, .15, .25, 10), skin, up, 0, 2.0, 0);
+  const head = new THREE.Group(); head.position.y = 2.45; up.add(head);
+  mesh(new THREE.SphereGeometry(.42, 20, 16), skin, head); const hr = mesh(new THREE.SphereGeometry(.45, 20, 10, 0, Math.PI * 2, 0, Math.PI * .55), mat(o.hair || 0x1b1512), head, 0, .05, -.04); hr.rotation.x = -.28;
+  if (o.cap) { const c = mesh(new THREE.SphereGeometry(.47, 18, 8, 0, Math.PI * 2, 0, Math.PI * .45), mat(0x111111), head, 0, .08, 0); mesh(new THREE.BoxGeometry(.55, .05, .45), mat(0x111111), head, 0, .22, .4); }
+  [-.15, .15].forEach(x => mesh(new THREE.SphereGeometry(.045, 8, 6), mat(0x111111), head, x, .05, .39));
+  if (o.shades) { box(.62, .13, .05, mat(0x050505, { m: .6, r: .2 }), head, 0, -.01, .4); }
+  const mouth = mesh(new THREE.TorusGeometry(.12, .024, 6, 14, Math.PI), mat(0x7a2e2e), head, 0, -.11, .37);
+  const arm = sd => { const p = new THREE.Group(); p.position.set(sd * .58, 1.62, 0); up.add(p); mesh(new THREE.CapsuleGeometry(.12, .95, 4, 8), shirt, p, 0, -.6, 0); mesh(new THREE.SphereGeometry(.13, 10, 8), skin, p, 0, -1.25, 0); return p; };
+  const aL = arm(-1), aR = arm(1);
+  [-.22, .22].forEach(x => { const l = new THREE.Group(); l.position.set(x, 0, 0); up.add(l); mesh(new THREE.CylinderGeometry(.17, .15, 2.4, 10), pants, l, 0, -1.2, 0); l.rotation.x = -Math.PI / 2; });
+  return { root, up, head, mouth, aL, aR, s };
+}
+function sit(P, hipY) { P.up.position.y = hipY / P.s; }
+function face(P, m) { P.mouth.rotation.z = m >= 0 ? Math.PI : 0; P.mouth.position.y = m >= 0 ? -.11 : -.16; P.mouth.scale.set(1, Math.max(.25, Math.abs(m)), 1); }
+// three viewers on the sofa; the middle one is "you"
+const VIEW = [{ shirt: 0xd6455a, x: -2.1 }, { shirt: 0x16a394, x: 0, you: true }, { shirt: 0xe0a32b, x: 2.1, hair: 0x3a2a20 }].map(v => {
+  const p = person(v); sofa.add(p.root); p.root.position.set(v.x, 0, .1); p.root.rotation.y = Math.PI; sit(p, 1.55);
+  p.aR.rotation.x = -1.2; p.aL.rotation.x = -.9; p.aL.rotation.z = .35;
+  const ph = new THREE.Group(); p.aR.add(ph); ph.position.set(-.05, -1.32, .12); box(.34, .6, .05, DARK, ph, 0, 0, 0); const scr = mesh(new THREE.PlaneGeometry(.3, .54), new THREE.MeshBasicMaterial({ color: 0x223355 }), ph, 0, .3, .03); ph.rotation.x = 1.0;
+  return { ...p, scr, you: v.you };
+});
+const youTag = (() => { const s = ctex(256, 96); s.x.fillStyle = "#16a394"; s.x.beginPath(); s.x.roundRect(8, 8, 240, 80, 40); s.x.fill(); s.x.fillStyle = "#fff"; s.x.font = "800 46px Inter, sans-serif"; s.x.textAlign = "center"; s.x.fillText("YOU", 128, 64); s.t.needsUpdate = true; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: s.t, depthWrite: false })); sp.scale.set(1.3, .5, 1); sp.position.set(-9, 6.2, 2.6); scene.add(sp); return sp; })();
+// the early buyers, in the back room
+const OPS = [{ x: 8.1 }, { x: 10.2 }].map((o, i) => { const p = person({ shirt: 0x2b2b3a, pants: 0x1a1a24, hair: 0x111111, cap: true, shades: true, skin: 0x9a6b4c }); BR.add(p.root); p.root.position.set(o.x, 0, -1.6); p.root.rotation.y = Math.PI; sit(p, 1.6); p.aL.rotation.x = p.aR.rotation.x = -1.1; box(1.4, .25, 1.3, DARK, BR, o.x, 1.35, -1.6); return p; });
+
+/* ---------- bubbles ---------- */
+const bubbles = [];
+function bubbleTex(text, bg) { const s = ctex(320, 120); s.x.fillStyle = bg; s.x.beginPath(); s.x.roundRect(6, 6, 308, 92, 30); s.x.fill(); s.x.beginPath(); s.x.moveTo(140, 96); s.x.lineTo(160, 118); s.x.lineTo(176, 96); s.x.fill(); s.x.fillStyle = "#fff"; s.x.font = "800 50px Inter, sans-serif"; s.x.textAlign = "center"; s.x.fillText(text, 160, 70); s.t.needsUpdate = true; return s.t; }
+const TEX = { buy: bubbleTex("BUY 🚀", "#16a34a"), sell: bubbleTex("SELL 💰", "#c0262d"), fear: bubbleTex("😱 −32%", "#c0262d"), check: bubbleTex("🔍 wait…", "#2563eb"), shh: bubbleTex("🤫 buy", "#5b3fa8") };
+function bubble(kind, pos) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX[kind], transparent: true, depthWrite: false })); sp.scale.set(1.5, .56, 1); sp.position.copy(pos); scene.add(sp); bubbles.push({ sp, born: performance.now() }); }
+const headPos = (P) => { const v = new THREE.Vector3(); P.head.getWorldPosition(v); return v.add(new THREE.Vector3(0, .9, 0)); };
+
+/* ---------- screens ---------- */
+const C = { up: "#22d39a", down: "#ff5470", text: "#e8ecf6", mute: "#8b93a7", gold: "#ffd23f", vio: "#9b7bff" };
+let tvMode = "idle", tick = 0;
+function drawTV(mode, t) {
+  const { x, t: tex } = TV; const g = x.createLinearGradient(0, 0, 1024, 576); g.addColorStop(0, "#0b1f4a"); g.addColorStop(1, "#1a0b2e"); x.fillStyle = g; x.fillRect(0, 0, 1024, 576);
+  // studio + anchor silhouette
+  x.fillStyle = "rgba(255,255,255,.06)"; for (let i = 0; i < 8; i++) x.fillRect(i * 140, 0, 2, 430);
+  x.fillStyle = "#26304f"; x.beginPath(); x.arc(220, 250, 70, 0, 7); x.fill(); x.beginPath(); x.ellipse(220, 430, 150, 110, 0, Math.PI, 0); x.fill();
+  x.fillStyle = "#fff"; x.font = "800 26px Inter, sans-serif"; x.fillText("CHANNEL X BUSINESS", 24, 44); x.fillStyle = "#ff3b3b"; x.beginPath(); x.roundRect(860, 18, 140, 38, 8); x.fill(); x.fillStyle = "#fff"; x.font = "800 22px Inter"; x.fillText("● LIVE", 890, 45);
+  const flash = Math.sin(t * 8) > 0;
+  if (mode === "tip" || mode === "next") {
+    const name = mode === "next" ? "ABC LTD" : "XYZ LTD", tgt = mode === "next" ? "₹420" : "₹160";
+    x.fillStyle = flash ? "#ff2d2d" : "#d10000"; x.beginPath(); x.roundRect(410, 110, 580, 74, 12); x.fill(); x.fillStyle = "#fff"; x.font = "900 40px Inter"; x.fillText("🚀 STOCK TO BUY NOW", 432, 160);
+    x.fillStyle = "#fff"; x.font = "900 92px 'Space Grotesk', Inter"; x.fillText(name, 420, 290);
+    x.fillStyle = "#ffd23f"; x.font = "800 52px Inter"; x.fillText(`TARGET ${tgt} 🎯`, 424, 360);
+    if (mode === "next") { x.fillStyle = "#9fb3ff"; x.font = "700 26px Inter"; x.fillText("…and XYZ? Nobody talks about it any more.", 424, 404); }
+  } else if (mode === "idle") { x.fillStyle = "#cfe0ff"; x.font = "800 56px 'Space Grotesk', Inter"; x.fillText("MARKET LIVE", 430, 240); x.fillStyle = "#8fa4d8"; x.font = "600 28px Inter"; x.fillText("Coming up: today's hot stock tip…", 432, 290); }
+  else { x.fillStyle = "#cfe0ff"; x.font = "800 50px 'Space Grotesk', Inter"; x.fillText("MARKET CLOSE", 430, 240); }
+  // ticker
+  x.fillStyle = "#ffcf33"; x.fillRect(0, 470, 1024, 106); x.fillStyle = "#111"; x.font = "800 34px Inter";
+  const tk = mode === "tip" ? "XYZ LTD ▲ HOT PICK · BUY NOW · TARGET ₹160 · " : mode === "next" ? "ABC LTD ▲ HOT PICK · BUY NOW · TARGET ₹420 · " : "NIFTY ▲ 0.4% · SENSEX ▲ 0.3% · BANK NIFTY ▼ 0.1% · ";
+  const off = (t * 160) % 900; for (let k = -1; k < 3; k++) x.fillText(tk, k * 900 - off, 534);
+  x.fillStyle = "rgba(255,255,255,.35)"; x.font = "600 16px Inter"; x.fillText("FICTIONAL CHANNEL · FOR LEARNING", 24, 456);
+  tex.needsUpdate = true;
+}
+let lapMode = "buy";
+function drawLap(mode, t) {
+  const { x, t: tex } = LAP; x.fillStyle = "#0b0d16"; x.fillRect(0, 0, 512, 320);
+  x.fillStyle = C.mute; x.font = "700 20px 'JetBrains Mono', monospace"; x.fillText("XYZ LTD · ORDERS", 18, 32);
+  const rows = mode === "buy" ? [["BUY", "40,000", "₹101"], ["BUY", "35,000", "₹106"], ["BUY", "50,000", "₹111"], ["BUY", "45,000", "₹117"]] : mode === "sell" ? [["SELL", "60,000", "₹136"], ["SELL", "80,000", "₹139"], ["SELL", "70,000", "₹141"], ["SELL", "55,000", "₹140"]] : [["", "position", "closed ✓"], ["", "profit", "+28% 💰"]];
+  rows.forEach(([s, q, p], i) => { const show = i <= Math.floor((t * 1.6) % 6); if (!show) return; x.fillStyle = s === "BUY" ? C.up : s === "SELL" ? C.down : C.gold; x.font = "800 26px 'JetBrains Mono'"; x.fillText(s || "✓", 18, 84 + i * 56); x.fillStyle = C.text; x.fillText(q, 130, 84 + i * 56); x.fillText(p, 330, 84 + i * 56); });
+  tex.needsUpdate = true;
+}
+// price story: s runs 0..100 (days before → show day → days after)
+let hist = [], marks = [];
+function drawChart(cur) {
+  const { x, t } = CH, W = 1400, H = 640; x.clearRect(0, 0, W, H); x.fillStyle = "rgba(10,12,22,.92)"; x.beginPath(); x.roundRect(0, 0, W, H, 28); x.fill();
+  x.fillStyle = C.text; x.font = "800 40px 'Space Grotesk', Inter"; x.fillText("XYZ LTD", 40, 64); x.fillStyle = C.mute; x.font = "600 22px Inter"; x.fillText("small-cap · fictional", 230, 62);
+  const last = hist[hist.length - 1]; if (last) { x.textAlign = "right"; x.fillStyle = last[1] >= 118 ? C.up : C.down; x.font = "800 56px 'JetBrains Mono'"; x.fillText(`₹${last[1].toFixed(1)}`, W - 40, 72); x.textAlign = "left"; }
+  const X = s => 60 + s / 100 * (W - 120), Y = v => 460 - (v - 85) / 65 * 360, VB = 600;
+  // zones
+  x.fillStyle = "rgba(155,123,255,.12)"; x.fillRect(X(0), 96, X(38) - X(0), 510); x.fillStyle = C.vio; x.font = "700 20px Inter"; x.fillText("quiet buying", X(2), 124);
+  x.strokeStyle = "rgba(255,210,63,.7)"; x.setLineDash([10, 8]); x.lineWidth = 2; x.beginPath(); x.moveTo(X(40), 96); x.lineTo(X(40), 600); x.stroke(); x.setLineDash([]); x.fillStyle = C.gold; x.fillText("📺 TV tip", X(40) + 8, 124);
+  [100, 118, 141].forEach(v => { x.strokeStyle = "rgba(255,255,255,.07)"; x.beginPath(); x.moveTo(60, Y(v)); x.lineTo(W - 60, Y(v)); x.stroke(); x.fillStyle = C.mute; x.font = "600 18px 'JetBrains Mono'"; x.fillText(`₹${v}`, W - 56, Y(v) + 6); });
+  // volume
+  hist.forEach(([s, v, vol, ph]) => { x.fillStyle = ph === "rush" ? "rgba(34,211,154,.55)" : ph === "sell" ? "rgba(255,84,112,.6)" : ph === "acc" ? "rgba(155,123,255,.5)" : "rgba(255,255,255,.18)"; x.fillRect(X(s) - 3, VB - vol * 90, 6, vol * 90); });
+  // price line
+  x.lineWidth = 5; for (let i = 1; i < hist.length; i++) { const [s0, v0] = hist[i - 1], [s1, v1] = hist[i]; x.strokeStyle = v1 >= v0 ? C.up : C.down; x.beginPath(); x.moveTo(X(s0), Y(v0)); x.lineTo(X(s1), Y(v1)); x.stroke(); }
+  marks.forEach(m => { x.fillStyle = m.c; x.beginPath(); x.arc(X(m.s), Y(m.v), 12, 0, 7); x.fill(); x.font = "800 22px Inter"; x.fillText(m.t, X(m.s) - 40, Y(m.v) - 22); });
+  if (cur?.hl) { x.strokeStyle = C.gold; x.lineWidth = 4; x.beginPath(); x.roundRect(X(0) - 6, Y(120) - 20, X(40) - X(0) + 12, Y(98) - Y(120) + 40, 14); x.stroke(); x.fillStyle = C.gold; x.font = "800 26px Inter"; x.fillText("already +18% BEFORE the tip 🚩", X(4), Y(98) + 50); }
+  t.needsUpdate = true;
+}
+let obPhase = "quiet";
+function drawOB(phase, t) {
+  const { x, t: tex } = OB, W = 600, H = 640; x.clearRect(0, 0, W, H); x.fillStyle = "rgba(10,12,22,.92)"; x.beginPath(); x.roundRect(0, 0, W, H, 28); x.fill();
+  x.fillStyle = C.text; x.font = "800 30px 'Space Grotesk', Inter"; x.fillText("ORDER BOOK", 30, 54);
+  const big = { quiet: [.25, .2], acc: [.45, .2], rush: [1, .35], sell: [.7, 1], fall: [.15, .7], calm: [.2, .2] }[phase] || [.2, .2];
+  x.font = "700 18px 'JetBrains Mono'"; x.fillStyle = C.up; x.fillText("BUYERS", 30, 96); x.fillStyle = C.down; x.textAlign = "right"; x.fillText("SELLERS", W - 30, 96); x.textAlign = "left";
+  for (let i = 0; i < 7; i++) {
+    const wb = (.35 + .65 * Math.abs(Math.sin(t * 2 + i))) * big[0] * 250, ws = (.35 + .65 * Math.abs(Math.cos(t * 1.7 + i))) * big[1] * 250, yy = 116 + i * 66;
+    x.fillStyle = "rgba(34,211,154,.35)"; x.fillRect(W / 2 - 4 - wb, yy, wb, 52); x.fillStyle = "rgba(255,84,112,.38)"; x.fillRect(W / 2 + 4, yy, ws, 52);
+  }
+  const lab = { quiet: "quiet trading", acc: "someone keeps buying…", rush: "viewers buying at market!", sell: "huge sellers above the price 🧱", fall: "no buyers left", calm: "back to normal" }[phase];
+  x.fillStyle = "#fff"; x.font = "800 24px Inter"; x.textAlign = "center"; x.fillText(lab, W / 2, H - 34); x.textAlign = "left";
+  tex.needsUpdate = true;
+}
+
+/* ---------- story ---------- */
+const V = (...a) => new THREE.Vector3(...a);
+const CAM = {
+  over: { pos: V(2, 13, 19), target: V(-1, 7, -6) }, tv: { pos: V(-6.5, 5.6, 4.6), target: V(-9, 4.6, -6) }, sofa: { pos: V(-7.6, 4.6, -3.2), target: V(-9, 3.3, 2.6) },
+  back: { pos: V(13.4, 5.4, -5.3), target: V(8.6, 3.2, -1.4) }, chart: { pos: V(1.8, 12.4, 6.8), target: V(1.8, 12.4, -9) },
+};
+const INTRO = [
+  { sec: 11, cap: "Days before the show. <i>XYZ Ltd</i>, a tiny small-cap, trades quietly around ₹100… but someone is <i>buying, quietly</i>.", s: [0, 38], v: [100, 118], vol: .45, ph: "acc", tv: "idle", lap: "buy", ob: "acc", cam: "back", when: "Days −5 to −1", ops: "shh" },
+  { sec: 9, cap: "Show day, 8:45 AM. On TV: <i>\"Stock to buy NOW: XYZ Ltd. Target ₹160!\"</i> Lakhs of people are watching.", s: [38, 41], v: [118, 118], vol: .1, ph: "flat", tv: "tip", lap: "buy", ob: "quiet", cam: "tv", when: "Show day · 8:45 AM" },
+  { sec: 11, cap: "9:15 AM. Viewers rush to buy <i>at market price</i>. XYZ jumps 20% in minutes.", s: [41, 52], v: [118, 141], vol: 1, ph: "rush", tv: "tip", lap: "buy", ob: "rush", cam: "sofa", when: "9:15 AM", viewers: "buy" },
+  { sec: 10, cap: "Behind the scenes: the people who bought early are <i>selling everything</i>, straight to the TV buyers.", s: [52, 57], v: [141, 140], vol: .95, ph: "sell", tv: "tip", lap: "sell", ob: "sell", cam: "back", when: "9:40 AM", ops: "sell" },
+  { sec: 0, cap: "10:05 AM. The chart looks unstoppable…", s: [57, 57], v: [140, 141], vol: 0, ph: "sell", tv: "tip", lap: "sell", ob: "sell", cam: "chart", when: "10:05 AM", choice: true },
+];
+const PATH = {
+  A: [
+    { sec: 9, cap: "You buy at <i>₹141</i>, near the top. A few minutes later, the buying dries up.", s: [57, 66], v: [141, 127], vol: .55, ph: "fall", tv: "tip", lap: "done", ob: "fall", cam: "chart", when: "10:10 AM", mark: { s: 57, v: 141, t: "you bought", c: "#ff5470" } },
+    { sec: 11, cap: "Over the next days there are no new buyers. XYZ slides to <i>₹96</i>, below where it started. The TV has moved on to its <i>next</i> hot tip.", s: [66, 100], v: [127, 96], vol: .35, ph: "fall", tv: "next", lap: "done", ob: "fall", cam: "sofa", when: "Days +1 to +5", viewers: "fear" },
+    { sec: 10, cap: "You're down <i>32%</i>. The early buyers made 20–40%, and the money they took home came from the people who bought on the tip.", s: [100, 100], v: [96, 96], vol: 0, ph: "fall", tv: "next", lap: "done", ob: "calm", cam: "back", when: "A week later" },
+  ],
+  B: [
+    { sec: 10, cap: "You open the chart first. XYZ had <i>already risen 18% in the week before the show</i>, on unusual volume. 🚩", s: [57, 59], v: [141, 139], vol: .5, ph: "sell", tv: "tip", lap: "sell", ob: "sell", cam: "chart", when: "10:06 AM", hl: true, viewers: "check" },
+    { sec: 10, cap: "And the order book shows <i>huge sell orders</i> sitting above the price. Someone is selling into the hype. You skip it.", s: [59, 64], v: [139, 129], vol: .6, ph: "fall", tv: "tip", lap: "done", ob: "sell", cam: "chart", when: "10:20 AM" },
+    { sec: 10, cap: "A week later XYZ is back at <i>₹96</i>. You lost nothing, and you learned to <i>check before you chase</i>.", s: [64, 100], v: [129, 96], vol: .35, ph: "fall", tv: "next", lap: "done", ob: "calm", cam: "over", when: "A week later", calm: true },
+  ],
+};
+let path = null, seq = INTRO, ci = 0, cT = 0, playing = false, seen = { A: false, B: false };
+let cam = null;
+function camGo(c, ms = 1500) { const { pos, target } = CAM[c]; const p0 = camera.position.clone(), t0 = controls.target.clone(), st = performance.now(); cam = now => { const k = Math.min(1, (now - st) / ms), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; camera.position.lerpVectors(p0, pos, e); controls.target.lerpVectors(t0, target, e); if (k >= 1) cam = null; }; }
+let lastBubble = 0;
+function chapterStart(c) {
+  tvMode = c.tv; lapMode = c.lap; obPhase = c.ob; if (c.mark) marks.push(c.mark);
+  $("#chap").innerHTML = `<b>${path ? (path === "A" ? "🚀 Bought the tip" : "🔍 Waited & checked") : "The tip"}</b> · ${c.when}`;
+  $("#sub").innerHTML = `<span>${c.cap}</span>`;
+  camGo(c.cam);
+  if (c.choice) { playing = false; setTimeout(() => $("#choice").hidden = false, 1700); }
+}
+function resetStory() { hist = [[0, 100, .2, "acc"]]; marks = []; bubbles.forEach(b => scene.remove(b.sp)); bubbles.length = 0; VIEW.forEach(v => face(v, .4)); }
+function startStory() { $("#lesson").hidden = true; $("#choice").hidden = true; path = null; seq = INTRO; resetStory(); camera.position.set(4, 16, 24); controls.target.set(-1, 7, -6); ci = 0; cT = 0; playing = true; chapterStart(seq[0]); $("#pp").textContent = "⏸"; }
+function choose(p) {
+  path = p; seen[p] = true; $("#choice").hidden = true; $("#lesson").hidden = true;
+  resetStory(); // rebuild the price history up to 10:05
+  for (let s = 0; s <= 57; s += .5) { const v = s <= 38 ? 100 + 18 * s / 38 : s <= 41 ? 118 : s <= 52 ? 118 + 23 * (s - 41) / 11 : 141 - (s - 52) * .2; hist.push([s, v, s <= 38 ? .3 + s / 38 * .3 : s <= 41 ? .1 : s <= 52 ? 1 : .95, s <= 38 ? "acc" : s <= 41 ? "flat" : s <= 52 ? "rush" : "sell"]); }
+  seq = PATH[p]; ci = 0; cT = 0; playing = true; chapterStart(seq[0]); $("#pp").textContent = "⏸";
+}
+document.querySelectorAll("#choice [data-p]").forEach(b => b.addEventListener("click", () => choose(b.dataset.p)));
+function endStory() {
+  playing = false; $("#pp").textContent = "▶"; const A = path === "A";
+  $("#lTitle").innerHTML = A ? `Bought the tip at ₹141. <em>Now ₹96.</em>` : `Checked first. <em>Lost nothing.</em>`;
+  $("#lLead").textContent = A ? "By the time a stock is shouted on TV, someone has often bought it already. The rush of viewers isn't the start of the move; it's the exit door for the people who bought early." : "Two minutes with the chart showed what the TV didn't: the stock had already run up before the tip, and big sellers were waiting. Skipping a trade is a decision too, and often the best one.";
+  $("#other").textContent = seen.A && seen.B ? "↺ Watch both again" : `▶ Watch the other path: ${A ? "🔍 wait & check" : "🚀 buy the tip"}`;
+  $("#lesson").hidden = false; drawCompare(); drawChecker();
+}
+function drawCompare() {
+  const cv = $("#cmpChart"), r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; const x = cv.getContext("2d"); x.scale(r, r);
+  const X = s => 30 + s / 100 * (w - 60), Y = v => h - 28 - (v - 85) / 65 * (h - 60);
+  x.fillStyle = "rgba(155,123,255,.14)"; x.fillRect(X(0), 10, X(38) - X(0), h - 36); x.fillStyle = "#b9a6ff"; x.font = "700 12px Inter"; x.fillText("🕶️ quiet buying", X(1), 26);
+  x.strokeStyle = "rgba(255,210,63,.8)"; x.setLineDash([5, 5]); x.beginPath(); x.moveTo(X(40), 10); x.lineTo(X(40), h - 26); x.stroke(); x.setLineDash([]); x.fillStyle = "#ffd23f"; x.fillText("📺 TV tip", X(40) + 6, 26);
+  const P = [[0, 100], [38, 118], [41, 118], [52, 141], [57, 140], [66, 127], [100, 96]];
+  x.strokeStyle = "#e8ecf6"; x.lineWidth = 3; x.beginPath(); P.forEach(([s, v], i) => i ? x.lineTo(X(s), Y(v)) : x.moveTo(X(s), Y(v))); x.stroke();
+  [[57, 141, "#ff5470", "TV buyers here"], [100, 96, "#ff5470", "a week later"], [10, 104, "#9b7bff", "early buyers"]].forEach(([s, v, c, t]) => { x.fillStyle = c; x.beginPath(); x.arc(X(s), Y(v), 6, 0, 7); x.fill(); x.font = "700 12px Inter"; const tw = x.measureText(t).width, lx = X(s) + 8 + tw > w - 6 ? X(s) - 8 - tw : X(s) + 8; x.fillText(t, lx, Y(v) - 8); });
+}
+const QS = ["Has the stock already risen 15% or more in the last week?", "Was there a volume spike before the tip went public?", "Is it a small-cap or thinly traded stock?", "Does the tip push urgency (\"buy NOW\") or a big target?", "Is the price gapping up with big sell orders above it?", "Is the source NOT a SEBI-registered adviser or analyst?"];
+const ans = QS.map(() => null);
+function drawChecker() {
+  $("#qs").innerHTML = QS.map((q, i) => `<div class="q"><span>${q}</span><span class="yn"><button data-i="${i}" data-v="1" class="${ans[i] === 1 ? "y" : ""}">Yes</button><button data-i="${i}" data-v="0" class="${ans[i] === 0 ? "n" : ""}">No</button></span></div>`).join("");
+  const n = ans.filter(a => a === 1).length, answered = ans.filter(a => a !== null).length;
+  $("#mI").style.width = `${n / QS.length * 100}%`;
+  const v = $("#verdict");
+  if (!answered) { v.textContent = "Answer the questions to see your red-flag count."; v.style.background = "rgba(255,255,255,.05)"; v.style.color = "#cfd3df"; return; }
+  const [msg, bg, col] = n >= 3 ? [`🚩 ${n}/6 red flags: you're probably late to the party. Skip it.`, "rgba(255,84,112,.15)", "#ff9aab"] : n >= 1 ? [`⚠️ ${n}/6 red flags: be very careful. Do your own checks first.`, "rgba(255,176,32,.13)", "#ffd98a"] : ["✅ No red flags so far, but still run your own analysis.", "rgba(34,211,154,.12)", "#9be8c9"];
+  v.textContent = msg; v.style.background = bg; v.style.color = col;
+}
+$("#qs").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (!b) return; const i = +b.dataset.i, val = +b.dataset.v; ans[i] = ans[i] === val ? null : val; drawChecker(); });
+const shareURL = () => /^https?:/.test(location.protocol) ? location.origin + location.pathname : "https://manideepcs024.github.io/tv-tip/";
+const wa = t => window.open("https://wa.me/?text=" + encodeURIComponent(t), "_blank", "noopener");
+$("#shareChk").addEventListener("click", () => { const n = ans.filter(a => a === 1).length; wa(`🚩 *Tip Trap Checker*\nGot a "stock to buy NOW" tip on TV or WhatsApp? Check these 6 red flags before you buy${ans.some(a => a !== null) ? ` (my tip scored ${n}/6)` : ""} 👇\n${shareURL()}`); });
+$("#shareStory").addEventListener("click", () => wa(`📺→🚀→📉 *"Stock to buy NOW!" Who's really making money?*\nA 2-minute 3D story about TV tips and front-running. You decide at the peak 👇\n${shareURL()}`));
+$("#other").addEventListener("click", () => { if (seen.A && seen.B) { seen = { A: false, B: false }; startStory(); return; } choose(path === "A" ? "B" : "A"); });
+$("#replay").addEventListener("click", startStory);
+$("#go").addEventListener("click", () => { $("#start").style.opacity = 0; setTimeout(() => $("#start").hidden = true, 600); startStory(); });
+$("#pp").addEventListener("click", () => { if (!$("#start").hidden || !$("#choice").hidden) return; if (!$("#lesson").hidden) { startStory(); return; } playing = !playing; $("#pp").textContent = playing ? "⏸" : "▶"; });
+$("#rw").addEventListener("click", startStory);
+
+/* ---------- animation ---------- */
+let last = 0, drawT = 0;
+renderer.setAnimationLoop(now => {
+  const raw = (now - (last || now)) / 1000, sdt = Math.min(.5, raw), t = now / 1000; last = now;
+  if (cam) cam(now);
+  let c = seq[ci], k = c && c.sec ? Math.min(1, cT / c.sec) : 0;
+  if (playing && c) {
+    cT += sdt; k = c.sec ? Math.min(1, cT / c.sec) : 0;
+    if (c.sec && cT >= c.sec) { ci++; cT = 0; if (ci >= seq.length) { ci = seq.length - 1; cT = c.sec; if (path) endStory(); else playing = false; } else { chapterStart(seq[ci]); c = seq[ci]; k = 0; } }
+  }
+  if (c) {
+    const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, s = c.s[0] + (c.s[1] - c.s[0]) * k, wig = (c.v[0] !== c.v[1] ? Math.sin(k * 31) * 1.2 * Math.sin(k * Math.PI) : 0);
+    const v = c.v[0] + (c.v[1] - c.v[0]) * e + wig;
+    if (playing && c.sec && (!hist.length || s > hist[hist.length - 1][0] + .25)) hist.push([s, v, c.vol * (.7 + Math.random() * .3), c.ph]);
+    // bubbles over heads
+    if (playing && now - lastBubble > 520) {
+      lastBubble = now;
+      if (c.viewers === "buy") { const p = VIEW[Math.floor(Math.random() * 3)]; bubble("buy", headPos(p)); }
+      if (c.viewers === "fear") { const p = VIEW[Math.floor(Math.random() * 3)]; bubble("fear", headPos(p)); }
+      if (c.viewers === "check" && Math.random() < .5) bubble("check", headPos(VIEW[1]));
+      if (c.ops) bubble(c.ops === "sell" ? "sell" : "shh", headPos(OPS[Math.floor(Math.random() * 2)]));
+    }
+    // faces + phones
+    VIEW.forEach((p, i) => {
+      const happy = c.viewers === "buy" || (c.tv === "tip" && !path) ? 1 : c.viewers === "fear" || (path === "A" && ci >= 1) ? -.9 : (path === "B" && p.you) ? .8 : .3;
+      face(p, p.you && path === "B" ? .9 : happy);
+      p.scr.material.color.set(c.viewers === "buy" ? (Math.sin(t * 9 + i) > 0 ? 0x22d39a : 0x0f5f3f) : c.viewers === "fear" ? 0x7a1520 : (p.you && path === "B") ? 0x2563eb : 0x223355);
+      p.aR.rotation.x = -1.2 + (c.viewers === "buy" ? Math.sin(t * 10 + i) * .12 : 0);
+    });
+    OPS.forEach((p, i) => { face(p, c.ops === "sell" || c.lap === "done" ? 1 : .2); p.aL.rotation.x = -1.1 + Math.sin(t * 12 + i) * .05; p.aR.rotation.x = -1.1 + Math.cos(t * 11 + i) * .05; });
+    bubbles.forEach((b, i) => { const a = (now - b.born) / 1000; b.sp.position.y += sdt * .9; b.sp.material.opacity = Math.max(0, 1 - a / 2.2); if (a > 2.2) { scene.remove(b.sp); bubbles.splice(i, 1); } });
+    if (now - drawT > 60) { drawT = now; drawTV(tvMode, t); drawLap(lapMode, t); drawOB(obPhase, t); drawChart(c); }
+    tvLight.color.set(c.tv === "tip" || c.tv === "next" ? (Math.sin(t * 8) > 0 ? 0xff5050 : 0x6a8bff) : 0x88aaff);
+    backLight.intensity = c.ops ? 26 : 14;
+    const tot = seq.reduce((a, x) => a + x.sec, 0), done = seq.slice(0, ci).reduce((a, x) => a + x.sec, 0) + (c.sec ? cT : 0);
+    $("#progI").style.width = `${tot ? Math.min(100, done / tot * 100) : 0}%`; $("#tm").textContent = `₹${v.toFixed(1)}`;
+  }
+  controls.update(); renderer.render(scene, camera);
+});
+addEventListener("resize", () => { camera.fov = innerWidth <= 760 ? 64 : 46; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (!$("#lesson").hidden) drawCompare(); });
+camera.position.set(4, 16, 24); controls.target.set(-1, 7, -6); resetStory(); drawTV("idle", 0); drawLap("buy", 0); drawOB("quiet", 0); drawChart();
+window.__tv = { choose, startStory, endStory, get state() { return { path, ci, playing, hist: hist.length, marks: marks.length }; } };
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
