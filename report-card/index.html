@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Monthly Trading Report Card — MANIMINDSMONEY</title>
+<meta name="description" content="Your month of trading, graded: discipline, risk control, edge, consistency and review habit. Built from your trade journal, pre-trade checklist, day reviews and option income log. Private, on your device." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #7c5cff; }
+  .monthbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .monthbar .mnav { display: flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 6px; }
+  .monthbar .mnav button { border: 0; background: rgba(255,255,255,.07); color: var(--fg); width: 38px; height: 38px; border-radius: 11px; font: 700 1rem Inter; cursor: pointer; }
+  .monthbar .mnav button:disabled { opacity: .3; cursor: default; }
+  .monthbar .mnav b { font: 700 1.05rem "Space Grotesk"; min-width: 150px; text-align: center; }
+  .src { display: flex; gap: 6px; flex-wrap: wrap; }
+  .src a { font: 600 .74rem Inter; text-decoration: none; color: #cfd3df; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.03); }
+  .src a.has { border-color: rgba(34,211,154,.45); color: #9be8c9; }
+  .src a.none { color: var(--muted); border-style: dashed; }
+  .demo { margin-bottom: 14px; padding: 12px 16px; border-radius: 16px; border: 1px solid rgba(124,92,255,.5); background: rgba(124,92,255,.1); font-size: .86rem; color: #d9d1ff; display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .demo button { border: 0; border-radius: 10px; padding: 8px 12px; font: 700 .8rem Inter; cursor: pointer; background: #fff; color: #000; }
+  .top { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; align-items: stretch; }
+  .grade { border-radius: 26px; padding: 22px; text-align: center; display: flex; flex-direction: column; justify-content: center; border: 1px solid var(--line); background: var(--card); position: relative; overflow: hidden; }
+  .grade::before { content: ""; position: absolute; inset: 0; background: radial-gradient(260px circle at 50% 30%, var(--gc), transparent 70%); opacity: .25; }
+  .grade > * { position: relative; }
+  .grade .k { font: 700 .72rem "JetBrains Mono"; letter-spacing: .14em; color: var(--muted); }
+  .grade .g { font: 800 6rem/1 "Space Grotesk"; margin: 8px 0 4px; color: var(--gc); }
+  .grade .s { font: 700 1.05rem "Space Grotesk"; }
+  .grade .sub2 { color: #cfd3df; font-size: .84rem; margin-top: 6px; line-height: 1.45; }
+  .grade .pts { font: 600 .78rem "JetBrains Mono"; color: var(--muted); margin-top: 8px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .kpi { border-radius: 18px; padding: 14px; border: 1px solid var(--line); background: var(--card); }
+  .kpi span { display: block; font: 600 .64rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .kpi b { display: block; font: 700 1.35rem "Space Grotesk"; margin-top: 4px; overflow-wrap: anywhere; }
+  .kpi small { color: var(--muted); font-size: .72rem; }
+  .scores { margin-top: 12px; border-radius: 20px; padding: 14px 16px; border: 1px solid var(--line); background: var(--card); display: grid; gap: 10px; }
+  .sc { display: grid; grid-template-columns: 150px minmax(0, 1fr) 46px; gap: 10px; align-items: center; font-size: .86rem; }
+  .sc .bar { height: 10px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .sc .bar i { display: block; height: 100%; border-radius: 6px; transition: width .6s; }
+  .sc b { font: 700 .86rem "JetBrains Mono"; text-align: right; }
+  .sc small { display: block; color: var(--muted); font-size: .7rem; }
+  .sec { margin-top: 22px; }
+  .sec > h2 { font: 700 1.25rem "Space Grotesk"; margin-bottom: 4px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .sec > h2 span { font: 500 .74rem "JetBrains Mono"; color: var(--muted); }
+  .sec > p { color: var(--muted); font-size: .86rem; margin-bottom: 12px; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .box { border-radius: 22px; padding: 16px; border: 1px solid var(--line); background: var(--card); min-width: 0; }
+  .box h3 { font: 700 1rem "Space Grotesk"; margin-bottom: 10px; display: flex; justify-content: space-between; gap: 8px; }
+  .box h3 small { font: 500 .7rem "JetBrains Mono"; color: var(--muted); }
+  .mini { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .mini div { border-radius: 14px; padding: 10px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+  .mini span { display: block; font: 600 .6rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+  .mini b { font: 700 .98rem "JetBrains Mono"; overflow-wrap: anywhere; }
+  canvas.curve { width: 100%; height: 190px; display: block; margin-top: 10px; border-radius: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+  table.t { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  table.t th { text-align: left; font: 600 .64rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; padding: 6px 6px; border-bottom: 1px solid var(--line); }
+  table.t td { padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,.05); }
+  table.t td.n { font: 600 .82rem "JetBrains Mono"; text-align: right; } table.t th.n { text-align: right; }
+  .vsrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .vsrow div { border-radius: 16px; padding: 14px; border: 1px solid; }
+  .vsrow span { display: block; font: 700 .7rem "JetBrains Mono"; letter-spacing: .06em; }
+  .vsrow b { display: block; font: 800 1.6rem "Space Grotesk"; margin: 4px 0; }
+  .vsrow small { color: #cfd3df; font-size: .76rem; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+  .cal .h { font: 600 .62rem "JetBrains Mono"; color: var(--muted); text-align: center; padding-bottom: 2px; }
+  .cal .d { aspect-ratio: 1; border-radius: 9px; display: grid; place-items: center; font: 600 .74rem "JetBrains Mono"; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.05); color: var(--muted); position: relative; }
+  .cal .d.w { color: #fff; } .cal .d.nt { border: 1.5px dashed rgba(91,140,255,.7); color: #9fb6ff; }
+  .cal .d em { position: absolute; top: 2px; right: 4px; font-style: normal; font-size: .55rem; }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: .72rem; color: var(--muted); margin-top: 8px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+  .flags { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .flags div { border-radius: 14px; padding: 10px; background: rgba(0,0,0,.25); border: 1px solid var(--line); text-align: center; }
+  .flags b { display: block; font: 800 1.4rem "Space Grotesk"; }
+  .flags span { font-size: .72rem; color: var(--muted); }
+  .moods { display: grid; gap: 6px; }
+  .moods div { display: grid; grid-template-columns: 140px minmax(0, 1fr) 90px; gap: 8px; align-items: center; font-size: .82rem; }
+  .moods .bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,.07); overflow: hidden; }
+  .moods .bar i { display: block; height: 100%; }
+  .moods b { font: 600 .78rem "JetBrains Mono"; text-align: right; }
+  .ins { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .ins .box ul { padding-left: 18px; display: grid; gap: 8px; font-size: .88rem; line-height: 1.45; color: #d5d9e4; }
+  .focus { border-radius: 22px; padding: 18px; border: 1.5px solid rgba(254,188,46,.55); background: linear-gradient(135deg, rgba(254,188,46,.12), rgba(255,84,112,.06)); }
+  .focus .k { font: 700 .7rem "JetBrains Mono"; letter-spacing: .12em; color: #ffd98a; }
+  .focus b { display: block; font: 800 1.3rem/1.3 "Space Grotesk"; margin: 6px 0; }
+  .focus p { color: #f1e3c4; font-size: .86rem; line-height: 1.5; }
+  .empty { text-align: center; padding: 40px 16px; border: 1px dashed var(--line); border-radius: 24px; }
+  .empty h2 { font: 700 1.4rem "Space Grotesk"; margin-bottom: 8px; }
+  .empty p { color: var(--muted); max-width: 560px; margin: 0 auto 16px; line-height: 1.55; }
+  .empty .row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .empty .row a, .empty .row button { padding: 12px 16px; border-radius: 14px; font: 700 .88rem Inter; text-decoration: none; border: 1px solid var(--line); color: var(--fg); background: rgba(255,255,255,.05); cursor: pointer; }
+  .empty .row button { background: linear-gradient(100deg, var(--a1), #5b8cff 50%, var(--a2)); border: 0; color: #fff; }
+  .nodata { color: var(--muted); font-size: .84rem; padding: 14px; text-align: center; border: 1px dashed var(--line); border-radius: 14px; }
+  .nodata a { color: var(--acc); }
+  .sharebox { max-width: 560px; margin: 22px auto 0; }
+  @media (max-width: 900px) { .top { grid-template-columns: 1fr; } .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cols, .ins { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .sc { grid-template-columns: 110px minmax(0, 1fr) 40px; } .flags { grid-template-columns: repeat(2, minmax(0, 1fr)); } .mini { grid-template-columns: repeat(2, minmax(0, 1fr)); } .moods div { grid-template-columns: 110px minmax(0, 1fr) 76px; } .vsrow { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../journal/">📒 Journal</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Your month, <span class="grad">graded.</span></h1>
+    <p class="sub">An honest report card built from your <a href="../journal/" style="color:inherit">trade journal</a>, <a href="../checklist/" style="color:inherit">pre-trade checklist</a>, <a href="../day-review/" style="color:inherit">day reviews</a> and <a href="../option-planner/" style="color:inherit">option income log</a>. It grades the <b>process</b>, not just the profit, and gives you one thing to fix next month. Everything stays on this device.</p>
+
+    <div class="monthbar">
+      <div class="mnav"><button id="prev" aria-label="Previous month">‹</button><b id="mLabel"></b><button id="next" aria-label="Next month">›</button></div>
+      <div class="src" id="src"></div>
+    </div>
+    <div id="demoBar"></div>
+    <div id="report"></div>
+
+    <div class="sharebox card" id="shareCard">
+      <div class="res-head"><h2>📤 Share your report</h2><span>₹ hidden unless you choose</span></div>
+      <label class="toggle"><span>Show ₹ amounts on the shared card<small>Off: share grades, R-multiples and % only</small></span><input type="checkbox" id="optMoney" /><span class="sw"></span></label>
+      <div class="share-row" id="shareRow"></div>
+      <div id="invite" style="margin-top:12px"></div>
+    </div>
+
+    <div class="learn" style="max-width:900px;margin:22px auto 0"><b>How the grade works:</b> <b>Discipline</b> (30%): stop-loss followed, plan followed, no revenge or overtrading, checklist GO before trades. <b>Risk control</b> (25%): losses kept near −1R, daily max loss respected. <b>Edge</b> (20%): expectancy in R per trade. <b>Review habit</b> (15%): trading days you reviewed. <b>Consistency</b> (10%): green days out of days traded. Parts with no data are left out and the rest re-weighted. <b>R</b> = profit or loss ÷ the risk you planned (entry to stop-loss). Charges aren't included unless you entered them in the day review.</div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This report summarises numbers you entered, for <b>personal learning only</b>. It's not a recommendation, and past results don't predict future returns. Trading involves risk, including loss of capital.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const read = k => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
+const S = K.store("reportcard_v1", { money: false });
+const MOODS = { calm: "😌 Calm", confident: "💪 Confident", anxious: "😰 Anxious", frustrated: "😤 Frustrated", greedy: "🤑 Greedy", bored: "🥱 Bored" };
+const now = K.istNow(); let ym = K.iso(now).slice(0, 7), demo = false;
+
+/* ---------- demo data (in memory only) ---------- */
+function demoData(ymStr) {
+  const [y, m] = ymStr.split("-").map(Number), days = new Date(y, m, 0).getDate(), J = [], C = [], H = {}, O = [];
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const syms = ["TATAMOTORS", "HDFCBANK", "INFY", "BEL", "TRENT", "LT", "SUNPHARMA", "DLF", "HAL", "POLYCAB"], setups = ["Breakout", "Pullback", "Range", "Breakout", "Trend follow", "Reversal"], moods = ["calm", "calm", "confident", "anxious", "frustrated", "greedy"];
+  for (let d = 1; d <= days; d++) {
+    const dt = new Date(y, m - 1, d), iso = K.iso(dt); if ([0, 6].includes(dt.getDay()) || dt > now) continue;
+    if (rnd() < .2) { H[iso] = { traded: "no", noWhy: "nosetup" }; continue; }
+    const n = 1 + Math.floor(rnd() * 3), mood = moods[Math.floor(rnd() * moods.length)], bad = mood === "frustrated" || mood === "greedy";
+    let P = 0, L = 0, w = 0, l = 0;
+    for (let i = 0; i < n; i++) {
+      const E = 200 + Math.floor(rnd() * 1800), rps = Math.max(2, Math.round(E * .02)), setup = setups[Math.floor(rnd() * setups.length)], win = rnd() < (setup === "Reversal" ? .3 : bad ? .35 : .52);
+      const R = win ? .8 + rnd() * 2.2 : -(bad && rnd() < .5 ? 1.3 + rnd() : .6 + rnd() * .5), q = Math.floor(1500 / rps), X = +(E + R * rps).toFixed(2), go = !bad && rnd() < .85;
+      J.push({ id: +dt + i, date: iso, sym: syms[Math.floor(rnd() * syms.length)], side: "long", setup, entry: String(E), sl: String(E - rps), tgt: String(E + 2 * rps), qty: String(q), exit: String(X), note: go ? "Checklist 14/15 ✅" : "Checklist 10/15 🛑 broke a red line" });
+      C.push({ id: +dt + i, date: iso, verdict: go ? "go" : "stop", act: "take", yes: go ? 14 : 10, total: 15 });
+      if (R > 0) { P += R * rps * q; w++; } else { L += -R * rps * q; l++; }
+    }
+    if (rnd() < .25) C.push({ id: +dt + 50, date: iso, verdict: "wait", act: "skip", yes: 11, total: 15 });
+    if (rnd() < .85) H[iso] = { traded: "yes", n: String(n), w: String(w), l: String(l), profit: String(Math.round(P)), loss: String(Math.round(L)), chg: String(40 * n), maxl: "4000", mood, ck: { sl: !bad || rnd() < .5, plan: !bad, over: bad && rnd() < .5, revenge: mood === "frustrated" } };
+  }
+  O.push({ id: 1, date: ymStr + "-03", closeDate: ymStr + "-17", st: "bps", sym: "RELIANCE", qty: 500, credit: 5.4, close: 2.5 }, { id: 2, date: ymStr + "-05", closeDate: ymStr + "-20", st: "cc", sym: "INFY", qty: 400, credit: 14, close: 0 }, { id: 3, date: ymStr + "-10", closeDate: ymStr + "-14", st: "bcs", sym: "HDFCBANK", qty: 550, credit: 6, close: 15 });
+  return { J, C, H, O };
+}
+
+/* ---------- collect data for a month ---------- */
+function collect(month) {
+  if (demo) { const d = demoData(month); return { trades: d.J, checks: d.C, days: d.H, opts: d.O, all: { j: d.J.length, c: d.C.length, h: Object.keys(d.H).length, o: d.O.length } }; }
+  const J = read("journal_v1").trades || [], C = read("checklist_v1").log || [], H = read("dayreview_v1").hist || {}, O = read("optplan_v1").log || [];
+  const inM = d => String(d || "").startsWith(month);
+  return { trades: J.filter(t => inM(t.date)), checks: C.filter(c => inM(c.date)), days: Object.fromEntries(Object.entries(H).filter(([k]) => inM(k))), opts: O.filter(o => o.close != null && inM(o.closeDate || o.date)), all: { j: J.length, c: C.length, h: Object.keys(H).length, o: O.length } };
+}
+function tradeMath(t) {
+  const dir = t.side === "short" ? -1 : 1, E = num(t.entry), SL = num(t.sl), X = num(t.exit);
+  if (!(E > 0 && SL > 0 && X > 0) || (E - SL) * dir <= 0) return null;
+  const rps = Math.abs(E - SL), q = num(t.qty) > 0 ? Math.floor(num(t.qty)) : (num(t.risk) > 0 ? Math.floor(num(t.risk) / rps) : 0);
+  return { R: (X - E) * dir / rps, pl: q ? (X - E) * dir * q : null };
+}
+function analyse(month) {
+  const D = collect(month), A = { D };
+  // journal
+  const closed = D.trades.map(t => ({ t, m: tradeMath(t) })).filter(x => x.m).sort((a, b) => a.t.date.localeCompare(b.t.date) || a.t.id - b.t.id);
+  A.closed = closed; A.open = D.trades.length - closed.length;
+  const Rs = closed.map(x => x.m.R), wins = Rs.filter(r => r > 0), losses = Rs.filter(r => r <= 0);
+  A.n = Rs.length; A.totalR = Rs.reduce((a, b) => a + b, 0); A.win = A.n ? wins.length / A.n : null;
+  A.avgW = wins.length ? wins.reduce((a, b) => a + b, 0) / wins.length : null; A.avgL = losses.length ? losses.reduce((a, b) => a + b, 0) / losses.length : null;
+  A.exp = A.n ? A.totalR / A.n : null; A.payoff = A.avgW && A.avgL ? A.avgW / -A.avgL : null;
+  const gw = wins.reduce((a, b) => a + b, 0), gl = -losses.reduce((a, b) => a + b, 0); A.pf = gl ? gw / gl : (gw ? Infinity : null);
+  A.bigLoss = losses.filter(r => r < -1.25).length; A.best = closed.reduce((b, x) => !b || x.m.R > b.m.R ? x : b, null); A.worst = closed.reduce((b, x) => !b || x.m.R < b.m.R ? x : b, null);
+  A.jPL = closed.some(x => x.m.pl != null) ? closed.reduce((a, x) => a + (x.m.pl || 0), 0) : null;
+  const bySetup = {}; closed.forEach(x => { const k = x.t.setup || "Other"; (bySetup[k] ||= { n: 0, w: 0, R: 0 }); bySetup[k].n++; bySetup[k].R += x.m.R; if (x.m.R > 0) bySetup[k].w++; });
+  A.setups = Object.entries(bySetup).map(([k, v]) => ({ k, ...v })).sort((a, b) => b.R - a.R);
+  // rules followed vs broken (checklist notes on journal trades)
+  const ok = closed.filter(x => /✅/.test(x.t.note || "")), br = closed.filter(x => /🛑/.test(x.t.note || ""));
+  A.rulesOk = ok.length ? { n: ok.length, avg: ok.reduce((a, x) => a + x.m.R, 0) / ok.length } : null; A.rulesBr = br.length ? { n: br.length, avg: br.reduce((a, x) => a + x.m.R, 0) / br.length } : null;
+  // checklist
+  const taken = D.checks.filter(c => c.act === "take"), skipped = D.checks.filter(c => c.act === "skip");
+  A.ck = D.checks.length ? { n: D.checks.length, taken: taken.length, skipped: skipped.length, rules: taken.length ? taken.filter(c => c.verdict === "go").length / taken.length : null } : null;
+  // day reviews
+  const days = Object.entries(D.days).sort(), td = days.filter(([, d]) => d.traded === "yes"), nt = days.filter(([, d]) => d.traded === "no");
+  const net = d => (num(d.profit) || 0) - Math.abs(num(d.loss) || 0) - (num(d.chg) || 0);
+  A.days = days.length ? { reviewed: days.length, traded: td.length, noTrade: nt.length, green: td.filter(([, d]) => net(d) > 0).length, red: td.filter(([, d]) => net(d) < 0).length, net: td.reduce((a, [, d]) => a + net(d), 0),
+    sl: td.filter(([, d]) => d.ck?.sl != null), slOk: td.filter(([, d]) => d.ck?.sl === true).length, plan: td.filter(([, d]) => d.ck?.plan != null), planOk: td.filter(([, d]) => d.ck?.plan === true).length,
+    over: td.filter(([, d]) => d.ck?.over === true).length, revenge: td.filter(([, d]) => d.ck?.revenge === true).length,
+    breach: td.filter(([, d]) => num(d.maxl) > 0 && Math.abs(num(d.loss) || 0) - (num(d.profit) || 0) > num(d.maxl)).length,
+    best: td.reduce((b, x) => !b || net(x[1]) > net(b[1]) ? x : b, null), worst: td.reduce((b, x) => !b || net(x[1]) < net(b[1]) ? x : b, null) } : null;
+  if (A.days) { const mo = {}; td.forEach(([, d]) => { if (!d.mood) return; (mo[d.mood] ||= { n: 0, net: 0 }); mo[d.mood].n++; mo[d.mood].net += net(d); }); A.moods = Object.entries(mo).map(([k, v]) => ({ k, ...v })).sort((a, b) => b.net - a.net); }
+  A.dayNet = {}; days.forEach(([k, d]) => A.dayNet[k] = d.traded === "no" ? "nt" : net(d));
+  if (!days.length) closed.forEach(x => { if (x.m.pl != null) A.dayNet[x.t.date] = (typeof A.dayNet[x.t.date] === "number" ? A.dayNet[x.t.date] : 0) + x.m.pl; });
+  // options
+  const opl = o => (o.credit - o.close) * o.qty;
+  A.opt = D.opts.length ? { n: D.opts.length, net: D.opts.reduce((a, o) => a + opl(o), 0), win: D.opts.filter(o => opl(o) > 0).length / D.opts.length, worst: Math.min(0, ...D.opts.map(opl)) } : null;
+  // scores
+  const pct = (a, b) => b ? a / b * 100 : null, avg = arr => { const v = arr.filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const sc = {};
+  const clamp = v => v == null ? null : Math.max(0, Math.min(100, v));
+  sc.disc = avg([A.days ? pct(A.days.slOk, A.days.sl.length) : null, A.days ? pct(A.days.planOk, A.days.plan.length) : null, A.days && A.days.traded ? 100 - pct(A.days.over + A.days.revenge, A.days.traded * 2) : null, A.ck?.rules != null ? A.ck.rules * 100 : null]);
+  sc.risk = avg([A.n && losses.length ? 100 - pct(A.bigLoss, losses.length) : A.n ? 100 : null, A.days && A.days.traded ? 100 - pct(A.days.breach, A.days.traded) : null]);
+  // every rule break costs points, however good the averages look
+  if (sc.disc != null) { const slFail = A.days ? A.days.sl.length - A.days.slOk : 0, planFail = A.days ? A.days.plan.length - A.days.planOk : 0, brk = A.ck ? A.ck.taken - Math.round((A.ck.rules || 0) * A.ck.taken) : 0;
+    sc.disc = clamp(Math.min(sc.disc, 100 - 15 * slFail - 12 * (A.days?.revenge || 0) - 8 * (A.days?.over || 0) - 6 * planFail - 5 * brk)); }
+  if (sc.risk != null) sc.risk = clamp(Math.min(sc.risk, 100 - 12 * A.bigLoss - 15 * (A.days?.breach || 0)));
+  sc.edge = A.exp != null ? Math.max(0, Math.min(100, 50 + A.exp * 80)) : (A.days && A.days.traded ? Math.max(0, Math.min(100, pct(A.days.green, A.days.traded))) : null);
+  const wd = (() => { const [y, m] = month.split("-").map(Number), last = month === K.iso(now).slice(0, 7) ? now.getDate() : new Date(y, m, 0).getDate(); let c = 0; for (let d = 1; d <= last; d++) if (![0, 6].includes(new Date(y, m - 1, d).getDay())) c++; return c; })();
+  const tradingDays = new Set([...closed.map(x => x.t.date), ...td.map(([k]) => k)]).size;
+  sc.review = A.days ? Math.min(100, pct(A.days.reviewed, Math.max(tradingDays, Math.min(wd, A.days.reviewed)))) : (tradingDays ? 0 : null);
+  sc.cons = A.days && A.days.traded ? pct(A.days.green, A.days.traded) : (() => { const dn = Object.values(A.dayNet).filter(v => typeof v === "number"); return dn.length ? pct(dn.filter(v => v > 0).length, dn.length) : null; })();
+  A.sc = sc; const W = { disc: .3, risk: .25, edge: .2, review: .15, cons: .1 }; let tw = 0, tot = 0; Object.entries(W).forEach(([k, w]) => { if (sc[k] != null) { tw += w; tot += w * sc[k]; } });
+  A.score = tw ? tot / tw : null;
+  // red lines cap the grade: one break → B at best, two or more → C at best
+  A.redLines = (A.days ? (A.days.sl.length - A.days.slOk) + A.days.revenge + A.days.breach : 0);
+  if (A.score != null && A.redLines) A.score = Math.min(A.score, A.redLines >= 2 ? 64 : 74);
+  A.grade = A.score == null ? null : A.score >= 85 ? ["A+", "#22d39a", "Outstanding process"] : A.score >= 75 ? ["A", "#22d39a", "Strong, disciplined month"] : A.score >= 65 ? ["B", "#5b8cff", "Good, with a few leaks"] : A.score >= 55 ? ["C", "#febc2e", "Mixed: rules slipped"] : A.score >= 45 ? ["D", "#ff9f43", "Rough month: back to basics"] : ["E", "#ff5470", "Reset needed: smaller size, strict rules"];
+  A.netPL = A.days ? A.days.net : A.jPL;
+  insights(A); return A;
+}
+function insights(A) {
+  const good = [], fix = []; let focus = null;
+  const r = x => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(2) + "R";
+  if (A.rulesOk && A.rulesBr) { const d = A.rulesOk.avg - A.rulesBr.avg; if (d > 0) { fix.push(`Rule-break trades averaged <b>${r(A.rulesBr.avg)}</b> vs <b>${r(A.rulesOk.avg)}</b> when you followed the checklist.`); focus ||= ["Take only checklist GO trades", `Your own data: following the rules was worth ${d.toFixed(2)}R per trade this month. Skip every trade that breaks a red line.`]; } }
+  if (A.redLines) fix.unshift(`<b>${A.redLines}</b> red-line break${A.redLines > 1 ? "s" : ""} (stop-loss skipped, revenge trading or max loss broken) capped this month's grade at <b>${A.redLines >= 2 ? "C" : "B"}</b>.`);
+  if (A.days?.revenge) { fix.push(`<b>${A.days.revenge}</b> revenge-trading day${A.days.revenge > 1 ? "s" : ""}.`); focus ||= ["Stop after 2 losses in a row", "Close the app for the day after the second loss. No exceptions, no 'one last trade'."]; }
+  if (A.bigLoss) { fix.push(`<b>${A.bigLoss}</b> loss${A.bigLoss > 1 ? "es" : ""} bigger than −1.25R: stop-loss slipped or wasn't placed.`); focus ||= ["Place the stop-loss order right after entry", "Every trade, as an order in the system, not in your head. Big losses are what sink good months."]; }
+  if (A.days?.over) { fix.push(`Overtrading on <b>${A.days.over}</b> day${A.days.over > 1 ? "s" : ""}.`); focus ||= ["Set a daily trade limit", "Decide your max trades before 9:15 (e.g. 3) and stop when you reach it, win or lose."]; }
+  if (A.days?.breach) fix.push(`Daily max loss broken on <b>${A.days.breach}</b> day${A.days.breach > 1 ? "s" : ""}.`);
+  if (A.payoff != null && A.payoff < 1.2 && A.n >= 5) { fix.push(`Average win (${r(A.avgW)}) is too close to average loss (${r(A.avgL)}).`); focus ||= ["Let winners run to at least 2R", "Book part at 2R, trail the rest. Your payoff ratio needs to be 1.5+ to win long term."]; }
+  if (A.setups.length > 1) { const w = A.setups[A.setups.length - 1]; if (w.R < 0 && w.n >= 2) { fix.push(`<b>${esc(w.k)}</b> setups lost ${r(w.R)} over ${w.n} trades.`); focus ||= [`Pause ${w.k} setups for a month`, `They cost you ${Math.abs(w.R).toFixed(1)}R. Trade only your best setup (${A.setups[0].k}) until the data says otherwise.`]; } }
+  if (A.moods?.length > 1) { const bad = A.moods[A.moods.length - 1]; if (bad.net < 0 && ["anxious", "frustrated", "greedy", "bored"].includes(bad.k)) fix.push(`Days you felt <b>${MOODS[bad.k]}</b> lost money overall: trade smaller or skip on those days.`); }
+  if (A.sc.review != null && A.sc.review < 60) fix.push("Most trading days weren't reviewed. A 2-minute day review each evening makes this report sharper.");
+  if (A.rulesOk && A.rulesOk.avg > 0) good.push(`Checklist GO trades averaged <b>${r(A.rulesOk.avg)}</b>: your process works when you follow it.`);
+  if (A.setups.length && A.setups[0].R > 0) good.push(`Best setup: <b>${esc(A.setups[0].k)}</b> (${r(A.setups[0].R)} over ${A.setups[0].n} trades).`);
+  if (A.days && A.days.sl.length && A.days.slOk === A.days.sl.length) good.push("Stop-loss respected on <b>every</b> day reviewed.");
+  if (A.days?.noTrade) good.push(`<b>${A.days.noTrade}</b> no-trade day${A.days.noTrade > 1 ? "s" : ""}: patience is a skill.`);
+  if (A.ck?.skipped) good.push(`Skipped <b>${A.ck.skipped}</b> trade${A.ck.skipped > 1 ? "s" : ""} that failed the checklist: money you didn't risk.`);
+  if (A.exp != null && A.exp > 0) good.push(`Positive expectancy: <b>${r(A.exp)}</b> per trade.`);
+  if (A.win != null && A.win >= .5) good.push(`Win rate <b>${Math.round(A.win * 100)}%</b>.`);
+  if (A.opt && A.opt.net > 0) good.push(`Option income positive with a <b>${Math.round(A.opt.win * 100)}%</b> win rate.`);
+  if (!focus) focus = A.score >= 75 ? ["Keep the process, add size slowly", "Your rules are working. Increase position size by a small step only after another month like this."] : ["Review every trading day", "Two minutes each evening: did I follow my stop-loss, plan and trade limit? What gets measured gets fixed."];
+  A.good = good.slice(0, 4); A.fix = fix.slice(0, 4); A.focus = focus;
+}
+
+/* ---------- render ---------- */
+const R2 = x => x == null ? "—" : (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(2) + "R";
+const pc = x => x == null ? "—" : Math.round(x * 100) + "%";
+const monthName = m => K.parseISO(m + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+let A = null;
+function render() {
+  $("#mLabel").textContent = monthName(ym); $("#next").disabled = ym >= K.iso(now).slice(0, 7);
+  A = analyse(ym); const D = A.D;
+  $("#src").innerHTML = [["📒 Journal", "journal", D.trades.length, "trades"], ["✅ Checklist", "checklist", D.checks.length, "checks"], ["📝 Day review", "day-review", Object.keys(D.days).length, "days"], ["🧾 Options", "option-planner", D.opts.length, "closed"]]
+    .map(([n, h, c, u]) => `<a href="../${h}/" class="${c ? "has" : "none"}">${n}: ${c ? `${c} ${u}` : "none this month"}</a>`).join("");
+  $("#demoBar").innerHTML = demo ? `<div class="demo"><span>👀 <b>Demo data</b>: a made-up month to show what your report will look like. Nothing is saved.</span><button id="demoOff">Show my real data</button></div>` : "";
+  const any = A.n || A.days || A.ck || A.opt;
+  if (!any) {
+    const total = D.all.j + D.all.c + D.all.h + D.all.o;
+    $("#report").innerHTML = `<div class="empty"><h2>${total ? `No data for ${monthName(ym)}` : "Your report card starts here"}</h2><p>${total ? "Use the arrows to pick another month, or keep logging this month." : "Log your trades in the <b>journal</b>, check them with the <b>pre-trade checklist</b> and do a 2-minute <b>day review</b> each evening. Your report fills in automatically."}</p>
+      <div class="row"><button id="demoOn">👀 See a demo report</button><a href="../journal/">📒 Trade journal</a><a href="../checklist/">✅ Checklist</a><a href="../day-review/">📝 Day review</a></div></div>`;
+    $("#shareCard").hidden = true; return;
+  }
+  $("#shareCard").hidden = false;
+  const g = A.grade || ["—", "#8b93a7", "Not enough data"], money = v => v == null ? "—" : K.srs(v);
+  const kpi = (k, v, sub = "", cls = "") => `<div class="kpi"><span>${k}</span><b class="${cls}">${v}</b>${sub ? `<small>${sub}</small>` : ""}</div>`;
+  const SCN = [["disc", "🧭 Discipline", "SL, plan, no revenge"], ["risk", "🛡️ Risk control", "losses kept small"], ["edge", "🎯 Edge", "expectancy per trade"], ["review", "📝 Review habit", "days reviewed"], ["cons", "📅 Consistency", "green days"]];
+  const scol = v => v >= 75 ? "#22d39a" : v >= 55 ? "#febc2e" : "#ff5470";
+  let h = `<div class="top">
+    <div class="grade" style="--gc:${g[1]}"><div class="k">${monthName(ym).toUpperCase()} · GRADE</div><div class="g">${g[0]}</div><div class="s">${g[2]}</div>${A.score != null ? `<div class="pts">${Math.round(A.score)} / 100 process score</div>` : ""}</div>
+    <div><div class="kpis">
+      ${kpi("Net P&L", money(A.netPL), A.days ? "from day reviews, after charges" : "from journal trades", A.netPL >= 0 ? "up" : "down")}
+      ${kpi("Total R", R2(A.n ? A.totalR : null), `${A.n} closed trade${A.n === 1 ? "" : "s"}${A.open ? ` · ${A.open} open` : ""}`, A.totalR >= 0 ? "up" : "down")}
+      ${kpi("Win rate", pc(A.win), A.avgW != null ? `avg win ${R2(A.avgW)} · loss ${R2(A.avgL)}` : "")}
+      ${kpi("Expectancy", R2(A.exp), A.pf != null ? `profit factor ${A.pf === Infinity ? "∞" : A.pf.toFixed(2)}` : "", A.exp >= 0 ? "up" : "down")}
+    </div>
+    <div class="scores">${SCN.map(([k, n, s]) => A.sc[k] == null ? `<div class="sc"><div>${n}<small>${s}</small></div><div class="bar"></div><b style="color:var(--muted)">—</b></div>` : `<div class="sc"><div>${n}<small>${s}</small></div><div class="bar"><i style="width:${A.sc[k]}%;background:${scol(A.sc[k])}"></i></div><b style="color:${scol(A.sc[k])}">${Math.round(A.sc[k])}</b></div>`).join("")}</div></div>
+  </div>`;
+  // insights
+  h += `<div class="sec"><h2>🧠 What the month says</h2><div class="ins">
+    <div class="box"><h3>✅ Going well</h3>${A.good.length ? `<ul>${A.good.map(x => `<li>${x}</li>`).join("")}</ul>` : `<div class="nodata">Log more data to see strengths.</div>`}</div>
+    <div class="box"><h3>⚠️ Fix next</h3>${A.fix.length ? `<ul>${A.fix.map(x => `<li>${x}</li>`).join("")}</ul>` : `<div class="nodata">No leaks found this month. 👏</div>`}</div>
+    <div class="focus"><div class="k">🎯 ONE FOCUS FOR NEXT MONTH</div><b>${esc(A.focus[0])}</b><p>${esc(A.focus[1])}</p></div></div></div>`;
+  // journal
+  h += `<div class="sec"><h2>📒 Trades <span>from your journal</span></h2><div class="cols"><div class="box"><h3>Equity curve <small>cumulative R</small></h3>${A.n ? `<div class="mini"><div><span>Best trade</span><b class="up">${A.best ? esc(A.best.t.sym) + " " + R2(A.best.m.R) : "—"}</b></div><div><span>Worst trade</span><b class="down">${A.worst ? esc(A.worst.t.sym) + " " + R2(A.worst.m.R) : "—"}</b></div><div><span>Losses &gt; 1.25R</span><b class="${A.bigLoss ? "down" : "up"}">${A.bigLoss}</b></div></div><canvas class="curve" id="curve"></canvas>` : `<div class="nodata">No closed trades this month. Add exit prices in the <a href="../journal/">journal</a>.</div>`}</div>
+    <div class="box"><h3>By setup <small>where your edge is</small></h3>${A.setups.length ? `<table class="t"><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win %</th><th class="n">Total R</th></tr>${A.setups.map(s => `<tr><td>${esc(s.k)}</td><td class="n">${s.n}</td><td class="n">${Math.round(s.w / s.n * 100)}%</td><td class="n ${s.R >= 0 ? "up" : "down"}">${R2(s.R)}</td></tr>`).join("")}</table>` : `<div class="nodata">Tag a setup on each journal trade to see this.</div>`}
+    ${A.rulesOk || A.rulesBr ? `<h3 style="margin-top:14px">Rules followed vs broken <small>checklist notes</small></h3><div class="vsrow"><div style="border-color:rgba(34,211,154,.45);background:rgba(34,211,154,.07)"><span style="color:#9be8c9">✅ CHECKLIST GO</span><b class="up">${A.rulesOk ? R2(A.rulesOk.avg) : "—"}</b><small>avg per trade · ${A.rulesOk?.n || 0} trades</small></div><div style="border-color:rgba(255,84,112,.45);background:rgba(255,84,112,.07)"><span style="color:#ff9aab">🛑 BROKE A RED LINE</span><b class="down">${A.rulesBr ? R2(A.rulesBr.avg) : "—"}</b><small>avg per trade · ${A.rulesBr?.n || 0} trades</small></div></div>` : ""}</div></div></div>`;
+  // days
+  h += `<div class="sec"><h2>📝 Days <span>from your day reviews</span></h2><div class="cols"><div class="box"><h3>Calendar <small>green / red days</small></h3>${calendar()}<div class="legend"><span><i style="background:#22d39a"></i>green day</span><span><i style="background:#ff5470"></i>red day</span><span><i style="border:1.5px dashed #5b8cff"></i>no-trade day</span><span>🔥 revenge / overtrading</span></div></div>
+    <div class="box"><h3>Behaviour <small>${A.days ? `${A.days.reviewed} days reviewed` : ""}</small></h3>${A.days ? `<div class="flags">
+      <div><b class="${A.days.sl.length && A.days.slOk < A.days.sl.length ? "down" : "up"}">${A.days.sl.length ? Math.round(A.days.slOk / A.days.sl.length * 100) + "%" : "—"}</b><span>stop-loss followed</span></div>
+      <div><b class="${A.days.revenge ? "down" : "up"}">${A.days.revenge}</b><span>revenge days</span></div>
+      <div><b class="${A.days.over ? "down" : "up"}">${A.days.over}</b><span>overtrading days</span></div>
+      <div><b class="${A.days.breach ? "down" : "up"}">${A.days.breach}</b><span>max-loss breaches</span></div>
+      <div><b>${A.days.traded}</b><span>days traded</span></div><div><b class="up">${A.days.green}</b><span>green days</span></div><div><b class="down">${A.days.red}</b><span>red days</span></div><div><b style="color:#9fb6ff">${A.days.noTrade}</b><span>no-trade days</span></div></div>
+      ${A.moods?.length ? `<h3 style="margin-top:14px">P&amp;L by mood <small>how feelings cost money</small></h3><div class="moods">${(() => { const mx = Math.max(...A.moods.map(m => Math.abs(m.net)), 1); return A.moods.map(m => `<div><span>${MOODS[m.k] || m.k} <small style="color:var(--muted)">×${m.n}</small></span><div class="bar"><i style="width:${Math.abs(m.net) / mx * 100}%;background:${m.net >= 0 ? "#22d39a" : "#ff5470"}"></i></div><b class="${m.net >= 0 ? "up" : "down"}">${K.srs(m.net)}</b></div>`).join(""); })()}</div>` : ""}`
+    : `<div class="nodata">Do a 2-minute <a href="../day-review/">day review</a> each evening to see behaviour, moods and a calendar here.</div>`}</div></div></div>`;
+  // checklist + options
+  h += `<div class="sec"><div class="cols"><div class="box"><h3>✅ Pre-trade checklist</h3>${A.ck ? `<div class="mini"><div><span>Checked</span><b>${A.ck.n}</b></div><div><span>Taken</span><b>${A.ck.taken}</b></div><div><span>Skipped</span><b class="up">${A.ck.skipped}</b></div><div><span>By the rules</span><b class="${A.ck.rules != null && A.ck.rules < .8 ? "down" : "up"}">${pc(A.ck.rules)}</b></div></div>` : `<div class="nodata">Run trades through the <a href="../checklist/">checklist</a> to track rule-following.</div>`}</div>
+    <div class="box"><h3>🧾 Option income</h3>${A.opt ? `<div class="mini"><div><span>Net income</span><b class="${A.opt.net >= 0 ? "up" : "down"}">${K.srs(A.opt.net)}</b></div><div><span>Trades closed</span><b>${A.opt.n}</b></div><div><span>Win rate</span><b>${pc(A.opt.win)}</b></div><div><span>Biggest loss</span><b class="${A.opt.worst < 0 ? "down" : ""}">${A.opt.worst < 0 ? K.srs(A.opt.worst) : "—"}</b></div></div>` : `<div class="nodata">Close option trades in the <a href="../option-planner/">option planner</a> log to see them here.</div>`}</div></div></div>`;
+  $("#report").innerHTML = h;
+  drawCurve();
+}
+function calendar() {
+  const [y, m] = ym.split("-").map(Number), first = new Date(y, m - 1, 1), days = new Date(y, m, 0).getDate(), off = (first.getDay() + 6) % 7;
+  const vals = Object.values(A.dayNet).filter(v => typeof v === "number"), mx = Math.max(...vals.map(Math.abs), 1), H = A.D.days;
+  let h = `<div class="cal">${["M", "T", "W", "T", "F", "S", "S"].map(d => `<div class="h">${d}</div>`).join("")}${"<div></div>".repeat(off)}`;
+  for (let d = 1; d <= days; d++) {
+    const k = `${ym}-${String(d).padStart(2, "0")}`, v = A.dayNet[k], hot = H[k] && (H[k].ck?.revenge === true || H[k].ck?.over === true);
+    if (v === "nt") h += `<div class="d nt" title="No-trade day">${d}</div>`;
+    else if (typeof v === "number") { const a = .25 + .65 * Math.abs(v) / mx; h += `<div class="d w" style="background:${v >= 0 ? `rgba(34,211,154,${a})` : `rgba(255,84,112,${a})`}" title="${K.srs(v)}">${d}${hot ? "<em>🔥</em>" : ""}</div>`; }
+    else h += `<div class="d">${d}</div>`;
+  }
+  return h + "</div>";
+}
+function drawCurve() {
+  const cv = $("#curve"); if (!cv) return; const r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; const x = cv.getContext("2d"); x.scale(r, r);
+  const pts = [0]; A.closed.forEach(c => pts.push(pts[pts.length - 1] + c.m.R)); const mx = Math.max(...pts, 1), mn = Math.min(...pts, -1), pad = 18;
+  const X = i => pad + i / Math.max(1, pts.length - 1) * (w - pad * 2), Y = v => 12 + (mx - v) / (mx - mn) * (h - 28);
+  x.strokeStyle = "rgba(255,255,255,.18)"; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(pad, Y(0)); x.lineTo(w - pad, Y(0)); x.stroke(); x.setLineDash([]);
+  const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "rgba(34,211,154,.35)"); g.addColorStop(1, "rgba(34,211,154,0)");
+  x.beginPath(); pts.forEach((v, i) => i ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v))); x.lineTo(X(pts.length - 1), Y(mn)); x.lineTo(X(0), Y(mn)); x.fillStyle = g; x.fill();
+  x.lineWidth = 2.5; x.strokeStyle = pts[pts.length - 1] >= 0 ? "#22d39a" : "#ff5470"; x.beginPath(); pts.forEach((v, i) => i ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v))); x.stroke();
+  x.font = "600 11px 'JetBrains Mono', monospace"; x.fillStyle = "#8b93a7"; x.fillText(R2(pts[pts.length - 1]), w - pad - 52, Y(pts[pts.length - 1]) - 8 < 12 ? 22 : Y(pts[pts.length - 1]) - 8);
+}
+
+/* ---------- events ---------- */
+const shiftM = d => { const [y, m] = ym.split("-").map(Number), t = new Date(y, m - 1 + d, 1); ym = K.iso(t).slice(0, 7); render(); };
+$("#prev").addEventListener("click", () => shiftM(-1)); $("#next").addEventListener("click", () => shiftM(1));
+document.addEventListener("click", e => { if (e.target.id === "demoOn") { demo = true; render(); } if (e.target.id === "demoOff") { demo = false; render(); } });
+$("#optMoney").checked = S.money; $("#optMoney").addEventListener("change", e => { S.money = e.target.checked; S.save(); });
+addEventListener("resize", () => A && drawCurve());
+addEventListener("focus", () => render());
+
+/* ---------- share ---------- */
+function buildText() {
+  const g = A.grade || ["—", "", ""], out = [`📅 *My trading report card: ${monthName(ym)}*${demo ? " (demo)" : ""}`, "", `🏅 Grade: *${g[0]}* (${g[2]})${A.score != null ? ` · ${Math.round(A.score)}/100` : ""}`];
+  if (A.n) out.push(`📊 ${A.n} trades · win rate ${pc(A.win)} · expectancy ${R2(A.exp)} · total ${R2(A.totalR)}`);
+  if (S.money && A.netPL != null) out.push(`💰 Net P&L: ${K.srs(A.netPL)}`);
+  const s = A.sc; out.push(`🧭 Discipline ${s.disc != null ? Math.round(s.disc) : "—"} · 🛡️ Risk ${s.risk != null ? Math.round(s.risk) : "—"} · 🎯 Edge ${s.edge != null ? Math.round(s.edge) : "—"}`);
+  if (A.good.length) out.push("", "*✅ Going well*", ...A.good.slice(0, 2).map(x => "• " + x.replace(/<[^>]+>/g, "")));
+  if (A.fix.length) out.push("", "*⚠️ Fixing next*", ...A.fix.slice(0, 2).map(x => "• " + x.replace(/<[^>]+>/g, "")));
+  out.push("", `🎯 *Next month's focus:* ${A.focus[0]}`);
+  return [...out, ...K.signoff("report-card", "Make your report card", "_Personal review for learning · Not advice · Not SEBI registered_")].join("\n");
+}
+async function draw() {
+  await K.loadFonts?.();
+  const probe = drawAt(2000, false);
+  return drawAt(Math.max(1350, probe + 70 + K.footerH(true)), true).c;
+}
+function drawAt(H, final) {
+  const W = 1080, g = A.grade || ["—", "#8b93a7", "Not enough data"], { c, ctx } = K.canvas(W, H, [[g[1] + "40", .2, .1, .6], ["rgba(0,224,184,0.10)", .95, .95, .5]]); K.brand(ctx);
+  K.txt(ctx, "MONTHLY REPORT CARD", 70, 182, `700 24px ${K.F.MONO}`, "#8b93a7");
+  K.txt(ctx, monthName(ym) + (demo ? " (demo)" : ""), 70, 238, `700 52px ${K.F.GROT}`, "#fff");
+  K.panel(ctx, 70, 280, 360, 360, 30, g[1] + "1f", g[1] + "88");
+  K.txt(ctx, "GRADE", 250, 336, `700 24px ${K.F.MONO}`, "#8b93a7", "center"); K.txt(ctx, g[0], 250, 500, `800 170px ${K.F.GROT}`, g[1], "center");
+  ctx.font = `600 24px ${K.F.INTER}`; K.cap(K.wrap(ctx, g[2], 320), 2).forEach((l, i) => K.txt(ctx, l, 250, 560 + i * 32, `600 24px ${K.F.INTER}`, "#e8ecf6", "center"));
+  const SCN = [["disc", "Discipline"], ["risk", "Risk control"], ["edge", "Edge"], ["review", "Review habit"], ["cons", "Consistency"]];
+  let y = 300; SCN.forEach(([k, n]) => { const v = A.sc[k], col = v == null ? "#555" : v >= 75 ? "#22d39a" : v >= 55 ? "#febc2e" : "#ff5470";
+    K.txt(ctx, n, 470, y + 26, `600 26px ${K.F.INTER}`, "#e8ecf6"); K.txt(ctx, v == null ? "—" : String(Math.round(v)), W - 70, y + 26, `700 28px ${K.F.MONO}`, col, "right");
+    K.rr(ctx, 470, y + 42, W - 540, 14, 7); ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fill(); if (v != null) { K.rr(ctx, 470, y + 42, (W - 540) * v / 100, 14, 7); ctx.fillStyle = col; ctx.fill(); } y += 70; });
+  y = 690; const kb = (lab, val, col, x0) => { K.panel(ctx, x0, y, 225, 110, 20); K.txt(ctx, lab, x0 + 20, y + 36, `600 18px ${K.F.MONO}`, "#8b93a7"); K.txt(ctx, val, x0 + 20, y + 84, K.fit(ctx, val, 700, K.F.GROT, 38, 190), col); };
+  kb("TRADES", String(A.n || 0), "#fff", 70); kb("WIN RATE", pc(A.win), "#fff", 307); kb("EXPECTANCY", R2(A.exp), A.exp >= 0 ? "#22d39a" : "#ff5470", 544); kb(S.money ? "NET P&L" : "TOTAL R", S.money ? (A.netPL != null ? K.srs(A.netPL) : "—") : R2(A.n ? A.totalR : null), (S.money ? A.netPL : A.totalR) >= 0 ? "#22d39a" : "#ff5470", 781);
+  y += 150;
+  const list = (title, items, col) => { if (!items.length) return; K.txt(ctx, title, 70, y, `700 26px ${K.F.GROT}`, col); y += 12; items.slice(0, 2).forEach(it => { ctx.font = `500 24px ${K.F.INTER}`; K.cap(K.wrap(ctx, "• " + it.replace(/<[^>]+>/g, ""), W - 140), 2).forEach(l => { y += 34; K.txt(ctx, l, 70, y, `500 24px ${K.F.INTER}`, "#d5d9e4"); }); y += 6; }); y += 30; };
+  list("✅ Going well", A.good, "#22d39a"); list("⚠️ Fixing next", A.fix, "#febc2e");
+  K.panel(ctx, 70, y - 10, W - 140, 96, 20, "rgba(254,188,46,.10)", "rgba(254,188,46,.5)");
+  K.txt(ctx, "🎯 NEXT MONTH", 96, y + 24, `700 20px ${K.F.MONO}`, "#ffd98a"); K.txt(ctx, A.focus[0], 96, y + 62, K.fit(ctx, A.focus[0], 700, K.F.GROT, 32, W - 200), "#fff");
+  if (final) K.footer(ctx, W, H, K.toolUrl("report-card"), "Personal review for learning · Not advice · Not SEBI registered", true);
+  return final ? { c } : y + 86;
+}
+K.share({ text: buildText, valid: () => !!A && !!(A.n || A.days || A.ck || A.opt), draw, file: () => `report-card-${ym}`, imgLabel: "Share my report card" });
+K.inviteField("#invite");
+if (new URLSearchParams(location.search).has("demo")) demo = true;
+render();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
