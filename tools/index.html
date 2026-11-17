@@ -46,6 +46,22 @@
   .appbtns button, .appbtns a { border: 0; border-radius: 12px; padding: 10px 14px; font: 600 .84rem Inter; cursor: pointer; text-decoration: none; white-space: nowrap; }
   .appbtns button { background: linear-gradient(100deg, #7c5cff, #00e0b8); color: #fff; }
   .appbtns a { background: rgba(255,255,255,.08); color: #eef0f6; border: 1px solid rgba(255,255,255,.12); }
+  [hidden] { display: none !important; }
+  .search { position: relative; margin-top: 26px; }
+  .search input { width: 100%; padding: 16px 92px 16px 50px; border-radius: 18px; border: 1.5px solid var(--line); background: rgba(10,12,20,.75); color: var(--fg); font: 500 1rem Inter; outline: 0; transition: border-color .2s, box-shadow .2s; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .search input:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .search input::placeholder { color: #5d6377; }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .search .mag { z-index: 1; position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; opacity: .8; }
+  .search .kbd { z-index: 1; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font: 600 .7rem "JetBrains Mono"; color: var(--muted); border: 1px solid var(--line); border-radius: 7px; padding: 3px 8px; pointer-events: none; }
+  .search .clr { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: 0; background: rgba(255,255,255,.08); color: var(--fg); border-radius: 10px; padding: 7px 11px; font: 600 .78rem Inter; cursor: pointer; }
+  .sugg { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center; font-size: .78rem; color: var(--muted); }
+  .sugg button { border: 1px dashed rgba(255,255,255,.18); background: none; color: #c3c8d6; padding: 5px 11px; border-radius: 999px; font: 500 .76rem Inter; cursor: pointer; }
+  .sugg button:hover { color: #fff; border-color: rgba(255,255,255,.4); }
+  mark { background: rgba(254,188,46,.28); color: #fff; border-radius: 4px; padding: 0 2px; }
+  .none { text-align: center; padding: 34px 16px; border: 1px dashed var(--line); border-radius: 22px; color: var(--muted); margin-top: 18px; }
+  .none b { color: var(--fg); display: block; font: 700 1.1rem "Space Grotesk"; margin-bottom: 6px; }
+  .gtag { font: 600 .64rem "JetBrains Mono"; color: var(--muted); letter-spacing: .04em; }
   .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 26px 0 8px; }
   .filters button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--muted); padding: 9px 15px; border-radius: 999px; font: 600 .84rem Inter; cursor: pointer; transition: color .2s, background .2s, border-color .2s; }
   .filters button:hover { color: var(--fg); }
@@ -122,6 +138,8 @@
       <div><b>📲 Use it like an app</b><span id="appTxt">Install on your phone: opens full-screen and works offline. Back up your saved data anytime.</span></div>
       <div class="appbtns"><button id="installHub" hidden>Install app</button><a href="../backup/" id="backupHub">💾 Backup &amp; app</a></div>
     </div>
+    <div class="search"><span class="mag">🔍</span><input id="q" type="search" placeholder="Search tools: stop-loss, tax, quiz, average, 3D…" autocomplete="off" enterkeyhint="search" aria-label="Search tools" /><span class="kbd" id="kbd">/</span><button class="clr" id="clr" hidden>Clear ✕</button></div>
+    <div class="sugg" id="sugg"></div>
     <div class="filters" id="filters"></div>
     <div id="groups"></div>
 
@@ -185,6 +203,69 @@ const TOOLS = [
   { href: "../tax/", g: "calc", ico: "🧾", c: "#ff5470", name: "Capital Gains Tax Estimator", desc: "STCG and LTCG on shares and equity funds with loss set-off and the yearly exemption, plus how much tax-free gain you can still book this year.", tags: ["STCG", "LTCG", "Tax harvesting"], fresh: true },
 ];
 
+/* Extra words people search with (Hinglish, short forms, related ideas). Key = folder name. */
+const ALSO = {
+  "sl-calculator": "sl stoploss stop loss quantity qty lot size how many shares position sizing capital risk per trade target",
+  checklist: "pre trade before buying rules discipline gate go no go checklist revenge fomo tip red flag",
+  journal: "risk reward rr ratio log diary record trades win rate r multiple performance",
+  average: "avg averaging average down average up break even buy more cost price",
+  tax: "stcg ltcg capital gains income tax itr harvesting 112a 111a 20% 12.5% exemption",
+  options: "option call put ce pe strike premium straddle strangle spread iron condor payoff fno f&o derivatives",
+  "day-review": "trading day review today how was my day confidence mistakes daily reflection",
+  levels: "pivot pivots cpr support resistance nifty bank nifty morning levels camarilla",
+  close: "closing market close evening wrap breadth advance decline fii dii nifty summary",
+  calendar: "results earnings dividend bonus split record date agm events week ahead corporate action",
+  glossary: "term meaning definition dictionary learning word of the day",
+  quiz: "question mcq quiz poll test knowledge",
+  "quiz-score": "quiz score points leaderboard ranking winners monthly",
+  "trade-review": "trade review lesson mistake post analysis loss win",
+  ipo: "ipo allotment listing gain gmp subscription",
+  message: "announcement message template notice rules post",
+  status: "whatsapp status story qr code invite join link grow",
+  contest: "guess the close nifty prediction contest weekly competition",
+  welcome: "welcome new members joiner onboarding spotlight member of the month intro",
+  "chart-game": "chart pattern candlestick read the chart guess game",
+  game: "market rush quick game 60 seconds fun",
+  "ipo-game": "ipo game upi asba application allotment",
+  "scam-game": "scam fraud fake tips telegram pump and dump guaranteed returns",
+  "fno-game": "f&o fno futures options game loss survival",
+  "mtf-game": "mtf margin leverage intraday positional pledge",
+  "fundamentals-game": "fundamentals pe pb pledge promoter debt detective analysis",
+  overtrading: "overtrading over trading greed stop after target log off 3d story film video",
+  "tv-tip": "tv tip front running pump dump news channel operator 3d story film video fomo",
+  "trader-room": "process how i trade screener ema rsi minervini trend template fundamentals 3d room walkthrough",
+  wish: "birthday anniversary congratulations congrats wishes greeting card 3d",
+  house: "home house family festival diwali holi greetings 3d",
+  backup: "backup restore export import data save phone install app offline",
+};
+const EXTRA = [{ href: "../backup/", g: "app", ico: "💾", c: "#00e0b8", name: "Backup & Install App", desc: "Save all your tool data to a file and restore it on any phone. Install the tools as an app that works offline.", tags: ["Backup", "Restore", "Offline"] }];
+const SUGG = ["stop-loss", "tax", "average", "options", "quiz", "levels", "birthday", "3D story", "game"];
+const norm = s => String(s).toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/&amp;/g, "&").replace(/<[^>]+>/g, " ");
+const slug = t => t.href.replace(/^\.\.\/|\/$/g, "");
+function score(t, toks) {
+  const name = norm(t.name), tags = norm(t.tags.join(" ")), desc = norm(t.desc), grp = norm(GROUPS[t.g]?.name || ""), also = norm(ALSO[slug(t)] || "");
+  let s = 0;
+  for (const k of toks) {
+    const wb = new RegExp("(^|[^a-z0-9])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const hit = name.includes(k) ? (wb.test(name) ? 12 : 8) : tags.includes(k) ? 6 : also.includes(k) ? (wb.test(also) ? 5 : 3) : grp.includes(k) ? 3 : desc.includes(k) ? (wb.test(desc) ? 2 : 1) : 0;
+    if (!hit) return 0; s += hit;
+  }
+  return s + (name.startsWith(toks[0]) ? 4 : 0);
+}
+function hl(html, toks) {
+  if (!toks.length) return html;
+  const re = new RegExp("(" + toks.filter(k => k.length > 1).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")", "gi");
+  return toks.some(k => k.length > 1) ? html.split(/(<[^>]+>)/).map(part => part.startsWith("<") ? part : part.replace(re, "<mark>$1</mark>")).join("") : html;
+}
+const card = (t, i, toks = []) => `
+      <a class="tool" href="${t.href}" style="--c:${t.c};${toks.length ? "animation:none" : `animation-delay:${i * 40}ms`}">
+        <div class="top"><span class="ico">${t.ico}</span>${toks.length ? `<span class="gtag">${GROUPS[t.g]?.name || "App"}</span>` : `<span class="badge${t.fresh ? " new" : ""}">${t.fresh ? "NEW" : "LIVE"}</span>`}</div>
+        <h3>${hl(t.name, toks)}</h3>
+        <div class="desc">${hl(t.desc, toks)}</div>
+        <div class="chips">${t.tags.map(x => `<span>${hl(x, toks)}</span>`).join("")}</div>
+        <span class="open">Open tool <i>↗</i></span>
+      </a>`;
+let query = new URLSearchParams(location.search).get("q") || "";
 const $ = s => document.querySelector(s);
 let filter = "all";
 function drawFilters() {
@@ -193,16 +274,20 @@ function drawFilters() {
 }
 function drawTools() {
   let i = 0;
+  const toks = norm(query).split(/[\s,]+/).filter(Boolean);
+  const searching = toks.length > 0;
+  $("#filters").hidden = searching; $("#plan").hidden = searching; $("#tips").hidden = searching;
+  $("#clr").hidden = !query; $("#kbd").hidden = !!query || matchMedia("(hover: none)").matches;
+  if (searching) {
+    const res = [...TOOLS, ...EXTRA].map(t => ({ t, s: score(t, toks) })).filter(x => x.s).sort((a, b) => b.s - a.s);
+    $("#groups").innerHTML = res.length
+      ? `<section class="group"><h2>Results for “${query.replace(/[<&"]/g, "")}”<span>${res.length} tool${res.length === 1 ? "" : "s"}</span></h2><p>Tap a tool to open it. Press Esc to clear.</p><div class="grid">${res.map(x => card(x.t, i++, toks)).join("")}</div></section>`
+      : `<div class="none"><b>No tool matches “${query.replace(/[<&"]/g, "")}”</b>Try a simpler word, like the ones below, or <a href="#" id="showAll" style="color:var(--a2)">see all ${TOOLS.length} tools</a>.</div>`;
+    return;
+  }
   $("#groups").innerHTML = Object.entries(GROUPS).filter(([k]) => filter === "all" || filter === k).map(([k, g]) => {
     const list = TOOLS.filter(t => t.g === k);
-    return `<section class="group"><h2>${g.name}<span>${list.length} tools</span></h2><p>${g.blurb}</p><div class="grid">${list.map(t => `
-      <a class="tool" href="${t.href}" style="--c:${t.c};animation-delay:${i++ * 50}ms">
-        <div class="top"><span class="ico">${t.ico}</span><span class="badge${t.fresh ? " new" : ""}">${t.fresh ? "NEW" : "LIVE"}</span></div>
-        <h3>${t.name}</h3>
-        <div class="desc">${t.desc}</div>
-        <div class="chips">${t.tags.map(x => `<span>${x}</span>`).join("")}</div>
-        <span class="open">Open tool <i>↗</i></span>
-      </a>`).join("")}</div></section>`;
+    return `<section class="group"><h2>${g.name}<span>${list.length} tools</span></h2><p>${g.blurb}</p><div class="grid">${list.map(t => card(t, i++)).join("")}</div></section>`;
   }).join("");
 }
 /* Weekly posting plan: [time, label, tool] */
@@ -231,6 +316,19 @@ document.getElementById("planGrid").innerHTML = PLAN.map(([d, items], i) => `<di
 document.getElementById("tipsGrid").innerHTML = TIPS.map(([h, p]) => `<div class="tip-c"><b>${h}</b><p>${p}</p></div>`).join("");
 $("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; filter = b.dataset.f; drawFilters(); drawTools(); });
 drawFilters(); drawTools();
+/* search box */
+const qIn = $("#q"); qIn.value = query;
+$("#sugg").innerHTML = "Try: " + SUGG.map(s => `<button data-s="${s}">${s}</button>`).join("");
+const setQ = v => { query = v; const u = new URL(location.href); v ? u.searchParams.set("q", v) : u.searchParams.delete("q"); history.replaceState(null, "", u); drawTools(); };
+qIn.addEventListener("input", () => setQ(qIn.value.trim() ? qIn.value : ""));
+qIn.addEventListener("keydown", e => {
+  if (e.key === "Escape") { qIn.value = ""; setQ(""); }
+  if (e.key === "Enter") { const first = document.querySelector("#groups .tool"); if (first && query) location.href = first.href; }
+});
+$("#clr").addEventListener("click", () => { qIn.value = ""; setQ(""); qIn.focus(); });
+$("#sugg").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; qIn.value = b.dataset.s; setQ(b.dataset.s); });
+$("#groups").addEventListener("click", e => { if (e.target.id === "showAll") { e.preventDefault(); qIn.value = ""; setQ(""); } });
+addEventListener("keydown", e => { if (e.key === "/" && document.activeElement !== qIn && !/input|textarea|select/i.test(document.activeElement.tagName)) { e.preventDefault(); qIn.focus(); } });
 /* app bar: install button + backup reminder */
 (function () {
   const bar = document.getElementById("appbar"), txt = document.getElementById("appTxt"), btn = document.getElementById("installHub");
