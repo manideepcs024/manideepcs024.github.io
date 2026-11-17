@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Myth or Fact? — stock market beliefs, busted</title>
+<meta name="description" content="24 common stock market beliefs: is each one a myth or a fact? Answer, see the explanation, keep your score and share a card with your group." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #febc2e; --acc2: #7c5cff; }
+  .wrap { max-width: 980px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; min-width: 0; gap: 18px; align-items: start; }
+  .deck { position: relative; min-height: 430px; min-width: 0; }
+  .mc h2 { overflow-wrap: anywhere; }
+  .mc { position: relative; border-radius: 28px; padding: 26px 24px; min-height: 410px; display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--line); background: linear-gradient(160deg, rgba(124,92,255,.16), rgba(16,18,28,.9) 55%); box-shadow: 0 30px 80px -40px rgba(124,92,255,.6); transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s; }
+  .mc.out-l { transform: translateX(-60px) rotate(-6deg); opacity: 0; } .mc.out-r { transform: translateX(60px) rotate(6deg); opacity: 0; }
+  .mc .k { display: flex; justify-content: space-between; font: 700 .72rem "JetBrains Mono"; color: var(--muted); letter-spacing: .1em; }
+  .mc .cat { color: #c9bcff; }
+  .mc .ico { font-size: 3rem; line-height: 1; }
+  .mc h2 { font: 800 clamp(1.35rem, 4.4vw, 1.9rem)/1.25 "Space Grotesk"; }
+  .mc .q2 { color: var(--muted); font-size: .9rem; }
+  .ans { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
+  .ans button { border: 1.5px solid; border-radius: 18px; padding: 16px; font: 800 1.05rem Inter; cursor: pointer; background: rgba(0,0,0,.25); color: #fff; }
+  .ans .my { border-color: rgba(255,84,112,.6); } .ans .my:hover { background: rgba(255,84,112,.15); }
+  .ans .fa { border-color: rgba(34,211,154,.6); } .ans .fa:hover { background: rgba(34,211,154,.15); }
+  .verdict { border-radius: 18px; padding: 14px 16px; border: 1px solid; }
+  .verdict.ok { border-color: rgba(34,211,154,.5); background: rgba(34,211,154,.08); } .verdict.no { border-color: rgba(255,84,112,.5); background: rgba(255,84,112,.08); }
+  .verdict b.big { display: block; font: 800 1.15rem "Space Grotesk"; margin-bottom: 4px; }
+  .verdict p { color: #d5d9e4; font-size: .92rem; line-height: 1.55; }
+  .verdict .tip { margin-top: 8px; font-size: .85rem; color: #f1e3c4; }
+  .nav2 { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; margin-top: auto; }
+  .nav2 .btn { padding: 12px 14px; }
+  .side { display: grid; gap: 12px; }
+  .score { border-radius: 22px; padding: 16px; text-align: center; border: 1px solid var(--line); background: var(--card); }
+  .score b { display: block; font: 800 2.4rem "Space Grotesk"; }
+  .score span { font: 600 .7rem "JetBrains Mono"; color: var(--muted); letter-spacing: .1em; }
+  .dots { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+  .dots i { width: 14px; height: 14px; border-radius: 4px; background: rgba(255,255,255,.08); cursor: pointer; }
+  .dots i.r { background: #22d39a; } .dots i.w { background: #ff5470; } .dots i.cur { outline: 2px solid #fff; }
+  .cats { display: flex; gap: 6px; flex-wrap: wrap; }
+  .cats button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 7px 11px; border-radius: 999px; font: 600 .76rem Inter; cursor: pointer; }
+  .cats button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .done { text-align: center; padding: 30px 20px; }
+  .done h2 { font: 800 1.6rem "Space Grotesk"; }
+  .done p { color: #cfd3df; margin: 8px 0 16px; }
+  .list { margin-top: 24px; }
+  .list h2 { font: 800 1.3rem "Space Grotesk"; margin-bottom: 10px; }
+  .li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 10px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); margin-top: 8px; font-size: .88rem; line-height: 1.5; }
+  .li .tg { font: 800 .7rem "JetBrains Mono"; text-align: center; border-radius: 8px; padding: 6px 4px; height: fit-content; }
+  .li .tg.m { color: #ff9aab; background: rgba(255,84,112,.12); } .li .tg.f { color: #9be8c9; background: rgba(34,211,154,.12); }
+  .li b { color: #fff; } .li span { color: #b4b9c8; }
+  @media (max-width: 800px) { .stage { grid-template-columns: minmax(0, 1fr); } .side { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../fomo/">🚨 FOMO traps</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Myth or <span class="grad">Fact?</span></h1>
+    <p class="sub">Things people say in every trading group. Some are true, most are costly myths. Pick your answer, read why, and share the ones your friends still believe.</p>
+    <div class="cats" id="cats" style="margin-bottom:14px"></div>
+    <div class="stage">
+      <div class="deck" id="deck"></div>
+      <div class="side">
+        <div class="score"><span>YOUR SCORE</span><b id="sc">0 / 0</b><div class="dots" id="dots"></div></div>
+        <div class="card" style="padding:14px"><div class="share-row" id="shareRow" style="margin-top:0"></div><button class="btn ghost" id="restart" style="margin-top:8px">↺ Shuffle &amp; restart</button></div>
+      </div>
+    </div>
+    <section class="list"><h2>📚 All myths &amp; facts</h2><div id="all"></div></section>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser. These cards are for <b>education only</b> and simplify complex topics; they're not investment advice. Figures quoted are approximate and from public reports.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+/* m: true = it's a MYTH, false = it's a FACT */
+const CARDS = [
+ { id: "penny", c: "Stocks", ico: "🪙", q: "Penny stocks are cheap, so they can multiply easily.", m: true, a: "Price alone tells you nothing. A ₹5 stock can be far more 'expensive' than a ₹5,000 one if the business is weak. Penny stocks are often illiquid, easy to manipulate and favourite targets of pump-and-dump groups.", t: "Judge value by P/E, P/B and business quality, never by the share price." },
+ { id: "sl", c: "Risk", ico: "🛑", q: "Stop-losses are for weak traders. Good traders just hold.", m: true, a: "Every professional uses stops or a planned exit. Holding a falling stock 'until it comes back' is how small losses become account-ending ones. Some stocks never come back.", t: "Decide your stop-loss before you enter, and place it as an order." },
+ { id: "avgdown", c: "Risk", ico: "📉", q: "Averaging down always lowers your risk.", m: true, a: "It lowers your average price, but it raises your exposure to a stock that is proving you wrong. Averaging a loser is one of the most common ways traders blow up.", t: "Add to winners, not losers. Only average into a long-term investment you'd buy fresh today." },
+ { id: "fno", c: "F&O", ico: "🎰", q: "Most individual traders in F&O lose money.", m: false, a: "True. SEBI's studies found that around 9 out of 10 individual F&O traders made net losses, with average losses running into lakhs once costs are included.", t: "Learn with cash-market trades and small size first. F&O is a professional's game." },
+ { id: "lowpe", c: "Valuation", ico: "🔢", q: "A low P/E always means the stock is undervalued.", m: true, a: "A low P/E can mean the market expects profits to fall, or it's a cyclical at peak earnings (metals, commodities). Cheap can get cheaper: the 'value trap'.", t: "Compare P/E with growth (PEG), the sector and the company's own history." },
+ { id: "tv", c: "Tips", ico: "📺", q: "If a stock is recommended on TV, it's a safe buy.", m: true, a: "By the time a tip reaches TV or a WhatsApp forward, early buyers have often bought already, and the rush of viewers gives them an exit. Front-running is illegal, but it happens.", t: "Check the chart before the tip. If it already ran 15%+, you're probably late." },
+ { id: "split", c: "Stocks", ico: "✂️", q: "Bonus shares and stock splits don't make you richer by themselves.", m: false, a: "True. After a 1:1 bonus you have twice the shares at half the price; your total value is the same. Any rally on the news is sentiment, not new value.", t: "Don't buy a stock just because a bonus or split is announced." },
+ { id: "dividend", c: "Stocks", ico: "💸", q: "The share price usually drops by about the dividend on the ex-date.", m: false, a: "True. The dividend leaves the company's cash, so the price adjusts down on the ex-dividend date. Buying just for the dividend usually doesn't create a free profit.", t: "Buy for the business; treat dividends as a bonus, not a trick." },
+ { id: "sip", c: "Investing", ico: "📆", q: "A SIP guarantees good returns.", m: true, a: "A SIP is a way of investing regularly; it doesn't guarantee returns. It averages your buying price and builds discipline, but the fund can still fall, especially over short periods.", t: "Give equity SIPs 5+ years and pick low-cost, well-run funds." },
+ { id: "lakhs", c: "Investing", ico: "💰", q: "You need lakhs of rupees to start investing.", m: true, a: "You can start an index fund SIP with as little as a few hundred rupees a month. Starting early matters far more than starting big.", t: "Start small now, increase the SIP every year (step-up)." },
+ { id: "ipo", c: "IPO", ico: "🎟️", q: "IPOs always list at a profit.", m: true, a: "Many IPOs list below the issue price or fall after listing. Grey market premium (GMP) is unofficial, unregulated and often wrong.", t: "Read the company's offer document (RHP) and valuation, not just the GMP." },
+ { id: "ulip", c: "Insurance", ico: "☂️", q: "Endowment plans and ULIPs are the best way to get life insurance.", m: true, a: "Mixing insurance and investment usually gives low cover and low returns. A pure term plan gives a large cover cheaply; invest the rest separately.", t: "Term insurance for protection, mutual funds for wealth." },
+ { id: "loss50", c: "Risk", ico: "🕳️", q: "After a 50% loss, you need a 100% gain to get back to where you started.", m: false, a: "True. ₹1,00,000 falls 50% to ₹50,000; you now need +100% to get back to ₹1,00,000. That's why small losses matter so much.", t: "Keep losses small: −10% needs only +11% to recover." },
+ { id: "moretrades", c: "Trading", ico: "🔁", q: "The more trades you take, the more money you make.", m: true, a: "More trades mean more charges, more taxes and more emotional decisions. Overtrading is one of the top reasons traders give back good days.", t: "Fewer, better trades. Set a daily trade limit." },
+ { id: "insider", c: "Tips", ico: "🤫", q: "Paid 'VIP tip' groups have insider information.", m: true, a: "Real insider trading is illegal, and anyone selling 'sure-shot' calls is very likely running a scam or a pump-and-dump. Unregistered tip-selling is itself against SEBI rules.", t: "Check SEBI registration of anyone giving advice. No registration = walk away." },
+ { id: "fall", c: "Stocks", ico: "⬇️", q: "A stock that has already fallen 70% can't fall much more.", m: true, a: "A stock down 70% can fall another 70% (to 9% of its old price). Falling prices often mean something is wrong with the business.", t: "Never buy just because it's 'fallen a lot'. Ask why it fell." },
+ { id: "index", c: "Investing", ico: "📊", q: "Over long periods, most large-cap active funds have trailed their index.", m: false, a: "True, based on S&P's SPIVA India reports: over 10-year periods, a large majority of active large-cap funds underperformed the benchmark after costs.", t: "A low-cost Nifty index fund or ETF is a strong core holding for most people." },
+ { id: "timing", c: "Investing", ico: "⏱️", q: "With enough skill, you can time the market's tops and bottoms.", m: true, a: "Even professionals rarely call tops and bottoms. Missing a handful of the best days in the market can cut long-term returns sharply, and those days often come right after the worst ones.", t: "Time in the market beats timing the market for long-term money." },
+ { id: "gold", c: "Investing", ico: "🥇", q: "Gold always goes up.", m: true, a: "Gold has had long flat or falling periods (for example, several years after 2012). It's a useful hedge and diversifier, not a one-way bet.", t: "Keep gold as a slice (often 5–15%) of a diversified portfolio." },
+ { id: "emergency", c: "Basics", ico: "🛟", q: "You should have an emergency fund before you start trading.", m: false, a: "True. Without 6 months of expenses set aside, any surprise (job loss, medical bill) forces you to sell investments at a bad time or trade with money you can't afford to lose.", t: "Health insurance → term insurance → emergency fund → SIP → then trading." },
+ { id: "highprice", c: "Stocks", ico: "🏷️", q: "A ₹50 share is cheaper than a ₹5,000 share.", m: true, a: "Share price depends on how many shares exist. What matters is the value of the whole company (market cap) compared with its profits and assets.", t: "Compare market cap with earnings, not share price with share price." },
+ { id: "news", c: "Results", ico: "📰", q: "Good results always make the share price go up.", m: true, a: "Prices react to results versus expectations. 'Good' results that are below what the market expected can still send a stock down.", t: "Read the results against expectations and guidance, not in isolation." },
+ { id: "forever", c: "Investing", ico: "🔒", q: "Buy and hold forever works for every stock.", m: true, a: "Buy-and-hold works for great businesses bought at sensible prices, reviewed regularly. Holding a deteriorating business forever just locks in losses.", t: "Hold great businesses, but review results every quarter." },
+ { id: "compounding", c: "Investing", ico: "🌱", q: "Starting 10 years earlier can roughly double or triple your final corpus.", m: false, a: "True for long horizons. At 12% a year, money roughly doubles every 6 years, so an extra decade means one to two more doublings.", t: "The best time to start a SIP was years ago. The next best time is today." },
+];
+const S = K.store("myths_v1", { order: [], ans: {}, i: 0, cat: "All" });
+const cats = ["All", ...new Set(CARDS.map(c => c.c))];
+const pool = () => S.cat === "All" ? CARDS : CARDS.filter(c => c.c === S.cat);
+function reshuffle() { S.order = pool().map(c => c.id).sort(() => Math.random() - .5); S.i = 0; S.save(); }
+if (!S.order.length || S.order.some(id => !CARDS.find(c => c.id === id))) reshuffle();
+const byId = id => CARDS.find(c => c.id === id);
+function drawCats() { $("#cats").innerHTML = cats.map(c => `<button data-c="${c}" class="${c === S.cat ? "on" : ""}">${c}</button>`).join(""); }
+$("#cats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; S.cat = b.dataset.c; reshuffle(); drawCats(); draw(); });
+function stats() { const ids = S.order.filter(id => S.ans[id] != null); return { done: ids.length, right: ids.filter(id => S.ans[id] === byId(id).m).length }; }
+function draw(dir) {
+  const st = stats(); $("#sc").textContent = `${st.right} / ${st.done}`;
+  $("#dots").innerHTML = S.order.map((id, i) => `<i data-i="${i}" class="${S.ans[id] == null ? "" : S.ans[id] === byId(id).m ? "r" : "w"} ${i === S.i ? "cur" : ""}"></i>`).join("");
+  if (S.i >= S.order.length) {
+    const pct = st.done ? st.right / st.done : 0;
+    $("#deck").innerHTML = `<div class="mc"><div class="done"><div style="font-size:3rem">${pct >= .85 ? "🏆" : pct >= .6 ? "🔥" : "📚"}</div><h2>You got ${st.right} of ${st.done} right</h2><p>${pct >= .85 ? "Myth-buster! You see through the noise." : pct >= .6 ? "Good instincts. Read the ones you missed below." : "Lots of these fool people. Read the explanations below and try again."}</p><button class="btn primary" id="again">↺ Play again</button></div></div>`;
+    return;
+  }
+  const c = byId(S.order[S.i]), a = S.ans[c.id], answered = a != null, right = a === c.m;
+  $("#deck").innerHTML = `<div class="mc" id="mc">
+    <div class="k"><span>CARD ${S.i + 1} / ${S.order.length}</span><span class="cat">${esc(c.c)}</span></div>
+    <div class="ico">${c.ico}</div><h2>“${esc(c.q)}”</h2>
+    ${answered ? `<div class="verdict ${right ? "ok" : "no"}"><b class="big">${right ? "✅ Correct!" : "❌ Not quite."} It's a ${c.m ? "MYTH" : "FACT"}.</b><p>${esc(c.a)}</p><p class="tip">💡 ${esc(c.t)}</p></div>
+      <div class="nav2"><button class="btn" id="prev">‹</button><button class="btn wa" id="waOne">💌 Share this card</button><button class="btn primary" id="next">Next ›</button></div>`
+    : `<p class="q2">Myth or fact? Tap your answer.</p><div class="ans"><button class="my" data-a="1">🙅 MYTH</button><button class="fa" data-a="0">✅ FACT</button></div>`}
+  </div>`;
+}
+$("#deck").addEventListener("click", e => {
+  const a = e.target.closest("[data-a]"); if (a) { S.ans[S.order[S.i]] = a.dataset.a === "1"; S.save(); draw(); return; }
+  if (e.target.closest("#next")) { S.i++; S.save(); draw(); }
+  if (e.target.closest("#prev") && S.i > 0) { S.i--; S.save(); draw(); }
+  if (e.target.closest("#again")) { reshuffle(); S.order.forEach(id => delete S.ans[id]); S.save(); draw(); }
+  if (e.target.closest("#waOne")) window.open("https://wa.me/?text=" + encodeURIComponent(cardText(byId(S.order[S.i]))), "_blank", "noopener");
+});
+$("#dots").addEventListener("click", e => { const d = e.target.closest("[data-i]"); if (!d) return; S.i = +d.dataset.i; S.save(); draw(); });
+$("#restart").addEventListener("click", () => { reshuffle(); S.order.forEach(id => delete S.ans[id]); S.save(); draw(); });
+$("#all").innerHTML = CARDS.map(c => `<div class="li"><span class="tg ${c.m ? "m" : "f"}">${c.m ? "MYTH" : "FACT"}</span><div><b>${c.ico} ${esc(c.q)}</b><br/><span>${esc(c.a)}</span></div></div>`).join("");
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/myths/";
+const cardText = c => [`${c.ico} *Myth or Fact?*`, `_“${c.q}”_`, "", `👉 *${c.m ? "MYTH" : "FACT"}.* ${c.a}`, "", `💡 ${c.t}`, "", `🃏 Test yourself on ${CARDS.length} myths 👇`, url(), "", "— MANIMINDSMONEY Community"].join("\n");
+function buildText() { const st = stats(); return [`🃏 *Myth or Fact?* I got *${st.right}/${st.done}* right.`, "", "Can you beat me? Stock market beliefs everyone repeats, busted 👇", url(), ...K.signoff("myths", "Play", "").slice(1, -1)].join("\n"); }
+async function drawImg() {
+  await K.loadFonts?.(); const c = byId(S.order[Math.min(S.i, S.order.length - 1)]), W = 1080, H = 1350, { c: cv, ctx } = K.canvas(W, H, [[c.m ? "rgba(255,84,112,0.25)" : "rgba(34,211,154,0.25)", .1, .05, .6], ["rgba(124,92,255,0.14)", .95, .95, .5]]); K.brand(ctx);
+  K.txt(ctx, "MYTH OR FACT?", 70, 186, `700 26px ${K.F.MONO}`, "#febc2e"); K.txt(ctx, c.ico, 70, 300, `90px ${K.F.INTER}`, "#fff");
+  ctx.font = `700 46px ${K.F.GROT}`; let y = 380; K.cap(K.wrap(ctx, `“${c.q}”`, W - 140), 4).forEach(l => { K.txt(ctx, l, 70, y, `700 46px ${K.F.GROT}`, "#fff"); y += 60; });
+  y += 20; const col = c.m ? "#ff5470" : "#22d39a"; K.pill(ctx, c.m ? "IT'S A MYTH" : "IT'S A FACT", 70, y, col, 34); y += 110;
+  ctx.font = `500 30px ${K.F.INTER}`; K.cap(K.wrap(ctx, c.a, W - 140), 7).forEach(l => { K.txt(ctx, l, 70, y, `500 30px ${K.F.INTER}`, "#d5d9e4"); y += 44; });
+  y += 20; ctx.font = `600 28px ${K.F.INTER}`; K.cap(K.wrap(ctx, "💡 " + c.t, W - 140), 3).forEach(l => { K.txt(ctx, l, 70, y, `600 28px ${K.F.INTER}`, "#f1e3c4"); y += 40; });
+  K.footer(ctx, W, H, K.toolUrl("myths"), "For learning · Not investment advice · Not SEBI registered", true); return cv;
+}
+K.share({ text: buildText, draw: drawImg, file: () => "myth-or-fact", imgLabel: "Share card as image" });
+drawCats(); draw();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

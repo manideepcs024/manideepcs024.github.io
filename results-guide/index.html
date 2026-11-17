@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Results &amp; concalls — how to read them and why stocks react</title>
+<meta name="description" content="How to read quarterly results (revenue, EBITDA, margins, PAT, one-offs), what to listen for in an earnings concall, and why stocks react to surprises versus expectations. With a results scorecard and a surprise simulator." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #5b8cff; --acc2: #00e0b8; }
+  .wrap { max-width: 1060px; }
+  .sec2 { margin-top: 26px; }
+  .sec2 > h2 { font: 800 1.4rem "Space Grotesk"; margin-bottom: 4px; }
+  .sec2 > p.l { color: var(--muted); font-size: .92rem; margin-bottom: 12px; line-height: 1.55; max-width: 820px; }
+  .tl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  .tl div { border-radius: 16px; padding: 12px; border: 1px solid var(--line); background: var(--card); font-size: .82rem; color: #cfd3df; line-height: 1.45; }
+  .tl b { display: block; font: 700 .7rem "JetBrains Mono"; color: var(--acc2); letter-spacing: .06em; margin-bottom: 4px; }
+  .tl strong { display: block; color: #fff; font: 700 .92rem "Space Grotesk"; margin-bottom: 3px; }
+  .lines { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .ln { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); font-size: .85rem; color: #cfd3df; line-height: 1.5; }
+  .ln b { display: block; color: #fff; font: 700 .98rem "Space Grotesk"; margin-bottom: 3px; }
+  .ln i { font-style: normal; color: #febc2e; font-size: .78rem; display: block; margin-top: 4px; }
+  .sc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  table.in { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  table.in th { font: 700 .66rem "JetBrains Mono"; color: var(--muted); text-align: left; padding: 6px; letter-spacing: .06em; }
+  table.in td { padding: 4px 6px; color: #d5d9e4; }
+  table.in td small { display: block; color: var(--muted); font-size: .7rem; }
+  table.in input { width: 100%; min-width: 0; background: rgba(0,0,0,.35); border: 1px solid var(--line); border-radius: 10px; padding: 8px 9px; color: var(--fg); font: 600 .86rem "JetBrains Mono"; outline: 0; }
+  .kp { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kp div { border-radius: 14px; padding: 11px 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+  .kp span { display: block; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+  .kp b { font: 800 1.15rem "Space Grotesk"; }
+  .flags { display: grid; gap: 6px; margin-top: 10px; }
+  .flags div { padding: 9px 12px; border-radius: 12px; font-size: .84rem; line-height: 1.45; border: 1px solid var(--line); background: rgba(0,0,0,.2); }
+  .flags .g { border-color: rgba(34,211,154,.4); } .flags .w { border-color: rgba(254,188,46,.45); } .flags .r { border-color: rgba(255,84,112,.45); }
+  .sim { border-radius: 22px; padding: 18px; border: 1px solid rgba(91,140,255,.45); background: linear-gradient(135deg, rgba(91,140,255,.1), rgba(0,224,184,.05)); }
+  .simgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: center; }
+  .rangewrap { margin-top: 12px; }
+  .rangewrap label { display: flex; justify-content: space-between; font-size: .84rem; color: #cfd3df; margin-bottom: 4px; }
+  .rangewrap label b { font-family: "JetBrains Mono"; color: #fff; }
+  input[type=range] { width: 100%; accent-color: #5b8cff; }
+  .seg3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+  .seg3 button { border: 1px solid var(--line); background: rgba(0,0,0,.25); color: #cfd3df; border-radius: 12px; padding: 9px 6px; font: 600 .78rem Inter; cursor: pointer; }
+  .seg3 button.on { background: var(--fg); color: #000; }
+  .react { border-radius: 20px; padding: 16px; text-align: center; border: 1px solid; }
+  .react b { display: block; font: 800 1.6rem "Space Grotesk"; }
+  .react p { color: #cfd3df; font-size: .86rem; margin-top: 6px; line-height: 1.5; }
+  .listen { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .listen label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; padding: 11px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); font-size: .85rem; color: #cfd3df; line-height: 1.45; cursor: pointer; }
+  .listen label b { color: #fff; }
+  .listen input { accent-color: #22d39a; margin-top: 2px; }
+  .redf { border-color: rgba(255,84,112,.35) !important; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .box2 { border-radius: 20px; padding: 16px 18px; border: 1px solid; }
+  .box2 h3 { font: 800 1.05rem "Space Grotesk"; margin-bottom: 8px; }
+  .box2 ul { padding-left: 18px; display: grid; gap: 6px; font-size: .88rem; color: #d5d9e4; line-height: 1.5; }
+  .box2 ul b { color: #fff; }
+  .good { border-color: rgba(34,211,154,.45); background: rgba(34,211,154,.06); } .bad { border-color: rgba(254,188,46,.5); background: rgba(254,188,46,.06); }
+  @media (max-width: 860px) { .tl { grid-template-columns: 1fr 1fr; } .sc, .simgrid, .two { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../calendar/">📅 Results calendar</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Results &amp; concalls, <span class="grad">decoded.</span></h1>
+    <p class="sub">Four times a year every listed company reports results, and stocks can jump or crash 10% in a day. The secret: <b>the price reacts to the surprise, not the number</b>. Learn to read a result in 5 minutes, what to listen for on the earnings call, and how to protect yourself around results day.</p>
+
+    <section class="sec2">
+      <h2>🗓️ How results season works</h2>
+      <div class="tl">
+        <div><b>QUARTER ENDS</b><strong>30 Jun · 30 Sep · 31 Dec · 31 Mar</strong>Companies close their books (Q1 to Q4 of the financial year).</div>
+        <div><b>BOARD MEETING NOTICE</b><strong>Date announced</strong>The company tells the exchange when its board will approve results. Insiders' trading window closes.</div>
+        <div><b>RESULTS DAY</b><strong>Within 45 days</strong>Quarterly results are filed on NSE/BSE, usually within 45 days (60 days for the Q4/annual results).</div>
+        <div><b>CONCALL</b><strong>Same day or next</strong>Management explains the numbers and answers analysts. Audio and transcript are filed later.</div>
+        <div><b>REACTION</b><strong>Next session</strong>The stock reprices on the surprise and on guidance. Moves can continue for days ('post-results drift').</div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>📄 Reading a result in 5 minutes</h2>
+      <p class="l">Open the results filing (or a site like Screener) and check these, always <b>year-on-year (YoY)</b> against the same quarter last year, because many businesses are seasonal.</p>
+      <div class="lines">
+        <div class="ln"><b>Revenue (sales)</b>Is the business growing? Compare YoY. Split into volume (more units) vs price (higher prices) if the company tells you.<i>Look for: steady double-digit growth</i></div>
+        <div class="ln"><b>EBITDA &amp; margin</b>Operating profit before interest, tax and depreciation. Margin = EBITDA ÷ revenue shows pricing power and cost control.<i>Look for: stable or rising margin</i></div>
+        <div class="ln"><b>Other income</b>Interest, dividends, one-time gains. Not from the core business.<i>Red flag: a big part of profit comes from here</i></div>
+        <div class="ln"><b>Exceptional items</b>One-offs: asset sales, write-offs, legal settlements. Remove them to see the real trend.<i>Red flag: profit growth driven by one-offs</i></div>
+        <div class="ln"><b>Net profit (PAT) &amp; EPS</b>The bottom line. EPS = profit per share, used for P/E.<i>Look for: PAT growing with revenue, not faster only because of tax or one-offs</i></div>
+        <div class="ln"><b>Segments &amp; order book</b>Which divisions grew? For capital goods, defence or infra: new orders and the order book.<i>Look for: the main segment driving growth</i></div>
+        <div class="ln"><b>Cash &amp; debt (half-yearly)</b>Balance sheet and cash flow come every 6 months. Profit should turn into cash.<i>Red flag: rising receivables or debt</i></div>
+        <div class="ln"><b>QoQ check</b>Compare with the last quarter for momentum, but remember seasonality (e.g. cement Q2 is weak).<i>Look for: improving trend</i></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧮 Results scorecard</h2>
+      <p class="l">Enter the quarter's figures (₹ crore) against the same quarter last year. It shows growth, margins and the <b>core profit</b> after removing other income and one-offs.</p>
+      <div class="sc card" style="padding:16px">
+        <div>
+          <table class="in"><tr><th>Item (₹ cr)</th><th>This qtr</th><th>Same qtr last yr</th></tr><tbody id="scIn"></tbody></table>
+          <button class="btn ghost" id="scEx" style="margin-top:8px">Fill an example</button>
+        </div>
+        <div><div class="kp" id="scKp"></div><div class="flags" id="scFlags"></div></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🎯 Why "good results" can sink a stock</h2>
+      <p class="l">Analysts publish estimates before results, and the price already reflects them. The stock moves on the <b>gap</b> between actual and expected, and on what management says about the <b>future</b>.</p>
+      <div class="sim">
+        <div class="simgrid">
+          <div>
+            <div class="rangewrap"><label>Expected profit growth <b id="eV"></b></label><input type="range" id="exp" min="-20" max="60" step="1" /></div>
+            <div class="rangewrap"><label>Actual profit growth <b id="aV"></b></label><input type="range" id="act" min="-20" max="60" step="1" /></div>
+            <div class="seg3" id="guid"><button data-g="up">📈 Guidance raised</button><button data-g="same">➖ Unchanged</button><button data-g="down">📉 Guidance cut</button></div>
+            <p style="font-size:.78rem;color:var(--muted);margin-top:10px">A simplified illustration of how markets react, not a prediction.</p>
+          </div>
+          <div class="react" id="react"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🎧 What to listen for on the concall</h2>
+      <p class="l">The earnings conference call has two parts: management's opening remarks, then analysts' questions. The Q&amp;A is where the truth comes out. Transcripts are filed on NSE/BSE and the company's investor page. Tick as you listen:</p>
+      <div class="listen" id="listen"></div>
+      <div class="flags"><div id="listenOut" class="g"></div></div>
+    </section>
+
+    <section class="sec2">
+      <div class="two">
+        <div class="box2 good"><h3>🛡️ For traders: around results day</h3><ul>
+          <li>Check the <a href="../calendar/" style="color:var(--acc2)">results calendar</a> before entering any swing trade.</li>
+          <li><b>Avoid fresh positions</b> the day before results unless you accept a gap of 10%+.</li>
+          <li>Holding into results? <b>Reduce size</b>: a stop-loss can't protect you from a gap.</li>
+          <li><b>Option sellers</b>: don't sell naked options into results; option buyers: premiums are inflated and collapse after the event (IV crush).</li>
+          <li>Let the first 30–60 minutes after results settle before reacting.</li></ul></div>
+        <div class="box2 bad"><h3>📈 For investors: using results well</h3><ul>
+          <li>Judge the <b>trend over 4–8 quarters</b>, not one quarter.</li>
+          <li>Track whether management <b>delivers on its guidance</b>; credibility compounds.</li>
+          <li>A fall on a temporary issue in a great business can be an opportunity; a fall on <b>structural</b> problems is a warning.</li>
+          <li>Watch "buy the rumour, sell the news": stocks often rise into results and fall after, even on good numbers.</li>
+          <li>Read the full transcript for the businesses you own.</li></ul></div>
+      </div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:22px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser. This guide is for <b>education only</b>; the simulator is a simplified illustration and examples are fictional. Filing timelines are as per current listing rules and can change. Not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const ROWS = [["rev", "Revenue"], ["ebitda", "EBITDA", "operating profit"], ["oi", "Other income"], ["exc", "Exceptional items", "+ gain / − loss"], ["pat", "Net profit (PAT)"]];
+const EXAMPLE = { rev: ["1,240", "1,050"], ebitda: ["201", "155"], oi: ["38", "12"], exc: ["30", "0"], pat: ["152", "98"] };
+const LISTEN = [
+  ["Guidance: revenue/margin outlook for the year", false], ["Demand: is it broad or one-off?", false], ["Margins: raw-material and pricing comments", false], ["Capex & expansion plans, and how they're funded", false],
+  ["Order book / new orders (if relevant)", false], ["Debt, cash flow and working capital", false], ["Management answers questions directly", false],
+  ["🚩 Guidance cut again or vague answers", true], ["🚩 Blaming 'one-offs' every quarter", true], ["🚩 Rising receivables or inventory", true], ["🚩 Auditor, CFO or key-person exits", true], ["🚩 Big related-party deals or pledging", true],
+];
+const S = K.store("resultsguide_v1", { sc: {}, exp: 20, act: 25, guid: "same", listen: {} });
+$("#scIn").innerHTML = ROWS.map(([k, n, h]) => `<tr><td>${n}${h ? `<small>${h}</small>` : ""}</td><td><input data-k="${k}" data-y="0" type="text" inputmode="decimal" /></td><td><input data-k="${k}" data-y="1" type="text" inputmode="decimal" /></td></tr>`).join("");
+const fill = () => document.querySelectorAll("#scIn input").forEach(i => i.value = S.sc[i.dataset.k]?.[+i.dataset.y] ?? "");
+const g = (k, y) => { const v = S.sc[k]?.[y]; return v === "" || v == null ? null : num(v); };
+const pct = (a, b) => a != null && b != null && b !== 0 ? (a - b) / Math.abs(b) * 100 : null;
+const fp = v => v == null ? "—" : (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(1) + "%";
+function score() {
+  const rev = pct(g("rev", 0), g("rev", 1)), ebit = pct(g("ebitda", 0), g("ebitda", 1)), pat = pct(g("pat", 0), g("pat", 1));
+  const m0 = g("ebitda", 0) != null && g("rev", 0) ? g("ebitda", 0) / g("rev", 0) * 100 : null, m1 = g("ebitda", 1) != null && g("rev", 1) ? g("ebitda", 1) / g("rev", 1) * 100 : null;
+  const core = y => g("pat", y) != null ? g("pat", y) - ((g("oi", y) || 0) + (g("exc", y) || 0)) * .75 : null; // rough: remove other income & one-offs after ~25% tax
+  const cg = pct(core(0), core(1));
+  const cls = v => v == null ? "" : v >= 0 ? "up" : "down";
+  $("#scKp").innerHTML = `<div><span>Revenue YoY</span><b class="${cls(rev)}">${fp(rev)}</b></div><div><span>EBITDA YoY</span><b class="${cls(ebit)}">${fp(ebit)}</b></div><div><span>EBITDA margin</span><b>${m0 == null ? "—" : m0.toFixed(1) + "%"}</b><small style="color:var(--muted);font-size:.72rem">${m1 == null ? "" : "vs " + m1.toFixed(1) + "% last yr"}</small></div><div><span>Net profit YoY</span><b class="${cls(pat)}">${fp(pat)}</b></div><div style="grid-column:1/-1"><span>Core profit YoY (approx.)</span><b class="${cls(cg)}">${fp(cg)}</b><small style="color:var(--muted);font-size:.72rem;display:block">PAT minus other income and exceptional items (after ~25% tax)</small></div>`;
+  const F = [];
+  if (rev != null) F.push(rev >= 12 ? ["g", `✅ Healthy revenue growth (${fp(rev)}).`] : rev >= 0 ? ["w", `⚠️ Slow revenue growth (${fp(rev)}).`] : ["r", `🚩 Revenue fell (${fp(rev)}).`]);
+  if (m0 != null && m1 != null) F.push(m0 >= m1 ? ["g", `✅ Margin improved by ${(m0 - m1).toFixed(1)} pts: pricing power or cost control.`] : ["w", `⚠️ Margin fell by ${(m1 - m0).toFixed(1)} pts: check costs and pricing on the concall.`]);
+  const oiShare = g("oi", 0) != null && g("pat", 0) > 0 ? (g("oi", 0) * .75) / g("pat", 0) : null;
+  if (oiShare != null && oiShare > .25) F.push(["r", `🚩 About ${Math.round(oiShare * 100)}% of profit comes from other income, not the core business.`]);
+  if (g("exc", 0)) F.push(["w", `⚠️ Includes exceptional items of ₹${g("exc", 0)} cr: remove them to see the real trend.`]);
+  if (pat != null && cg != null && pat - cg > 10) F.push(["r", `🚩 Headline profit growth (${fp(pat)}) is much higher than core growth (${fp(cg)}). Don't be fooled by the headline.`]);
+  if (rev != null && pat != null && rev > 0 && pat > rev + 5 && !(pat - cg > 10)) F.push(["g", `✅ Profit growing faster than sales: operating leverage.`]);
+  $("#scFlags").innerHTML = F.length ? F.map(([c, t]) => `<div class="${c}">${t}</div>`).join("") : `<div>Enter revenue, EBITDA and profit for both quarters, or tap "Fill an example".</div>`;
+  S.save();
+}
+$("#scIn").addEventListener("input", e => { const i = e.target; if (!i.dataset.k) return; K.fmtNum(i, 2, true); (S.sc[i.dataset.k] ||= ["", ""])[+i.dataset.y] = i.value; score(); });
+$("#scEx").addEventListener("click", () => { S.sc = structuredClone(EXAMPLE); fill(); score(); });
+function react() {
+  const e = +S.exp, a = +S.act, gd = S.guid, s = a - e; $("#eV").textContent = (e >= 0 ? "+" : "") + e + "%"; $("#aV").textContent = (a >= 0 ? "+" : "") + a + "%";
+  document.querySelectorAll("#guid button").forEach(b => b.classList.toggle("on", b.dataset.g === gd));
+  let sc = s / 5 + (gd === "up" ? 2 : gd === "down" ? -3 : 0);
+  const [t, col, p] = sc >= 3 ? ["📈 Likely strong rally", "#22d39a", "Results beat expectations and the outlook supports it. Stocks can gap up and keep drifting higher for days."] : sc >= 1 ? ["↗️ Likely positive", "#22d39a", "A modest beat. Expect a positive but smaller move."] : sc > -1 ? ["➖ Likely muted / mixed", "#5b8cff", "Roughly in line with what was priced in. The stock may barely move, or fall on 'sell the news'."] : sc > -3 ? ["↘️ Likely negative", "#febc2e", s >= 0 && gd === "down" ? "The quarter beat expectations, but guidance was cut. The market cares more about the future than the last quarter." : a > 0 ? `Profit grew ${a}%, but the market expected ${e}%. 'Good' results that miss expectations often fall.` : "A miss versus expectations. Expect selling."] : ["📉 Likely sharp fall", "#ff5470", gd === "down" ? "A guidance cut hurts more than a weak quarter: the market reprices the future. Gaps of 10%+ are common." : "A big miss. Expect a gap down."];
+  $("#react").style.borderColor = col + "88"; $("#react").style.background = col + "12";
+  $("#react").innerHTML = `<div style="font:600 .74rem 'JetBrains Mono';color:var(--muted)">SURPRISE ${s >= 0 ? "+" : ""}${s} PTS · GUIDANCE ${gd.toUpperCase()}</div><b style="color:${col}">${t}</b><p>${p}</p>`;
+  S.save();
+}
+["exp", "act"].forEach(k => { const el = $("#" + k); el.value = S[k]; el.addEventListener("input", () => { S[k] = el.value; react(); }); });
+$("#guid").addEventListener("click", e => { const b = e.target.closest("[data-g]"); if (!b) return; S.guid = b.dataset.g; react(); });
+function listen() {
+  $("#listen").innerHTML = LISTEN.map(([t, red], i) => `<label class="${red ? "redf" : ""}"><input type="checkbox" data-l="${i}" ${S.listen[i] ? "checked" : ""} /><span>${red ? `<b>${esc(t)}</b>` : esc(t)}</span></label>`).join("");
+  const good = LISTEN.filter(([, r], i) => !r && S.listen[i]).length, bad = LISTEN.filter(([, r], i) => r && S.listen[i]).length, o = $("#listenOut");
+  o.className = bad >= 2 ? "r" : bad === 1 ? "w" : "g";
+  o.innerHTML = bad >= 2 ? `🚩 <b>${bad} red flags</b> heard. Be cautious: these often come before bigger problems.` : bad === 1 ? `⚠️ One red flag. Track it next quarter.` : `✅ ${good} of 7 key topics covered${good >= 6 ? ": a well-rounded call." : ". Tick the topics as management discusses them."}`;
+  S.save();
+}
+$("#listen").addEventListener("change", e => { const i = e.target.dataset.l; if (i == null) return; S.listen[i] = e.target.checked; listen(); });
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/results-guide/";
+function buildText() {
+  return ["📊 *Results & concalls, decoded*", "", "1️⃣ Compare *YoY* (same quarter last year): revenue, EBITDA margin, profit.", "2️⃣ Remove *other income & one-offs* to see the real trend.", "3️⃣ Stocks react to the *surprise vs expectations* and to *guidance*, not the headline number.", "4️⃣ On the concall, listen to the *Q&A*: guidance, demand, margins, debt, red flags.", "5️⃣ Traders: avoid fresh positions right before results; stop-losses can't stop a gap.", "", "Free scorecard & concall checklist 👇", url(), ...K.signoff("results-guide", "Learn", "").slice(1, -1)].join("\n");
+}
+async function drawImg() {
+  await K.loadFonts?.(); const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "LEARN · RESULTS SEASON", 70, 186, `700 26px ${K.F.MONO}`, "#5b8cff"); K.txt(ctx, "Results & concalls, decoded", 70, 250, `800 54px ${K.F.GROT}`, "#fff");
+  let y = 300; [["📅", "Compare year-on-year", "Revenue, EBITDA margin and profit vs the same quarter last year."], ["🧹", "Strip out one-offs", "Other income and exceptional items can inflate profit."], ["🎯", "Surprise beats the number", "The price moves on actual vs expected, and on guidance."], ["🎧", "Listen to the Q&A", "Guidance, demand, margins, debt and red flags."], ["🛡️", "Traders: respect the gap", "A stop-loss can't protect you from a results gap."]].forEach(([i, t, d], k) => {
+    K.panel(ctx, 70, y, W - 140, 150, 22); K.txt(ctx, i, 100, y + 92, `54px ${K.F.INTER}`, "#fff"); K.txt(ctx, t, 190, y + 62, `800 36px ${K.F.GROT}`, "#fff"); ctx.font = `500 26px ${K.F.INTER}`; K.cap(K.wrap(ctx, d, W - 300), 2).forEach((l, j) => K.txt(ctx, l, 190, y + 102 + j * 32, `500 26px ${K.F.INTER}`, "#cfd3df")); y += 168; });
+  K.footer(ctx, W, H, K.toolUrl("results-guide"), "Education only · Not investment advice · Not SEBI registered", true); return c;
+}
+K.share({ text: buildText, draw: drawImg, file: () => "results-concalls", imgLabel: "Share cheat sheet" });
+fill(); score(); react(); listen();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

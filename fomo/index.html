@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>FOMO Trap Detector — spot hype words before they cost you</title>
+<meta name="description" content="Paste any tweet, Telegram or WhatsApp stock message. The FOMO Trap Detector highlights trap words like 'don't miss', 'aaj ka dhamaka', '100% sure' and '🚀', scores the hype and shows what professional information looks like." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #ff5470; --acc2: #febc2e; }
+  .samples { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; scrollbar-width: thin; }
+  .smp { flex: none; width: 250px; text-align: left; border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #d5d9e4; border-radius: 16px; padding: 12px; cursor: pointer; font: 500 .8rem/1.45 Inter; }
+  .smp b { display: block; font: 700 .72rem "JetBrains Mono"; color: var(--muted); margin-bottom: 4px; }
+  .smp:hover { border-color: rgba(255,255,255,.3); }
+  textarea#msg { min-height: 150px; font-size: .95rem; }
+  .preview { margin-top: 12px; border-radius: 18px; padding: 14px 16px; background: #0b141a; border: 1px solid var(--line); font-size: .95rem; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 60px; }
+  .preview mark { border-radius: 5px; padding: 1px 3px; color: #fff; }
+  .preview mark.pro { background: rgba(34,211,154,.3); }
+  .meter { position: relative; height: 16px; border-radius: 9px; background: linear-gradient(90deg, #22d39a, #febc2e 45%, #ff5470 80%); margin: 10px 0 4px; }
+  .meter i { position: absolute; top: -5px; width: 6px; height: 26px; border-radius: 3px; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,.5); transition: left .4s; }
+  .scale { display: flex; justify-content: space-between; font: 600 .66rem "JetBrains Mono"; color: var(--muted); }
+  .vbox { border-radius: 20px; padding: 16px; text-align: center; border: 1px solid; margin-top: 12px; }
+  .vbox b { display: block; font: 800 2.3rem "Space Grotesk"; }
+  .vbox span { font: 800 1.1rem "Space Grotesk"; }
+  .vbox p { color: #cfd3df; font-size: .86rem; margin-top: 6px; line-height: 1.5; }
+  .hits { display: grid; gap: 6px; margin-top: 12px; }
+  .hit { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 10px; padding: 9px 12px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); font-size: .84rem; line-height: 1.45; }
+  .hit i { width: 12px; height: 12px; border-radius: 3px; margin-top: 4px; }
+  .hit b { color: #fff; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-size: .74rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; }
+  .sec2 { margin-top: 26px; }
+  .sec2 > h2 { font: 800 1.35rem "Space Grotesk"; margin-bottom: 4px; }
+  .sec2 > p { color: var(--muted); font-size: .9rem; margin-bottom: 12px; line-height: 1.5; }
+  .vs2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .bubble2 { border-radius: 18px; padding: 14px; font-size: .9rem; line-height: 1.55; white-space: pre-wrap; }
+  .bubble2.bad { background: rgba(255,84,112,.08); border: 1px solid rgba(255,84,112,.4); }
+  .bubble2.good { background: rgba(34,211,154,.07); border: 1px solid rgba(34,211,154,.4); }
+  .bubble2 h4 { font: 800 .95rem "Space Grotesk"; margin-bottom: 8px; white-space: normal; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .tile { border-radius: 18px; padding: 14px 16px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .tile > b:first-child { display: block; color: #fff; font: 700 1rem "Space Grotesk"; margin-bottom: 4px; } .tile b { color: #fff; }
+  .tile a { color: var(--acc2); }
+  .story { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .panel2 { border-radius: 18px; padding: 14px; border: 1px solid var(--line); background: var(--card); font-size: .85rem; color: #cfd3df; line-height: 1.5; }
+  .panel2 .t { font: 700 .7rem "JetBrains Mono"; color: var(--acc2); letter-spacing: .08em; }
+  .panel2 .e { font-size: 2rem; margin: 4px 0; }
+  .panel2 b { color: #fff; }
+  .game { border-radius: 22px; padding: 18px; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(0,224,184,.05)); }
+  .game .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .game .pair button { text-align: left; border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #e8ecf6; border-radius: 16px; padding: 14px; font: 500 .86rem/1.5 Inter; cursor: pointer; white-space: pre-wrap; }
+  .game .pair button.right { border-color: var(--up); background: rgba(34,211,154,.12); } .game .pair button.wrong { border-color: var(--down); background: rgba(255,84,112,.1); }
+  .game .res { margin-top: 10px; font-size: .88rem; color: #cfd3df; min-height: 1.4em; }
+  @media (max-width: 760px) { .vs2, .game .pair { grid-template-columns: 1fr; } .story { grid-template-columns: 1fr 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../myths/">🃏 Myth or Fact</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Don't let <span class="grad">FOMO</span> trade for you.</h1>
+    <p class="sub">"Don't miss!", "Aaj ka dhamaka!", "100% sure 🚀🚀". These words are designed to make you act before you think. Paste any tweet, Telegram or WhatsApp stock message below: the detector highlights the trap words and scores the hype. Real, professional information never needs to rush you.</p>
+
+    <div class="layout">
+      <section class="card">
+        <div class="q">Try a sample <span class="opt">all fictional</span></div>
+        <div class="samples" id="samples"></div>
+        <div class="q">Or paste a message</div>
+        <textarea id="msg" placeholder="Paste a tweet, Telegram or WhatsApp message here…"></textarea>
+        <div class="preview" id="preview"></div>
+        <div class="legend" id="legend"></div>
+      </section>
+      <section class="card sticky">
+        <div class="res-head"><h2>Hype score</h2><span id="cnt"></span></div>
+        <div class="meter"><i id="needle" style="left:0"></i></div>
+        <div class="scale"><span>PROFESSIONAL</span><span>SOME HYPE</span><span>FOMO TRAP</span></div>
+        <div class="vbox" id="vbox"></div>
+        <div class="hits" id="hits"></div>
+        <div class="share-row" id="shareRow"></div>
+      </section>
+    </div>
+
+    <section class="sec2">
+      <h2>📖 A day of FOMO <span style="font:500 .8rem Inter;color:var(--muted)">a 4-panel story</span></h2>
+      <div class="story">
+        <div class="panel2"><div class="t">9:02 AM</div><div class="e">📱</div>A Telegram ping: <b>"🚀 Aaj ka DHAMAKA! XYZ will fly 40% today. Last chance, don't miss!!"</b></div>
+        <div class="panel2"><div class="t">9:16 AM</div><div class="e">😰</div>XYZ is already up 8%. The group shows screenshots of "profits". <b>Everyone seems to be buying.</b> He buys at market, double his usual size.</div>
+        <div class="panel2"><div class="t">11:40 AM</div><div class="e">📉</div>The buying stops. Early sellers dump. XYZ ends the day <b>down 6%</b>. The group has moved on to "tomorrow's jackpot".</div>
+        <div class="panel2"><div class="t">LESSON</div><div class="e">🧠</div>The message was built to <b>rush</b> him. A real opportunity is still there after a 10-minute check of the filing, the chart and the source.</div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🆚 Hype vs professional</h2>
+      <p>Same company, same news. One message wants you to act now; the other helps you decide.</p>
+      <div class="vs2">
+        <div class="bubble2 bad"><h4>🚨 Hype message</h4>🔥🔥 DON'T MISS 🔥🔥
+AAJ KA JACKPOT: ABC Ltd 🚀🚀🚀
+Operator buying started. Target ₹500 in 2 days!! 100% sure shot, paisa double ✅
+Only for our VIP members. Join fast, limited seats 👇</div>
+        <div class="bubble2 good"><h4>✅ Professional message</h4>ABC Ltd: Q2 FY26 results (filed on NSE, 14 Nov)
+• Revenue +18% YoY to ₹1,240 cr; EBITDA margin 16.2% (vs 14.8%)
+• Net profit +22%; includes ₹30 cr one-time gain
+• Management cut full-year volume guidance in the concall
+Risks: high receivables, guidance cut. Not a recommendation; read the filing and do your own research.</div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🎯 Spot the professional one</h2>
+      <p>Tap the message you'd trust more.</p>
+      <div class="game" id="game"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧠 Why these words work on us</h2>
+      <div class="grid3">
+        <div class="tile"><b>⏰ Urgency</b>"Last chance", "only today", "jaldi". A deadline switches off careful thinking. Real opportunities rarely disappear in 10 minutes.</div>
+        <div class="tile"><b>🤑 Greed &amp; guarantees</b>"100% sure", "paisa double", "multibagger". Markets have no guarantees; anyone promising one is either wrong or lying.</div>
+        <div class="tile"><b>🤫 Secrecy</b>"Operator buying", "inside news". Trading on real inside information is illegal; the 'secret' is usually the scam.</div>
+        <div class="tile"><b>👥 Fake social proof</b>"Everyone is buying", profit screenshots. Screenshots are easy to fake and only the winners are shown.</div>
+        <div class="tile"><b>💳 Pay to join</b>"VIP group", "limited seats", "DM now". Selling stock tips needs SEBI registration. Most paid tip groups don't have it.</div>
+        <div class="tile"><b>🎯 Fixed targets</b>"Target ₹500 in 2 days". Exact quick targets with no stop-loss or risk are a red flag, not analysis.</div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>✅ Follow professional information</h2>
+      <p>Before acting on any tip, check where it comes from. These are the sources professionals use.</p>
+      <div class="grid3">
+        <div class="tile"><b>🏛️ Exchange filings</b>Results, orders, bonuses and announcements are filed on <b>NSE</b> and <b>BSE</b> (Corporate Announcements). If it's not filed, it's a rumour.</div>
+        <div class="tile"><b>🏢 Company sources</b>Annual reports, investor presentations and concall transcripts on the company's investor-relations page.</div>
+        <div class="tile"><b>🪪 Check SEBI registration</b>Anyone giving buy/sell advice for money must be a SEBI-registered Research Analyst or Investment Adviser. Search their name on SEBI's registered intermediaries list.</div>
+        <div class="tile"><b>📊 Your own process</b>Run it through your <a href="../checklist/">pre-trade checklist</a>: chart, results date, risk-reward, stop-loss.</div>
+        <div class="tile"><b>📣 Report fraud</b>Complain about unregistered advice on <b>SEBI SCORES</b>. For financial cyber fraud, call <b>1930</b> or use cybercrime.gov.in.</div>
+        <div class="tile"><b>⏳ The 24-hour rule</b>If a tip makes you excited, wait a day. If it's still a good idea after research, it'll still be there.</div>
+      </div>
+    </section>
+
+    <div class="disclaimer"><b>⚠️ Note:</b> The detector looks for common hype patterns in English, Hinglish and Hindi; it can't judge whether a stock is good or bad, and a low score doesn't make a tip safe. All sample messages are fictional. Nothing you paste leaves your device. I'm not SEBI-registered; this is for education only.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const CATS = {
+  urgency: ["⏰ Urgency", "#ff9f43", "Rushes you so you don't check"],
+  greed: ["🤑 Greed / guarantee", "#ff5470", "Promises returns no market can promise"],
+  secret: ["🤫 Secrecy / insider", "#b9a6ff", "Fake 'inside' information, often a pump-and-dump"],
+  social: ["👥 Fake social proof", "#4fc3f7", "'Everyone is buying', made to make you follow the crowd"],
+  pay: ["💳 Pay / join pressure", "#ff4d8d", "Pushes you into paid or private groups"],
+  target: ["🎯 Quick fixed target", "#febc2e", "Exact targets in days, with no risk or stop-loss"],
+  emoji: ["🚀 Hype emojis", "#ff9f43", "Rockets and money bags replace analysis"],
+};
+const W = s => new RegExp("(?<![\\p{L}\\p{N}])(?:" + s + ")(?![\\p{L}\\p{N}])", "giu");
+const RULES = [
+  ["urgency", 12, W("don'?t miss|do not miss|miss (?:mat|na) karo|last chance|hurry( up)?|urgent(?:ly)?|now or never|only today|today only|before it'?s too late|act (?:fast|now)|limited time|ending soon|jaldi( karo)?|abhi(?: ke abhi)?|turant|aakhri mauka|mauka mat chhodo|aaj hi|fast fast|जल्दी|आख़िरी मौका|आखिरी मौका|मौका मत छोड़ो|अभी")],
+  ["greed", 16, W("guarantee[ds]?|guaranteed returns?|100 ?% (?:sure|profit|returns?|accuracy|safe)|sure ?shot|pakka|fixed (?:profit|returns?|income)|risk[- ]?free|no loss|zero loss|double (?:your )?money|paisa double|money double|multi ?bagger|jackpot|bumper|dhamaka|loot(?: lo)?|lottery|\\d+x (?:returns?|profit)|10x|100x|udega|bhagega|rocket|to the moon|free money|गारंटी|पक्का|धमाका|जैकपॉट|डबल|लूट|बम्पर")],
+  ["secret", 14, W("insider|operator(?:s)?(?: buying| stock| game)?|inside (?:news|info(?:rmation)?)|secret|sources say|confidential|hidden gem|chupa (?:rustam|hua)|smart money entering|big players? (?:entering|buying)|ऑपरेटर|अंदर की खबर")],
+  ["social", 8, W("everyone is buying|sab (?:log )?(?:le|kharid) rahe|lakhs of (?:members|followers)|thousands of (?:members|followers|traders)|trending|viral|members (?:made|booked)|profit screenshots?|booked profit(?:s)?")],
+  ["pay", 12, W("vip(?: group| members?| channel)?|premium (?:group|tips?|calls?|channel)|paid group|join (?:now|fast|today)|link in bio|dm (?:me|now)|inbox (?:me|now)|limited (?:seats|slots)|subscribe now|registration fees?|one[- ]time fees?")],
+  ["target", 10, W("target ₹? ?[\\d,]+(?: in [\\d]+ (?:days?|din|hours?|weeks?))|upper circuit|UC (?:lagega|confirmed)|breakout confirmed|aaj ka (?:pick|dhamaka|jackpot|daan|stock|tip|call|bomb|rocket)|stock of the day|today'?s (?:pick|jackpot)|आज का (?:धमाका|स्टॉक|पिक)")],
+];
+const EMOJI = /🚀|💰|🤑|💸|🔥|💥|📈🚀|💎|🤯/gu;
+const PRO = [
+  [W("source|filed|filing|exchange filing|nse|bse|annual report|investor presentation|concall|con-call|transcript|q[1-4] ?fy ?\\d{2}|yoy|qoq|ebitda|margin|guidance"), "📄 Gives a source or real numbers"],
+  [W("risks?|downside|stop[- ]?loss|not (?:a )?recommendation|not investment advice|do your own research|dyor|disclaimer|educational"), "⚖️ Mentions risk or disclaimers"],
+  [W("sebi[- ]registered|sebi reg(?:istration)?|IN[AH]\\d{6,}"), "🪪 Shows SEBI registration"],
+];
+const SAMPLES = [
+  ["Telegram · 'Stock Rockets VIP'", "🔥🔥 DON'T MISS 🔥🔥\nAAJ KA DHAMAKA: XYZ Ltd 🚀🚀🚀\nOperator buying started! Target ₹500 in 2 days. 100% sure shot, paisa double ✅\nJoin VIP fast, limited seats 👇"],
+  ["X / Twitter · @MultibaggerKing", "Hidden gem alert 💎 This small-cap is the NEXT 10x multibagger. Insider news: big order coming. Last chance to enter before it's too late!! 🚀 #stocks #jackpot"],
+  ["WhatsApp forward", "Aaj ka pick: ABC ✅ Abhi kharido, kal upper circuit pakka. Sab log le rahe hain, members made 40% profit yesterday (screenshots in group). Miss mat karo!"],
+  ["Hindi WhatsApp forward", "आज का धमाका 🚀 यह शेयर पक्का डबल होगा, गारंटी! ऑपरेटर अंदर हैं। जल्दी खरीदो, आख़िरी मौका!"],
+  ["Analyst note (professional)", "ABC Ltd Q2 FY26 (NSE filing, 14 Nov): revenue +18% YoY, EBITDA margin 16.2% vs 14.8%. Profit includes a one-time gain. Management cut volume guidance on the concall. Risks: receivables, guidance cut. Not a recommendation; do your own research."],
+  ["Company announcement (professional)", "DEF Ltd informs the exchange that it has received an order worth ₹420 crore from a state utility, to be executed over 24 months. (Source: BSE corporate announcement)"],
+];
+const PAIRS = [
+  ["🚀 XYZ to the moon! Insider says big order tomorrow. Buy before it's too late!!", "XYZ filed a BSE announcement today: ₹310 cr order from Indian Railways, execution over 18 months. Order book now 2.4x annual revenue.", 1],
+  ["Q3 results: revenue +9% YoY, margins down 120 bps on raw material costs. Management expects recovery in Q4. Source: NSE filing.", "Aaj ka jackpot 💰 result se pehle hi le lo, 20% pakka upar jayega!!", 0],
+  ["SEBI-registered RA (INH000012345) note: valuation stretched at 45x P/E; risks include high debt. Not a recommendation.", "Only for our premium members 🔒 3 stocks that will double this month. Join now, one-time fee ₹999 only!", 0],
+  ["Breaking 🔥 Operators entering ABC, UC lagega kal! Sab log le rahe hain 🚀🚀", "ABC annual report: debt reduced from ₹800 cr to ₹520 cr; promoter pledge fell to 0%. Interest cover improved to 4.1x.", 1],
+];
+const S = K.store("fomo_v1", { msg: "" });
+$("#samples").innerHTML = SAMPLES.map(([h, t], i) => `<button class="smp" data-s="${i}"><b>${esc(h)}</b>${esc(t.length > 120 ? t.slice(0, 120) + "…" : t)}</button>`).join("");
+$("#legend").innerHTML = Object.values(CATS).map(([n, c]) => `<span><i style="background:${c}"></i>${n}</span>`).join("") + `<span><i style="background:rgba(34,211,154,.6)"></i>✅ Professional signal</span>`;
+function analyse(text) {
+  const hits = [];
+  RULES.forEach(([cat, w, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(text))) { hits.push({ s: m.index, e: m.index + m[0].length, cat, w, t: m[0] }); if (!m[0].length) re.lastIndex++; } });
+  EMOJI.lastIndex = 0; let m, em = 0; while ((m = EMOJI.exec(text))) { em++; if (em <= 6) hits.push({ s: m.index, e: m.index + m[0].length, cat: "emoji", w: 3, t: m[0] }); }
+  const pro = []; PRO.forEach(([re, label]) => { re.lastIndex = 0; let x; while ((x = re.exec(text))) { pro.push({ s: x.index, e: x.index + x[0].length, label, t: x[0] }); } });
+  const caps = (text.match(/\b[A-Z]{4,}\b/g) || []).filter(w => !/^(NSE|BSE|SEBI|EBITDA|YOY|QOQ|FY\d+|INR|NIFTY|BANK|DYOR)$/.test(w)).length, bangs = (text.match(/!{2,}/g) || []).length;
+  hits.sort((a, b) => a.s - b.s || b.e - a.e); const clean = []; hits.forEach(h => { if (!clean.length || h.s >= clean[clean.length - 1].e) clean.push(h); });
+  let score = clean.reduce((a, h) => a + h.w, 0) + Math.min(10, caps * 2) + Math.min(8, bangs * 3);
+  const proKinds = new Set(pro.map(p => p.label)); score -= proKinds.size * 10;
+  score = Math.max(0, Math.min(100, Math.round(score * 1.1)));
+  return { hits: clean, pro, proKinds: [...proKinds], score, caps, bangs };
+}
+function render() {
+  const text = S.msg, A = analyse(text);
+  // preview with marks
+  const marks = [...A.hits.map(h => ({ ...h, col: CATS[h.cat][1] })), ...A.pro.map(p => ({ ...p, pro: true }))].sort((a, b) => a.s - b.s);
+  let out = "", pos = 0; marks.forEach(mk => { if (mk.s < pos) return; out += esc(text.slice(pos, mk.s)); out += mk.pro ? `<mark class="pro" title="${esc(mk.label)}">${esc(text.slice(mk.s, mk.e))}</mark>` : `<mark style="background:${mk.col}55;box-shadow:inset 0 -2px ${mk.col}" title="${esc(CATS[mk.cat][0])}">${esc(text.slice(mk.s, mk.e))}</mark>`; pos = mk.e; });
+  out += esc(text.slice(pos));
+  $("#preview").innerHTML = text.trim() ? out : `<span style="color:var(--muted)">Highlighted message appears here.</span>`;
+  $("#needle").style.left = `calc(${A.score}% - 3px)`;
+  $("#cnt").textContent = text.trim() ? `${A.hits.length} trap word${A.hits.length === 1 ? "" : "s"}` : "";
+  const V = !text.trim() ? ["—", "Paste a message", "Try one of the samples to see how it works.", "#8b93a7"] : A.score >= 70 ? [A.score, "🚨 FOMO TRAP", "This message is built to rush you. Don't act on it. If the stock still interests you, research it yourself tomorrow.", "#ff5470"] : A.score >= 35 ? [A.score, "⚠️ HEAVY HYPE", "Several pressure words. Slow down, find the original source and check the chart before doing anything.", "#febc2e"] : A.score >= 15 ? [A.score, "🤔 SOME HYPE", "A bit of excitement. Check whether the facts are backed by a filing or real numbers.", "#febc2e"] : [A.score, "✅ LOOKS PROFESSIONAL", "Calm, factual tone. Still verify the source and do your own research; a calm tone doesn't make it a good trade.", "#22d39a"];
+  $("#vbox").style.borderColor = V[3] + "88"; $("#vbox").style.background = V[3] + "14";
+  $("#vbox").innerHTML = `<b style="color:${V[3]}">${V[0]}${typeof V[0] === "number" ? "<small style='font-size:1rem;color:var(--muted)'>/100</small>" : ""}</b><span style="color:${V[3]}">${V[1]}</span><p>${V[2]}</p>`;
+  const byCat = {}; A.hits.forEach(h => (byCat[h.cat] ||= []).push(h.t));
+  $("#hits").innerHTML = Object.entries(byCat).map(([c, ws]) => `<div class="hit"><i style="background:${CATS[c][1]}"></i><div><b>${CATS[c][0]}</b>: ${[...new Set(ws.map(w => w.toLowerCase()))].map(w => `“${esc(w)}”`).join(", ")}<br/><span style="color:var(--muted)">${CATS[c][2]}</span></div></div>`).join("")
+    + (A.caps >= 2 ? `<div class="hit"><i style="background:#ff9f43"></i><div><b>🔠 SHOUTING IN CAPS</b> (${A.caps} words)<br/><span style="color:var(--muted)">Capital letters are used to create excitement, not information</span></div></div>` : "")
+    + A.proKinds.map(k => `<div class="hit"><i style="background:#22d39a"></i><div><b>${k}</b><br/><span style="color:var(--muted)">A good sign. Still verify it yourself.</span></div></div>`).join("");
+  S.save(); return A;
+}
+$("#msg").value = S.msg; $("#msg").addEventListener("input", e => { S.msg = e.target.value; render(); });
+$("#samples").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; S.msg = SAMPLES[+b.dataset.s][1]; $("#msg").value = S.msg; render(); });
+if (!S.msg) { S.msg = SAMPLES[0][1]; $("#msg").value = S.msg; }
+/* game */
+let gi = 0, gs = 0, gAns = false;
+function drawGame() {
+  if (gi >= PAIRS.length) { $("#game").innerHTML = `<div style="text-align:center"><div style="font-size:2.4rem">${gs === PAIRS.length ? "🏆" : "👍"}</div><h3 style="font:800 1.2rem 'Space Grotesk'">You spotted ${gs} of ${PAIRS.length}</h3><p style="color:#cfd3df;margin:6px 0 12px">Professional messages give a source, real numbers and risks. Hype gives urgency, guarantees and emojis.</p><button class="btn primary" id="gAgain">↺ Play again</button></div>`; return; }
+  const [a, b] = PAIRS[gi]; gAns = false;
+  $("#game").innerHTML = `<div style="font:600 .74rem 'JetBrains Mono';color:var(--muted)">ROUND ${gi + 1} / ${PAIRS.length} · SCORE ${gs}</div><div class="pair"><button data-g="0">${esc(a)}</button><button data-g="1">${esc(b)}</button></div><div class="res" id="gres"></div>`;
+}
+$("#game").addEventListener("click", e => {
+  if (e.target.closest("#gAgain")) { gi = 0; gs = 0; drawGame(); return; }
+  if (e.target.closest("#gNext")) { gi++; drawGame(); return; }
+  const b = e.target.closest("[data-g]"); if (!b || gAns) return; gAns = true; const good = PAIRS[gi][2], ok = +b.dataset.g === good; if (ok) gs++;
+  $("#game").querySelectorAll("[data-g]").forEach(x => x.classList.add(+x.dataset.g === good ? "right" : "wrong"));
+  const bad = PAIRS[gi][1 - good], A = analyse(bad);
+  $("#gres").innerHTML = `${ok ? "✅ Right!" : "❌ The other one is professional."} The hype message scores <b>${A.score}/100</b>: ${[...new Set(A.hits.map(h => CATS[h.cat][0]))].join(", ") || "pressure tone"}. <button class="btn" id="gNext" style="padding:8px 14px;margin-left:6px">${gi + 1 >= PAIRS.length ? "See score →" : "Next →"}</button>`;
+});
+/* share */
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/fomo/";
+function buildText() {
+  const A = analyse(S.msg);
+  return ["🚨 *FOMO Trap Detector*", "", S.msg.trim() ? `I checked a stock message: hype score *${A.score}/100*${A.hits.length ? ` (${[...new Set(A.hits.map(h => CATS[h.cat][0]))].join(", ")})` : ""}.` : "", "", "Words like *\"don't miss\"*, *\"aaj ka dhamaka\"*, *\"100% sure\"* and 🚀 are built to rush you. Professional info gives a source, numbers and risks.", "", "Paste any tip and check it before you act 👇", url(), ...K.signoff("fomo", "Check a tip", "").slice(1, -1)].filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n");
+}
+async function drawImg() {
+  await K.loadFonts?.(); const A = analyse(S.msg), W = 1080, H = 1350, col = A.score >= 70 ? "#ff5470" : A.score >= 15 ? "#febc2e" : "#22d39a", { c, ctx } = K.canvas(W, H, [[col + "40", .1, .05, .6], ["rgba(124,92,255,0.14)", .95, .95, .5]]); K.brand(ctx);
+  K.txt(ctx, "FOMO TRAP DETECTOR", 70, 186, `700 26px ${K.F.MONO}`, "#febc2e");
+  K.panel(ctx, 70, 220, W - 140, 520, 26, "rgba(11,20,26,.9)", "rgba(255,255,255,.12)");
+  ctx.font = `500 30px ${K.F.INTER}`; let y = 280; S.msg.split("\n").flatMap(p => K.wrap(ctx, p || " ", W - 220)).slice(0, 11).forEach(l => { K.txt(ctx, l, 110, y, `500 30px ${K.F.INTER}`, "#e9edef"); y += 42; });
+  K.txt(ctx, String(A.score), 70, 880, `800 150px ${K.F.GROT}`, col); K.txt(ctx, "/100 hype", 70 + ctx.measureText(String(A.score)).width + 20, 880, `700 36px ${K.F.MONO}`, "#8b93a7");
+  K.txt(ctx, A.score >= 70 ? "🚨 FOMO TRAP: don't act on it" : A.score >= 15 ? "⚠️ Hype: verify before acting" : "✅ Looks professional: still verify", 70, 950, `800 40px ${K.F.GROT}`, col);
+  let px = 70, py = 1000; [...new Set(A.hits.map(h => CATS[h.cat][0]))].forEach(n => { const w = K.pill(ctx, n, px, py, "#ff9aab", 22); px += w + 12; if (px > W - 300) { px = 70; py += 60; } });
+  K.footer(ctx, W, H, K.toolUrl("fomo"), "Sample/fictional messages · Education only · Not SEBI registered", true); return c;
+}
+K.share({ text: buildText, draw: drawImg, file: () => "fomo-check", imgLabel: "Share result as image" });
+render(); drawGame();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

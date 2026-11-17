@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>The Money Ladder — what to do before you start trading</title>
+<meta name="description" content="For beginners: health insurance first, then term insurance, a 6-month emergency fund, clearing costly debt, building a SIP corpus, and only then trading with risk capital. With calculators and an 'Am I ready to trade?' check." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #7c5cff; }
+  .wrap { max-width: 1000px; }
+  .ladder { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .rungs { position: sticky; top: 14px; display: flex; flex-direction: column-reverse; gap: 6px; }
+  .rung { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--card); cursor: pointer; text-align: left; color: inherit; font: inherit; }
+  .rung .n { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 1.3rem; background: rgba(255,255,255,.06); }
+  .rung b { font: 700 .92rem "Space Grotesk"; display: block; }
+  .rung small { color: var(--muted); font-size: .72rem; }
+  .rung .ck { font: 800 .9rem Inter; color: var(--muted); }
+  .rung.ok { border-color: rgba(34,211,154,.55); background: rgba(34,211,154,.08); } .rung.ok .ck { color: var(--up); }
+  .rung.cur { box-shadow: 0 0 0 3px rgba(124,92,255,.35); border-color: rgba(124,92,255,.7); }
+  .rung.trade { border-style: dashed; }
+  .ready { border-radius: 18px; padding: 14px; text-align: center; border: 1px solid; margin-top: 4px; }
+  .ready b { display: block; font: 800 1.15rem "Space Grotesk"; }
+  .ready small { color: #cfd3df; font-size: .8rem; }
+  .step { border-radius: 24px; padding: 20px; border: 1px solid var(--line); background: var(--card); margin-bottom: 14px; scroll-margin-top: 14px; }
+  .step .hd { display: flex; align-items: center; gap: 12px; }
+  .step .hd .n { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 1.6rem; background: rgba(255,255,255,.06); border: 1px solid var(--line); flex: none; }
+  .step .hd small { font: 700 .68rem "JetBrains Mono"; letter-spacing: .1em; color: var(--acc); }
+  .step h2 { font: 800 1.3rem/1.2 "Space Grotesk"; }
+  .step .why { color: #d5d9e4; margin: 12px 0; line-height: 1.6; font-size: .93rem; }
+  .step ul { padding-left: 20px; display: grid; gap: 6px; font-size: .88rem; color: #cfd3df; line-height: 1.5; }
+  .step ul b { color: #fff; }
+  .calc2 { margin-top: 14px; border-radius: 18px; padding: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+  .calc2 h4 { font: 700 .92rem "Space Grotesk"; margin-bottom: 8px; }
+  .out { margin-top: 10px; border-radius: 14px; padding: 12px 14px; background: rgba(34,211,154,.08); border: 1px solid rgba(34,211,154,.35); font-size: .9rem; line-height: 1.5; }
+  .out b { font: 800 1.25rem "Space Grotesk"; color: #fff; }
+  .done-btn { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .done-btn button { border: 1.5px solid var(--line); background: rgba(255,255,255,.04); color: #fff; border-radius: 12px; padding: 11px 14px; font: 700 .86rem Inter; cursor: pointer; }
+  .done-btn button.on { border-color: var(--up); background: rgba(34,211,154,.15); }
+  .avoid { margin-top: 12px; border-radius: 14px; padding: 11px 13px; border: 1px solid rgba(255,84,112,.35); background: rgba(255,84,112,.06); font-size: .84rem; color: #ffd0d8; line-height: 1.5; }
+  @media (max-width: 820px) { .ladder { grid-template-columns: 1fr; } .rungs { position: static; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../goals/">🎯 Goal planner</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Climb the <span class="grad">money ladder</span> first.</h1>
+    <p class="sub">Most beginners start at the top, with trading, and fall off. Build the ladder from the bottom: protect your health and family, keep a cushion, invest steadily, and only then trade with money you can afford to lose. Tick each rung as you complete it.</p>
+    <div class="ladder">
+      <aside class="rungs" id="rungs"></aside>
+      <div id="steps"></div>
+    </div>
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or an insurance advisor. This is general education, not personal financial advice; cover amounts and percentages are common rules of thumb, not recommendations for your situation. Read policy documents carefully and consult a qualified adviser for your needs.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const S = K.store("ladder_v1", { done: {}, income: "", expenses: "", loans: "", assets: "", deps: "yes", months: "6", portfolio: "" });
+const STEPS = [
+  { id: "health", ico: "🏥", t: "Health insurance", s: "protect against medical bills", why: "One hospital stay can cost lakhs and wipe out years of savings, or force you to sell investments at the worst time. Health insurance comes first because illness doesn't wait for you to be ready.",
+    pts: ["Buy <b>your own family floater</b>, even if your employer covers you: company cover ends when the job does.", "Common guidance in cities: <b>₹10 lakh+</b> base cover for a family, then add a <b>super top-up</b> (cheap way to reach ₹25–50 lakh).", "Check: no or low <b>room-rent limits</b>, short waiting periods for existing illnesses, no co-payment, good claim-settlement record.", "Buy young and healthy: premiums are lower and fewer conditions are excluded.", "Parents: a separate policy so their claims don't use up your family's cover."],
+    avoid: "Don't rely only on employer insurance, and don't pick the cheapest policy without reading the room-rent and co-pay clauses." },
+  { id: "term", ico: "🛡️", t: "Term insurance", s: "if anyone depends on your income", why: "If someone depends on your income (spouse, children, parents), a term plan replaces that income if something happens to you. It's pure protection: a large cover for a small premium.",
+    pts: ["Cover of roughly <b>10–15× your annual income</b>, plus outstanding loans, minus investments you already have.", "Cover <b>till 60–65</b> (your working years).", "Buy a <b>pure term plan</b> online, disclose health and habits honestly so claims aren't rejected.", "No dependents yet? You can wait, but buying young locks in a low premium."],
+    calc: "term", avoid: "Avoid endowment, money-back and ULIP plans as life cover: low cover, low returns. Insurance and investment work better separately." },
+  { id: "emergency", ico: "🛟", t: "6-month emergency fund", s: "a cushion for job loss or surprises", why: "Job loss, a medical deductible, a family emergency: without a cushion you'll break your SIPs or sell stocks in a crash. The emergency fund means bad luck doesn't become a financial disaster.",
+    pts: ["Keep <b>6 months of expenses</b> (9–12 if you're self-employed or the only earner).", "Where: savings account + sweep-in FD + a <b>liquid fund</b>. Safe and quick to withdraw.", "Not in stocks, crypto or long-term FDs with penalties.", "Refill it after you use it."],
+    calc: "emergency", avoid: "Don't count your trading account or stock holdings as an emergency fund: they can be down 30% exactly when you need them." },
+  { id: "debt", ico: "💳", t: "Clear costly debt", s: "credit cards, personal loans", why: "Credit cards charge around 36–42% a year; personal loans often 12–24%. Paying them off is a guaranteed 'return' no stock or trade can promise.",
+    pts: ["Pay off <b>credit-card balances</b> in full every month.", "Close <b>personal loans and consumer EMIs</b> before investing heavily.", "Home loans and education loans at reasonable rates can run alongside investing.", "Never borrow to trade or invest."],
+    avoid: "Never trade with borrowed money, a credit card or a personal loan. Losses plus interest is the fastest way into a debt trap." },
+  { id: "sip", ico: "📈", t: "SIP & build a corpus", s: "steady long-term investing", why: "Now grow your money steadily. A monthly SIP in a low-cost index fund builds a corpus through compounding, without needing to pick stocks or time the market.",
+    pts: ["Start a <b>SIP in a Nifty 50 / Nifty Next 50 index fund or ETF</b>; add a flexi-cap fund if you like.", "<b>Step it up 10% every year</b> as your income grows.", "Link SIPs to goals: house, children, retirement (use the <a href=\"../goals/\" style=\"color:var(--acc)\">Goal planner</a>).", "Stay invested through falls: that's when SIPs buy more units.", "Build at least 6–12 months of steady investing, and a corpus you're proud of, before trading."],
+    avoid: "Don't stop SIPs when the market falls. That's exactly when they work hardest." },
+  { id: "trade", ico: "🎯", t: "Then start trading", s: "only with risk capital", why: "With your family protected, a cushion ready and a corpus growing, trading losses can't hurt your life. Now you can learn to trade calmly, with money you can afford to lose.",
+    pts: ["Use <b>risk capital only</b>: a common rule is no more than <b>5–10% of your investments</b>.", "Start with the <b>cash market</b> and small size; skip F&O until you're consistently profitable.", "Risk at most <b>1% of trading capital per trade</b>, always with a stop-loss.", "Use the <a href=\"../checklist/\" style=\"color:var(--acc)\">pre-trade checklist</a>, <a href=\"../journal/\" style=\"color:var(--acc)\">journal</a> and <a href=\"../day-review/\" style=\"color:var(--acc)\">day review</a>.", "Never move money from SIPs or the emergency fund into trading."],
+    calc: "trade", avoid: "Don't add more money to trading to 'win back' losses. If the trading account halves, stop and review." },
+];
+const fmt = v => "₹" + Math.round(v).toLocaleString("en-IN");
+function calcHTML(kind) {
+  if (kind === "term") return `<div class="calc2"><h4>🧮 How much term cover?</h4><div class="cols3"><div><div class="q">Annual income ₹</div><label class="field sm"><input data-k="income" type="text" inputmode="decimal" placeholder="12,00,000" value="${esc(S.income)}" /></label></div><div><div class="q">Loans ₹</div><label class="field sm"><input data-k="loans" type="text" inputmode="decimal" placeholder="25,00,000" value="${esc(S.loans)}" /></label></div><div><div class="q">Investments ₹</div><label class="field sm"><input data-k="assets" type="text" inputmode="decimal" placeholder="5,00,000" value="${esc(S.assets)}" /></label></div></div><div class="out" id="out-term"></div></div>`;
+  if (kind === "emergency") return `<div class="calc2"><h4>🧮 Your emergency fund</h4><div class="cols2"><div><div class="q">Monthly expenses ₹</div><label class="field sm"><input data-k="expenses" type="text" inputmode="decimal" placeholder="50,000" value="${esc(S.expenses)}" /></label></div><div><div class="q">Months</div><label class="field sm"><input data-k="months" type="text" inputmode="numeric" placeholder="6" value="${esc(S.months)}" /></label></div></div><div class="out" id="out-emergency"></div></div>`;
+  if (kind === "trade") return `<div class="calc2"><h4>🧮 Your trading capital limit</h4><div><div class="q">Total investments (SIPs, stocks, FDs) ₹</div><label class="field sm"><input data-k="portfolio" type="text" inputmode="decimal" placeholder="10,00,000" value="${esc(S.portfolio)}" /></label></div><div class="out" id="out-trade"></div></div>`;
+  return "";
+}
+function outs() {
+  const inc = num(S.income), loans = num(S.loans) || 0, assets = num(S.assets) || 0, o1 = $("#out-term");
+  if (o1) o1.innerHTML = inc > 0 ? `Suggested cover: <b>${fmt(Math.max(0, inc * 10 + loans - assets))} – ${fmt(Math.max(0, inc * 15 + loans - assets))}</b><br/><span style="color:var(--muted);font-size:.8rem">10–15× income + loans − investments. Round up to the next ₹25–50 lakh.</span>` : "Enter your annual income to see a suggested cover.";
+  const ex = num(S.expenses), m = Math.max(1, Math.floor(num(S.months)) || 6), o2 = $("#out-emergency");
+  if (o2) o2.innerHTML = ex > 0 ? `Keep about <b>${fmt(ex * m)}</b> ready (${m} months).<br/><span style="color:var(--muted);font-size:.8rem">Split: ~1 month in savings, the rest in a sweep-in FD or liquid fund.</span>` : "Enter your monthly expenses.";
+  const pf = num(S.portfolio), o3 = $("#out-trade");
+  if (o3) o3.innerHTML = pf > 0 ? `Trading capital: at most <b>${fmt(pf * .05)} – ${fmt(pf * .1)}</b><br/><span style="color:var(--muted);font-size:.8rem">5–10% of investments. At 1% risk per trade, a stop-loss costs about ${fmt(pf * .0005)}–${fmt(pf * .001)} per trade.</span>` : "Enter the value of your investments.";
+}
+function drawRungs() {
+  const nDone = STEPS.slice(0, 5).filter(s => S.done[s.id]).length, next = STEPS.find(s => !S.done[s.id]);
+  const ready = nDone === 5;
+  $("#rungs").innerHTML = STEPS.map((s, i) => `<button class="rung ${S.done[s.id] ? "ok" : ""} ${next && next.id === s.id ? "cur" : ""} ${s.id === "trade" ? "trade" : ""}" data-go="${s.id}"><span class="n">${s.ico}</span><span><b>${i + 1}. ${s.t}</b><small>${s.s}</small></span><span class="ck">${S.done[s.id] ? "✓" : ""}</span></button>`).join("")
+    .concat(`<div class="ready" style="order:99;border-color:${ready ? "rgba(34,211,154,.55)" : "rgba(254,188,46,.5)"};background:${ready ? "rgba(34,211,154,.08)" : "rgba(254,188,46,.07)"}"><b style="color:${ready ? "var(--up)" : "var(--warn)"}">${ready ? "✅ Ready to start trading" : `⏳ ${nDone} of 5 foundations done`}</b><small>${ready ? "Trade with risk capital only, small size, stop-loss always." : `Next: ${next.ico} ${next.t}. Trading comes after the 5 foundations.`}</small></div>`);
+}
+function drawSteps() {
+  $("#steps").innerHTML = STEPS.map((s, i) => `<section class="step" id="st-${s.id}"><div class="hd"><span class="n">${s.ico}</span><div><small>RUNG ${i + 1} OF 6</small><h2>${s.t}</h2></div></div>
+    <p class="why">${s.why}</p><ul>${s.pts.map(p => `<li>${p}</li>`).join("")}</ul>${calcHTML(s.calc)}<div class="avoid">🚫 ${s.avoid}</div>
+    <div class="done-btn"><button data-done="${s.id}" class="${S.done[s.id] ? "on" : ""}">${S.done[s.id] ? "✅ Done" : "☐ Mark this rung done"}</button>${s.id === "term" ? `<button data-done="term-na" class="${S.done.term && S.done["term-na"] ? "on" : ""}" style="font-weight:600">Nobody depends on my income yet</button>` : ""}</div></section>`).join("");
+  outs();
+}
+$("#rungs").addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) $("#st-" + b.dataset.go).scrollIntoView({ behavior: "smooth", block: "start" }); });
+$("#steps").addEventListener("click", e => {
+  const b = e.target.closest("[data-done]"); if (!b) return; const id = b.dataset.done;
+  if (id === "term-na") { S.done.term = !S.done["term-na"]; S.done["term-na"] = !S.done["term-na"]; } else { S.done[id] = !S.done[id]; if (id === "term" && !S.done.term) S.done["term-na"] = false; }
+  if (id === "trade" && S.done.trade && STEPS.slice(0, 5).some(s => !S.done[s.id])) K.toast("Finish the first 5 rungs before trading 🙂", 2600);
+  S.save(); drawRungs(); drawSteps();
+});
+$("#steps").addEventListener("input", e => { const k = e.target.dataset.k; if (!k) return; K.fmtNum(e.target, k === "months" ? 0 : 2); S[k] = e.target.value; S.save(); outs(); });
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/money-ladder/";
+function buildText() {
+  return ["🪜 *The Money Ladder: do this before you trade*", "", ...STEPS.map((s, i) => `${S.done[s.id] ? "✅" : "⬜"} ${i + 1}. ${s.ico} *${s.t}*: ${s.s}`), "", "Most beginners start at the top (trading) and fall. Build from the bottom 👇", url(), ...K.signoff("money-ladder", "Climb yours", "").slice(1, -1)].join("\n");
+}
+async function drawImg() {
+  await K.loadFonts?.(); const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "BEFORE YOU START TRADING", 70, 186, `700 26px ${K.F.MONO}`, "#22d39a"); K.txt(ctx, "The Money Ladder", 70, 250, `800 64px ${K.F.GROT}`, "#fff");
+  let y = 1080; STEPS.forEach((s, i) => { const done = S.done[s.id], col = s.id === "trade" ? "#7c5cff" : "#22d39a"; K.panel(ctx, 70 + i * 22, y - 110, W - 140 - i * 44, 120, 22, done ? col + "22" : "rgba(255,255,255,.05)", done ? col + "99" : "rgba(255,255,255,.15)");
+    K.txt(ctx, s.ico, 100 + i * 22, y - 32, `52px ${K.F.INTER}`, "#fff"); K.txt(ctx, `${i + 1}. ${s.t}`, 180 + i * 22, y - 54, `800 34px ${K.F.GROT}`, "#fff"); K.txt(ctx, s.s, 180 + i * 22, y - 16, `500 24px ${K.F.INTER}`, "#cfd3df"); if (done) K.txt(ctx, "✓", W - 110 - i * 22, y - 36, `800 44px ${K.F.INTER}`, col, "right"); y -= 140; });
+  K.txt(ctx, "Build from the bottom. Trade last.", W / 2, 1150, `700 34px ${K.F.GROT}`, "#febc2e", "center");
+  K.footer(ctx, W, H, K.toolUrl("money-ladder"), "General education · Not financial advice · Not SEBI registered", true); return c;
+}
+K.share({ text: buildText, draw: drawImg, file: () => "money-ladder", imgLabel: "Share my ladder" });
+drawRungs(); drawSteps();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

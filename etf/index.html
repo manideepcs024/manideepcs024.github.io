@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>ETFs explained — how they work, types and why they're a smart core</title>
+<meta name="description" content="What an ETF is, how it works (NAV, iNAV, market makers), types of ETFs in India (index, sector, smart beta, gold, silver, debt, international), ETF vs mutual fund, risks to watch and how to buy one well. With a cost calculator and a fair-price checker." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #7c5cff; }
+  .wrap { max-width: 1060px; }
+  .sec2 { margin-top: 26px; }
+  .sec2 > h2 { font: 800 1.4rem "Space Grotesk"; margin-bottom: 4px; }
+  .sec2 > p.l { color: var(--muted); font-size: .92rem; margin-bottom: 12px; line-height: 1.55; max-width: 800px; }
+  .flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+  .flow div { border-radius: 18px; padding: 14px 12px; text-align: center; border: 1px solid var(--line); background: var(--card); font-size: .82rem; color: #cfd3df; line-height: 1.45; position: relative; }
+  .flow div b { display: block; font-size: 1.7rem; margin-bottom: 4px; }
+  .flow div strong { display: block; color: #fff; font: 700 .92rem "Space Grotesk"; margin-bottom: 4px; }
+  .flow div:not(:last-child)::after { content: "→"; position: absolute; right: -9px; top: 50%; transform: translateY(-50%); color: var(--acc); font-weight: 800; z-index: 1; }
+  .types { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .ty { border-radius: 20px; padding: 16px; border: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
+  .ty::before { content: ""; position: absolute; inset: 0; background: radial-gradient(300px circle at 0 0, var(--c), transparent 60%); opacity: .14; pointer-events: none; }
+  .ty .h { display: flex; gap: 10px; align-items: center; }
+  .ty .h span { font-size: 1.6rem; }
+  .ty b { font: 800 1.02rem "Space Grotesk"; }
+  .ty p { font-size: .85rem; color: #cfd3df; line-height: 1.5; }
+  .ty .eg { font: 500 .74rem "JetBrains Mono"; color: var(--muted); line-height: 1.5; }
+  .ty .use { font-size: .78rem; color: #9be8c9; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: .86rem; border-radius: 18px; overflow: hidden; }
+  table.cmp th, table.cmp td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: left; vertical-align: top; }
+  table.cmp th { font: 700 .74rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); background: rgba(255,255,255,.03); }
+  table.cmp td:first-child { color: #fff; font-weight: 600; }
+  .tblwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .box2 { border-radius: 20px; padding: 16px 18px; border: 1px solid; }
+  .box2 h3 { font: 800 1.05rem "Space Grotesk"; margin-bottom: 8px; }
+  .box2 ul { padding-left: 18px; display: grid; gap: 6px; font-size: .88rem; color: #d5d9e4; line-height: 1.5; }
+  .box2 ul b { color: #fff; }
+  .good { border-color: rgba(34,211,154,.45); background: rgba(34,211,154,.06); } .bad { border-color: rgba(254,188,46,.5); background: rgba(254,188,46,.06); }
+  .tool2 { border-radius: 22px; padding: 18px; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.1), rgba(0,224,184,.05)); }
+  .tool2 h3 { font: 800 1.1rem "Space Grotesk"; }
+  .tool2 p.d { color: var(--muted); font-size: .85rem; margin: 4px 0 8px; }
+  .res2 { margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .res2 div { border-radius: 14px; padding: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .res2 span { display: block; font: 600 .64rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+  .res2 b { font: 800 1.15rem "Space Grotesk"; overflow-wrap: anywhere; }
+  .note2 { margin-top: 10px; font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .steps2 { display: grid; gap: 8px; counter-reset: s; }
+  .steps2 div { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); font-size: .88rem; color: #cfd3df; line-height: 1.5; }
+  .steps2 div::before { counter-increment: s; content: counter(s); width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: rgba(0,224,184,.15); color: var(--acc); font: 800 .9rem "Space Grotesk"; }
+  .steps2 b { color: #fff; }
+  @media (max-width: 860px) { .flow { grid-template-columns: 1fr 1fr; } .flow div::after { display: none; } .two, .res2 { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../money-ladder/">🪜 Money ladder</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>ETFs, <span class="grad">simply explained.</span></h1>
+    <p class="sub">An ETF (Exchange Traded Fund) lets you buy a whole basket of stocks, gold or bonds in one click, at a very low cost, through your demat account. One Nifty 50 ETF unit = a tiny slice of all 50 Nifty companies. Here's how they work, the different types, and how to choose one well.</p>
+
+    <section class="sec2">
+      <h2>⚙️ How an ETF works</h2>
+      <p class="l">An ETF is a mutual fund that is listed on the stock exchange. You buy and sell it like a share, during market hours, at the live price.</p>
+      <div class="flow">
+        <div><b>🏦</b><strong>Fund house (AMC)</strong>launches an ETF that tracks an index, say Nifty 50.</div>
+        <div><b>🧺</b><strong>Basket</strong>the AMC holds the same stocks as the index, in the same weights.</div>
+        <div><b>🔁</b><strong>Market makers</strong>create or redeem units in large blocks, keeping the price close to the basket's value.</div>
+        <div><b>📈</b><strong>Exchange</strong>units trade on NSE/BSE all day; you see a live price and the iNAV.</div>
+        <div><b>🙋</b><strong>You</strong>buy from your demat account, hold as long as you want, sell any trading day.</div>
+      </div>
+      <div class="two" style="margin-top:12px">
+        <div class="box2 good"><h3>📏 NAV vs market price vs iNAV</h3><ul><li><b>NAV</b>: value of the basket, calculated once a day after the close.</li><li><b>iNAV</b> (indicative NAV): the basket's value updated every few seconds during the day. Shown on the AMC/NSE website.</li><li><b>Market price</b>: what buyers and sellers are paying right now. In a liquid ETF it stays very close to iNAV.</li></ul></div>
+        <div class="box2 good"><h3>📐 Tracking error &amp; difference</h3><ul><li><b>Tracking difference</b>: how much the ETF's return lagged the index over a year (mostly its costs).</li><li><b>Tracking error</b>: how jumpy that gap is. Lower is better for both.</li><li>A good Nifty 50 ETF trails the index by only a small fraction of a percent a year.</li></ul></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧩 Types of ETFs in India</h2>
+      <p class="l">Examples are well-known ETFs for learning, not recommendations. Always check liquidity, costs and the latest details before buying.</p>
+      <div class="types" id="types"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🆚 ETF vs index mutual fund vs buying stocks</h2>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th></th><th>ETF</th><th>Index mutual fund</th><th>Picking stocks yourself</th></tr>
+        <tr><td>How you buy</td><td>On the exchange, needs a demat account</td><td>From the AMC/app, no demat needed</td><td>On the exchange, demat account</td></tr>
+        <tr><td>Price</td><td>Live price all day</td><td>One NAV at day's end</td><td>Live price</td></tr>
+        <tr><td>Yearly cost</td><td>Usually the lowest (often ~0.05–0.3%)</td><td>Low (often ~0.1–0.5%)</td><td>No fund fee, but your time and mistakes</td></tr>
+        <tr><td>SIP</td><td>Possible via broker or buying regularly</td><td>Easiest: auto SIP</td><td>Manual</td></tr>
+        <tr><td>Diversification</td><td>Instant (whole index)</td><td>Instant (whole index)</td><td>Only what you build</td></tr>
+        <tr><td>Watch out for</td><td>Low volume, wide bid-ask, premium to iNAV</td><td>Slightly higher cost than ETF</td><td>Concentration, emotional decisions</td></tr>
+      </table></div>
+    </section>
+
+    <section class="sec2">
+      <div class="two">
+        <div class="box2 good"><h3>✅ Why ETFs are better for many investors</h3><ul>
+          <li><b>Very low cost</b>: no expensive fund manager; the saving compounds for decades.</li>
+          <li><b>No fund-manager risk</b>: it follows the index, so there's no bad stock-picking.</li>
+          <li><b>Instant diversification</b>: 50 or 100 companies in one unit.</li>
+          <li><b>Transparent</b>: you know exactly what it holds.</li>
+          <li><b>Flexible</b>: buy or sell any time the market is open, no exit load.</li>
+          <li><b>Easy asset mix</b>: equity, gold, silver and bonds all from one demat account.</li></ul></div>
+        <div class="box2 bad"><h3>⚠️ What to watch out for</h3><ul>
+          <li><b>Liquidity</b>: low-volume ETFs can have a wide gap between buy and sell prices.</li>
+          <li><b>Premium / discount</b>: in a rush, the price can trade well above iNAV. Don't overpay.</li>
+          <li><b>Brokerage &amp; demat charges</b> apply, unlike a direct mutual fund.</li>
+          <li><b>Sector &amp; thematic ETFs</b> are concentrated and volatile; they're not a core holding.</li>
+          <li><b>International ETFs</b> can trade at big premiums when overseas investment limits are hit.</li>
+          <li>An ETF follows the index <b>down</b> too; it's not a safe-return product.</li></ul></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧮 Try it</h2>
+      <div class="two">
+        <div class="tool2"><h3>💸 What does cost do over the years?</h3><p class="d">Same returns before costs: compare a low-cost ETF with a higher-cost fund.</p>
+          <div class="cols2"><div><div class="q">Monthly SIP ₹</div><label class="field sm"><input id="sip" type="text" inputmode="decimal" placeholder="10,000" /></label></div><div><div class="q">Years</div><label class="field sm"><input id="yrs" type="text" inputmode="numeric" placeholder="20" /></label></div></div>
+          <div class="cols3"><div><div class="q">Market return %</div><label class="field sm"><input id="ret" type="text" inputmode="decimal" placeholder="12" /></label></div><div><div class="q">ETF cost %</div><label class="field sm"><input id="c1" type="text" inputmode="decimal" placeholder="0.05" /></label></div><div><div class="q">Other fund cost %</div><label class="field sm"><input id="c2" type="text" inputmode="decimal" placeholder="1.5" /></label></div></div>
+          <div class="res2" id="costOut"></div><p class="note2" id="costNote"></p></div>
+        <div class="tool2"><h3>🎯 Is this ETF price fair?</h3><p class="d">Check the live price against the iNAV before you place a limit order.</p>
+          <div class="cols2"><div><div class="q">Market price ₹</div><label class="field sm"><input id="px" type="text" inputmode="decimal" placeholder="268.40" /></label></div><div><div class="q">iNAV ₹</div><label class="field sm"><input id="inav" type="text" inputmode="decimal" placeholder="267.90" /></label></div></div>
+          <div class="res2" id="fairOut" style="grid-template-columns:1fr"></div><p class="note2" id="fairNote"></p></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🛒 How to buy an ETF well</h2>
+      <div class="steps2">
+        <div><span><b>Pick the index first</b>, then the ETF: for a core holding, Nifty 50 or Sensex; add Nifty Next 50 or a midcap index for more growth.</span></div>
+        <div><span><b>Compare ETFs on the same index</b>: lower expense ratio, lower tracking error, and higher <b>daily traded volume</b>.</span></div>
+        <div><span><b>Check price vs iNAV</b> on the AMC or NSE website; avoid buying at a big premium.</span></div>
+        <div><span><b>Use a limit order</b> near iNAV, never a market order, especially in the first and last 15 minutes of the day.</span></div>
+        <div><span><b>Buy regularly</b>: a fixed amount every month works like a SIP. Many brokers offer ETF SIPs.</span></div>
+        <div><span><b>Hold for the long term</b> and rebalance once a year between equity, gold and debt.</span></div>
+      </div>
+      <p class="note2" style="margin-top:12px"><b>💰 Tax (simplified):</b> equity ETFs are taxed like equity shares (short-term if sold within 12 months, long-term after that, with the yearly long-term exemption). Gold, silver, debt and international ETFs follow different rules, which have changed in recent Budgets. Use the <a href="../tax/" style="color:var(--acc)">tax estimator</a> for equity, and check current rules for others.</p>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:22px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser. This page is for <b>education only</b>. ETF names are well-known examples, not recommendations; costs, liquidity and tax rules change. Mutual fund and ETF investments are subject to market risks; read all scheme-related documents carefully.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const TYPES = [
+  ["📊", "#00e0b8", "Broad index ETFs", "Track a whole market index: the simplest, lowest-cost core holding for long-term investors.", "Nifty 50 · Sensex · Nifty Next 50 · Nifty Midcap 150", "e.g. Nippon India ETF Nifty BeES, SBI Nifty 50 ETF, ICICI Prudential Nifty 50 ETF", "Core of a long-term portfolio"],
+  ["🏦", "#5b8cff", "Sector & thematic ETFs", "Hold one sector or theme. More concentrated, so bigger swings both ways.", "Bank · IT · PSU Bank · Pharma · Infra · Consumption · Defence", "e.g. Nippon India ETF Bank BeES, IT and PSU Bank ETFs from several AMCs", "Tactical bets on a sector you've researched"],
+  ["🧪", "#b9a6ff", "Smart beta / factor ETFs", "Follow rule-based indices that tilt towards a factor: low volatility, momentum, quality, value or alpha.", "Nifty 100 Low Vol 30 · Nifty 200 Momentum 30 · Nifty Alpha 50", "Offered by several AMCs; check volume carefully", "A satellite next to a core index ETF"],
+  ["🥇", "#febc2e", "Gold ETFs", "Each unit is backed by physical gold held by the fund. No making charges, purity worries or locker.", "Tracks the domestic price of gold", "e.g. Nippon India ETF Gold BeES, gold ETFs from SBI, HDFC, ICICI", "Hedge and diversifier (often 5–15%)"],
+  ["🥈", "#cfd3df", "Silver ETFs", "Backed by physical silver. More volatile than gold, partly an industrial metal.", "Tracks the domestic price of silver", "Offered by several AMCs since 2022", "Small diversifier, volatile"],
+  ["🏛️", "#22d39a", "Debt ETFs", "Hold government or PSU bonds, or overnight/liquid money-market instruments.", "Bharat Bond (target maturity) · Gilt · Liquid / overnight", "e.g. Bharat Bond ETF series, liquid ETFs used to park cash", "Stability, parking money, target-date goals"],
+  ["🌍", "#4fc3f7", "International ETFs", "Give exposure to foreign markets like the US Nasdaq 100 or S&P 500.", "Nasdaq 100 · S&P 500 · other global indices", "e.g. Motilal Oswal Nasdaq 100 ETF", "Global diversification; watch premiums to iNAV"],
+  ["🏭", "#ff9f43", "PSU / CPSE ETFs", "Baskets of government-owned companies, launched by the government to sell stakes.", "CPSE Index · Bharat 22", "e.g. CPSE ETF, Bharat 22 ETF", "PSU theme; cyclical and policy-driven"],
+];
+$("#types").innerHTML = TYPES.map(([i, c, n, d, idx, eg, use]) => `<div class="ty" style="--c:${c}"><div class="h"><span>${i}</span><b>${n}</b></div><p>${d}</p><div class="eg">📈 ${esc(idx)}</div><div class="eg">${esc(eg)}</div><div class="use">🎯 ${use}</div></div>`).join("");
+const S = K.store("etf_v1", { sip: "10,000", yrs: "20", ret: "12", c1: "0.05", c2: "1.5", px: "", inav: "" });
+const fmt = v => v >= 1e7 ? "₹" + (v / 1e7).toFixed(2) + " Cr" : v >= 1e5 ? "₹" + (v / 1e5).toFixed(1) + " L" : "₹" + Math.round(v).toLocaleString("en-IN");
+function fv(sip, yrs, r) { const m = Math.pow(1 + r, 1 / 12) - 1, n = Math.round(yrs * 12); return m ? sip * ((Math.pow(1 + m, n) - 1) / m) * (1 + m) : sip * n; }
+function calc() {
+  const sip = num(S.sip), y = num(S.yrs), r = num(S.ret) / 100, a = num(S.c1) / 100, b = num(S.c2) / 100;
+  if (sip > 0 && y > 0) { const v1 = fv(sip, y, r - a), v2 = fv(sip, y, r - b), inv = sip * 12 * y;
+    $("#costOut").innerHTML = `<div><span>Low-cost ETF</span><b class="up">${fmt(v1)}</b></div><div><span>Higher-cost fund</span><b>${fmt(v2)}</b></div><div><span>Difference</span><b class="warnc">${fmt(v1 - v2)}</b></div>`;
+    $("#costNote").innerHTML = `You'd invest <b>${fmt(inv)}</b> in total. A ${(b * 100 - a * 100).toFixed(2)}% yearly cost gap ends up costing <b>${fmt(v1 - v2)}</b> (${Math.round((v1 - v2) / v1 * 100)}% of the low-cost result). This assumes both earn the same before costs; many active funds trail their index over long periods.`;
+  } else { $("#costOut").innerHTML = ""; $("#costNote").textContent = "Enter a SIP amount and years."; }
+  const px = num(S.px), nav = num(S.inav);
+  if (px > 0 && nav > 0) { const p = (px - nav) / nav * 100, ap = Math.abs(p), col = ap <= .25 ? "up" : ap <= 1 ? "warnc" : "down";
+    $("#fairOut").innerHTML = `<div><span>${p >= 0 ? "Premium over iNAV" : "Discount to iNAV"}</span><b class="${col}">${p >= 0 ? "+" : "−"}${ap.toFixed(2)}%</b></div>`;
+    $("#fairNote").innerHTML = ap <= .25 ? "✅ <b>Fair.</b> The price is very close to the basket's value. Use a limit order near the iNAV." : ap <= 1 ? "⚠️ <b>Slightly off.</b> Check volume and the bid-ask spread; wait, or place a limit order closer to the iNAV." : p > 0 ? "🚨 <b>Big premium.</b> You'd pay well above the basket's value; common in illiquid or international ETFs. Avoid chasing; consider another ETF on the same index or an index fund." : "🚨 <b>Big discount.</b> Unusual; check for low liquidity or a data delay before trading.";
+  } else { $("#fairOut").innerHTML = ""; $("#fairNote").textContent = "Enter the live price and the iNAV (from the AMC or NSE website)."; }
+  S.save();
+}
+["sip", "yrs", "ret", "c1", "c2", "px", "inav"].forEach(k => { const el = $("#" + k); el.value = S[k]; el.addEventListener("input", e => { K.fmtNum(e.target, k === "yrs" ? 0 : 2); S[k] = e.target.value; calc(); }); });
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/etf/";
+function buildText() {
+  return ["📦 *ETFs, simply explained*", "", "An ETF = a basket of stocks, gold or bonds you buy like a share, at a very low cost.", "", "*Types:* 📊 Index · 🏦 Sector · 🧪 Smart beta · 🥇 Gold · 🥈 Silver · 🏛️ Debt · 🌍 International · 🏭 CPSE", "", "*Why many investors prefer them:* low cost, no fund-manager risk, instant diversification, transparent, flexible.", "*Watch out:* low volume, buying at a premium to iNAV, sector ETFs are concentrated.", "", "Tip: always use a limit order near the iNAV 👇", url(), ...K.signoff("etf", "Learn more", "").slice(1, -1)].join("\n");
+}
+async function drawImg() {
+  await K.loadFonts?.(); const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "LEARN · ETFs", 70, 186, `700 26px ${K.F.MONO}`, "#00e0b8"); K.txt(ctx, "ETFs, simply explained", 70, 250, `800 58px ${K.F.GROT}`, "#fff");
+  ctx.font = `500 30px ${K.F.INTER}`; let y = 320; K.wrap(ctx, "A basket of stocks, gold or bonds you buy like a share, at a very low cost.", W - 140).forEach(l => { K.txt(ctx, l, 70, y, `500 30px ${K.F.INTER}`, "#d5d9e4"); y += 42; });
+  y += 20; TYPES.forEach(([i, col, n], k) => { const x = 70 + (k % 2) * 475, yy = y + Math.floor(k / 2) * 100; K.panel(ctx, x, yy, 455, 84, 18, col + "18", col + "66"); K.txt(ctx, i, x + 22, yy + 56, `40px ${K.F.INTER}`, "#fff"); K.txt(ctx, n, x + 82, yy + 52, K.fit(ctx, n, 700, K.F.GROT, 30, 350), "#fff"); });
+  y += 420; ["✅ Low cost · no fund-manager risk · diversified", "⚠️ Check volume · don't pay above iNAV", "🎯 Use a limit order near the iNAV"].forEach(l => { K.txt(ctx, l, 70, y, `600 30px ${K.F.INTER}`, "#e8ecf6"); y += 52; });
+  K.footer(ctx, W, H, K.toolUrl("etf"), "Education only · Not a recommendation · Not SEBI registered", true); return c;
+}
+K.share({ text: buildText, draw: drawImg, file: () => "etf-explained", imgLabel: "Share ETF cheat sheet" });
+calc();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
