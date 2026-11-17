@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Sector Explorer — every sector of the Indian stock market, explained</title>
+<meta name="description" content="Learn every sector of the Indian stock market: banks, IT, FMCG, pharma, auto, defence, real estate, agri, metals, oil & gas, power, railways and more. What drives each sector, what to check, its Nifty index and popular stocks." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #7c5cff; }
+  .wrap { max-width: 1200px; }
+  .hero-stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 20px; }
+  .hero-stats div { padding: 10px 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); }
+  .hero-stats b { font: 700 1.4rem "Space Grotesk"; display: block; }
+  .hero-stats span { font: 600 .66rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; margin-bottom: 22px; }
+  .vs > div { border-radius: 22px; padding: 18px; border: 1px solid var(--line); background: var(--card); }
+  .vs .war { background: linear-gradient(135deg, rgba(120,140,90,.22), rgba(40,48,30,.35)); border-color: rgba(160,180,110,.45); position: relative; overflow: hidden; }
+  .vs .war::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(0,0,0,.08) 0 14px, transparent 14px 28px); pointer-events: none; }
+  .vs .shield { background: linear-gradient(135deg, rgba(34,211,154,.14), rgba(0,224,184,.05)); border-color: rgba(34,211,154,.4); }
+  .vs h3 { font: 800 1.2rem "Space Grotesk"; margin-bottom: 6px; }
+  .vs p { color: #cfd3df; font-size: .88rem; line-height: 1.5; }
+  .vs > .x { border: 0; background: none; padding: 0; }
+  .vs .x { display: grid; place-items: center; font: 800 1.1rem "Space Grotesk"; color: var(--warn); }
+  .vs .eg { margin-top: 8px; font: 600 .74rem "JetBrains Mono"; color: var(--muted); }
+  .sec-h { font: 700 1.35rem "Space Grotesk"; margin: 30px 0 4px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .sec-h span { font: 500 .74rem "JetBrains Mono"; color: var(--muted); }
+  .sec-p { color: var(--muted); font-size: .9rem; margin-bottom: 14px; max-width: 760px; line-height: 1.5; }
+  /* cycle */
+  .cycle { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 22px; align-items: center; }
+  .wheel { position: relative; width: 100%; max-width: 360px; aspect-ratio: 1; margin: 0 auto; }
+  .wheel button { position: absolute; width: 50%; height: 50%; border: 0; cursor: pointer; color: #fff; font: 700 .9rem Inter; display: grid; place-items: center; text-align: center; padding: 26px; line-height: 1.25; transition: filter .2s, transform .2s; }
+  .wheel button small { display: block; font: 500 .7rem Inter; opacity: .8; margin-top: 3px; }
+  .wheel button:hover, .wheel button.on { filter: brightness(1.25); transform: scale(1.03); z-index: 1; }
+  .wheel button.on { outline: 3px solid #fff; outline-offset: -3px; }
+  .wheel .p1 { left: 50%; top: 0; border-radius: 0 100% 0 0; background: linear-gradient(135deg, #1f8f6a, #22d39a); padding: 40px 18px 18px 30px; }
+  .wheel .p2 { left: 50%; top: 50%; border-radius: 0 0 100% 0; background: linear-gradient(135deg, #3d63d6, #5b8cff); padding: 18px 18px 40px 30px; }
+  .wheel .p3 { left: 0; top: 50%; border-radius: 0 0 0 100%; background: linear-gradient(135deg, #c27a12, #febc2e); padding: 18px 30px 40px 18px; }
+  .wheel .p4 { left: 0; top: 0; border-radius: 100% 0 0 0; background: linear-gradient(135deg, #b8304a, #ff5470); padding: 40px 30px 18px 18px; }
+  .wheel .hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 34%; aspect-ratio: 1; border-radius: 50%; background: #0b0d16; border: 1px solid var(--line); display: grid; place-items: center; text-align: center; font: 700 .74rem "JetBrains Mono"; color: var(--muted); z-index: 2; pointer-events: none; padding: 8px; }
+  .phase { border-radius: 22px; padding: 18px; border: 1px solid var(--line); background: var(--card); }
+  .phase h3 { font: 800 1.2rem "Space Grotesk"; }
+  .phase p { color: #cfd3df; font-size: .9rem; line-height: 1.5; margin: 6px 0 10px; }
+  .phase .chips-in button { font-size: .8rem; }
+  /* filters + grid */
+  .tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 8px; }
+  .srch { position: relative; }
+  .srch input { width: 100%; padding: 14px 16px 14px 46px; border-radius: 16px; border: 1.5px solid var(--line); background: rgba(10,12,20,.75); color: var(--fg); font: 500 .98rem Inter; outline: 0; }
+  .srch input:focus { border-color: var(--a1); box-shadow: 0 0 0 5px rgba(124,92,255,.15); }
+  .srch span { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); z-index: 1; }
+  .types { display: flex; gap: 6px; flex-wrap: wrap; }
+  .types button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .types button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .types button b { font: 600 .68rem "JetBrains Mono"; opacity: .6; margin-left: 3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; margin-top: 16px; }
+  .sc { position: relative; text-align: left; border: 1px solid var(--line); background: var(--card); border-radius: 22px; padding: 18px; cursor: pointer; color: inherit; display: flex; flex-direction: column; gap: 9px; overflow: hidden; transition: transform .25s, border-color .25s, box-shadow .25s; font: inherit; }
+  .sc::before { content: ""; position: absolute; inset: 0; background: radial-gradient(380px circle at 0 0, var(--c), transparent 60%); opacity: .14; pointer-events: none; }
+  .sc:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.22); box-shadow: 0 24px 60px -30px var(--c); }
+  .sc.war { background: linear-gradient(135deg, rgba(90,105,60,.35), rgba(16,18,28,.8)); border-color: rgba(160,180,110,.5); }
+  .sc .top { display: flex; align-items: center; gap: 10px; }
+  .sc .ico { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.4rem; background: rgba(255,255,255,.06); border: 1px solid var(--line); flex: none; }
+  .sc h3 { font: 700 1.1rem "Space Grotesk"; line-height: 1.2; }
+  .sc .idx { font: 500 .68rem "JetBrains Mono"; color: var(--muted); }
+  .sc p { color: #b4b9c8; font-size: .85rem; line-height: 1.45; }
+  .badges { display: flex; gap: 5px; flex-wrap: wrap; }
+  .bd { font: 700 .62rem "JetBrains Mono"; letter-spacing: .03em; padding: 3px 7px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
+  .stk { display: flex; gap: 5px; flex-wrap: wrap; }
+  .stk span { font: 500 .72rem Inter; color: #d5d9e4; padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+  .stk span.more { color: var(--muted); }
+  .sc .open { font: 600 .82rem Inter; margin-top: auto; color: var(--fg); }
+  .none { text-align: center; color: var(--muted); padding: 30px; border: 1px dashed var(--line); border-radius: 20px; margin-top: 16px; }
+  mark { background: rgba(254,188,46,.3); color: #fff; border-radius: 4px; padding: 0 2px; }
+  /* detail drawer */
+  .modal { z-index: 40 !important; } .toast { z-index: 50 !important; }
+  .dr { position: fixed; inset: 0; z-index: 30; display: flex; justify-content: flex-end; background: rgba(3,4,8,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .dr .pane { width: min(720px, 100%); height: 100%; overflow: auto; background: #0b0d16; border-left: 1px solid var(--line); padding: 22px clamp(16px, 4vw, 30px) 40px; animation: slide .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes slide { from { transform: translateX(40px); opacity: 0; } }
+  .dr .head { display: flex; align-items: center; gap: 12px; }
+  .dr .head .ico { width: 58px; height: 58px; font-size: 1.8rem; border-radius: 18px; display: grid; place-items: center; background: rgba(255,255,255,.06); border: 1px solid var(--line); flex: none; }
+  .dr h2 { font: 800 clamp(1.4rem, 5vw, 1.9rem)/1.15 "Space Grotesk"; }
+  .dr .close { margin-left: auto; border: 1px solid var(--line); background: none; color: var(--fg); border-radius: 12px; width: 42px; height: 42px; font-size: 1.1rem; cursor: pointer; flex: none; }
+  .dr .what { color: #d5d9e4; line-height: 1.6; margin: 14px 0; font-size: .95rem; }
+  .dr h4 { font: 700 1rem "Space Grotesk"; margin: 18px 0 8px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .lst { border-radius: 16px; padding: 12px 14px; border: 1px solid var(--line); background: rgba(255,255,255,.03); }
+  .lst.up { border-color: rgba(34,211,154,.35); background: rgba(34,211,154,.05); } .lst.dn { border-color: rgba(255,84,112,.35); background: rgba(255,84,112,.05); }
+  .lst b { font: 700 .74rem "JetBrains Mono"; letter-spacing: .06em; display: block; margin-bottom: 6px; }
+  .lst ul { padding-left: 18px; display: grid; gap: 4px; font-size: .86rem; color: #d5d9e4; line-height: 1.45; }
+  .met { display: grid; gap: 6px; }
+  .met div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px; padding: 9px 12px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); font-size: .84rem; line-height: 1.4; }
+  .met div b { font: 700 .8rem "JetBrains Mono"; color: #c9bcff; }
+  .met div span { color: #cfd3df; }
+  .sg { margin-top: 8px; }
+  .sg small { display: block; font: 600 .7rem "JetBrains Mono"; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 5px; }
+  .sg .stk span { font-size: .8rem; padding: 6px 10px; }
+  .note { margin-top: 16px; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(254,188,46,.4); background: rgba(254,188,46,.07); color: #f1e3c4; font-size: .9rem; line-height: 1.55; }
+  .note b { color: #fff; }
+  .dacts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .dacts .btn { padding: 13px 10px; }
+  .related { display: flex; gap: 6px; flex-wrap: wrap; }
+  .related button { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: #d5d9e4; padding: 7px 11px; border-radius: 999px; font: 600 .78rem Inter; cursor: pointer; }
+  /* game */
+  .game { border-radius: 24px; padding: 20px; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(0,224,184,.06)); }
+  .game .qn { font: 600 .74rem "JetBrains Mono"; color: var(--muted); }
+  .game h3 { font: 800 1.2rem "Space Grotesk"; margin: 6px 0 10px; }
+  .game .clue { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .game .clue span { font: 700 .95rem Inter; padding: 9px 13px; border-radius: 12px; background: rgba(0,0,0,.35); border: 1px solid var(--line); }
+  .game .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .game .opts button { border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #fff; border-radius: 14px; padding: 13px; font: 700 .9rem Inter; cursor: pointer; text-align: left; }
+  .game .opts button.right { border-color: var(--up); background: rgba(34,211,154,.15); }
+  .game .opts button.wrong { border-color: var(--down); background: rgba(255,84,112,.15); }
+  .game .res { margin-top: 10px; font-size: .88rem; color: #cfd3df; min-height: 1.4em; }
+  .game .bar { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .game .bar .btn { padding: 11px 16px; }
+  .lessons { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .lessons div { border-radius: 18px; padding: 14px 16px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .lessons div b { display: block; color: #fff; font: 700 1rem "Space Grotesk"; margin-bottom: 4px; }
+  .lessons a { color: var(--acc); }
+  @media (max-width: 820px) { .vs { grid-template-columns: 1fr; } .vs .x { padding: 0; } .cycle { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .two, .dacts, .game .opts { grid-template-columns: 1fr; } .met div { grid-template-columns: 1fr; gap: 2px; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Every sector, <span class="grad">explained.</span></h1>
+    <p class="sub">The Indian market isn't one thing. Banks move on interest rates, cement on monsoons and elections, defence on government orders, IT on the US economy. Learn what drives each sector, what numbers to check and which companies are in it. Tap any sector to open it.</p>
+    <div class="hero-stats" id="heroStats"></div>
+
+    <div class="vs">
+      <div class="war"><h3>⚔️ Defence sector</h3><p>Companies that build <b>fighter jets, missiles, warships, radars and ammunition</b> for the armed forces. Driven by government orders, the defence budget and "Make in India". War headlines make these stocks <b>jump</b>, and very volatile.</p><div class="eg">e.g. HAL · BEL · Mazagon Dock · BDL</div></div>
+      <div class="x">≠</div>
+      <div class="shield"><h3>🛡️ Defensive sectors</h3><p>Sectors whose sales <b>don't fall much in a slowdown</b>, because people still buy soap, medicine and mobile data. They fall <b>less</b> in a crash, and usually rise less in a boom.</p><div class="eg">e.g. FMCG · Pharma · Telecom · Power utilities</div></div>
+    </div>
+
+    <h2 class="sec-h">🔄 The economic cycle <span>which sectors tend to lead when</span></h2>
+    <p class="sec-p">Money rotates between sectors as the economy moves through phases. Tap a phase to see the sectors that usually do well in it. It's a tendency, not a rule.</p>
+    <div class="cycle">
+      <div class="wheel" id="wheel">
+        <button class="p1" data-ph="1">🌱 Recovery<small>rates falling</small></button>
+        <button class="p2" data-ph="2">🚀 Expansion<small>growth strong</small></button>
+        <button class="p3" data-ph="3">🔥 Peak<small>inflation high</small></button>
+        <button class="p4" data-ph="4">🧊 Slowdown<small>growth falling</small></button>
+        <div class="hub">ECONOMIC<br/>CYCLE<br/>↻</div>
+      </div>
+      <div class="phase" id="phase"></div>
+    </div>
+
+    <h2 class="sec-h">📚 All sectors <span id="count"></span></h2>
+    <div class="tools">
+      <div class="srch"><span>🔍</span><input id="q" type="search" placeholder="Search a sector or company: real estate, HAL, monsoon, steel…" autocomplete="off" /></div>
+      <div class="types" id="types"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+
+    <h2 class="sec-h">🎯 Guess the Sector <span>a quick game for you or the group</span></h2>
+    <div class="game" id="game"></div>
+
+    <h2 class="sec-h">🧭 How to use sectors in your trading</h2>
+    <div class="lessons">
+      <div><b>Trade the strongest sector</b>Most of a stock's move comes from its sector and the market. Pick leaders from the 2–3 strongest sectors: compare sector indices against the Nifty 50.</div>
+      <div><b>Check the right numbers</b>A bank's P/E means little; use P/B and NPAs. For cement, EBITDA per tonne. For realty, pre-sales. Each sector has its own scorecard (see each card).</div>
+      <div><b>Don't over-concentrate</b>Five stocks from one sector is one bet, not five. Keep a single sector to 25–30% of your portfolio at most.</div>
+      <div><b>Themes get crowded</b>Defence, railways and PSU stocks ran hard on news and budgets. When everyone talks about a theme, valuations are usually stretched. Size smaller.</div>
+      <div><b>Watch the macro triggers</b>Interest rates (banks, realty, auto), crude oil (OMCs, paints, aviation), the rupee (IT, pharma), monsoon (FMCG, agri, tractors).</div>
+      <div><b>Then run your process</b>Sector first, then the stock: <a href="../trader-room/">my 3D trading process</a> and the <a href="../checklist/">pre-trade checklist</a>.</div>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This page is for <b>education only</b>. Companies are listed as <b>popular, well-known examples</b> of each sector, not recommendations to buy or sell. Company names, listings and classifications change (mergers, demergers, renamings); check the latest details on NSE/BSE before acting. Investing involves risk.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+
+  <div class="dr" id="dr" hidden><div class="pane" id="pane"></div></div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+
+/* ---------- sector types ---------- */
+const TYPES = {
+  defensive: ["🛡️ Defensive", "#22d39a"], cyclical: ["🔄 Cyclical", "#5b8cff"], growth: ["📈 Growth", "#b9a6ff"], commodity: ["🛢️ Commodity", "#febc2e"],
+  rate: ["💸 Rate-sensitive", "#00e0b8"], govt: ["🏛️ Govt / PSU-driven", "#ff9f43"], rural: ["🌾 Rural & monsoon", "#9ccc65"], export: ["🌍 Export-driven", "#4fc3f7"], war: ["⚔️ War & geopolitics", "#c5d86d"],
+};
+
+/* ---------- sectors (popular, well-known examples for learning) ---------- */
+const SECTORS = [
+ { id: "banks", ico: "🏦", c: "#5b8cff", name: "Banking", idx: "Nifty Bank · Nifty PSU Bank · Nifty Private Bank", t: ["cyclical", "rate"], ph: [1, 2],
+   one: "The backbone of the economy: banks take deposits and lend them out. The biggest sector in the Nifty 50.",
+   what: "Banks earn the gap between the interest they charge on loans and what they pay on deposits (net interest margin). They grow when credit demand is strong and suffer when borrowers stop repaying (bad loans, NPAs). Private banks usually grow faster; PSU banks are government-owned and cheaper.",
+   up: ["Strong loan growth as businesses and people borrow", "Falling bad loans (NPAs) and lower provisions", "Stable or rising margins (NIM)", "Rising CASA (cheap savings and current account deposits)"],
+   dn: ["Rising NPAs in a slowdown", "Deposit war pushing up costs and squeezing margins", "Sharp RBI rate cuts can squeeze margins short-term", "Unsecured loan stress (cards, personal loans)"],
+   m: [["NIM", "Net interest margin: lending rate minus deposit cost"], ["GNPA / NNPA", "Bad loans before and after provisions: lower is better"], ["CASA ratio", "Share of cheap deposits"], ["ROA / ROE", "Profit per ₹ of assets / equity"], ["P/B", "Banks are valued on book value, not P/E"], ["Credit cost", "Provisions as % of loans"]],
+   s: { "Private banks": ["HDFC Bank", "ICICI Bank", "Kotak Mahindra Bank", "Axis Bank", "IndusInd Bank", "Federal Bank", "IDFC First Bank"], "PSU banks": ["State Bank of India", "Bank of Baroda", "Punjab National Bank", "Canara Bank", "Union Bank of India", "Indian Bank"] },
+   note: "Bank Nifty often leads the whole market. When banks are weak, broad rallies rarely last. Value banks on <b>P/B and asset quality</b>, not P/E." },
+ { id: "nbfc", ico: "💳", c: "#7c5cff", name: "NBFCs & Financial Services", idx: "Nifty Financial Services", t: ["cyclical", "rate", "growth"], ph: [1, 2],
+   one: "Lenders that aren't banks: consumer loans, vehicle finance, gold loans, housing finance, microfinance.",
+   what: "NBFCs (non-banking financial companies) borrow from banks and markets and lend to niches banks under-serve. They grow fast in good times, but their cost of funds rises with interest rates, and a liquidity squeeze can hit them hard.",
+   up: ["Falling interest rates (cheaper borrowing)", "Strong consumption and vehicle sales", "Rising gold prices (gold-loan companies)", "Good collection efficiency"],
+   dn: ["Rising rates and tight liquidity", "RBI curbs on unsecured lending", "Asset-quality stress in microfinance or personal loans", "Funding shocks"],
+   m: [["AUM growth", "Growth in loans managed"], ["Cost of funds", "What they pay to borrow"], ["Spread / NIM", "Lending yield minus funding cost"], ["GNPA, stage 3", "Bad loans"], ["ROA", "Healthy NBFCs: 2–4%+"], ["P/B", "Main valuation measure"]],
+   s: { "Diversified lenders": ["Bajaj Finance", "Shriram Finance", "Cholamandalam Investment", "Mahindra & Mahindra Financial", "Sundaram Finance"], "Gold loans": ["Muthoot Finance", "Manappuram Finance"], "Housing finance": ["LIC Housing Finance", "Bajaj Housing Finance", "Aadhar Housing Finance"], "Holding / others": ["Bajaj Finserv", "Jio Financial Services", "Power Finance Corporation", "REC"] },
+   note: "NBFCs are <b>rate-sensitive</b>: they often rally when the RBI starts cutting rates, and struggle when liquidity tightens." },
+ { id: "insurance", ico: "☂️", c: "#4fc3f7", name: "Insurance", idx: "Nifty Financial Services (part)", t: ["growth", "defensive"], ph: [2, 4],
+   one: "Life, health and general insurers. India is still under-insured, so it's a long-term growth story.",
+   what: "Insurers collect premiums now and pay claims later, investing the money in between. Life insurers are valued on embedded value; general insurers on how well they price risk (combined ratio).",
+   up: ["Rising insurance awareness (health, term)", "Higher incomes and financial savings", "Stable markets (investment income)", "Regulatory push for 'insurance for all'"],
+   dn: ["Tax rule changes on insurance products", "Commission caps or regulatory changes", "High claims (pandemic, disasters)", "Falling bond yields can hurt returns"],
+   m: [["VNB margin", "Profit margin on new life policies"], ["APE growth", "New business growth (life)"], ["Combined ratio", "Claims + costs ÷ premium: below 100% = underwriting profit"], ["Persistency", "% of customers renewing"], ["Solvency ratio", "Capital buffer: regulator wants 150%+"], ["P/EV", "Price to embedded value (life)"]],
+   s: { "Life": ["LIC", "SBI Life Insurance", "HDFC Life Insurance", "ICICI Prudential Life"], "General & health": ["ICICI Lombard", "Star Health", "New India Assurance", "Go Digit General Insurance"] },
+   note: "Insurance compounds slowly. It's more of an <b>investing</b> sector than a trading one." },
+ { id: "capmkt", ico: "📊", c: "#00e0b8", name: "Capital Markets", idx: "Nifty Capital Markets", t: ["growth", "cyclical"], ph: [2],
+   one: "Exchanges, depositories, brokers and mutual fund houses. They earn more when markets are busy.",
+   what: "These businesses earn fees on trading volumes, demat accounts, mutual fund assets and SIP flows. Retail participation in India exploded after 2020, and these stocks ride that wave.",
+   up: ["Rising demat accounts and SIP inflows", "High trading volumes and market rallies", "Mutual fund AUM growth", "New listings (IPOs)"],
+   dn: ["Market crashes and falling volumes", "SEBI curbs on F&O trading", "Fee or regulatory changes", "Competition squeezing broker fees"],
+   m: [["ADTV", "Average daily traded value"], ["Demat accounts", "Investor base growth"], ["AUM & SIP flows", "Money in mutual funds"], ["Market share", "Share of volumes or AUM"], ["Operating margin", "Platforms are high-margin"]],
+   s: { "Exchanges & infra": ["BSE", "MCX", "CDSL", "CAMS", "KFin Technologies"], "AMCs": ["HDFC AMC", "Nippon Life India AMC", "UTI AMC", "Aditya Birla Sun Life AMC"], "Brokers": ["Angel One", "Motilal Oswal Financial", "Nuvama Wealth"] },
+   note: "A <b>bull-market sector</b>: it does best when everyone is trading. SEBI's F&O rule changes hit volumes, so watch regulation closely." },
+ { id: "it", ico: "💻", c: "#4fc3f7", name: "IT Services", idx: "Nifty IT", t: ["growth", "export"], ph: [2, 4],
+   one: "India's software exporters: they build and run tech for global companies, mostly in the US and Europe.",
+   what: "IT companies earn in dollars and spend in rupees, so a weaker rupee helps. Their growth depends on how much US and European companies spend on technology. They carry little debt, generate lots of cash and pay steady dividends and buybacks.",
+   up: ["Strong US/Europe tech spending", "Weaker rupee (more rupees per dollar)", "Big deal wins (TCV)", "New tech waves: cloud, AI, digital"],
+   dn: ["US recession or banking stress (big clients)", "Stronger rupee", "Visa rules and protectionism", "AI automating parts of traditional services"],
+   m: [["CC revenue growth", "Growth in constant currency"], ["EBIT margin", "Operating margin"], ["TCV / deal wins", "Signals future revenue"], ["Attrition", "Staff leaving"], ["Guidance", "Company's own growth forecast: markets react to it most"]],
+   s: { "Large caps": ["TCS", "Infosys", "HCLTech", "Wipro", "Tech Mahindra", "LTIMindtree"], "Mid caps": ["Persistent Systems", "Coforge", "Mphasis", "L&T Technology Services", "KPIT Technologies", "Tata Elxsi"] },
+   note: "Watch the <b>US economy and the dollar</b>. IT results come early each quarter (TCS usually first) and set the tone for the season." },
+ { id: "fmcg", ico: "🧴", c: "#22d39a", name: "FMCG", idx: "Nifty FMCG", t: ["defensive", "rural"], ph: [4, 3],
+   one: "Everyday products: soap, biscuits, tea, toothpaste. People keep buying them even in a slowdown.",
+   what: "Fast-moving consumer goods companies sell low-price items in huge volumes through lakhs of shops. Demand is steady, so they're the classic defensive sector, but that safety usually comes with high valuations.",
+   up: ["Good monsoon and rural income growth", "Falling raw-material costs (palm oil, wheat, milk, crude)", "Volume growth from new products", "Slowdowns (money rotates in for safety)"],
+   dn: ["Raw-material inflation squeezing margins", "Weak rural demand", "Competition from new D2C brands", "Very high valuations limiting upside"],
+   m: [["Volume growth", "Real demand, excluding price hikes"], ["Gross margin", "Shows raw-material pressure"], ["Rural vs urban growth", "Where demand is coming from"], ["Ad spend", "Needed to defend market share"], ["P/E", "Often 40–60×: safety is expensive"]],
+   s: { "Personal & home care": ["Hindustan Unilever", "Dabur India", "Marico", "Godrej Consumer Products", "Colgate-Palmolive India", "Emami"], "Food & beverages": ["Nestle India", "Britannia Industries", "Tata Consumer Products", "Varun Beverages"], "Diversified / spirits": ["ITC", "United Spirits", "Radico Khaitan", "United Breweries"] },
+   note: "FMCG <b>falls less in crashes</b>, which is why it's called defensive. In strong bull markets it often lags. Think stability, not speed." },
+ { id: "pharma", ico: "💊", c: "#22d39a", name: "Pharma & Healthcare", idx: "Nifty Pharma · Nifty Healthcare", t: ["defensive", "export", "growth"], ph: [4],
+   one: "Medicine makers, hospitals and diagnostics. People need healthcare in every economic phase.",
+   what: "Indian pharma companies sell generic medicines in India and export heavily to the US. Hospitals and diagnostics are domestic growth businesses. The US FDA's inspections are a big risk factor for exporters.",
+   up: ["New US launches and complex generics", "Weaker rupee (export earnings)", "Domestic branded medicine growth", "Rising health spending and insurance cover"],
+   dn: ["US FDA warning letters or import alerts", "US generic price erosion", "Drug price controls in India", "Patent litigation"],
+   m: [["US revenue growth", "Biggest export market"], ["FDA status", "Clean inspections matter a lot"], ["R&D % of sales", "Investment in future products"], ["ANDA pipeline", "Upcoming US approvals"], ["ARPOB, occupancy", "Hospitals: revenue per bed and beds filled"]],
+   s: { "Pharma": ["Sun Pharmaceutical", "Dr. Reddy's Laboratories", "Cipla", "Divi's Laboratories", "Lupin", "Zydus Lifesciences", "Torrent Pharmaceuticals", "Mankind Pharma"], "Hospitals & diagnostics": ["Apollo Hospitals", "Max Healthcare", "Fortis Healthcare", "Narayana Hrudayalaya", "Dr. Lal PathLabs"] },
+   note: "A <b>defensive</b> sector with an export twist: watch the rupee and the US FDA. One bad inspection can wipe out a year of gains for a single stock." },
+ { id: "auto", ico: "🚗", c: "#5b8cff", name: "Automobiles & Auto Parts", idx: "Nifty Auto", t: ["cyclical", "rate", "rural"], ph: [1, 2],
+   one: "Cars, two-wheelers, tractors and trucks, plus the companies that make their parts.",
+   what: "Auto sales follow the economy: people buy vehicles when incomes rise and loans are cheap. Two-wheelers and tractors depend on rural India; trucks on industrial activity. Monthly sales numbers (1st of every month) move these stocks.",
+   up: ["Falling interest rates (cheaper car loans)", "Good monsoon (two-wheelers, tractors)", "Festive season demand", "Falling steel and commodity prices", "New launches, SUVs and EV growth"],
+   dn: ["Rising rates and fuel prices", "Commodity inflation", "Weak rural demand", "Disruption from EVs for slow movers", "Rising inventory at dealers"],
+   m: [["Monthly volumes", "Released on the 1st of each month"], ["Market share", "Who's winning"], ["EBITDA margin", "Commodity cost pressure"], ["Dealer inventory", "Too high = discounts coming"], ["EV share", "Readiness for the transition"]],
+   s: { "Cars & SUVs": ["Maruti Suzuki", "Mahindra & Mahindra", "Hyundai Motor India"], "Two & three-wheelers": ["Bajaj Auto", "Hero MotoCorp", "TVS Motor", "Eicher Motors"], "Trucks & tractors": ["Ashok Leyland", "Escorts Kubota", "Force Motors"], "Auto parts & tyres": ["Bosch", "Samvardhana Motherson", "Sona BLW", "Uno Minda", "Exide Industries", "MRF", "Apollo Tyres"] },
+   note: "A classic <b>early-cycle</b> sector: it tends to lead when rates start falling and the economy recovers." },
+ { id: "defence", ico: "⚔️", c: "#c5d86d", name: "Defence", idx: "Nifty India Defence", t: ["govt", "war", "growth"], ph: [2], war: true,
+   one: "Fighter jets, missiles, warships, radars and ammunition for the armed forces. Driven by government orders and geopolitics.",
+   what: "India is one of the world's largest defence spenders and is pushing to make weapons at home (Atmanirbhar Bharat) and export them. Most big defence companies are government-owned (PSUs) with large multi-year order books. Border tensions and global wars bring these stocks into the headlines, and into speculative spikes.",
+   up: ["Bigger defence budget and capital outlay", "Indigenisation lists (imports banned, made in India)", "Large orders: aircraft, missiles, ships", "Defence exports growth", "Geopolitical tension or war headlines (short-term spikes)"],
+   dn: ["Very high valuations after big rallies", "Order delays and slow government payments", "Ceasefire or peace news (spikes reverse)", "Execution delays on complex projects"],
+   m: [["Order book ÷ revenue", "Years of revenue already booked (3–8× is common)"], ["Order inflow", "New orders this year"], ["Execution", "How fast orders become revenue"], ["EBITDA margin", "Profitability of contracts"], ["P/E vs growth", "Many trade at 50×+: is growth worth it?"]],
+   s: { "Aircraft & electronics": ["Hindustan Aeronautics (HAL)", "Bharat Electronics (BEL)", "Data Patterns", "Astra Microwave", "Paras Defence"], "Shipbuilding": ["Mazagon Dock Shipbuilders", "Cochin Shipyard", "Garden Reach Shipbuilders (GRSE)"], "Missiles, explosives & metals": ["Bharat Dynamics (BDL)", "Solar Industries", "Mishra Dhatu Nigam", "MTAR Technologies"], "Equipment & guns": ["BEML", "Bharat Forge", "Zen Technologies"] },
+   note: "⚔️ <b>War headlines move these stocks fast, both ways.</b> Buying after a news spike often means buying from early buyers (remember the TV Tip Trap). The long-term story is orders and execution, not headlines." },
+ { id: "metals", ico: "⛏️", c: "#febc2e", name: "Metals & Mining", idx: "Nifty Metal", t: ["commodity", "cyclical", "govt"], ph: [2, 3],
+   one: "Steel, aluminium, zinc, copper, iron ore and coal. Prices are set globally, so these stocks swing with commodity cycles.",
+   what: "Metal companies are price-takers: their profits rise and fall with global metal prices, which depend heavily on China's demand. They're highly cyclical, often look cheapest (lowest P/E) at the top of the cycle, and pay big dividends in good years.",
+   up: ["Rising global metal prices", "Chinese stimulus or demand", "India's infrastructure and construction boom", "Import duties protecting local producers"],
+   dn: ["Global slowdown or Chinese dumping", "Falling metal prices", "High debt in a downturn", "Rising coking coal and power costs"],
+   m: [["LME prices", "Global metal price benchmark"], ["EBITDA per tonne", "Profit per tonne made"], ["Net debt / EBITDA", "Debt load"], ["EV/EBITDA", "Better than P/E for cyclicals"], ["Dividend yield", "Coal India, NMDC and others pay well"]],
+   s: { "Steel": ["Tata Steel", "JSW Steel", "Jindal Steel & Power", "SAIL", "Jindal Stainless"], "Non-ferrous": ["Hindalco Industries", "Vedanta", "Hindustan Zinc", "National Aluminium (NALCO)", "Hindustan Copper"], "Mining": ["Coal India", "NMDC"] },
+   note: "With cyclicals, a <b>low P/E can be a trap</b>: profits are at a peak and about to fall. Watch the metal price trend, not just the P/E." },
+ { id: "oilgas", ico: "🛢️", c: "#ff9f43", name: "Oil, Gas & Energy", idx: "Nifty Oil & Gas · Nifty Energy", t: ["commodity", "govt"], ph: [3],
+   one: "Oil producers, refiners, fuel retailers and gas distributors. Crude oil prices drive almost everything here.",
+   what: "Upstream companies (ONGC, Oil India) earn more when crude rises. Refiners and fuel retailers (oil marketing companies, OMCs) often earn more when crude falls, because pump prices don't fall as fast. City gas companies sell CNG and piped gas.",
+   up: ["Upstream: higher crude prices", "OMCs: lower crude with stable pump prices", "Strong refining margins (GRMs)", "Gas demand growth (CNG, industry)"],
+   dn: ["Upstream: falling crude, windfall taxes", "OMCs: crude spikes with frozen pump prices", "Government pricing controls", "Rupee weakness (imports cost more)"],
+   m: [["Brent crude", "Global oil price"], ["GRM", "Refining margin per barrel"], ["Marketing margin", "OMC profit per litre"], ["Gas price", "APM / spot LNG prices"], ["Dividend yield", "PSU oil companies pay steady dividends"]],
+   s: { "Integrated": ["Reliance Industries"], "Upstream": ["ONGC", "Oil India"], "Refiners & OMCs": ["Indian Oil Corporation", "BPCL", "HPCL"], "Gas": ["GAIL", "Petronet LNG", "Indraprastha Gas", "Mahanagar Gas", "Gujarat Gas"] },
+   note: "Ask <b>which side of crude</b> a company is on. The same oil spike helps ONGC and hurts IOC, BPCL and HPCL." },
+ { id: "power", ico: "⚡", c: "#00e0b8", name: "Power & Renewables", idx: "Nifty Energy · BSE Power", t: ["defensive", "govt", "growth"], ph: [4, 2],
+   one: "Power generation, transmission and the green energy boom: solar, wind and storage.",
+   what: "Traditional utilities (NTPC, Power Grid) earn regulated, steady returns, which makes them defensive. Renewables and power equipment makers are growth stories, riding India's push to 500 GW of clean energy.",
+   up: ["Rising power demand (heatwaves, industry, EVs, data centres)", "Renewable capacity targets and tenders", "Regulated returns on new projects", "Falling interest rates (capital-heavy sector)"],
+   dn: ["Rising rates and high debt", "Policy or tariff changes", "Project delays and land issues", "Very high valuations in green-energy names"],
+   m: [["Capacity (GW)", "Installed and under construction"], ["PLF", "Plant load factor: how much capacity is used"], ["Regulated ROE", "Return allowed by the regulator"], ["Order book", "For equipment and EPC players"], ["Net debt", "Power is capital-heavy"]],
+   s: { "Utilities": ["NTPC", "Power Grid Corporation", "Tata Power", "NHPC", "SJVN", "Torrent Power", "CESC"], "Private & renewables": ["Adani Power", "Adani Green Energy", "JSW Energy", "NTPC Green Energy"], "Green equipment": ["Suzlon Energy", "Inox Wind", "Waaree Energies", "Premier Energies"] },
+   note: "Two very different stories under one roof: <b>steady utilities</b> (defensive, dividends) and <b>green growth</b> (fast, volatile, expensive)." },
+ { id: "capgoods", ico: "🏗️", c: "#5b8cff", name: "Capital Goods & Infrastructure", idx: "Nifty Infrastructure · BSE Capital Goods", t: ["cyclical", "govt", "growth"], ph: [1, 2],
+   one: "Companies that build roads, bridges, power plants and factories, and make the heavy machinery for them.",
+   what: "When the government and companies invest (capex), these firms get orders. Their revenue is visible years ahead through order books. India's infrastructure push and the manufacturing revival (PLI schemes) have powered this sector.",
+   up: ["Government capex in the Budget", "Private capex revival", "Big order wins", "Manufacturing shifting to India (China+1)"],
+   dn: ["Capex cuts or election-year slowdowns", "Execution delays and cost overruns", "Working-capital stress (slow payments)", "Commodity cost spikes on fixed-price contracts"],
+   m: [["Order inflow", "New orders won"], ["Order book ÷ revenue", "Revenue visibility"], ["Execution rate", "Order book turning into sales"], ["Working capital days", "How long money is stuck"], ["EBITDA margin", "Contract profitability"]],
+   s: { "Engineering & EPC": ["Larsen & Toubro", "KEC International", "Kalpataru Projects", "NCC"], "Machinery & electricals": ["Siemens", "ABB India", "BHEL", "Cummins India", "Thermax", "Hitachi Energy India", "CG Power"], "Roads & airports": ["IRB Infrastructure", "GMR Airports", "PNC Infratech"] },
+   note: "Read the <b>Union Budget's capex number</b>: it's the starting gun for this sector." },
+ { id: "railways", ico: "🚆", c: "#ff9f43", name: "Railways", idx: "Part of Nifty PSE / CPSE", t: ["govt", "growth"], ph: [2],
+   one: "Railway construction, wagons, coaches, finance and ticketing: mostly PSUs riding record railway budgets.",
+   what: "Indian Railways is modernising: Vande Bharat trains, dedicated freight corridors, station upgrades and electrification. Railway PSUs and private wagon makers win these orders. The theme saw huge rallies, which also made many of these stocks very expensive.",
+   up: ["Higher railway budget allocation", "Big orders: trains, wagons, tracks", "Station redevelopment and metro projects", "Order book growth"],
+   dn: ["Budget disappointments", "Very high valuations after rallies", "Competitive bidding cutting margins", "Government stake sales (OFS)"],
+   m: [["Order book", "Visibility of revenue"], ["Railway capex", "Budget number for the year"], ["Margins", "Often thin for construction PSUs"], ["P/E vs growth", "Check if hype exceeds growth"]],
+   s: { "PSUs": ["IRFC", "RVNL", "IRCON International", "RailTel", "RITES", "IRCTC"], "Wagons & coaches": ["Titagarh Rail Systems", "Texmaco Rail", "Jupiter Wagons", "BEML"] },
+   note: "A <b>budget-driven theme</b>. These stocks often run up before the Budget and fall after it: \"buy the rumour, sell the news\"." },
+ { id: "cement", ico: "🧱", c: "#a1887f", name: "Cement", idx: "Part of Nifty Commodities", t: ["cyclical", "commodity", "rural"], ph: [1, 2],
+   one: "Every house, road and bridge needs cement. Demand follows construction and infrastructure spending.",
+   what: "Cement is heavy and costly to transport, so it's a regional business: prices differ by region. Profits depend on cement prices versus fuel (pet coke, coal) and power costs. The industry is consolidating, with the big players buying smaller ones.",
+   up: ["Infrastructure and housing demand", "Price hikes holding", "Falling fuel and power costs", "Consolidation (less price war)"],
+   dn: ["Monsoon months (construction slows)", "Price wars and overcapacity", "Fuel cost spikes", "Elections and labour shortages slowing projects"],
+   m: [["EBITDA per tonne", "THE key number: profit per tonne sold"], ["Capacity utilisation", "% of capacity used"], ["Realisation per tonne", "Average selling price"], ["Volume growth", "Tonnes sold"], ["EV per tonne", "Valuation vs capacity"]],
+   s: { "Large players": ["UltraTech Cement", "Ambuja Cements", "Shree Cement", "ACC"], "Mid players": ["Dalmia Bharat", "JK Cement", "The Ramco Cements", "JK Lakshmi Cement", "Birla Corporation"] },
+   note: "Q2 (July–September) is usually the <b>weakest quarter</b> because of the monsoon. Don't panic at a seasonal dip." },
+ { id: "realty", ico: "🏢", c: "#ff4d8d", name: "Real Estate", idx: "Nifty Realty", t: ["cyclical", "rate"], ph: [1],
+   one: "Developers who build and sell homes, offices and malls, plus REITs that rent out office parks and malls.",
+   what: "Residential developers earn by selling flats (often before they're built: pre-sales). Commercial players and REITs earn rent from offices and malls. Real estate is very sensitive to home-loan rates and has strong up-and-down cycles. After years of clean-up (RERA, demonetisation), the sector entered a strong upcycle from 2021.",
+   up: ["Falling home-loan rates", "Rising incomes and demand for bigger homes", "Strong pre-sales and new launches", "Office leasing demand (IT, global capability centres)", "Industry consolidation: big brands winning"],
+   dn: ["Rising interest rates", "Unsold inventory piling up", "Project delays and approvals", "High debt and land costs", "An economic slowdown hitting buyers"],
+   m: [["Pre-sales (bookings)", "Value of homes sold this year: the #1 number"], ["Collections", "Cash actually received"], ["Net debt", "Developers can go bust on debt"], ["Launch pipeline", "Future sales visibility"], ["Inventory months", "How long unsold stock takes to clear"], ["Rental yield / occupancy", "For REITs and malls"]],
+   s: { "Residential developers": ["DLF", "Godrej Properties", "Macrotech Developers (Lodha)", "Prestige Estates", "Oberoi Realty", "Sobha", "Brigade Enterprises"], "Malls & commercial": ["Phoenix Mills"], "REITs (rental income)": ["Embassy Office Parks REIT", "Mindspace Business Parks REIT", "Brookfield India REIT", "Nexus Select Trust (malls)"], "Housing ecosystem": ["LIC Housing Finance", "Bajaj Housing Finance", "Kajaria Ceramics", "Asian Paints", "Astral (pipes)"] },
+   note: "Real estate is the <b>most rate-sensitive</b> sector. Watch RBI rate cycles: it usually leads early in a rate-cut cycle. REITs are a calmer way to earn rental income from the stock market." },
+ { id: "agri", ico: "🌾", c: "#9ccc65", name: "Agri & Agro-based", idx: "No single index", t: ["rural", "commodity", "export"], ph: [3, 1],
+   one: "Everything from the farm: fertilisers, crop protection chemicals, seeds, tractors, sugar, rice and edible oils.",
+   what: "About half of India works in agriculture, so the monsoon matters to the whole market. Fertiliser companies depend on government subsidies; agro-chemical makers on crop sowing and exports; sugar companies on cane prices and ethanol blending; rice exporters on global demand and export rules.",
+   up: ["Good, well-spread monsoon", "Higher MSP (minimum support prices) and rural income", "Timely subsidy payments (fertilisers)", "Ethanol blending push (sugar)", "Export demand for rice and agro-chemicals"],
+   dn: ["Poor or erratic monsoon", "Subsidy delays or cuts", "Export bans (rice, sugar) to control food prices", "Chinese dumping of agro-chemicals", "Crop disease, pests and floods"],
+   m: [["Monsoon % of normal", "IMD forecasts and actual rainfall"], ["Sowing data", "Kharif/rabi acreage"], ["Subsidy receivables", "Money owed by government"], ["Ethanol volumes", "For sugar companies"], ["Gross margin", "Raw-material swings"]],
+   s: { "Fertilisers": ["Coromandel International", "Chambal Fertilisers", "Rashtriya Chemicals & Fertilizers", "FACT", "Paradeep Phosphates"], "Agro-chemicals": ["PI Industries", "UPL", "Bayer CropScience", "Dhanuka Agritech", "Rallis India", "Sumitomo Chemical India"], "Seeds, tractors & equipment": ["Kaveri Seed", "Escorts Kubota", "Mahindra & Mahindra (tractors)", "VST Tillers"], "Sugar & ethanol": ["Balrampur Chini Mills", "Triveni Engineering", "EID Parry", "Shree Renuka Sugars"], "Rice, foods & oils": ["LT Foods (Daawat)", "KRBL (India Gate)", "Patanjali Foods"] },
+   note: "🌧️ The <b>IMD monsoon forecast</b> (April) and actual rainfall (June–September) are the big triggers. Agri stocks are seasonal; government policy (MSP, subsidies, export bans) can change the story overnight." },
+ { id: "chem", ico: "🧪", c: "#b9a6ff", name: "Chemicals", idx: "Part of Nifty Commodities", t: ["export", "cyclical", "commodity"], ph: [2],
+   one: "Specialty and bulk chemicals for pharma, agri, textiles, refrigerants and more. A big 'China+1' story.",
+   what: "Global companies want suppliers outside China, and Indian chemical makers benefit. But China also dumps cheap products when its own demand is weak, and chemical prices swing, so this sector has sharp up and down cycles.",
+   up: ["China+1 supply shifts", "New long-term contracts with global companies", "Rising chemical prices", "New capacity coming online"],
+   dn: ["Chinese dumping and price falls", "Inventory destocking by global clients", "Pollution and regulatory issues", "Raw-material swings (crude-linked)"],
+   m: [["Gross margin", "Price vs raw-material spread"], ["Capacity utilisation", "How full plants are"], ["Capex pipeline", "Future growth"], ["Export share", "Exposure to global demand"], ["ROCE", "Return on capital employed"]],
+   s: { "Specialty": ["SRF", "Navin Fluorine", "Gujarat Fluorochemicals", "Deepak Nitrite", "Aarti Industries", "Clean Science", "Vinati Organics", "Atul"], "Bulk & diversified": ["Tata Chemicals", "Pidilite Industries", "Solar Industries"] },
+   note: "Chemicals had a huge 2020–21 boom and then a long slump. A good reminder that <b>great stories can still be in the wrong part of the cycle</b>." },
+ { id: "durables", ico: "📺", c: "#4fc3f7", name: "Consumer Durables & Electronics", idx: "Nifty Consumer Durables", t: ["growth", "cyclical"], ph: [2],
+   one: "ACs, fans, wires, appliances, plus the electronics manufacturing (EMS) boom under 'Make in India'.",
+   what: "Durables are bought when incomes rise and summers are hot. Wires and cables ride construction and power. Electronics manufacturing services (EMS) companies assemble phones, TVs and electronics for brands, helped by PLI schemes.",
+   up: ["Hot summers (ACs, fans, coolers)", "Housing and construction (wires, switches)", "PLI schemes and electronics exports", "Rising incomes and easy EMIs"],
+   dn: ["Mild summers or slowdowns", "Commodity costs (copper, aluminium)", "Thin margins in EMS", "Very high valuations"],
+   m: [["Revenue growth", "Demand trend"], ["EBITDA margin", "Commodity cost pressure"], ["Order book (EMS)", "Future revenue"], ["Market share", "Brand strength"], ["Working capital", "Inventory and receivables"]],
+   s: { "Electricals & wires": ["Havells India", "Polycab India", "KEI Industries", "Crompton Greaves Consumer", "V-Guard"], "Appliances & ACs": ["Voltas", "Blue Star", "Whirlpool of India"], "Electronics manufacturing": ["Dixon Technologies", "Kaynes Technology", "Amber Enterprises", "Syrma SGS"] },
+   note: "Summer heat is a real driver: a <b>hot April–May</b> means strong AC and cooler sales." },
+ { id: "retail", ico: "🛍️", c: "#ff4d8d", name: "Retail, Consumption & Internet", idx: "Nifty India Consumption · Nifty India Digital", t: ["growth"], ph: [2],
+   one: "Jewellery, fashion, supermarkets, restaurants, and India's new-age internet companies.",
+   what: "As India gets richer, people spend more on wants, not just needs. Organised retail, branded fashion and food delivery all ride this. Many new-age internet companies (listed after 2021) are still growing into profits, so they're volatile.",
+   up: ["Rising incomes and urban spending", "Store expansion and same-store growth", "Festive and wedding seasons", "Internet companies turning profitable"],
+   dn: ["Slowdown in discretionary spending", "Gold price spikes (jewellery demand)", "High valuations", "Competition and cash burn (internet)"],
+   m: [["SSSG", "Same-store sales growth: are existing stores growing?"], ["Store additions", "Expansion pace"], ["Revenue per sq ft", "Store productivity"], ["GOV / GMV", "Order value (internet platforms)"], ["Contribution margin / EBITDA", "Path to profit"]],
+   s: { "Retail & lifestyle": ["Titan Company", "Trent", "Avenue Supermarts (DMart)", "Page Industries", "Aditya Birla Fashion"], "Food & restaurants": ["Jubilant FoodWorks", "Devyani International"], "Internet": ["Eternal (Zomato)", "Swiggy", "FSN E-Commerce (Nykaa)", "Info Edge (Naukri)", "PB Fintech (Policybazaar)", "One 97 (Paytm)"] },
+   note: "Growth stocks at high valuations: <b>great businesses can still be bad buys at the wrong price</b>. Watch growth and margin trends each quarter." },
+ { id: "telecom", ico: "📡", c: "#22d39a", name: "Telecom & Media", idx: "BSE Telecommunication · Nifty Media", t: ["defensive", "growth"], ph: [4],
+   one: "Mobile networks, towers, broadband, plus TV, cinemas and entertainment.",
+   what: "India's mobile market has consolidated to a few players, so they can raise tariffs, which improves profits. People don't cut their data plan in a slowdown, making telecom fairly defensive. Media is more cyclical and depends on ad spending.",
+   up: ["Tariff hikes (higher ARPU)", "5G and home broadband growth", "Consolidation (fewer competitors)", "Falling capex after 5G rollout"],
+   dn: ["Price wars", "Government dues (AGR, spectrum payments)", "Heavy capex for new networks", "Ad slowdown (media)"],
+   m: [["ARPU", "Average revenue per user: the #1 number"], ["Subscriber adds", "Customer growth"], ["Churn", "Customers leaving"], ["Net debt / EBITDA", "Telecom is debt-heavy"], ["Capex", "Network spending"]],
+   s: { "Telecom & towers": ["Bharti Airtel", "Vodafone Idea", "Indus Towers", "Tata Communications"], "Media & entertainment": ["Sun TV Network", "PVR Inox", "Zee Entertainment", "Nazara Technologies"] },
+   note: "Watch for <b>tariff hikes</b>: they are the single biggest trigger for telecom stocks." },
+ { id: "travel", ico: "✈️", c: "#ff9f43", name: "Hotels, Travel & Aviation", idx: "Nifty India Tourism", t: ["cyclical", "growth"], ph: [2],
+   one: "Hotels, airlines, airports and travel companies, riding India's travel boom.",
+   what: "Indians are travelling more for leisure, weddings and business. Hotels benefit from limited new supply, so room rates rise. Airlines are a tough business: fuel (ATF) and the rupee hit costs hard.",
+   up: ["Strong travel and wedding seasons", "Rising room rates and occupancy", "Falling crude oil (cheaper jet fuel)", "New airports and tourism push"],
+   dn: ["Crude oil spikes (airlines)", "Rupee weakness (aircraft leases in dollars)", "Pandemics and travel shocks", "New hotel supply"],
+   m: [["ARR", "Average room rate (hotels)"], ["Occupancy", "% of rooms filled"], ["RevPAR", "Revenue per available room = ARR × occupancy"], ["Load factor", "% of airline seats filled"], ["Yield & CASK", "Airline revenue and cost per seat-km"]],
+   s: { "Hotels": ["Indian Hotels (Taj)", "ITC Hotels", "EIH (Oberoi)", "Lemon Tree Hotels", "Chalet Hotels"], "Aviation & airports": ["InterGlobe Aviation (IndiGo)", "GMR Airports"], "Travel": ["IRCTC", "Thomas Cook India", "Easy Trip Planners"] },
+   note: "Airlines are the classic <b>crude-oil-sensitive</b> sector: oil up, airline stocks down." },
+ { id: "logistics", ico: "🚢", c: "#5b8cff", name: "Logistics, Ports & Shipping", idx: "Nifty Transportation & Logistics", t: ["cyclical", "growth", "export"], ph: [2],
+   one: "Ports, container trains, couriers, trucking and shipping: the pipes of trade.",
+   what: "As India's trade and manufacturing grow, more goods need moving. Ports and rail container operators earn on volumes; courier companies on e-commerce; shipping companies on global freight rates (very cyclical).",
+   up: ["Rising trade and manufacturing", "E-commerce growth", "New freight corridors and ports", "High global freight rates (shipping)"],
+   dn: ["Global trade slowdown", "Freight rate crashes (shipping)", "Fuel cost spikes", "Competition and pricing pressure"],
+   m: [["Volumes (TEUs, tonnes)", "Cargo handled"], ["Realisation", "Revenue per unit moved"], ["EBITDA margin", "Pricing power"], ["Freight rates", "For shipping companies"]],
+   s: { "Ports": ["Adani Ports & SEZ", "JSW Infrastructure"], "Rail & road logistics": ["Container Corporation (CONCOR)", "Transport Corporation of India", "VRL Logistics", "Delhivery", "Blue Dart Express"], "Shipping": ["Great Eastern Shipping", "Shipping Corporation of India"] },
+   note: "Ports and logistics are a <b>real-economy pulse</b>: rising volumes usually mean trade and manufacturing are healthy." },
+ { id: "textiles", ico: "🧵", c: "#b9a6ff", name: "Textiles & Apparel", idx: "No major index", t: ["export", "cyclical", "rural"], ph: [2],
+   one: "Cotton yarn, fabrics, home textiles and garment exports: one of India's biggest employers.",
+   what: "Textile companies depend on cotton prices, export orders from the US and Europe, and trade deals. Many are small and cyclical, with thin margins. Government schemes (PLI, textile parks) and shifts away from China and Bangladesh can boost orders.",
+   up: ["Export orders shifting to India", "Trade agreements (lower tariffs)", "Stable cotton prices", "Government textile schemes"],
+   dn: ["Cotton price spikes", "Weak US/Europe demand", "Competition from Bangladesh and Vietnam", "Rupee strength"],
+   m: [["Cotton price", "Main raw material"], ["Export growth", "Order trend"], ["EBITDA margin", "Thin in this sector"], ["Debt", "Capital-heavy mills"]],
+   s: { "Yarn & fabrics": ["KPR Mill", "Vardhman Textiles", "Arvind", "Trident"], "Home textiles & garments": ["Welspun Living", "Gokaldas Exports", "Indo Count Industries"] },
+   note: "Highly <b>cyclical and export-dependent</b>: trade news (tariffs, agreements) can swing the whole sector." },
+ { id: "paints", ico: "🎨", c: "#ff4d8d", name: "Paints & Building Materials", idx: "Part of Nifty Consumption / Housing", t: ["growth", "rate"], ph: [1, 2],
+   one: "Paints, adhesives, pipes, tiles and plywood: the companies behind every home build and renovation.",
+   what: "These are consumer-facing brands linked to housing. Paint companies use crude-based raw materials, so falling crude helps margins. New competition in paints (a large conglomerate entered in 2024) has pressured leaders.",
+   up: ["Housing and real estate boom", "Falling crude oil (paint raw materials)", "Renovation and repainting demand", "Strong brands and dealer networks"],
+   dn: ["Crude oil spikes", "New competition and price cuts", "Slow housing demand", "Very high valuations"],
+   m: [["Volume growth", "Real demand"], ["Gross margin", "Raw-material pressure"], ["Market share", "Competitive position"], ["P/E", "Usually premium valuations"]],
+   s: { "Paints & adhesives": ["Asian Paints", "Berger Paints", "Kansai Nerolac", "Indigo Paints", "Pidilite Industries"], "Pipes, tiles & ply": ["Astral", "Supreme Industries", "Finolex Industries", "Kajaria Ceramics", "Century Plyboards", "Greenply"] },
+   note: "A <b>housing-linked consumer</b> play: it often moves with real estate, but with steadier, brand-driven demand." },
+];
+
+/* ---------- economic cycle ---------- */
+const PHASES = {
+  1: ["🌱 Recovery", "Interest rates have been cut, the economy is turning up from a slowdown. Rate-sensitive and early-cycle sectors lead: borrowing gets cheaper and demand returns.", "#22d39a"],
+  2: ["🚀 Expansion", "Growth is strong, profits rise, companies invest. Capex, consumption and growth sectors do well, and the broad market usually rallies.", "#5b8cff"],
+  3: ["🔥 Peak", "Growth is hot, inflation rises and central banks start hiking rates. Commodities and energy often do best as prices rise.", "#febc2e"],
+  4: ["🧊 Slowdown", "Growth falls, rates are high, markets get nervous. Money hides in defensive sectors with steady demand.", "#ff5470"],
+};
+let curPhase = 1;
+function drawPhase() {
+  const [h, p, c] = PHASES[curPhase], list = SECTORS.filter(s => s.ph.includes(curPhase));
+  $("#wheel").querySelectorAll("button").forEach(b => b.classList.toggle("on", +b.dataset.ph === curPhase));
+  $("#phase").style.borderColor = c + "88";
+  $("#phase").innerHTML = `<h3 style="color:${c}">${h}</h3><p>${p}</p><div class="chips-in">${list.map(s => `<button data-open="${s.id}">${s.ico} ${s.name}</button>`).join("")}</div><p style="font-size:.78rem;color:var(--muted);margin:10px 0 0">Real markets don't follow the textbook exactly. Use this as a map, then confirm with price action and sector-index strength.</p>`;
+}
+$("#wheel").addEventListener("click", e => { const b = e.target.closest("[data-ph]"); if (!b) return; curPhase = +b.dataset.ph; drawPhase(); });
+$("#phase").addEventListener("click", e => { const b = e.target.closest("[data-open]"); if (b) openSector(b.dataset.open); });
+
+/* ---------- grid ---------- */
+const allStocks = s => Object.values(s.s).flat();
+let type = "all", q = "";
+const norm = x => String(x).toLowerCase();
+function matches(s) {
+  if (type !== "all" && !s.t.includes(type)) return false;
+  if (!q) return true;
+  const hay = norm([s.name, s.one, s.what, s.idx, ...s.up, ...s.dn, ...allStocks(s), ...Object.keys(s.s), ...s.t.map(t => TYPES[t][0])].join(" "));
+  return norm(q).split(/\s+/).filter(Boolean).every(k => k.length <= 3 ? new RegExp("(^|[^a-z0-9])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "($|[^a-z0-9])").test(hay) : hay.includes(k));
+}
+const hl = t => { if (!q.trim()) return t; const re = new RegExp("(" + q.trim().split(/\s+/).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")", "gi"); return t.replace(re, "<mark>$1</mark>"); };
+const badges = s => s.t.map(t => `<span class="bd" style="color:${TYPES[t][1]};border-color:${TYPES[t][1]}66">${TYPES[t][0]}</span>`).join("");
+function drawTypes() {
+  const opts = [["all", "All sectors", SECTORS.length], ...Object.entries(TYPES).map(([k, v]) => [k, v[0], SECTORS.filter(s => s.t.includes(k)).length])];
+  $("#types").innerHTML = opts.map(([k, n, c]) => `<button data-t="${k}" class="${k === type ? "on" : ""}">${n}<b>${c}</b></button>`).join("");
+}
+function drawGrid() {
+  const list = SECTORS.filter(matches);
+  $("#count").textContent = `${list.length} of ${SECTORS.length}`;
+  $("#grid").innerHTML = list.map(s => {
+    const st = allStocks(s), ql = norm(q), hit = ql ? st.filter(x => ql.split(/\s+/).some(k => k && norm(x).includes(k))) : [], show = [...new Set([...hit, ...st])].slice(0, 5);
+    return `<button class="sc${s.war ? " war" : ""}" data-open="${s.id}" style="--c:${s.c}">
+      <div class="top"><span class="ico">${s.ico}</span><div><h3>${hl(esc(s.name))}</h3><div class="idx">${esc(s.idx)}</div></div></div>
+      <div class="badges">${badges(s)}</div>
+      <p>${hl(esc(s.one))}</p>
+      <div class="stk">${show.map(x => `<span>${hl(esc(x))}</span>`).join("")}${st.length > show.length ? `<span class="more">+${st.length - show.length} more</span>` : ""}</div>
+      <span class="open">Open sector →</span></button>`;
+  }).join("") || `<div class="none" style="grid-column:1/-1">No sector matches “${esc(q)}”. Try a company name or a word like "rates", "monsoon" or "export".</div>`;
+}
+$("#types").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (!b) return; type = b.dataset.t; drawTypes(); drawGrid(); });
+$("#q").addEventListener("input", e => { q = e.target.value; drawGrid(); });
+$("#grid").addEventListener("click", e => { const b = e.target.closest("[data-open]"); if (b) openSector(b.dataset.open); });
+
+/* ---------- detail drawer ---------- */
+let cur = null;
+function openSector(id, push = true) {
+  const s = SECTORS.find(x => x.id === id); if (!s) return; cur = s;
+  const rel = SECTORS.filter(x => x.id !== s.id && x.t.some(t => s.t.includes(t))).slice(0, 6);
+  $("#pane").innerHTML = `
+    <div class="head"><span class="ico" style="box-shadow:0 0 40px -10px ${s.c}">${s.ico}</span><div><h2>${esc(s.name)}</h2><div class="idx" style="font:500 .74rem 'JetBrains Mono';color:var(--muted);margin-top:4px">📈 ${esc(s.idx)}</div></div><button class="close" id="drClose" aria-label="Close">✕</button></div>
+    <div class="badges" style="margin-top:12px">${badges(s)}</div>
+    <p class="what">${esc(s.what)}</p>
+    <div class="two"><div class="lst up"><b style="color:var(--up)">▲ WHAT LIFTS IT</b><ul>${s.up.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div><div class="lst dn"><b style="color:var(--down)">▼ WHAT HURTS IT</b><ul>${s.dn.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></div>
+    <h4>🔍 Numbers to check</h4><div class="met">${s.m.map(([a, b]) => `<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join("")}</div>
+    <h4>🏢 Popular companies <span style="font:500 .7rem Inter;color:var(--muted)">examples for learning, not recommendations</span></h4>
+    ${Object.entries(s.s).map(([g, l]) => `<div class="sg"><small>${esc(g)}</small><div class="stk">${l.map(x => `<span>${esc(x)}</span>`).join("")}</div></div>`).join("")}
+    <h4>🔄 Best phase of the cycle</h4><div class="related">${s.ph.map(p => `<button data-phase="${p}">${PHASES[p][0]}</button>`).join("")}</div>
+    <div class="note">💡 ${s.note}</div>
+    <div class="dacts"><button class="btn wa" id="waSec">${K.WA_SVG} Share as "Sector of the day"</button><button class="btn img" id="imgSec" style="grid-column:auto">📸 Share as image</button></div>
+    <h4>Related sectors</h4><div class="related">${rel.map(x => `<button data-open="${x.id}">${x.ico} ${esc(x.name)}</button>`).join("")}</div>`;
+  $("#dr").hidden = false; document.body.style.overflow = "hidden"; $("#pane").scrollTop = 0;
+  if (push) history.replaceState(null, "", "#" + s.id);
+}
+function closeSector() { $("#dr").hidden = true; document.body.style.overflow = ""; cur = null; history.replaceState(null, "", location.pathname + location.search); }
+$("#dr").addEventListener("click", e => {
+  if (e.target.id === "dr" || e.target.closest("#drClose")) return closeSector();
+  const o = e.target.closest("[data-open]"); if (o) return openSector(o.dataset.open);
+  const p = e.target.closest("[data-phase]"); if (p) { curPhase = +p.dataset.phase; drawPhase(); closeSector(); $("#wheel").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+  if (e.target.closest("#waSec")) window.open("https://wa.me/?text=" + encodeURIComponent(sectorText(cur)), "_blank", "noopener");
+  if (e.target.closest("#imgSec")) shareImg(cur);
+});
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("#dr").hidden) closeSector(); });
+const pageURL = id => (/^https?:/.test(location.protocol) ? location.origin + location.pathname : "https://manideepcs024.github.io/sectors/") + (id ? "#" + id : "");
+function sectorText(s) {
+  return [`${s.ico} *Sector of the day: ${s.name}*`, `_${s.one}_`, "", "*▲ What lifts it*", ...s.up.slice(0, 3).map(x => "• " + x), "", "*▼ What hurts it*", ...s.dn.slice(0, 3).map(x => "• " + x), "",
+    "*🔍 Numbers to check*", ...s.m.slice(0, 3).map(([a, b]) => `• ${a}: ${b}`), "", `*🏢 Popular names:* ${allStocks(s).slice(0, 6).join(", ")}`, "", `💡 ${s.note.replace(/<[^>]+>/g, "")}`, "",
+    `📚 All sectors explained 👇`, pageURL(s.id), "", ...K.signoff("sectors", "Explore sectors", "Education only · Not a recommendation · Not SEBI registered").slice(1, -2), "_Education only · Not a recommendation · Not SEBI registered_"].join("\n");
+}
+async function shareImg(s) {
+  await K.loadFonts?.();
+  const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H, [[s.c + "55", .1, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .5]]); K.brand(ctx);
+  K.txt(ctx, "SECTOR OF THE DAY", 70, 180, `700 24px ${K.F.MONO}`, "#8b93a7");
+  K.txt(ctx, s.ico, 70, 270, `80px ${K.F.INTER}`, "#fff");
+  K.txt(ctx, s.name, 180, 262, K.fit(ctx, s.name, 700, K.F.GROT, 62, W - 260), "#fff");
+  let x = 70; s.t.forEach(t => { x += K.pill(ctx, TYPES[t][0].replace(/^\S+\s/, ""), x, 300, TYPES[t][1], 20) + 10; });
+  ctx.font = `500 30px ${K.F.INTER}`; let y = 410; K.cap(K.wrap(ctx, s.one, W - 140), 3).forEach(l => { K.txt(ctx, l, 70, y, `500 30px ${K.F.INTER}`, "#d5d9e4"); y += 42; });
+  y += 20;
+  const col = (title, items, colr, x0) => { K.panel(ctx, x0, y, 455, 330, 22, colr + "14", colr + "55"); K.txt(ctx, title, x0 + 24, y + 46, `700 24px ${K.F.MONO}`, colr); let yy = y + 92; items.slice(0, 4).forEach(it => { ctx.font = `500 24px ${K.F.INTER}`; K.cap(K.wrap(ctx, "• " + it, 410), 2).forEach(l => { K.txt(ctx, l, x0 + 24, yy, `500 24px ${K.F.INTER}`, "#e8ecf6"); yy += 32; }); yy += 8; }); };
+  col("▲ LIFTS IT", s.up, "#22d39a", 70); col("▼ HURTS IT", s.dn, "#ff5470", 555); y += 370;
+  K.txt(ctx, "POPULAR COMPANIES", 70, y, `700 22px ${K.F.MONO}`, "#8b93a7"); y += 22;
+  let px = 70, py = y; allStocks(s).slice(0, 8).forEach(n => { ctx.font = `600 24px ${K.F.INTER}`; const w = ctx.measureText(n).width + 30; if (px + w > W - 70) { px = 70; py += 54; } K.panel(ctx, px, py, w, 42, 12, "rgba(255,255,255,.06)", "rgba(255,255,255,.14)"); K.txt(ctx, n, px + 15, py + 29, `600 24px ${K.F.INTER}`, "#e8ecf6"); px += w + 10; });
+  y = py + 90;
+  ctx.font = `500 24px ${K.F.INTER}`; K.cap(K.wrap(ctx, "💡 " + s.note.replace(/<[^>]+>/g, ""), W - 140), 3).forEach(l => { K.txt(ctx, l, 70, y, `500 24px ${K.F.INTER}`, "#f1e3c4"); y += 34; });
+  K.footer(ctx, W, H, K.toolUrl("sectors"), "Examples for learning · Not recommendations · Not SEBI registered", true);
+  await K.shareCanvas(c, `sector-${s.id}.png`, sectorText(s));
+}
+
+/* ---------- guess the sector ---------- */
+const G = { n: 0, score: 0, total: 10, cur: null, answered: false };
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function nextQ() {
+  if (G.n >= G.total) return endGame();
+  G.n++; G.answered = false;
+  const s = SECTORS[Math.floor(Math.random() * SECTORS.length)], stocks = shuffle(allStocks(s).filter(x => !/\(tractors\)|\(pipes\)/.test(x))).slice(0, 3);
+  const wrong = shuffle(SECTORS.filter(x => x.id !== s.id && !allStocks(x).some(y => stocks.includes(y)))).slice(0, 3);
+  G.cur = { s, opts: shuffle([s, ...wrong]) };
+  $("#game").innerHTML = `<div class="qn">QUESTION ${G.n} / ${G.total} · SCORE ${G.score}</div><h3>Which sector do these companies belong to?</h3>
+    <div class="clue">${stocks.map(x => `<span>${esc(x)}</span>`).join("")}</div>
+    <div class="opts">${G.cur.opts.map(o => `<button data-g="${o.id}">${o.ico} ${esc(o.name)}</button>`).join("")}</div><div class="res" id="gres"></div>
+    <div class="bar"><button class="btn primary" id="gNext" hidden>Next question →</button></div>`;
+}
+function endGame() {
+  const pct = G.score / G.total, msg = pct >= .9 ? "🏆 Sector master!" : pct >= .7 ? "🔥 Strong! You know your sectors." : pct >= .5 ? "👍 Good start. Open a few sectors above and try again." : "📚 Keep learning: tap the sectors above and play again.";
+  $("#game").innerHTML = `<div class="qn">GAME OVER</div><h3>You scored ${G.score} / ${G.total}</h3><p style="color:#cfd3df">${msg}</p>
+    <div class="bar"><button class="btn primary" id="gAgain">↺ Play again</button><button class="btn wa" id="gShare">${K.WA_SVG} Challenge the group</button></div>`;
+}
+function startGame() { G.n = 0; G.score = 0; nextQ(); }
+$("#game").addEventListener("click", e => {
+  const o = e.target.closest("[data-g]");
+  if (o && !G.answered) {
+    G.answered = true; const ok = o.dataset.g === G.cur.s.id; if (ok) G.score++;
+    $("#game").querySelectorAll("[data-g]").forEach(b => { if (b.dataset.g === G.cur.s.id) b.classList.add("right"); else if (b === o) b.classList.add("wrong"); });
+    $("#gres").innerHTML = (ok ? "✅ Correct! " : `❌ It's <b>${esc(G.cur.s.name)}</b>. `) + esc(G.cur.s.one) + ` <a href="#${G.cur.s.id}" data-open="${G.cur.s.id}" style="color:var(--acc)">Learn more →</a>`;
+    $("#gNext").hidden = false; $("#gNext").textContent = G.n >= G.total ? "See my score →" : "Next question →"; return;
+  }
+  const lm = e.target.closest("#gres [data-open]"); if (lm) { e.preventDefault(); openSector(lm.dataset.open); return; }
+  if (e.target.closest("#gNext")) nextQ();
+  if (e.target.closest("#gAgain")) startGame();
+  if (e.target.closest("#gShare")) window.open("https://wa.me/?text=" + encodeURIComponent(`🎯 *Guess the Sector*\nI scored *${G.score}/${G.total}*. Can you beat me? 3 company names, 4 sectors, pick the right one 👇\n${pageURL()}#game`), "_blank", "noopener");
+});
+
+/* ---------- init ---------- */
+const nStocks = SECTORS.reduce((a, s) => a + allStocks(s).length, 0);
+$("#heroStats").innerHTML = `<div><b>${SECTORS.length}</b><span>sectors</span></div><div><b>${nStocks}+</b><span>popular companies</span></div><div><b>4</b><span>cycle phases</span></div><div><b>⚔️ 🛡️ 🌾 🏢</b><span>defence · defensive · agri · realty</span></div>`;
+drawTypes(); drawGrid(); drawPhase(); startGame();
+const h = location.hash.slice(1); if (h === "game") $("#game").scrollIntoView(); else if (h) openSector(h, false);
+addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id && id !== "game") openSector(id, false); });
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
