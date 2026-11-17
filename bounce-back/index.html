@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Recovery Room — bounce back after a trading loss</title>
+<meta name="description" content="Had a loss or made a bad trading decision? Pause, breathe, put the loss in perspective, turn it into a lesson and follow a comeback plan. A private space for traders on bad days." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #7c5cff; }
+  .wrap { max-width: 980px; }
+  .steps { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 18px; position: sticky; top: 8px; z-index: 5; padding: 6px; border-radius: 16px; background: rgba(10,12,20,.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--line); }
+  .steps a { flex: 1; min-width: 0; text-align: center; text-decoration: none; color: #cfd3df; font: 700 .8rem Inter; padding: 9px 6px; border-radius: 11px; background: rgba(255,255,255,.04); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .steps a:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .step { margin-top: 22px; scroll-margin-top: 80px; }
+  .step > h2 { font: 800 1.45rem "Space Grotesk"; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .step > h2 span { font: 600 .72rem "JetBrains Mono"; color: var(--acc); letter-spacing: .12em; }
+  .step > p.lead { color: var(--muted); margin: 4px 0 12px; font-size: .92rem; line-height: 1.5; }
+  .feel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .feel button { border: 1.5px solid var(--line); background: rgba(255,255,255,.03); color: #fff; border-radius: 16px; padding: 14px 8px; font: 700 .9rem Inter; cursor: pointer; }
+  .feel button i { display: block; font-style: normal; font-size: 1.6rem; margin-bottom: 4px; }
+  .feel button.on { border-color: var(--acc); background: rgba(0,224,184,.1); }
+  .msg { margin-top: 12px; padding: 16px 18px; border-radius: 18px; background: linear-gradient(135deg, rgba(124,92,255,.14), rgba(0,224,184,.08)); border: 1px solid rgba(124,92,255,.4); font-size: .95rem; line-height: 1.6; color: #e6e1ff; }
+  .msg b { color: #fff; }
+  .breath { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: center; margin-top: 14px; }
+  .orb { width: 220px; height: 220px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; text-align: center; position: relative; }
+  .orb::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(0,224,184,.9), rgba(124,92,255,.65) 60%, rgba(124,92,255,.15)); transform: scale(var(--s, .55)); transition: transform var(--d, 4s) ease-in-out; box-shadow: 0 0 80px -10px rgba(0,224,184,.6); }
+  .orb b { position: relative; font: 800 1.3rem "Space Grotesk"; text-shadow: 0 2px 10px rgba(0,0,0,.5); }
+  .orb small { position: relative; display: block; font: 600 .8rem "JetBrains Mono"; opacity: .85; }
+  .bctl { display: grid; gap: 10px; }
+  .bctl p { color: #cfd3df; font-size: .88rem; line-height: 1.5; }
+  .lock { margin-top: 14px; border-radius: 20px; padding: 16px; border: 1px solid rgba(255,84,112,.45); background: rgba(255,84,112,.06); }
+  .lock h3 { font: 800 1.05rem "Space Grotesk"; }
+  .lock p { color: #cfd3df; font-size: .86rem; margin: 4px 0 10px; }
+  .lock .opts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .lock .opts button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #fff; padding: 9px 14px; border-radius: 12px; font: 700 .84rem Inter; cursor: pointer; }
+  .lock .timer { font: 800 2.4rem "JetBrains Mono"; color: #ff9aab; margin: 6px 0; }
+  .lock.on { border-color: rgba(0,224,184,.5); background: rgba(0,224,184,.06); }
+  .lock.on .timer { color: var(--acc); }
+  .persp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .big { border-radius: 20px; padding: 16px; text-align: center; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
+  .big span { font: 700 .66rem "JetBrains Mono"; letter-spacing: .1em; color: var(--muted); }
+  .big b { display: block; font: 800 2.4rem/1.1 "Space Grotesk"; margin: 6px 0; }
+  .big small { color: #cfd3df; font-size: .82rem; }
+  .gauge { height: 14px; border-radius: 8px; background: rgba(34,211,154,.25); overflow: hidden; margin-top: 10px; display: flex; }
+  .gauge i { display: block; height: 100%; background: #ff5470; }
+  .facts { display: grid; gap: 8px; margin-top: 12px; }
+  .facts div { padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid var(--line); font-size: .86rem; color: #d5d9e4; line-height: 1.45; }
+  .facts b { color: #fff; }
+  table.rec { width: 100%; border-collapse: collapse; font-size: .84rem; margin-top: 8px; }
+  table.rec td, table.rec th { padding: 7px 8px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: left; }
+  table.rec th { font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+  table.rec td.n { font: 700 .84rem "JetBrains Mono"; text-align: right; } table.rec th.n { text-align: right; }
+  table.rec tr.hl td { background: rgba(254,188,46,.1); }
+  .track { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .track div { border-radius: 14px; padding: 10px; text-align: center; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+  .track b { display: block; font: 800 1.4rem "Space Grotesk"; }
+  .track span { font-size: .72rem; color: var(--muted); }
+  .qs { display: grid; gap: 10px; }
+  .qq { border-radius: 16px; padding: 12px 14px; border: 1px solid var(--line); background: rgba(0,0,0,.22); }
+  .qq .t { font: 700 .92rem Inter; margin-bottom: 8px; }
+  .qq .t small { display: block; font: 500 .76rem Inter; color: var(--muted); margin-top: 2px; }
+  .verdict { margin-top: 12px; border-radius: 18px; padding: 16px; border: 1px solid; }
+  .verdict h3 { font: 800 1.2rem "Space Grotesk"; }
+  .verdict p { color: #d5d9e4; font-size: .9rem; line-height: 1.55; margin-top: 4px; }
+  .verdict.good { border-color: rgba(34,211,154,.5); background: rgba(34,211,154,.07); }
+  .verdict.bad { border-color: rgba(254,188,46,.55); background: rgba(254,188,46,.07); }
+  .lessons { display: grid; gap: 8px; margin-top: 12px; }
+  .les { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.22); font-size: .86rem; }
+  .les i { font-style: normal; font-size: 1.3rem; }
+  .les small { display: block; color: var(--muted); font: .7rem "JetBrains Mono"; margin-top: 2px; }
+  .les b { color: #fff; }
+  .les button { border: 0; background: none; color: var(--muted); cursor: pointer; }
+  .ladder { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .rung { border-radius: 16px; padding: 12px 8px; text-align: center; border: 1.5px solid var(--line); background: rgba(0,0,0,.25); cursor: pointer; color: #fff; font: inherit; }
+  .rung b { display: block; font: 800 1.1rem "Space Grotesk"; }
+  .rung span { font: 600 .7rem "JetBrains Mono"; color: var(--muted); }
+  .rung.done { border-color: rgba(34,211,154,.6); background: rgba(34,211,154,.12); }
+  .rung.next { border-color: rgba(124,92,255,.7); box-shadow: 0 0 0 4px rgba(124,92,255,.15); }
+  .sizebar { margin-top: 12px; height: 14px; border-radius: 8px; background: rgba(255,255,255,.07); overflow: hidden; }
+  .sizebar i { display: block; height: 100%; background: linear-gradient(90deg, #7c5cff, #00e0b8); transition: width .5s; }
+  .rules3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .rules3 div { border-radius: 14px; padding: 12px; background: rgba(255,255,255,.03); border: 1px solid var(--line); font-size: .84rem; line-height: 1.45; color: #d5d9e4; }
+  .rules3 b { display: block; color: #fff; font: 700 .92rem "Space Grotesk"; margin-bottom: 3px; }
+  .wis { position: relative; border-radius: 22px; padding: 26px 22px; text-align: center; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.15), rgba(0,224,184,.06)); min-height: 170px; display: grid; place-items: center; }
+  .wis q { font: 700 clamp(1.1rem, 3.4vw, 1.45rem)/1.4 "Space Grotesk"; quotes: none; display: block; }
+  .wis small { display: block; color: var(--muted); font-size: .8rem; margin-top: 10px; }
+  .wisbtns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .wisbtns .btn { padding: 10px 14px; font-size: .84rem; }
+  .proud { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
+  .pm { position: relative; border-radius: 16px; padding: 14px; border: 1px solid rgba(254,188,46,.4); background: rgba(254,188,46,.06); font-size: .88rem; line-height: 1.5; color: #f1e3c4; }
+  .pm small { display: block; color: var(--muted); font: .68rem "JetBrains Mono"; margin-top: 6px; }
+  .pm button { position: absolute; top: 6px; right: 8px; border: 0; background: none; color: var(--muted); cursor: pointer; }
+  .addrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 10px; }
+  .addrow .btn { padding: 10px 16px; }
+  .sos { margin-top: 22px; padding: 16px; border-radius: 18px; border: 1px solid rgba(91,140,255,.45); background: rgba(91,140,255,.07); font-size: .88rem; color: #d7e2ff; line-height: 1.6; }
+  .sos b { color: #fff; }
+  .step .btn { white-space: normal; line-height: 1.25; min-width: 0; }
+  @media (max-width: 520px) { .step .acts { grid-template-columns: 1fr !important; } }
+  @media (max-width: 720px) { .breath, .persp { grid-template-columns: 1fr; } .feel { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ladder { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; } .rung { padding: 10px 2px; } .rung b { font-size: .95rem; } .rules3, .track { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rules3 div:last-child { grid-column: 1 / -1; } .steps a { font-size: .72rem; padding: 8px 4px; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Bad day? <span class="grad">Breathe. Then bounce back.</span></h1>
+    <p class="sub">Every trader who lasts has had days like this: a loss that stings, a decision you regret. The difference is what happens next. Take 5 minutes here <b>before</b> you place another trade.</p>
+
+    <nav class="steps"><a href="#pause">🧘 1 Pause</a><a href="#perspective">🔭 2 Perspective</a><a href="#learn">📖 3 Learn</a><a href="#comeback">🪜 4 Comeback</a><a href="#remember">⭐ Remember</a></nav>
+
+    <!-- 1 PAUSE -->
+    <section class="step card" id="pause">
+      <h2>Pause first <span>STEP 1</span></h2>
+      <p class="lead">Right after a loss your brain wants to win it back <b>now</b>. That urge is where the biggest losses come from. How are you feeling?</p>
+      <div class="feel" id="feel"></div>
+      <div class="msg" id="feelMsg" hidden></div>
+      <div class="breath">
+        <div class="orb" id="orb"><div><b id="orbT">Ready?</b><small id="orbS">4 rounds · 1 minute</small></div></div>
+        <div class="bctl"><p><b>Box breathing</b> calms the body in about a minute: breathe <b>in for 4</b>, <b>hold 4</b>, <b>out for 4</b>, <b>hold 4</b>. Follow the circle. It's the same technique used to stay calm under pressure.</p><button class="btn primary" id="breathBtn">🫁 Start breathing (1 minute)</button></div>
+      </div>
+      <div class="lock" id="lock"></div>
+    </section>
+
+    <!-- 2 PERSPECTIVE -->
+    <section class="step card" id="perspective">
+      <h2>See it in proportion <span>STEP 2</span></h2>
+      <p class="lead">A loss feels like everything. On paper, it's usually a small part of your capital and a few normal trades away from recovery.</p>
+      <div class="cols3">
+        <div><div class="q">Today's loss ₹</div><label class="field sm"><input id="loss" type="text" inputmode="decimal" placeholder="8,000" /></label></div>
+        <div><div class="q">Trading capital ₹</div><label class="field sm"><input id="cap" type="text" inputmode="decimal" placeholder="3,00,000" /></label></div>
+        <div><div class="q">Usual risk / trade ₹</div><label class="field sm"><input id="risk" type="text" inputmode="decimal" placeholder="3,000" /></label></div>
+      </div>
+      <div id="perspOut" style="margin-top:14px"></div>
+      <h3 style="font:700 1rem 'Space Grotesk';margin-top:18px">📈 Your own track record <span style="font:500 .72rem Inter;color:var(--muted)">from your day reviews &amp; journal</span></h3>
+      <div id="track"></div>
+      <details style="margin-top:14px"><summary style="cursor:pointer;font:600 .86rem Inter;color:#cfd3df">📐 Why small losses matter: the recovery maths</summary>
+        <table class="rec" id="recTbl"></table>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:8px">Small losses are easy to recover; big ones get exponentially harder. That's why the stop-loss and position size matter more than any single trade.</p>
+      </details>
+    </section>
+
+    <!-- 3 LEARN -->
+    <section class="step card" id="learn">
+      <h2>Turn it into a lesson <span>STEP 3</span></h2>
+      <p class="lead">Not every loss is a mistake. A loss where you followed your plan is just the <b>cost of doing business</b>. Answer honestly; nobody sees this but you.</p>
+      <div class="qs" id="qs"></div>
+      <div class="q">What happened? <span class="opt">one line</span></div>
+      <textarea id="what" maxlength="160" placeholder="e.g. Bought a breakout that failed; moved my stop-loss lower hoping it would come back."></textarea>
+      <div class="q">The lesson / what I'll do next time</div>
+      <textarea id="lesson" maxlength="160" placeholder="e.g. Never move the stop-loss after entry. Exit and re-enter if the setup comes back."></textarea>
+      <div id="verdict"></div>
+      <div class="acts" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><button class="btn primary" id="saveLesson">📖 Save to my Lesson Book</button><button class="btn" id="shareLesson">💌 Share the lesson (anonymous)</button></div>
+      <h3 style="font:700 1rem 'Space Grotesk';margin-top:18px">📖 My Lesson Book <span id="lesMeta" style="font:500 .72rem 'JetBrains Mono';color:var(--muted)"></span></h3>
+      <div class="lessons" id="lessons"></div>
+    </section>
+
+    <!-- 4 COMEBACK -->
+    <section class="step card" id="comeback">
+      <h2>The comeback plan <span>STEP 4</span></h2>
+      <p class="lead">Don't try to win it all back in one trade. Climb back with <b>5 disciplined trades at half size</b>. Each one you take with the full process (setup, stop-loss, size), tap a rung. Win or lose doesn't matter; <b>discipline</b> does.</p>
+      <div class="ladder" id="ladder"></div>
+      <div class="sizebar"><i id="sizeI"></i></div>
+      <div style="display:flex;justify-content:space-between;font:600 .78rem 'JetBrains Mono';color:var(--muted);margin-top:6px"><span id="sizeT"></span><button id="resetLadder" style="border:0;background:none;color:var(--muted);cursor:pointer;font:inherit">↺ restart ladder</button></div>
+      <div class="rules3">
+        <div><b>🎯 A+ setups only</b>Only the setup you know best. No new ideas, no tips, no "quick ones".</div>
+        <div><b>✋ Max 2 trades a day</b>Fewer trades means clearer decisions. Stop after 1 loss on comeback days.</div>
+        <div><b>✅ Checklist every trade</b>Run each trade through the <a href="../checklist/" style="color:var(--acc)">pre-trade checklist</a> first.</div>
+      </div>
+    </section>
+
+    <!-- REMEMBER -->
+    <section class="step card" id="remember">
+      <h2>Remember who you are <span>⭐</span></h2>
+      <p class="lead">One bad day doesn't erase your good ones. Read a principle, and look at your proud moments.</p>
+      <div class="wis"><div><q id="wisQ"></q><small id="wisN"></small></div></div>
+      <div class="wisbtns"><button class="btn" id="wisPrev">‹</button><button class="btn" id="wisNext">Next principle ›</button><button class="btn wa" id="wisShare">💌 Share</button></div>
+      <h3 style="font:700 1rem 'Space Grotesk';margin-top:20px">⭐ My proud moments <span style="font:500 .72rem Inter;color:var(--muted)">good trades, good decisions, good habits</span></h3>
+      <div class="addrow"><label class="field sm"><input id="proudIn" class="txt" type="text" maxlength="120" placeholder="e.g. Exited exactly at my stop-loss even though it hurt" /></label><button class="btn primary" id="proudAdd">Add</button></div>
+      <div class="proud" id="proud"></div>
+      <div class="sos"><b>💙 If it's more than trading stress:</b> if losses are affecting your sleep, family, health or you feel hopeless, stop trading for a while and talk to someone you trust. In India you can call <b>Tele-MANAS: 14416</b> or <b>1-800-891-4416</b> (free, 24×7, Government of India mental-health helpline). Money can be rebuilt; you matter more than any account.</div>
+    </section>
+
+    <div class="disclaimer"><b>⚠️ Note:</b> This page is for self-reflection and education, not financial or medical advice. I'm not SEBI-registered. Everything you type stays on this device.</div>
+    <footer>Made with care by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const S = K.store("bounce_v1", { feel: "", lockUntil: 0, loss: "", cap: "", risk: "", ans: {}, what: "", lesson: "", lessons: [], ladder: [false, false, false, false, false], proud: [], wi: 0 });
+
+/* ---------- 1. feelings ---------- */
+const FEEL = {
+  angry: ["😤", "Angry", "Anger wants revenge, and the market doesn't care. <b>Don't place another trade today.</b> Close the trading app, walk for 10 minutes, and come back to this page when the urge has passed."],
+  sad: ["😔", "Down", "It's okay to feel low; it means you care. But this loss is <b>one data point</b>, not a verdict on you. Every great trader has a drawer full of days like this one."],
+  ashamed: ["😳", "Stupid / ashamed", "You made a decision with the information and emotions you had. Shame keeps you stuck; <b>a lesson moves you forward</b>. Step 3 turns this into something useful."],
+  anxious: ["😰", "Anxious", "Anxiety shrinks your thinking. Do the breathing below, then look at the real numbers in Step 2. They're almost always smaller than they feel."],
+  numb: ["😶", "Numb / shocked", "Shock is normal after a big hit. Don't make any decisions for the next few hours: no new trades, no big exits. Breathe, then come back to the steps calmly."],
+  fired: ["🔥", "Want to win it back", "That's the most dangerous feeling in trading. <b>The market will still be here tomorrow.</b> Start the cool-off timer below and let it run before you touch the app."],
+};
+function drawFeel() {
+  $("#feel").innerHTML = Object.entries(FEEL).map(([k, [i, n]]) => `<button data-f="${k}" class="${S.feel === k ? "on" : ""}"><i>${i}</i>${n}</button>`).join("");
+  $("#feelMsg").hidden = !S.feel; if (S.feel) $("#feelMsg").innerHTML = FEEL[S.feel][2];
+}
+$("#feel").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; S.feel = b.dataset.f; S.save(); drawFeel(); if (["angry", "fired"].includes(S.feel) && S.lockUntil < Date.now()) $("#lock").scrollIntoView({ behavior: "smooth", block: "center" }); });
+
+/* breathing */
+let breathing = false;
+$("#breathBtn").addEventListener("click", async () => {
+  if (breathing) return; breathing = true; const orb = $("#orb"), T = $("#orbT"), Sm = $("#orbS"), btn = $("#breathBtn"); btn.disabled = true;
+  const phases = [["Breathe in", 1, 4], ["Hold", 1, 4], ["Breathe out", .55, 4], ["Hold", .55, 4]];
+  for (let r = 1; r <= 4; r++) for (const [t, s, sec] of phases) {
+    orb.style.setProperty("--d", sec + "s"); orb.style.setProperty("--s", s); T.textContent = t;
+    for (let c = sec; c > 0; c--) { Sm.textContent = `${c} · round ${r}/4`; await new Promise(res => setTimeout(res, 1000)); }
+  }
+  T.textContent = "Well done 💙"; Sm.textContent = "Calmer now. Continue below"; btn.disabled = false; btn.textContent = "🫁 Breathe again"; breathing = false;
+});
+
+/* cool-off lock */
+let lockTick;
+function drawLock() {
+  const left = S.lockUntil - Date.now(), box = $("#lock");
+  clearInterval(lockTick);
+  if (left > 0) {
+    box.className = "lock on";
+    const fmt = ms => { const s = Math.ceil(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+    box.innerHTML = `<h3>🔒 Cool-off running: no trading until ${new Date(S.lockUntil).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}</h3><div class="timer" id="lockT">${fmt(left)}</div><p>Close the trading app. Use this time for Steps 2–4, a walk, or time with family. If you open this page again, the timer will still be here.</p><div class="opts"><button id="unlock">I'm calm, end early</button></div>`;
+    lockTick = setInterval(() => { const l = S.lockUntil - Date.now(); if (l <= 0) { drawLock(); K.toast("✅ Cool-off done. Trade only if your plan says so"); return; } $("#lockT").textContent = fmt(l); }, 1000);
+  } else {
+    box.className = "lock";
+    box.innerHTML = `<h3>🔒 Start a cool-off: no trading for…</h3><p>A promise to yourself. Revenge trades are taken in the first hour after a loss; a timer breaks the loop.</p><div class="opts"><button data-lock="30">30 min</button><button data-lock="60">1 hour</button><button data-lock="eod">Rest of the day</button><button data-lock="24">24 hours</button></div>`;
+  }
+}
+$("#lock").addEventListener("click", e => {
+  const b = e.target.closest("[data-lock]");
+  if (b) { const v = b.dataset.lock; if (v === "eod") { const d = new Date(); d.setHours(23, 59, 0, 0); S.lockUntil = +d; } else S.lockUntil = Date.now() + (v === "24" ? 24 * 60 : +v) * 60000; S.save(); drawLock(); K.toast("🔒 Cool-off started. Close the trading app"); }
+  if (e.target.id === "unlock" && confirm("End the cool-off early? Only if you're genuinely calm and not chasing the loss.")) { S.lockUntil = 0; S.save(); drawLock(); }
+});
+
+/* ---------- 2. perspective ---------- */
+const read = k => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
+function drawPersp() {
+  const L = Math.abs(num(S.loss)), C = num(S.cap), Rk = num(S.risk);
+  if (!(L > 0)) { $("#perspOut").innerHTML = `<div class="nodata" style="color:var(--muted);font-size:.86rem;padding:12px;border:1px dashed var(--line);border-radius:14px;text-align:center">Enter today's loss (and your capital) to see it in proportion.</div>`; return; }
+  const pct = C > 0 ? L / C * 100 : null, need = pct != null ? (1 / (1 - pct / 100) - 1) * 100 : null, Rs = Rk > 0 ? L / Rk : null;
+  const facts = [];
+  if (pct != null) facts.push(`You still have <b>${(100 - pct).toFixed(1)}%</b> of your capital (<b>${K.rs(C - L)}</b>). You're still in the game.`);
+  if (Rs != null) facts.push(Rs <= 1.2 ? `This was about <b>${Rs.toFixed(1)}R</b>: a normal, planned-size loss. Your system expects these.` : `This was <b>${Rs.toFixed(1)}R</b>, bigger than your usual risk. The lesson is probably about the <b>stop-loss or size</b>, not the stock.`);
+  if (Rs != null) facts.push(`At an average win of 2R, roughly <b>${Math.max(1, Math.ceil(Rs / 2))} good trade${Math.ceil(Rs / 2) > 1 ? "s" : ""}</b> recover this. No hurry: over the next week or two is fine.`);
+  if (pct != null && pct >= 10) facts.push(`⚠️ A ${pct.toFixed(0)}% hit is big. <b>Halve your position size</b> until you've had 5 disciplined trades (Step 4), and review your risk per trade.`);
+  facts.push("Losses are part of every trading system. Even strategies with a 50% win rate can be very profitable when losses are kept small.");
+  $("#perspOut").innerHTML = `<div class="persp"><div class="big"><span>LOSS AS % OF CAPITAL</span><b class="${pct >= 10 ? "down" : pct >= 3 ? "warnc" : ""}" style="${pct != null && pct < 3 ? "color:var(--acc)" : ""}">${pct != null ? pct.toFixed(1) + "%" : "—"}</b><small>${pct != null ? `needs +${need.toFixed(1)}% to get back` : "add your capital"}</small>${pct != null ? `<div class="gauge"><i style="width:${Math.min(100, pct)}%"></i></div>` : ""}</div>
+    <div class="big"><span>IN UNITS OF YOUR RISK</span><b>${Rs != null ? Rs.toFixed(1) + "R" : "—"}</b><small>${Rs != null ? (Rs <= 1.2 ? "a planned, normal loss" : "bigger than planned") : "add your usual risk per trade"}</small></div></div>
+    <div class="facts">${facts.map(f => `<div>${f}</div>`).join("")}</div>`;
+}
+["loss", "cap", "risk"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); S[k] = e.target.value; S.save(); drawPersp(); }); });
+$("#recTbl").innerHTML = `<tr><th>If you lose</th><th class="n">You need to gain</th></tr>` + [5, 10, 20, 30, 50, 75].map(p => `<tr class="${p === 50 ? "hl" : ""}"><td>−${p}%</td><td class="n ${p >= 30 ? "down" : ""}">+${((1 / (1 - p / 100) - 1) * 100).toFixed(0)}%</td></tr>`).join("");
+function drawTrack() {
+  const H = read("dayreview_v1").hist || {}, net = d => (num(d.profit) || 0) - Math.abs(num(d.loss) || 0) - (num(d.chg) || 0);
+  const days = Object.entries(H).filter(([, d]) => d.traded === "yes").sort(([a], [b]) => a.localeCompare(b));
+  const red = days.filter(([, d]) => net(d) < 0), green = days.filter(([, d]) => net(d) > 0);
+  let comebacks = 0; for (let i = 0; i < days.length - 1; i++) if (net(days[i][1]) < 0 && days.slice(i + 1).some(([, d]) => net(d) > 0)) comebacks++;
+  const months = {}; days.forEach(([k, d]) => { months[k.slice(0, 7)] = (months[k.slice(0, 7)] || 0) + net(d); });
+  const gm = Object.values(months).filter(v => v > 0).length;
+  const J = (read("journal_v1").trades || []).filter(t => num(t.exit) > 0);
+  if (!days.length && !J.length) { $("#track").innerHTML = `<div style="color:var(--muted);font-size:.86rem;padding:12px;border:1px dashed var(--line);border-radius:14px;text-align:center;margin-top:8px">Start doing a 2-minute <a href="../day-review/" style="color:var(--acc)">day review</a> each evening. Next time you have a bad day, this will show how many times you've already bounced back.</div>`; return; }
+  $("#track").innerHTML = `<div class="track"><div><b class="down">${red.length}</b><span>red days survived</span></div><div><b class="up">${comebacks}</b><span>times you bounced back</span></div><div><b class="up">${green.length}</b><span>green days</span></div><div><b>${gm}/${Object.keys(months).length}</b><span>green months</span></div></div>
+    <div class="facts"><div>${red.length ? `You've had <b>${red.length}</b> red day${red.length > 1 ? "s" : ""} before, and you're still here, still learning. ${comebacks ? `<b>${comebacks}</b> of them were followed by green days.` : ""}` : "No red days recorded yet. This is your first; treat it as tuition."}</div></div>`;
+}
+
+/* ---------- 3. learn ---------- */
+const QS = [
+  ["plan", "Was it a planned setup from my playbook?", "Not a tip, not an impulse"],
+  ["sl", "Did I respect my stop-loss?", "Exited where I planned, didn't move it"],
+  ["size", "Was my position size within my risk rule?", "Normal size, not doubled to win back"],
+  ["calm", "Was I calm when I took it?", "Not bored, angry, greedy or chasing"],
+];
+function drawQs() {
+  $("#qs").innerHTML = QS.map(([k, t, s]) => `<div class="qq"><div class="t">${t}<small>${s}</small></div><div class="seg" style="grid-template-columns:1fr 1fr"><div class="pill" style="display:none"></div><button data-q="${k}" data-v="1" class="${S.ans[k] === 1 ? "on" : ""}" style="${S.ans[k] === 1 ? "background:rgba(34,211,154,.25);color:#fff;border-radius:12px" : ""}">✅ Yes</button><button data-q="${k}" data-v="0" class="${S.ans[k] === 0 ? "on" : ""}" style="${S.ans[k] === 0 ? "background:rgba(255,84,112,.25);color:#fff;border-radius:12px" : ""}">❌ No</button></div></div>`).join("");
+  drawVerdict();
+}
+$("#qs").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (!b) return; S.ans[b.dataset.q] = +b.dataset.v; S.save(); drawQs(); });
+["what", "lesson"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { S[k] = e.target.value; S.save(); }); });
+const kind = () => { const a = QS.map(([k]) => S.ans[k]); if (a.some(v => v == null)) return null; return a.every(v => v === 1) ? "good" : "bad"; };
+const MISS = { plan: "Only trade setups from your playbook. If it's not on your list, it's not your trade.", sl: "Put the stop-loss order in right after entry, and never move it further away.", size: "Fix your risk per trade (e.g. 1% of capital) and size every position from the stop-loss.", calm: "Don't trade when angry, bored or chasing. Use the cool-off timer instead." };
+function drawVerdict() {
+  const k = kind(), v = $("#verdict");
+  if (!k) { v.innerHTML = ""; return; }
+  if (k === "good") v.innerHTML = `<div class="verdict good"><h3>✅ This was a GOOD loss</h3><p>You followed your process: right setup, right size, stop-loss respected, calm mind. <b>That's exactly what professionals do.</b> The trade didn't work, and that's normal; no system wins every time. Change nothing. Take the next setup with the same discipline.</p></div>`;
+  else { const miss = QS.filter(([k]) => S.ans[k] === 0); v.innerHTML = `<div class="verdict bad"><h3>📖 A tuition loss, with a clear lesson</h3><p>The problem wasn't the market; it was ${miss.length === 1 ? "one rule" : miss.length + " rules"} that slipped. That's actually good news: <b>rules are fully in your control.</b></p><p>${miss.map(([k]) => "👉 " + MISS[k]).join("<br/>")}</p></div>`; if (!S.lesson) { S.lesson = MISS[miss[0][0]]; $("#lesson").value = S.lesson; S.save(); } }
+}
+function drawLessons() {
+  $("#lesMeta").textContent = S.lessons.length ? `${S.lessons.length} lesson${S.lessons.length > 1 ? "s" : ""} · ${S.lessons.filter(l => l.kind === "good").length} good losses` : "";
+  $("#lessons").innerHTML = S.lessons.length ? S.lessons.slice(0, 20).map(l => `<div class="les" data-id="${l.id}"><i>${l.kind === "good" ? "✅" : "📖"}</i><div>${l.what ? esc(l.what) + "<br/>" : ""}<b>👉 ${esc(l.lesson || "—")}</b><small>${K.niceDate(l.date, { day: "numeric", month: "short", year: "numeric" })}${l.loss ? " · " + esc(l.loss) : ""}</small></div><button data-del="${l.id}" title="Delete">✕</button></div>`).join("")
+    : `<div style="color:var(--muted);font-size:.86rem;padding:12px;border:1px dashed var(--line);border-radius:14px;text-align:center">Your lessons will collect here. Read them before each trading week.</div>`;
+}
+$("#saveLesson").addEventListener("click", () => {
+  if (!kind()) { K.toast("Answer the 4 questions first"); return; }
+  if (!S.lesson.trim()) { K.shake($("#lesson")); K.toast("Write the lesson in one line"); return; }
+  S.lessons.unshift({ id: Date.now(), date: K.iso(K.istNow()), kind: kind(), what: S.what.trim(), lesson: S.lesson.trim(), loss: S.loss ? "−₹" + S.loss.replace(/^-/, "") : "" });
+  S.ans = {}; S.what = ""; S.lesson = ""; $("#what").value = ""; $("#lesson").value = ""; S.save(); drawQs(); drawLessons();
+  K.toast(kind() === "good" ? "✅ Saved. Good process, keep going" : "📖 Lesson saved. Now Step 4", 2400); $("#comeback").scrollIntoView({ behavior: "smooth" });
+});
+$("#lessons").addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (!b) return; S.lessons = S.lessons.filter(l => l.id !== +b.dataset.del); S.save(); drawLessons(); });
+const pageURL = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/bounce-back/";
+$("#shareLesson").addEventListener("click", () => {
+  const l = (S.lesson || S.lessons[0]?.lesson || "").trim(); if (!l) { K.toast("Write a lesson first"); return; }
+  const k = kind() || S.lessons[0]?.kind;
+  window.open("https://wa.me/?text=" + encodeURIComponent(`📖 *Today's trading lesson*\n${k === "good" ? "I took a loss, but I followed my process. That's a good loss. ✅" : "I took a loss and broke a rule. Here's what I learned:"}\n\n👉 _${l}_\n\nLosses are tuition. The comeback starts with the next disciplined trade. 💪\n\n🧘 Bad day? Use the Recovery Room 👇\n${pageURL()}`), "_blank", "noopener");
+});
+
+/* ---------- 4. comeback ladder ---------- */
+function drawLadder() {
+  const n = S.ladder.filter(Boolean).length, size = 50 + n * 10, next = S.ladder.indexOf(false);
+  $("#ladder").innerHTML = S.ladder.map((d, i) => `<button class="rung ${d ? "done" : i === next ? "next" : ""}" data-r="${i}"><b>${d ? "✅" : i + 1}</b><span>${50 + (i + 1) * 10}% size</span></button>`).join("");
+  $("#sizeI").style.width = size + "%";
+  $("#sizeT").textContent = n >= 5 ? "🏆 Back to 100% size: comeback complete!" : `Trade at ${size}% of your normal size · ${5 - n} disciplined trade${5 - n > 1 ? "s" : ""} to full size`;
+}
+$("#ladder").addEventListener("click", e => { const b = e.target.closest("[data-r]"); if (!b) return; const i = +b.dataset.r, next = S.ladder.indexOf(false);
+  if (S.ladder[i]) { S.ladder = S.ladder.map((v, j) => j < i ? v : false); }
+  else { if (i !== next) { K.toast("Climb one rung at a time 🙂"); return; } S.ladder[i] = true; K.toast(S.ladder.every(Boolean) ? "🏆 Comeback complete! Back to full size" : `✅ Rung ${i + 1}: disciplined trade logged`); }
+  S.save(); drawLadder(); });
+$("#resetLadder").addEventListener("click", () => { S.ladder = [false, false, false, false, false]; S.save(); drawLadder(); });
+
+/* ---------- remember: principles + proud moments ---------- */
+const WIS = [
+  "A loss with a stop-loss is a cost. A loss without one is a disaster. You paid a cost today.",
+  "You don't need to win back the money where you lost it. The next good setup can be anywhere.",
+  "Judge yourself on your decisions, not on one outcome. Good decisions win over 100 trades, not 1.",
+  "The market will be open tomorrow, and next week, and next year. There's no rush.",
+  "Every professional trader has lost more trades than you have. They just kept the losses small.",
+  "Your capital is your inventory. Protect it today so you can trade tomorrow.",
+  "Revenge trading turns one bad day into a bad month. Walking away turns it into a lesson.",
+  "Being wrong is part of trading. Staying wrong is optional.",
+  "Small losses are the price of finding big winners.",
+  "Confidence comes back one disciplined trade at a time, not one big trade.",
+  "Write the lesson down. A loss you learn from is tuition; a loss you forget is just a loss.",
+  "You are not your P&L. A red day doesn't make you a bad trader; breaking your rules repeatedly does, and that's fixable.",
+  "Zoom out: what will this loss matter in a year if you follow your process from here?",
+  "The best traders aren't the ones who never fall. They're the ones who get up the same way every time.",
+];
+function drawWis() { const i = ((S.wi % WIS.length) + WIS.length) % WIS.length; $("#wisQ").textContent = WIS[i]; $("#wisN").textContent = `Principle ${i + 1} of ${WIS.length}`; }
+$("#wisNext").addEventListener("click", () => { S.wi++; S.save(); drawWis(); }); $("#wisPrev").addEventListener("click", () => { S.wi--; S.save(); drawWis(); });
+$("#wisShare").addEventListener("click", () => { const i = ((S.wi % WIS.length) + WIS.length) % WIS.length; window.open("https://wa.me/?text=" + encodeURIComponent(`💪 *For traders on a bad day*\n\n_"${WIS[i]}"_\n\nTook a loss? Pause, breathe and bounce back 👇\n${pageURL()}\n\n— MANIMINDSMONEY Community`), "_blank", "noopener"); });
+function drawProud() {
+  const J = (read("journal_v1").trades || []).map(t => { const E = num(t.entry), SL = num(t.sl), X = num(t.exit), dir = t.side === "short" ? -1 : 1; return E && SL && X && (E - SL) * dir > 0 ? { t, R: (X - E) * dir / Math.abs(E - SL) } : null; }).filter(Boolean).sort((a, b) => b.R - a.R).slice(0, 2);
+  const auto = J.filter(x => x.R >= 1.5).map(x => `<div class="pm" style="border-color:rgba(34,211,154,.45);background:rgba(34,211,154,.06);color:#c9f2e2">📈 Your ${esc(x.t.sym)} trade made <b>+${x.R.toFixed(1)}R</b>. You've done it before; you'll do it again.<small>from your journal · ${K.niceDate(x.t.date, { day: "numeric", month: "short" })}</small></div>`);
+  const mine = S.proud.map(p => `<div class="pm">⭐ ${esc(p.t)}<small>${K.niceDate(p.date, { day: "numeric", month: "short", year: "numeric" })}</small><button data-pd="${p.id}" title="Remove">✕</button></div>`);
+  $("#proud").innerHTML = [...mine, ...auto].join("") || `<div style="grid-column:1/-1;color:var(--muted);font-size:.86rem;padding:12px;border:1px dashed var(--line);border-radius:14px;text-align:center">Add moments you're proud of: a perfect exit, a trade you skipped wisely, a month you followed every rule. On bad days, they'll be waiting here.</div>`;
+}
+function addProud() { const t = $("#proudIn").value.trim(); if (!t) { K.shake($("#proudIn").closest(".field")); return; } S.proud.unshift({ id: Date.now(), t, date: K.iso(K.istNow()) }); $("#proudIn").value = ""; S.save(); drawProud(); K.toast("⭐ Saved. Future you will thank you"); }
+$("#proudAdd").addEventListener("click", addProud); $("#proudIn").addEventListener("keydown", e => { if (e.key === "Enter") addProud(); });
+$("#proud").addEventListener("click", e => { const b = e.target.closest("[data-pd]"); if (!b) return; S.proud = S.proud.filter(p => p.id !== +b.dataset.pd); S.save(); drawProud(); });
+
+drawFeel(); drawLock(); drawPersp(); drawTrack(); drawQs(); drawLessons(); drawLadder(); drawWis(); drawProud();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
