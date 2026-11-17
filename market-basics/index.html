@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Stock market basics — demat, broker, CNC/MIS, circuits, BE, SME, F&amp;O ban</title>
+<meta name="description" content="Everything a beginner needs before the first trade in India: demat and trading accounts, brokers and depositories, T+1 settlement, order types, CNC/MIS/NRML, intraday vs swing vs positional, SME vs mainboard, upper/lower circuits, BE/trade-to-trade, ASM/GSM and F&amp;O ban." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #5b8cff; }
+  .wrap { max-width: 1080px; }
+  .toc { display: flex; gap: 6px; flex-wrap: wrap; position: sticky; top: 8px; z-index: 5; padding: 6px; border-radius: 16px; background: rgba(10,12,20,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--line); margin-bottom: 16px; }
+  .toc a { text-decoration: none; color: #cfd3df; font: 600 .78rem Inter; padding: 8px 11px; border-radius: 10px; background: rgba(255,255,255,.04); white-space: nowrap; }
+  .toc a:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .topic { border-radius: 24px; padding: clamp(16px, 3vw, 24px); border: 1px solid var(--line); background: var(--card); margin-bottom: 16px; scroll-margin-top: 80px; }
+  .topic > h2 { font: 800 1.45rem "Space Grotesk"; margin-bottom: 6px; }
+  .topic > p.l { color: #d5d9e4; line-height: 1.6; margin-bottom: 12px; font-size: .94rem; }
+  .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .flow div { border-radius: 16px; padding: 12px; text-align: center; border: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: .8rem; color: #cfd3df; line-height: 1.45; position: relative; }
+  .flow div b { display: block; font-size: 1.6rem; }
+  .flow div strong { display: block; color: #fff; font: 700 .9rem "Space Grotesk"; margin: 2px 0; }
+  .flow div:not(:last-child)::after { content: "→"; position: absolute; right: -9px; top: 50%; transform: translateY(-50%); color: var(--acc); font-weight: 800; }
+  .g3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .t { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: rgba(0,0,0,.22); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .t > b:first-child { display: block; color: #fff; font: 700 .98rem "Space Grotesk"; margin-bottom: 3px; }
+  .t b { color: #fff; }
+  .t .tag { display: inline-block; font: 700 .66rem "JetBrains Mono"; padding: 2px 7px; border-radius: 6px; margin-top: 6px; }
+  .tblwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: .85rem; min-width: 560px; }
+  table.cmp th, table.cmp td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: left; vertical-align: top; color: #cfd3df; }
+  table.cmp th { font: 700 .72rem "JetBrains Mono"; letter-spacing: .05em; color: var(--muted); background: rgba(255,255,255,.03); }
+  table.cmp td:first-child { color: #fff; font-weight: 600; }
+  .tool3 { margin-top: 12px; border-radius: 20px; padding: 16px; border: 1px solid rgba(0,224,184,.4); background: linear-gradient(135deg, rgba(0,224,184,.08), rgba(91,140,255,.05)); }
+  .tool3 h3 { font: 800 1.05rem "Space Grotesk"; margin-bottom: 8px; }
+  .qq { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); margin-top: 6px; font-size: .88rem; }
+  .yn { display: flex; gap: 4px; }
+  .yn button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 9px; padding: 6px 12px; font: 700 .78rem Inter; cursor: pointer; }
+  .yn button.on { background: var(--fg); color: #000; }
+  .ans3 { margin-top: 10px; border-radius: 14px; padding: 12px 14px; background: rgba(0,0,0,.3); border: 1px solid var(--line); font-size: .9rem; line-height: 1.55; color: #d5d9e4; }
+  .ans3 b.big { display: block; font: 800 1.3rem "Space Grotesk"; color: var(--acc); }
+  .circ { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .circ div { border-radius: 14px; padding: 12px; text-align: center; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .circ span { display: block; font: 600 .64rem "JetBrains Mono"; color: var(--muted); letter-spacing: .06em; }
+  .circ b { font: 800 1.2rem "Space Grotesk"; }
+  .band { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .band button { border: 1px solid var(--line); background: rgba(0,0,0,.25); color: #cfd3df; border-radius: 10px; padding: 8px 12px; font: 700 .8rem "JetBrains Mono"; cursor: pointer; }
+  .band button.on { background: var(--fg); color: #000; }
+  .warn3 { margin-top: 12px; border-radius: 14px; padding: 11px 13px; border: 1px solid rgba(254,188,46,.4); background: rgba(254,188,46,.06); font-size: .86rem; color: #f1e3c4; line-height: 1.55; }
+  .warn3 b { color: #fff; }
+  @media (max-width: 760px) { .flow { grid-template-columns: 1fr 1fr; } .flow div::after { display: none; } .circ { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../candlesticks/">🕯️ Candlesticks</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Stock market <span class="grad">basics.</span></h1>
+    <p class="sub">Before your first trade: what each account does, how an order reaches the exchange, which product to choose (CNC, MIS, NRML), and the special situations that trap beginners: circuits, BE/trade-to-trade stocks, SME shares and F&amp;O bans.</p>
+    <nav class="toc"><a href="#accounts">🏦 Accounts</a><a href="#flow">🔁 Order journey</a><a href="#orders">🧾 Order types</a><a href="#products">📦 CNC · MIS · NRML</a><a href="#styles">⏱️ Intraday vs positional</a><a href="#sme">🏭 SME vs Mainboard</a><a href="#circuits">🚧 Circuits</a><a href="#be">🔒 BE / T2T · ASM · GSM</a><a href="#ban">⛔ F&amp;O ban</a></nav>
+
+    <section class="topic" id="accounts">
+      <h2>🏦 Demat, trading account, broker &amp; DP</h2>
+      <p class="l">You need three linked accounts. Most brokers open the demat and trading accounts together in one online process (with PAN, Aadhaar and a bank account).</p>
+      <div class="g3">
+        <div class="t"><b>🏛️ Demat account</b>Holds your shares and ETFs <b>electronically</b>, like a bank account for securities. Shares sit with a depository (<b>NSDL</b> or <b>CDSL</b>), in your name.</div>
+        <div class="t"><b>📲 Trading account</b>Used to <b>place buy and sell orders</b> on the exchange. It connects your bank account (money) with your demat account (shares).</div>
+        <div class="t"><b>🧑‍💼 Broker</b>A SEBI-registered member of the exchange who sends your orders: <b>discount brokers</b> (low flat fees, app-based) or <b>full-service</b> brokers (research, advice, higher fees).</div>
+        <div class="t"><b>🗄️ Depository Participant (DP)</b>The agent between you and NSDL/CDSL; usually your broker. A small <b>DP charge</b> applies when shares leave your demat (when you sell).</div>
+        <div class="t"><b>🏦 Bank account</b>Funds move in and out through your linked bank account. Money is credited after settlement.</div>
+        <div class="t"><b>🧾 Charges on every trade</b>Brokerage, STT, exchange fees, SEBI fee, stamp duty and GST. Small per trade, big for frequent traders.</div>
+      </div>
+    </section>
+
+    <section class="topic" id="flow">
+      <h2>🔁 The journey of an order</h2>
+      <div class="flow">
+        <div><b>🙋</b><strong>You</strong>place a buy order on the broker's app.</div>
+        <div><b>🏢</b><strong>Exchange</strong>NSE/BSE matches it with a seller at your price or better.</div>
+        <div><b>🧮</b><strong>Clearing corp.</strong>guarantees the trade and settles money and shares.</div>
+        <div><b>📥</b><strong>Your demat</strong>shares arrive on <b>T+1</b> (the next working day).</div>
+      </div>
+      <div class="warn3"><b>⏰ Market timings (equity):</b> pre-open 9:00–9:15 AM (orders collected, opening price found), normal trading <b>9:15 AM – 3:30 PM</b>, closing session shortly after. <b>T+1 settlement</b>: buy on Monday, shares in your demat on Tuesday; sell on Monday, money on Tuesday.</div>
+    </section>
+
+    <section class="topic" id="orders">
+      <h2>🧾 Order types</h2>
+      <div class="g3">
+        <div class="t"><b>Market order</b>Buys or sells immediately at the best available price. Fast, but you can get a bad price in thin or fast markets.<span class="tag" style="color:#febc2e;background:rgba(254,188,46,.12)">USE RARELY</span></div>
+        <div class="t"><b>Limit order</b>Buys or sells only at your price or better. You control the price; it may not fill.<span class="tag" style="color:#22d39a;background:rgba(34,211,154,.12)">DEFAULT CHOICE</span></div>
+        <div class="t"><b>Stop-loss (SL) order</b>Sits waiting; when the price hits your <b>trigger</b>, it becomes a limit order. Protects a position automatically.</div>
+        <div class="t"><b>SL-Market (SL-M)</b>When triggered, becomes a market order: sure exit, uncertain price. Not allowed in every segment (e.g. options at many brokers).</div>
+        <div class="t"><b>GTT (Good Till Triggered)</b>A broker feature that waits for weeks or months until your price is hit, then places the order. Great for swing stop-losses and targets.</div>
+        <div class="t"><b>AMO (After Market Order)</b>Placed after hours or before the open; sent to the exchange when the market opens.</div>
+      </div>
+    </section>
+
+    <section class="topic" id="products">
+      <h2>📦 CNC vs MIS vs NRML</h2>
+      <p class="l">When you place an order, the app asks for a <b>product type</b>. It decides whether the position can stay overnight and how much margin is used.</p>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th></th><th>CNC (Cash &amp; Carry)</th><th>MIS (Margin Intraday Square-off)</th><th>NRML (Normal)</th></tr>
+        <tr><td>Used for</td><td>Delivery: buy and hold shares</td><td>Intraday in stocks or F&amp;O</td><td>F&amp;O positions held overnight</td></tr>
+        <tr><td>Holding period</td><td>Days to years</td><td>Same day only</td><td>Till you exit or expiry</td></tr>
+        <tr><td>Money needed</td><td>Full value of shares</td><td>A margin (leverage, roughly up to 5× in equity)</td><td>Full F&amp;O (SPAN + exposure) margin</td></tr>
+        <tr><td>If you don't exit</td><td>Shares stay in your demat</td><td><b>Auto square-off</b> by the broker near the close (often ~3:15–3:25 PM), sometimes with a fee</td><td>Carried forward</td></tr>
+        <tr><td>Risk</td><td>Lowest: no leverage</td><td>High: leverage magnifies losses</td><td>High: overnight gaps on leveraged positions</td></tr>
+      </table></div>
+      <div class="tool3"><h3>🤔 Which product should I choose?</h3><div id="pick"></div><div class="ans3" id="pickOut"></div></div>
+    </section>
+
+    <section class="topic" id="styles">
+      <h2>⏱️ Intraday vs swing vs positional vs investing</h2>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th></th><th>Intraday</th><th>Swing</th><th>Positional</th><th>Investing</th></tr>
+        <tr><td>Holding</td><td>Minutes to hours</td><td>2 days to a few weeks</td><td>Weeks to months</td><td>Years</td></tr>
+        <tr><td>Product</td><td>MIS</td><td>CNC (or MTF)</td><td>CNC</td><td>CNC / SIP</td></tr>
+        <tr><td>Chart</td><td>1–15 min, VWAP</td><td>Daily</td><td>Daily / weekly</td><td>Fundamentals, weekly / monthly</td></tr>
+        <tr><td>Screen time</td><td>Full day</td><td>30–60 min a day</td><td>A few hours a week</td><td>Quarterly review</td></tr>
+        <tr><td>Costs &amp; stress</td><td>Highest</td><td>Medium</td><td>Low</td><td>Lowest</td></tr>
+        <tr><td>Good for beginners?</td><td>❌ Hardest</td><td>⚠️ After learning</td><td>✅ Good start</td><td>✅ Best start</td></tr>
+      </table></div>
+      <div class="warn3"><b>Tip:</b> most beginners lose money in intraday because of leverage, costs and fast decisions. Start with <b>investing and positional</b> trades, and follow the <a href="../money-ladder/" style="color:#fff">money ladder</a> first.</div>
+    </section>
+
+    <section class="topic" id="sme">
+      <h2>🏭 SME stocks vs Mainboard stocks</h2>
+      <p class="l">Small and medium enterprises list on separate platforms: <b>NSE Emerge</b> and <b>BSE SME</b>. They can grow fast, but the rules and the risks are very different.</p>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th></th><th>Mainboard</th><th>SME platform</th></tr>
+        <tr><td>Company size</td><td>Larger, established</td><td>Small, often young businesses</td></tr>
+        <tr><td>How you buy</td><td>Any quantity (even 1 share)</td><td>Only in <b>lots</b> (a fixed minimum quantity, often worth ₹1 lakh+)</td></tr>
+        <tr><td>IPO minimum</td><td>One lot, usually ~₹15,000</td><td>Much higher minimum application</td></tr>
+        <tr><td>Results</td><td>Every quarter</td><td>Often <b>half-yearly</b> only</td></tr>
+        <tr><td>Liquidity</td><td>Usually good</td><td>Often thin: hard to sell in a fall</td></tr>
+        <tr><td>Risk</td><td>Normal market risk</td><td>Higher: easier to manipulate; SEBI has flagged price rigging in some SME stocks</td></tr>
+      </table></div>
+      <div class="warn3"><b>🚩 Watch out:</b> huge SME IPO subscriptions and listing pops attract hype. Check the business, the promoters, related-party transactions and whether you could exit if buyers disappear. Use the <a href="../fomo/" style="color:#fff">FOMO detector</a> on SME "tips".</div>
+    </section>
+
+    <section class="topic" id="circuits">
+      <h2>🚧 Upper circuit, lower circuit &amp; price bands</h2>
+      <p class="l">Exchanges limit how far many stocks can move in a day, using <b>price bands</b> of 2%, 5%, 10% or 20% from the previous close. Stocks in F&amp;O don't have fixed bands; they use dynamic limits instead.</p>
+      <div class="g3">
+        <div class="t"><b>📈 Upper circuit (UC)</b>The price hits the top of the band: <b>only buyers, almost no sellers</b>. Your buy order may not fill at all. Chasing UC stocks is a common trap.</div>
+        <div class="t"><b>📉 Lower circuit (LC)</b>Only sellers, no buyers. <b>You can't sell</b>: you're stuck until buyers return, sometimes for days. That's the real danger of hyped small stocks.</div>
+        <div class="t"><b>🌐 Market-wide circuit breaker</b>If the Nifty or Sensex falls (or rises) 10%, 15% or 20% in a day, trading in the whole market halts for a while.</div>
+      </div>
+      <div class="tool3"><h3>🧮 Circuit limit calculator</h3>
+        <div class="cols2"><div><div class="q">Previous close ₹</div><label class="field sm"><input id="pc" type="text" inputmode="decimal" placeholder="245.60" /></label></div><div><div class="q">Price band</div><div class="band" id="band"><button data-b="2">2%</button><button data-b="5">5%</button><button data-b="10">10%</button><button data-b="20">20%</button></div></div></div>
+        <div class="circ" id="circOut"></div><p style="font-size:.76rem;color:var(--muted);margin-top:8px">Approximate: the exchange rounds to the tick size. Check the exact band on the NSE/BSE quote page.</p></div>
+    </section>
+
+    <section class="topic" id="be">
+      <h2>🔒 BE / trade-to-trade, ASM &amp; GSM</h2>
+      <p class="l">Exchanges move some stocks into special segments or surveillance to cool down speculation. These change how you can trade them.</p>
+      <div class="g3">
+        <div class="t"><b>🔒 BE series / Trade-to-Trade (T2T)</b>On NSE you'll see <b>BE</b> instead of EQ (BSE: "T" group). <b>Every trade must be settled by delivery</b>: <b>no intraday</b>. If you buy and sell the same day, both are settled separately, and you can end up with a short-delivery penalty.</div>
+        <div class="t"><b>👁️ ASM (Additional Surveillance Measure)</b>For stocks with unusual price or volume moves. Can mean higher margins (up to 100%), tighter price bands or a move to trade-to-trade.</div>
+        <div class="t"><b>🧯 GSM (Graded Surveillance Measure)</b>For small companies whose price looks out of line with their fundamentals. Stages add restrictions such as 100% margin, extra deposits and limited trading frequency.</div>
+        <div class="t"><b>🔤 Other series you'll see</b><b>EQ</b>: normal stocks. <b>BZ</b>: companies not meeting listing rules. <b>SM / ST</b>: SME stocks. Always check the series before buying.</div>
+      </div>
+      <div class="warn3"><b>Why it matters:</b> stocks under ASM/GSM or in BE are usually being watched for a reason. Liquidity is thin, intraday is not allowed and exits can be hard. Beginners should simply avoid them.</div>
+    </section>
+
+    <section class="topic" id="ban">
+      <h2>⛔ F&amp;O ban period</h2>
+      <p class="l">Each F&amp;O stock has a <b>market-wide position limit (MWPL)</b>: the total open interest allowed across all traders. When open interest crosses <b>95% of MWPL</b>, the stock enters the <b>ban period</b>.</p>
+      <div class="g3">
+        <div class="t"><b>What changes</b><b>No new F&amp;O positions</b> can be created in that stock. You can only reduce or close existing positions. Increasing a position can attract penalties.</div>
+        <div class="t"><b>When it ends</b>When open interest falls below <b>80% of MWPL</b>, the ban is lifted. NSE publishes the ban list every day.</div>
+        <div class="t"><b>Cash market?</b>Buying or selling the <b>shares</b> (CNC/MIS) continues as normal. Only the derivatives are restricted.</div>
+        <div class="t"><b>What it tells you</b>A stock in ban has a very crowded derivatives position, so it can be volatile. It's a signal to be careful, not a trade by itself.</div>
+      </div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> adviser. This page simplifies exchange rules for <b>education</b>; timings, margins, bands, lot sizes and surveillance rules change. Always check the latest NSE/BSE circulars and your broker's rules. Not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, num = K.num; K.chrome();
+const S = K.store("basics_v1", { q: {}, pc: "", band: "5" });
+const QS = [["over", "Will you hold it overnight or longer?"], ["fno", "Is it futures or options?"], ["lev", "Do you want leverage (borrowed exposure)?"]];
+function pick() {
+  $("#pick").innerHTML = QS.map(([k, t]) => `<div class="qq"><span>${t}</span><span class="yn"><button data-k="${k}" data-v="1" class="${S.q[k] === 1 ? "on" : ""}">Yes</button><button data-k="${k}" data-v="0" class="${S.q[k] === 0 ? "on" : ""}">No</button></span></div>`).join("");
+  const { over, fno, lev } = S.q; let r;
+  if (over == null || fno == null) r = "Answer the questions to see the right product.";
+  else if (fno === 1) r = over === 1 ? `<b class="big">NRML</b>Carry F&amp;O positions overnight with full margin. Remember: overnight gaps on leveraged positions can be large.` : `<b class="big">MIS</b>Intraday F&amp;O with lower margin, auto squared-off before the close. High risk: most F&amp;O traders lose money.`;
+  else if (over === 1) r = lev === 1 ? `<b class="big">CNC (or MTF)</b>Delivery holds shares overnight. Borrowed delivery (MTF) charges daily interest and can trigger margin calls; for beginners, plain <b>CNC with your own money</b> is safer.` : `<b class="big">CNC</b>Delivery: pay the full amount, shares come to your demat on T+1, hold as long as you like.`;
+  else r = lev === 1 ? `<b class="big">MIS</b>Intraday with leverage. Your position is auto-closed near the close. Use a stop-loss and small size.` : `<b class="big">CNC or MIS</b>Same-day trade without leverage: MIS still works (and auto-squares off); CNC means you could also decide to hold.`;
+  $("#pickOut").innerHTML = r; S.save();
+}
+$("#pick").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (!b) return; S.q[b.dataset.k] = +b.dataset.v; pick(); });
+function circ() {
+  document.querySelectorAll("#band button").forEach(b => b.classList.toggle("on", b.dataset.b === S.band));
+  const pc = num(S.pc), b = +S.band / 100;
+  $("#circOut").innerHTML = pc > 0 ? `<div><span>LOWER CIRCUIT</span><b class="down">₹${(pc * (1 - b)).toFixed(2)}</b></div><div><span>PREVIOUS CLOSE</span><b>₹${pc.toFixed(2)}</b></div><div><span>UPPER CIRCUIT</span><b class="up">₹${(pc * (1 + b)).toFixed(2)}</b></div>` : `<div style="grid-column:1/-1;color:var(--muted)">Enter the previous close.</div>`;
+  S.save();
+}
+$("#pc").value = S.pc; $("#pc").addEventListener("input", e => { K.fmtNum(e.target); S.pc = e.target.value; circ(); });
+$("#band").addEventListener("click", e => { const b = e.target.closest("[data-b]"); if (!b) return; S.band = b.dataset.b; circ(); });
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/market-basics/";
+function buildText() {
+  return ["🏦 *Stock market basics*", "", "• *Demat* holds your shares; *trading account* places orders; *broker* sends them to NSE/BSE. Settlement is *T+1*.", "• *CNC* = delivery · *MIS* = intraday (auto square-off) · *NRML* = F&O overnight.", "• *Upper circuit*: no sellers, your buy may not fill. *Lower circuit*: no buyers, you can't sell.", "• *BE / T2T*: no intraday allowed. *ASM / GSM*: surveillance, avoid as a beginner.", "• *F&O ban*: open interest above 95% of the limit; no new F&O positions.", "• *SME* stocks trade in lots, are less liquid and riskier.", "", "Full beginner guide 👇", url(), ...K.signoff("market-basics", "Learn", "").slice(1, -1)].join("\n");
+}
+async function drawImg() {
+  await K.loadFonts?.(); const W = 1080, H = 1420, { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "LEARN · BASICS", 70, 186, `700 26px ${K.F.MONO}`, "#00e0b8"); K.txt(ctx, "Market basics cheat sheet", 70, 250, `800 54px ${K.F.GROT}`, "#fff");
+  let y = 290; [["🏦", "Demat · Trading · Broker", "Demat holds shares, trading account places orders. Settlement T+1."], ["📦", "CNC · MIS · NRML", "Delivery · intraday (auto square-off) · F&O overnight."], ["🚧", "Upper / lower circuit", "UC: no sellers. LC: no buyers, you can't exit."], ["🔒", "BE / T2T · ASM · GSM", "No intraday, surveillance: avoid as a beginner."], ["⛔", "F&O ban", "OI above 95% of MWPL: no new F&O positions."], ["🏭", "SME vs Mainboard", "SME: lots only, thin liquidity, higher risk."]].forEach(([i, t, d]) => {
+    K.panel(ctx, 70, y, W - 140, 132, 22); K.txt(ctx, i, 100, y + 84, `52px ${K.F.INTER}`, "#fff"); K.txt(ctx, t, 186, y + 56, `800 34px ${K.F.GROT}`, "#fff"); K.txt(ctx, d, 186, y + 98, K.fit(ctx, d, 500, K.F.INTER, 26, W - 280), "#cfd3df"); y += 148; });
+  K.footer(ctx, W, H, K.toolUrl("market-basics"), "Education only · Rules change: check NSE/BSE · Not SEBI registered", true); return c;
+}
+K.share({ text: buildText, draw: drawImg, file: () => "market-basics", imgLabel: "Share cheat sheet" });
+pick(); circ();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

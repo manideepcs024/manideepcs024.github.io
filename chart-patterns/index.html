@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Chart patterns — trendlines, double top/bottom, H&amp;S, cup &amp; handle, flag, VCP, NR7, inside bar</title>
+<meta name="description" content="How to draw trendlines and support/resistance, and how to trade chart patterns: double top (M), double bottom (W), head and shoulders, rounding bottom, cup and handle, flag and pole, triangles, VCP, NR4/NR7, inside bar and neckline breakouts. With diagrams, entry/stop/target rules, a target calculator and a quiz." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #febc2e; --acc2: #7c5cff; }
+  .wrap { max-width: 1120px; }
+  .sec2 { margin-top: 24px; } .sec2 > h2 { font: 800 1.4rem "Space Grotesk"; margin-bottom: 4px; } .sec2 > p.l { color: var(--muted); font-size: .9rem; margin-bottom: 12px; line-height: 1.5; max-width: 820px; }
+  .tl2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: center; }
+  .art { border-radius: 18px; background: rgba(0,0,0,.35); border: 1px solid var(--line); padding: 6px; }
+  .art svg { width: 100%; height: auto; display: block; }
+  .steps3 { display: grid; gap: 8px; counter-reset: s; }
+  .steps3 div { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 11px 13px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); font-size: .87rem; color: #cfd3df; line-height: 1.5; }
+  .steps3 div::before { counter-increment: s; content: counter(s); width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: rgba(254,188,46,.15); color: var(--acc); font: 800 .88rem "Space Grotesk"; }
+  .steps3 b { color: #fff; }
+  .flt { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .flt button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .flt button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .pc { border-radius: 22px; border: 1px solid var(--line); background: var(--card); overflow: hidden; display: flex; flex-direction: column; }
+  .pc .art { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+  .pc .bd { padding: 13px 15px; display: flex; flex-direction: column; gap: 8px; font-size: .85rem; color: #cfd3df; line-height: 1.5; }
+  .pc h3 { font: 800 1.08rem "Space Grotesk"; color: #fff; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .pc .ty { font: 700 .62rem "JetBrains Mono"; padding: 3px 7px; border-radius: 6px; white-space: nowrap; }
+  .ty.bu { color: #22d39a; background: rgba(34,211,154,.12); } .ty.be { color: #ff5470; background: rgba(255,84,112,.12); } .ty.co { color: #5b8cff; background: rgba(91,140,255,.14); }
+  .rules { display: grid; gap: 4px; }
+  .rules div { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; font-size: .82rem; }
+  .rules span:first-child { font: 700 .66rem "JetBrains Mono"; letter-spacing: .05em; padding-top: 2px; }
+  .r-in { color: #22d39a; } .r-sl { color: #ff5470; } .r-tg { color: #febc2e; } .r-x { color: #b9a6ff; }
+  .calc4 { border-radius: 22px; padding: 18px; border: 1px solid rgba(254,188,46,.45); background: linear-gradient(135deg, rgba(254,188,46,.08), rgba(124,92,255,.05)); }
+  .out4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .out4 div { border-radius: 14px; padding: 11px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .out4 span { display: block; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); }
+  .out4 b { font: 800 1.15rem "Space Grotesk"; }
+  .quiz { border-radius: 24px; padding: 18px; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(254,188,46,.04)); display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 18px; align-items: center; }
+  .quiz .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .quiz .opts button { border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #fff; border-radius: 14px; padding: 12px; font: 700 .88rem Inter; cursor: pointer; }
+  .quiz .opts button.right { border-color: var(--up); background: rgba(34,211,154,.15); } .quiz .opts button.wrong { border-color: var(--down); background: rgba(255,84,112,.12); }
+  .gen { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .gen div { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .gen b { display: block; color: #fff; font: 700 .98rem "Space Grotesk"; margin-bottom: 3px; }
+  @media (max-width: 860px) { .tl2, .quiz { grid-template-columns: 1fr; } .out4 { grid-template-columns: 1fr 1fr; } .quiz .opts { grid-template-columns: 1fr; } .lib { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../indicators/">📈 Indicators</a><a href="../candlesticks/">🕯️ Candles</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Chart patterns, <span class="grad">drawn and decoded.</span></h1>
+    <p class="sub">Patterns are pictures of supply and demand: where buyers gave up, where sellers ran out, where price coiled before a move. Learn to draw trendlines first, then each pattern with its <b>entry</b>, <b>stop-loss</b> and <b>target</b>.</p>
+
+    <section class="sec2">
+      <h2>✏️ How to draw a trendline (and support/resistance)</h2>
+      <div class="tl2">
+        <div class="art" id="tlArt"></div>
+        <div class="steps3">
+          <div><span><b>Find swing points.</b> In an uptrend, mark the clear swing <b>lows</b>; in a downtrend, the swing <b>highs</b>.</span></div>
+          <div><span><b>Connect two of them</b> and extend the line to the right. Use wicks or bodies, but be consistent.</span></div>
+          <div><span><b>A third touch confirms it.</b> The more touches (and the longer the line), the more it matters.</span></div>
+          <div><span><b>Don't force it.</b> If you must cut through many candles to make it fit, it's not a valid line. Slightly angled lines (30–45°) last longer than very steep ones.</span></div>
+          <div><span><b>Support &amp; resistance</b> are horizontal zones where price turned several times. Once broken, <b>old resistance often becomes new support</b> (role reversal), and a <b>retest</b> is a classic entry.</span></div>
+          <div><span><b>A break</b> of the trendline on a strong close (with volume) is the first warning the trend is changing; a lower high after it confirms.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>📚 Pattern library</h2>
+      <p class="l"><b>Neckline</b> = the support/resistance line a pattern must break to confirm. <b>Measured move target</b> = pattern height added to (or subtracted from) the breakout point. Targets are guides, not promises.</p>
+      <div class="flt" id="flt"></div>
+      <div class="lib" id="lib"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧮 Pattern target &amp; risk calculator</h2>
+      <div class="calc4">
+        <div class="cols3"><div><div class="q">Breakout / neckline ₹</div><label class="field sm"><input id="bo" type="text" inputmode="decimal" placeholder="500" /></label></div><div><div class="q">Pattern height ₹ <span class="opt">top − bottom</span></div><label class="field sm"><input id="ht" type="text" inputmode="decimal" placeholder="60" /></label></div><div><div class="q">Stop-loss ₹</div><label class="field sm"><input id="sl" type="text" inputmode="decimal" placeholder="482" /></label></div></div>
+        <div class="seg mb" id="dir" style="margin-top:12px;margin-bottom:0"><div class="pill"></div><button data-v="up">📈 Bullish breakout</button><button data-v="down">📉 Bearish breakdown</button></div>
+        <div class="out4" id="out"></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🎯 Name that pattern</h2>
+      <div class="quiz" id="quiz"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧭 Rules that make patterns work</h2>
+      <div class="gen">
+        <div><b>📊 Volume confirms</b>Real breakouts come with volume well above average. A breakout on low volume often fails.</div>
+        <div><b>🕯️ Wait for the close</b>A wick through the neckline isn't a breakout. Wait for a candle to <b>close</b> beyond it (daily for swing trades).</div>
+        <div><b>🔁 Retests are gifts</b>Price often comes back to test the broken level. Entering on a successful retest gives a tighter stop.</div>
+        <div><b>📈 Trade with the trend</b>Continuation patterns (flags, cups, VCP) in an uptrend above the 200 EMA have better odds than reversals against it.</div>
+        <div><b>❌ Know the failure point</b>If price falls back inside the pattern and closes there, the setup has failed: exit, don't hope.</div>
+        <div><b>🧪 Practise</b>Spot patterns on the <a href="../chart-game/" style="color:var(--acc)">Read the Chart game</a> before risking money.</div>
+      </div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> adviser. Diagrams are idealised for <b>education</b>; real charts are messier and patterns fail often. Use a stop-loss and position sizing on every trade. Not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const G = "#22d39a", R = "#ff5470", Y = "#febc2e", B = "#5b8cff", W = "#e8ecf6", M = "#8b93a7";
+/* svg helpers: 0..100 coordinate space, y up */
+function svg(parts, w = 360, h = 200) {
+  const X = v => 14 + v / 100 * (w - 28), Yc = v => h - 16 - v / 100 * (h - 32);
+  const out = parts.map(p => {
+    if (p.poly) return `<polyline fill="none" stroke="${p.c || W}" stroke-width="${p.w || 2.6}" stroke-linejoin="round" stroke-linecap="round" points="${p.poly.map(([a, b]) => X(a) + "," + Yc(b)).join(" ")}"${p.dash ? ` stroke-dasharray="${p.dash}"` : ""} opacity="${p.op || 1}"/>`;
+    if (p.line) { const [a, b, c, d] = p.line; return `<line x1="${X(a)}" y1="${Yc(b)}" x2="${X(c)}" y2="${Yc(d)}" stroke="${p.c}" stroke-width="${p.w || 1.8}"${p.dash ? ` stroke-dasharray="${p.dash}"` : ""}/>` + (p.t ? `<text x="${X(c) + (p.tx || 0)}" y="${Yc(d) + (p.ty ?? -5)}" fill="${p.c}" font-family="JetBrains Mono" font-size="10" font-weight="700" text-anchor="${p.ta || "end"}">${p.t}</text>` : ""); }
+    if (p.dot) return `<circle cx="${X(p.dot[0])}" cy="${Yc(p.dot[1])}" r="4.5" fill="${p.c}"/>` + (p.t ? `<text x="${X(p.dot[0])}" y="${Yc(p.dot[1]) + (p.ty ?? -9)}" fill="${p.c}" font-family="Inter" font-size="10" font-weight="800" text-anchor="middle">${p.t}</text>` : "");
+    if (p.zone) { const [a, b, c, d] = p.zone; return `<rect x="${X(a)}" y="${Yc(d)}" width="${X(c) - X(a)}" height="${Yc(b) - Yc(d)}" fill="${p.c}" opacity="${p.op || .12}" rx="4"/>`; }
+    if (p.txt) return `<text x="${X(p.txt[0])}" y="${Yc(p.txt[1])}" fill="${p.c || M}" font-family="Inter" font-size="${p.s || 10}" font-weight="700" text-anchor="${p.ta || "middle"}">${p.t}</text>`;
+    if (p.candles) { const n = p.candles.length, sw = (p.x1 - p.x0) / n; return p.candles.map(([o, hh, l, c, hl], i) => { const x = X(p.x0 + sw * (i + .5)), col = c >= o ? G : R, bw = (w - 28) * sw / 100 * .55; return `<g opacity="${hl === 0 ? .45 : 1}"><line x1="${x}" y1="${Yc(hh)}" x2="${x}" y2="${Yc(l)}" stroke="${col}" stroke-width="1.6"/><rect x="${x - bw / 2}" y="${Yc(Math.max(o, c))}" width="${bw}" height="${Math.max(1.5, Math.abs(Yc(o) - Yc(c)))}" fill="${col}" rx="1.5"/>${hl === 2 ? `<rect x="${x - bw / 2 - 3}" y="${Yc(hh) - 3}" width="${bw + 6}" height="${Yc(l) - Yc(hh) + 6}" fill="none" stroke="${Y}" stroke-width="1.5" stroke-dasharray="3 2" rx="3"/>` : ""}</g>`; }).join(""); }
+    return "";
+  }).join("");
+  return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${out}</svg>`;
+}
+const ENTRY = (x, y, t = "ENTRY") => ({ dot: [x, y], c: G, t }), STOP = (x0, x1, y) => ({ line: [x0, y, x1, y], c: R, dash: "4 3", t: "SL", ty: 12 }), TGT = (x0, x1, y) => ({ line: [x0, y, x1, y], c: Y, dash: "4 3", t: "TARGET" });
+const P = [
+  { id: "dbottom", n: "Double bottom (W)", t: "bu", d: "Price falls to a low, bounces, falls back to about the same low and holds. The 'W' shows sellers failed twice. Confirmed when price closes above the middle peak (the neckline).", in: "Close above the neckline, ideally with volume (or on the retest).", sl: "Below the second low (or below the retest low).", tg: "Neckline + (neckline − lows).", x: "Price closes back below the neckline.",
+    art: [{ zone: [12, 18, 64, 62], c: B, op: .06 }, { poly: [[0, 85], [12, 70], [24, 22], [36, 58], [48, 23], [60, 58], [72, 72], [84, 92]] }, { line: [10, 58, 100, 58], c: B, dash: "5 4", t: "NECKLINE" }, ENTRY(62, 60), STOP(40, 74, 18), TGT(66, 100, 94)] },
+  { id: "dtop", n: "Double top (M)", t: "be", d: "Price rallies to a high, pulls back, rallies to the same high and fails. The 'M' shows buyers failed twice. Confirmed on a close below the middle low (the neckline).", in: "Close below the neckline (short or exit longs).", sl: "Above the second high.", tg: "Neckline − (highs − neckline).", x: "Price closes back above the neckline.",
+    art: [{ poly: [[0, 15], [12, 30], [24, 78], [36, 42], [48, 77], [60, 42], [72, 28], [84, 8]] }, { line: [10, 42, 100, 42], c: B, dash: "5 4", t: "NECKLINE", ty: 14 }, { dot: [62, 40], c: R, t: "BREAKDOWN", ty: 16 }, STOP(40, 74, 82), { line: [66, 6, 100, 6], c: Y, dash: "4 3", t: "TARGET" }] },
+  { id: "hs", n: "Head & shoulders", t: "be", d: "Three peaks: a left shoulder, a higher head and a lower right shoulder. The lows between them form the neckline. One of the most reliable top patterns.", in: "Close below the neckline.", sl: "Above the right shoulder.", tg: "Neckline − (head − neckline).", x: "Close back above the neckline.",
+    art: [{ poly: [[0, 20], [12, 60], [22, 42], [36, 86], [50, 42], [62, 64], [74, 40], [86, 14]] }, { line: [8, 42, 100, 40], c: B, dash: "5 4", t: "NECKLINE", ty: 14 }, { txt: [12, 68], t: "L.SHOULDER", c: M }, { txt: [36, 93], t: "HEAD", c: M }, { txt: [62, 72], t: "R.SHOULDER", c: M }, { dot: [76, 38], c: R, t: "BREAKDOWN", ty: 16 }, STOP(56, 80, 68), { line: [76, 2, 100, 2], c: Y, dash: "4 3", t: "TARGET", ty: 12 }] },
+  { id: "ihs", n: "Inverse head & shoulders", t: "bu", d: "The bullish mirror image: three troughs with the middle one (head) lowest. A break above the neckline signals a bottom.", in: "Close above the neckline.", sl: "Below the right shoulder.", tg: "Neckline + (neckline − head).", x: "Close back below the neckline.",
+    art: [{ poly: [[0, 80], [12, 40], [22, 58], [36, 14], [50, 58], [62, 36], [74, 60], [86, 86]] }, { line: [8, 58, 100, 60], c: B, dash: "5 4", t: "NECKLINE" }, { txt: [36, 6], t: "HEAD", c: M }, ENTRY(76, 62), STOP(56, 80, 32), TGT(76, 100, 98)] },
+  { id: "round", n: "Rounding bottom (saucer)", t: "bu", d: "A slow, U-shaped base: selling pressure fades gradually, then buyers take over. Often forms over months; volume dries up at the bottom and rises on the right side.", in: "Break above the rim (the start of the decline).", sl: "Below the last higher low on the right side.", tg: "Rim + depth of the saucer.", x: "Fails back into the base.",
+    art: [{ poly: [[0, 78], [8, 66], [16, 50], [24, 38], [32, 30], [40, 26], [48, 25], [56, 27], [64, 33], [72, 44], [80, 58], [86, 72], [94, 90]] }, { line: [0, 74, 100, 74], c: B, dash: "5 4", t: "RIM" }, ENTRY(86, 74), STOP(72, 92, 52), TGT(86, 100, 98)] },
+  { id: "cup", n: "Cup & handle", t: "co", d: "A rounded 'cup' base, then a small, shallow pullback (the handle) near the high on lower volume. A classic growth-stock continuation pattern (popularised by William O'Neil).", in: "Break above the handle high with volume.", sl: "Below the handle low.", tg: "Breakout + cup depth.", x: "Handle drops into the lower half of the cup.",
+    art: [{ poly: [[0, 72], [8, 60], [16, 44], [24, 34], [32, 30], [40, 30], [48, 34], [56, 44], [64, 60], [70, 72], [74, 66], [78, 63], [82, 65], [86, 74], [96, 92]] }, { line: [0, 73, 100, 73], c: B, dash: "5 4", t: "BREAKOUT" }, { txt: [36, 22], t: "CUP", c: M }, { txt: [78, 56], t: "HANDLE", c: M }, ENTRY(86, 74), STOP(70, 90, 61), TGT(86, 100, 99)] },
+  { id: "bullflag", n: "Bull flag (flag & pole)", t: "co", d: "A sharp rally (the pole) followed by a small, slightly downward-sloping consolidation (the flag) on falling volume. Buyers are resting, not leaving.", in: "Break above the flag's upper line.", sl: "Below the flag's low.", tg: "Breakout + pole height.", x: "Price breaks below the flag.",
+    art: [{ poly: [[0, 18], [8, 22], [14, 28], [22, 70], [28, 66], [32, 62], [36, 66], [40, 58], [44, 62], [48, 54], [52, 58], [58, 74], [70, 96]] }, { line: [22, 72, 54, 60], c: B, dash: "4 3" }, { line: [26, 64, 54, 52], c: B, dash: "4 3" }, { txt: [14, 46], t: "POLE", c: M }, { txt: [40, 76], t: "FLAG", c: M }, ENTRY(56, 66), STOP(40, 66, 50), TGT(56, 100, 98)] },
+  { id: "bearflag", n: "Bear flag", t: "be", d: "A sharp fall (pole) followed by a small upward-sloping bounce (flag). Sellers are resting before the next leg down.", in: "Break below the flag's lower line.", sl: "Above the flag's high.", tg: "Breakdown − pole height.", x: "Price breaks above the flag.",
+    art: [{ poly: [[0, 84], [8, 80], [14, 74], [22, 32], [28, 36], [32, 40], [36, 36], [40, 44], [44, 40], [48, 48], [52, 44], [58, 28], [70, 6]] }, { line: [22, 30, 54, 42], c: B, dash: "4 3" }, { line: [26, 38, 54, 50], c: B, dash: "4 3" }, { dot: [56, 36], c: R, t: "BREAKDOWN", ty: 16 }, STOP(40, 66, 52), { line: [56, 4, 100, 4], c: Y, dash: "4 3", t: "TARGET", ty: 12 }] },
+  { id: "asctri", n: "Ascending triangle", t: "co", d: "A flat resistance on top with rising lows underneath: buyers keep paying more while sellers sit at one price. Usually breaks upward.", in: "Close above the flat resistance.", sl: "Below the last higher low.", tg: "Breakout + triangle height (at its widest).", x: "Breaks the rising trendline instead.",
+    art: [{ poly: [[0, 22], [12, 70], [22, 36], [34, 70], [44, 48], [54, 70], [62, 56], [70, 70], [76, 76], [90, 96]] }, { line: [10, 70, 74, 70], c: B, dash: "5 4", t: "RESISTANCE", ty: -6 }, { line: [0, 22, 72, 62], c: B, dash: "4 3" }, ENTRY(76, 74), STOP(60, 82, 54), TGT(76, 100, 99)] },
+  { id: "desctri", n: "Descending triangle", t: "be", d: "A flat support below with falling highs above: sellers keep accepting less. Usually breaks downward.", in: "Close below the flat support.", sl: "Above the last lower high.", tg: "Breakdown − triangle height.", x: "Breaks the falling trendline instead.",
+    art: [{ poly: [[0, 80], [12, 32], [22, 66], [34, 32], [44, 54], [54, 32], [62, 46], [70, 32], [76, 26], [90, 6]] }, { line: [10, 32, 74, 32], c: B, dash: "5 4", t: "SUPPORT", ty: 14 }, { line: [0, 80, 72, 40], c: B, dash: "4 3" }, { dot: [76, 28], c: R, t: "BREAKDOWN", ty: 16 }, STOP(60, 82, 48), { line: [76, 2, 100, 2], c: Y, dash: "4 3", t: "TARGET", ty: 12 }] },
+  { id: "symtri", n: "Symmetrical triangle", t: "co", d: "Lower highs and higher lows squeezing together. Neutral: it usually breaks in the direction of the prior trend.", in: "Close outside either line, in the trend's direction.", sl: "Back inside the triangle (opposite side).", tg: "Breakout ± height at the widest part.", x: "Quick move back inside.",
+    art: [{ poly: [[0, 20], [10, 82], [22, 30], [34, 72], [44, 40], [54, 64], [62, 48], [68, 58], [74, 66], [86, 90]] }, { line: [8, 84, 72, 56], c: B, dash: "4 3" }, { line: [14, 26, 72, 50], c: B, dash: "4 3" }, ENTRY(74, 64), STOP(58, 82, 46), TGT(74, 100, 96)] },
+  { id: "vcp", n: "VCP (Volatility Contraction Pattern)", t: "co", d: "Popularised by Mark Minervini: a base where each pullback is smaller than the last (e.g. 25% → 12% → 6%), with volume drying up. Supply is being absorbed; the stock is 'tightening' before a pivot breakout.", in: "Break above the pivot (top of the last, tightest contraction) on strong volume.", sl: "Below the low of the last contraction.", tg: "Trail the stop; first targets 2–3× risk.", x: "Breakout fails back into the base.",
+    art: [{ poly: [[0, 40], [8, 86], [18, 34], [28, 84], [38, 58], [48, 84], [56, 70], [64, 84], [70, 78], [76, 85], [88, 98]] }, { line: [6, 85, 78, 85], c: B, dash: "5 4", t: "PIVOT", ty: -6 }, { txt: [18, 26], t: "−25%", c: M }, { txt: [38, 50], t: "−12%", c: M }, { txt: [56, 62], t: "−6%", c: M }, { txt: [70, 70], t: "−3%", c: M }, ENTRY(78, 87), STOP(64, 86, 75), TGT(78, 100, 100)] },
+  { id: "nr7", n: "NR4 / NR7 (narrow range)", t: "co", d: "An NR7 day has the narrowest high-low range of the last 7 days (NR4: of the last 4). Volatility contracts before it expands, so a narrow range often comes just before a big move.", in: "Buy-stop above the NR day's high (or sell-stop below its low).", sl: "The opposite end of the NR day.", tg: "1.5–2× the risk, or trail.", x: "Both sides trigger: chop. Stay small.",
+    art: [{ candles: [[40, 52, 30, 48, 0], [48, 60, 42, 44, 0], [44, 54, 34, 51, 0], [51, 58, 40, 46, 0], [46, 55, 38, 52, 0], [52, 57, 44, 49, 0], [49, 51.5, 47, 50.5, 2], [51, 76, 50, 74, 1]], x0: 2, x1: 98 }, { line: [2, 51.5, 100, 51.5], c: G, dash: "3 3" }, { line: [2, 47, 100, 47], c: R, dash: "3 3" }, { txt: [2, 66], t: "BUY ABOVE NR7 HIGH", c: G, ta: "start" }, { txt: [2, 22], t: "STOP BELOW NR7 LOW", c: R, ta: "start" }, { txt: [80, 40], t: "NR7 DAY", c: Y }] },
+  { id: "inside", n: "Inside bar", t: "co", d: "A candle whose high and low are both inside the previous candle (the 'mother bar'). A pause; the break of the mother bar's range shows the next direction. Best in the direction of the trend.", in: "Break above the mother bar's high (in an uptrend).", sl: "Below the mother bar's low (or the inside bar's low for a tighter stop).", tg: "Next resistance, or 2× risk.", x: "Breaks out, then closes back inside.",
+    art: [{ candles: [[30, 40, 26, 38, 0], [38, 48, 35, 46, 0], [46, 54, 43, 52, 0], [50, 70, 46, 66, 1], [64, 66, 54, 57, 2], [58, 82, 56, 80, 1]], x0: 4, x1: 96 }, { line: [2, 70, 100, 70], c: G, dash: "3 3" }, { line: [2, 46, 100, 46], c: R, dash: "3 3" }, { txt: [2, 74], t: "MOTHER HIGH", c: G, ta: "start" }, { txt: [2, 40], t: "MOTHER LOW", c: R, ta: "start" }] },
+  { id: "breakretest", n: "Breakout & retest", t: "co", d: "Price breaks a resistance, pulls back to test it from above, and holds: old resistance has become new support. Often the safest way to enter a breakout.", in: "Bounce candle at the retested level.", sl: "Below the retest low.", tg: "Next resistance or measured move.", x: "Closes back below the level.",
+    art: [{ poly: [[0, 30], [10, 56], [18, 40], [28, 58], [36, 44], [46, 60], [56, 80], [64, 62], [70, 60], [76, 72], [92, 96]] }, { zone: [0, 56, 100, 63], c: B, op: .16 }, { txt: [20, 66], t: "RESISTANCE → SUPPORT", c: B, ta: "start" }, ENTRY(72, 62, "RETEST"), STOP(60, 82, 52), TGT(74, 100, 96)] },
+  { id: "range", n: "Rectangle / range", t: "co", d: "Price bounces between flat support and resistance. Trade the range edges, or wait for a breakout with volume.", in: "Close beyond the range (or buy near support with a tight stop).", sl: "Back inside the range.", tg: "Breakout ± range height.", x: "False breakout back into the range.",
+    art: [{ poly: [[0, 20], [10, 66], [20, 36], [30, 66], [40, 36], [50, 66], [60, 36], [70, 66], [78, 72], [92, 96]] }, { zone: [8, 34, 74, 68], c: B, op: .08 }, { line: [8, 66, 74, 66], c: B, dash: "5 4", t: "RESISTANCE", ty: -6 }, { line: [8, 36, 74, 36], c: B, dash: "5 4", t: "SUPPORT", ty: 14 }, ENTRY(78, 72), STOP(64, 86, 58), TGT(78, 100, 99)] },
+];
+const TY = { bu: ["Bullish reversal", "bu"], be: ["Bearish", "be"], co: ["Continuation / breakout", "co"] };
+$("#tlArt").innerHTML = svg([{ poly: [[0, 10], [10, 34], [18, 22], [30, 50], [38, 36], [50, 66], [58, 52], [70, 80], [78, 64], [86, 70], [94, 46]] }, { line: [0, 8, 100, 72], c: B, w: 2, t: "TRENDLINE", ty: 14 }, { dot: [18, 22], c: G, t: "1" }, { dot: [38, 36], c: G, t: "2" }, { dot: [58, 52], c: G, t: "3 ✓" }, { dot: [90, 58], c: R, t: "BREAK", ty: 16 }, { line: [40, 66, 100, 66], c: Y, dash: "4 3", t: "RESISTANCE" }], 420, 230);
+const S = K.store("patterns_v1", { f: "all", bo: "", ht: "", sl: "", dir: "up", qs: 0, qn: 0 });
+function drawLib() {
+  $("#flt").innerHTML = [["all", `All ${P.length}`], ["bu", "🟢 Bullish reversal"], ["be", "🔴 Bearish"], ["co", "🔵 Continuation / breakout"]].map(([k, n]) => `<button data-f="${k}" class="${S.f === k ? "on" : ""}">${n}</button>`).join("");
+  $("#lib").innerHTML = P.filter(p => S.f === "all" || p.t === S.f).map(p => `<article class="pc"><div class="art">${svg(p.art)}</div><div class="bd"><h3>${esc(p.n)}<span class="ty ${TY[p.t][1]}">${TY[p.t][0]}</span></h3><span>${esc(p.d)}</span><div class="rules"><div><span class="r-in">ENTRY</span><span>${esc(p.in)}</span></div><div><span class="r-sl">STOP</span><span>${esc(p.sl)}</span></div><div><span class="r-tg">TARGET</span><span>${esc(p.tg)}</span></div><div><span class="r-x">FAILS IF</span><span>${esc(p.x)}</span></div></div></div></article>`).join("");
+}
+$("#flt").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; S.f = b.dataset.f; S.save(); drawLib(); });
+function calc() {
+  const bo = num(S.bo), ht = num(S.ht), sl = num(S.sl), up = S.dir === "up", o = $("#out");
+  if (!(bo > 0 && ht > 0)) { o.innerHTML = `<div style="grid-column:1/-1;color:var(--muted)">Enter the breakout level and the pattern height.</div>`; S.save(); return; }
+  const tg = up ? bo + ht : bo - ht, risk = sl > 0 ? (up ? bo - sl : sl - bo) : null, rew = Math.abs(tg - bo), rr = risk > 0 ? rew / risk : null;
+  o.innerHTML = `<div><span>TARGET</span><b class="${up ? "up" : "down"}">₹${tg.toFixed(2)}</b></div><div><span>MOVE</span><b>${up ? "+" : "−"}${(rew / bo * 100).toFixed(1)}%</b></div><div><span>RISK</span><b class="down">${risk > 0 ? "₹" + risk.toFixed(2) : risk != null ? "check SL" : "—"}</b></div><div><span>REWARD : RISK</span><b class="${rr >= 2 ? "up" : rr ? "warnc" : ""}">${rr ? rr.toFixed(1) + " : 1" : "—"}</b></div>` + (rr && rr < 2 ? `<div style="grid-column:1/-1;font-size:.84rem;color:#f1e3c4">⚠️ Less than 2:1. Look for a tighter stop (e.g. on a retest) or skip.</div>` : "");
+  S.save();
+}
+["bo", "ht", "sl"].forEach(k => { const el = $("#" + k); el.value = S[k]; el.addEventListener("input", e => { K.fmtNum(e.target); S[k] = e.target.value; calc(); }); });
+K.seg("#dir", () => S.dir, v => { S.dir = v; calc(); });
+let q, ans;
+function newQ() { const p = P[Math.floor(Math.random() * P.length)], o = [p, ...P.filter(x => x !== p).sort(() => Math.random() - .5).slice(0, 3)].sort(() => Math.random() - .5); q = { p, o }; ans = false;
+  const art = p.art.filter(a => !a.txt && !(a.line && /NECKLINE|PIVOT|RIM|RESISTANCE|SUPPORT|MOTHER|BREAKOUT/.test(a.t || ""))).map(a => a.dot ? { ...a, t: "" } : a.line ? { ...a, t: "" } : a);
+  $("#quiz").innerHTML = `<div class="art">${svg(art, 380, 210)}</div><div><div style="font:600 .74rem 'JetBrains Mono';color:var(--muted)">SCORE ${S.qs} / ${S.qn}</div><h3 style="font:800 1.2rem 'Space Grotesk';margin-top:6px">Which pattern is this?</h3><div class="opts">${o.map(x => `<button data-q="${x.id}">${esc(x.n)}</button>`).join("")}</div><div id="qres" style="margin-top:10px;font-size:.88rem;color:#cfd3df;min-height:1.4em"></div></div>`; }
+$("#quiz").addEventListener("click", e => { if (e.target.closest("#qNext")) { newQ(); return; } const b = e.target.closest("[data-q]"); if (!b || ans) return; ans = true; const ok = b.dataset.q === q.p.id; S.qn++; if (ok) S.qs++; S.save();
+  $("#quiz").querySelectorAll("[data-q]").forEach(x => x.classList.add(x.dataset.q === q.p.id ? "right" : x === b ? "wrong" : "x"));
+  $("#qres").innerHTML = `${ok ? "✅ Correct!" : `❌ It's a <b>${esc(q.p.n)}</b>.`} Entry: ${esc(q.p.in)} <button class="btn" id="qNext" style="padding:8px 14px;margin-left:6px">Next →</button>`; });
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/chart-patterns/";
+function buildText() { return ["📐 *Chart patterns cheat sheet*", "", "🟢 *Bullish reversal*: double bottom (W), inverse H&S, rounding bottom", "🔴 *Bearish*: double top (M), head & shoulders, bear flag, descending triangle", "🔵 *Continuation*: cup & handle, bull flag, ascending triangle, VCP, NR7, inside bar, breakout & retest", "", "✅ Wait for a *close* beyond the neckline · 📊 volume confirms · 🛑 stop where the pattern fails · 🎯 target = pattern height", "", `Diagrams, rules & quiz (my score ${S.qs}/${S.qn}) 👇`, url(), ...K.signoff("chart-patterns", "Learn", "").slice(1, -1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const Wd = 1080, H = 1560, { c, ctx } = K.canvas(Wd, H); K.brand(ctx);
+  K.txt(ctx, "LEARN · CHART PATTERNS", 70, 186, `700 26px ${K.F.MONO}`, "#febc2e"); K.txt(ctx, "Chart patterns cheat sheet", 70, 250, `800 54px ${K.F.GROT}`, "#fff");
+  const pick = ["dbottom", "dtop", "hs", "ihs", "cup", "bullflag", "asctri", "vcp", "round"].map(id => P.find(p => p.id === id));
+  for (let i = 0; i < pick.length; i++) { const p = pick[i], x = 70 + (i % 3) * 318, y = 290 + Math.floor(i / 3) * 360; K.panel(ctx, x, y, 300, 340, 20);
+    const img = new Image(); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg(p.art, 360, 200)); await img.decode(); ctx.drawImage(img, x + 8, y + 12, 284, 158);
+    ctx.font = `800 24px ${K.F.GROT}`; K.cap(K.wrap(ctx, p.n, 270), 2).forEach((l, k) => K.txt(ctx, l, x + 150, y + 204 + k * 28, `800 24px ${K.F.GROT}`, "#fff", "center"));
+    ctx.font = `500 18px ${K.F.INTER}`; K.cap(K.wrap(ctx, "Entry: " + p.in, 270), 3).forEach((l, k) => K.txt(ctx, l, x + 150, y + 262 + k * 24, `500 18px ${K.F.INTER}`, "#cfd3df", "center")); }
+  K.footer(ctx, Wd, H, K.toolUrl("chart-patterns"), "Idealised diagrams · Education only · Not SEBI registered", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "chart-patterns", imgLabel: "Share cheat sheet" });
+drawLib(); calc(); newQ();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

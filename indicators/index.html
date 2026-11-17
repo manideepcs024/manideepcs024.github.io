@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Indicators explained — EMA 21/50/200, golden cross, VWAP, RSI, MACD, ADX, Supertrend</title>
+<meta name="description" content="Find the trend with 21/50/200 EMAs, spot golden and death crosses, and learn VWAP, RSI, MACD, ADX and Supertrend on live practice charts with adjustable settings: what each shows, how to use it and the common traps." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #5b8cff; --acc2: #22d39a; }
+  .wrap { max-width: 1120px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tabs button { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: #cfd3df; padding: 10px 14px; border-radius: 12px; font: 700 .84rem Inter; cursor: pointer; }
+  .tabs button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .chartbox { border-radius: 22px; background: #0a0d18; border: 1px solid var(--line); padding: 10px; }
+  canvas#ch { width: 100%; height: 440px; display: block; }
+  .ctl { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+  .ctl label { display: flex; gap: 8px; align-items: center; font: 600 .82rem Inter; color: #cfd3df; background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+  .ctl input[type=range] { width: 110px; accent-color: #5b8cff; }
+  .ctl b { font: 700 .82rem "JetBrains Mono"; color: #fff; min-width: 24px; }
+  .ctl .btn { padding: 9px 14px; font-size: .84rem; }
+  .legend2 { display: flex; gap: 12px; flex-wrap: wrap; font-size: .78rem; color: var(--muted); margin-top: 8px; }
+  .legend2 i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: 3px; }
+  .read { margin-top: 12px; border-radius: 16px; padding: 12px 14px; border: 1px solid rgba(91,140,255,.45); background: rgba(91,140,255,.08); font-size: .9rem; color: #dfe6ff; line-height: 1.55; }
+  .read b { color: #fff; }
+  .info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .info div { border-radius: 18px; padding: 14px 16px; border: 1px solid var(--line); background: var(--card); font-size: .87rem; color: #cfd3df; line-height: 1.55; }
+  .info h3 { font: 800 1rem "Space Grotesk"; color: #fff; margin-bottom: 6px; }
+  .info ul { padding-left: 18px; display: grid; gap: 5px; }
+  .info b { color: #fff; }
+  .info .trap { border-color: rgba(254,188,46,.45); background: rgba(254,188,46,.05); }
+  .combo { margin-top: 22px; border-radius: 22px; padding: 18px; border: 1px solid rgba(34,211,154,.4); background: rgba(34,211,154,.05); font-size: .9rem; color: #d5d9e4; line-height: 1.6; }
+  .combo h2 { font: 800 1.25rem "Space Grotesk"; margin-bottom: 8px; color: #fff; }
+  .combo ol { padding-left: 20px; display: grid; gap: 6px; }
+  .combo b { color: #fff; }
+  @media (max-width: 820px) { canvas#ch { height: 380px; } .info { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../candlesticks/">🕯️ Candles</a><a href="../chart-patterns/">📐 Patterns</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Indicators, <span class="grad">on a live chart.</span></h1>
+    <p class="sub">Indicators turn price and volume into a clearer picture of <b>trend</b> and <b>momentum</b>. Pick one below: it's calculated live on a practice chart (computer-generated, not a real stock). Change the settings and press <b>New chart</b> to see how it behaves in different markets.</p>
+    <div class="tabs" id="tabs"></div>
+    <div class="chartbox"><canvas id="ch"></canvas></div>
+    <div class="ctl" id="ctl"></div>
+    <div class="legend2" id="legend"></div>
+    <div class="read" id="read"></div>
+    <div class="info" id="info"></div>
+    <div class="combo">
+      <h2>🧩 A simple way to combine them</h2>
+      <ol>
+        <li><b>Trend first (EMAs):</b> trade long only when price is above the 200 EMA and the 50 is above the 200.</li>
+        <li><b>Strength (ADX):</b> prefer trades when ADX is above ~20–25, so there's a real trend to ride.</li>
+        <li><b>Timing (RSI / MACD):</b> buy pullbacks where RSI holds 40–50 and turns up, or MACD crosses up above zero.</li>
+        <li><b>Intraday (VWAP):</b> longs above VWAP, shorts below it.</li>
+        <li><b>Exit (Supertrend / 21 EMA):</b> trail your stop with the Supertrend line or a close below the 21 EMA.</li>
+      </ol>
+      <p style="margin-top:8px">Indicators are derived from price, so they <b>lag</b>. Use 2–3, not 10, and always respect your stop-loss. Then check candles and patterns: <a href="../candlesticks/" style="color:#22d39a">candlesticks</a> · <a href="../chart-patterns/" style="color:#22d39a">chart patterns</a>.</p>
+    </div>
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> adviser. Charts are computer-generated practice data, not real stocks. Indicator settings shown are common defaults, not recommendations. For <b>education</b> only.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$; K.chrome();
+const C = { up: "#22d39a", dn: "#ff5470", e21: "#febc2e", e50: "#5b8cff", e200: "#ff4d8d", vw: "#00e0b8", grid: "rgba(255,255,255,.06)", mute: "#6c7285" };
+const S = K.store("ind_v1", { tab: "ema", seed: 7, rsiN: 14, stN: 10, stM: 3, adxN: 14 });
+/* ---------- data ---------- */
+function rng(seed) { let s = seed >>> 0 || 1; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+function genDaily(seed, n = 620) {
+  const r = rng(seed), regs = []; let left = n; const pat = [.0028, -.0032, .0004, .0030, -.0026, .0022];
+  let k = Math.floor(r() * 6); while (left > 0) { const len = 70 + Math.floor(r() * 90); regs.push([pat[k % 6] * (.7 + r() * .6), Math.min(len, left)]); left -= len; k++; }
+  const bars = []; let p = 1000; regs.forEach(([d, len]) => { for (let i = 0; i < len; i++) { const vol = .012 + r() * .008, ch = d + (r() - .5) * 2 * vol; const o = p, c = p * (1 + ch), h = Math.max(o, c) * (1 + r() * vol * .7), l = Math.min(o, c) * (1 - r() * vol * .7); bars.push({ o, h, l, c, v: 1e5 * (.6 + r() + Math.abs(ch) * 40) }); p = c; } });
+  return bars;
+}
+function genIntra(seed) { const r = rng(seed * 7 + 3), bars = []; let p = 500; const drift = (r() - .45) * .0012; for (let i = 0; i < 75; i++) { const ch = drift + (r() - .5) * .004 + Math.sin(i / 9) * .0012; const o = p, c = p * (1 + ch), h = Math.max(o, c) * (1 + r() * .0015), l = Math.min(o, c) * (1 - r() * .0015); const u = 1 - Math.abs(i - 37) / 37; bars.push({ o, h, l, c, v: 2e4 * (2.2 - u * 1.4) * (.6 + r()) }); p = c; } return bars; }
+/* ---------- maths ---------- */
+const ema = (a, n) => { const k = 2 / (n + 1), o = []; a.forEach((v, i) => o.push(i ? v * k + o[i - 1] * (1 - k) : v)); return o; };
+const sma = (a, n) => a.map((v, i) => i < n - 1 ? null : a.slice(i - n + 1, i + 1).reduce((x, y) => x + y, 0) / n);
+function rsi(cl, n) { const o = [null]; let ag = 0, al = 0; for (let i = 1; i < cl.length; i++) { const d = cl[i] - cl[i - 1], g = Math.max(d, 0), l = Math.max(-d, 0); if (i <= n) { ag += g / n; al += l / n; o.push(i === n ? 100 - 100 / (1 + ag / (al || 1e-9)) : null); } else { ag = (ag * (n - 1) + g) / n; al = (al * (n - 1) + l) / n; o.push(100 - 100 / (1 + ag / (al || 1e-9))); } } return o; }
+function atrW(b, n) { const tr = b.map((x, i) => i ? Math.max(x.h - x.l, Math.abs(x.h - b[i - 1].c), Math.abs(x.l - b[i - 1].c)) : x.h - x.l), o = []; tr.forEach((t, i) => o.push(i ? (o[i - 1] * (n - 1) + t) / n : t)); return { tr, atr: o }; }
+function adx(b, n) {
+  const pdm = [0], mdm = [0]; for (let i = 1; i < b.length; i++) { const u = b[i].h - b[i - 1].h, d = b[i - 1].l - b[i].l; pdm.push(u > d && u > 0 ? u : 0); mdm.push(d > u && d > 0 ? d : 0); }
+  const { atr } = atrW(b, n), sm = a => { const o = []; a.forEach((v, i) => o.push(i ? (o[i - 1] * (n - 1) + v) / n : v)); return o; }, sp = sm(pdm), sn = sm(mdm);
+  const pdi = sp.map((v, i) => 100 * v / (atr[i] || 1)), mdi = sn.map((v, i) => 100 * v / (atr[i] || 1)), dx = pdi.map((p, i) => 100 * Math.abs(p - mdi[i]) / ((p + mdi[i]) || 1));
+  return { adx: sm(dx), pdi, mdi };
+}
+function supertrend(b, n, m) {
+  const { atr } = atrW(b, n), line = [], dir = []; let fu = 0, fl = 0;
+  b.forEach((x, i) => { const mid = (x.h + x.l) / 2, bu = mid + m * atr[i], bl = mid - m * atr[i];
+    if (!i) { fu = bu; fl = bl; dir.push(1); line.push(fl); return; }
+    fu = bu < fu || b[i - 1].c > fu ? bu : fu; fl = bl > fl || b[i - 1].c < fl ? bl : fl;
+    let d = dir[i - 1]; if (d === 1 && x.c < fl) d = -1; else if (d === -1 && x.c > fu) d = 1; dir.push(d); line.push(d === 1 ? fl : fu); });
+  return { line, dir };
+}
+/* ---------- drawing ---------- */
+function draw(cfg) {
+  const cv = $("#ch"), r = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; cv.width = W * r; cv.height = H * r; const x = cv.getContext("2d"); x.scale(r, r);
+  const bars = cfg.bars, n = bars.length, subH = cfg.sub ? H * .3 : 0, mainH = H - subH - (cfg.sub ? 14 : 0), pr = 54, padT = 10;
+  const vals = [...bars.map(b => b.h), ...bars.map(b => b.l), ...(cfg.lines || []).flatMap(l => l.d.filter(v => v != null))];
+  const hi = Math.max(...vals), lo = Math.min(...vals), X = i => 6 + (i + .5) * (W - pr - 12) / n, Y = v => padT + (hi - v) / (hi - lo) * (mainH - padT * 2), bw = Math.max(1, (W - pr - 12) / n * .62);
+  x.font = "600 10px 'JetBrains Mono', monospace"; x.fillStyle = C.mute;
+  for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, yy = Y(v); x.strokeStyle = C.grid; x.beginPath(); x.moveTo(0, yy); x.lineTo(W - pr, yy); x.stroke(); x.fillText(v.toFixed(0), W - pr + 6, yy + 3); }
+  (cfg.bg || []).forEach(([i0, i1, col]) => { x.fillStyle = col; x.fillRect(X(i0) - bw, padT, X(i1) - X(i0) + bw * 2, mainH - padT * 2); });
+  bars.forEach((b, i) => { const col = b.c >= b.o ? C.up : C.dn; x.strokeStyle = col; x.fillStyle = col; x.globalAlpha = cfg.dim ? .55 : .9; x.beginPath(); x.moveTo(X(i), Y(b.h)); x.lineTo(X(i), Y(b.l)); x.stroke(); x.fillRect(X(i) - bw / 2, Y(Math.max(b.o, b.c)), bw, Math.max(1, Math.abs(Y(b.o) - Y(b.c)))); });
+  x.globalAlpha = 1;
+  (cfg.lines || []).forEach(l => { x.lineWidth = l.w || 2;
+    if (l.colFn) { for (let i = 1; i < l.d.length; i++) { if (l.d[i - 1] == null || l.d[i] == null) continue; x.strokeStyle = l.colFn(i); x.beginPath(); x.moveTo(X(i - 1), Y(l.d[i - 1])); x.lineTo(X(i), Y(l.d[i])); x.stroke(); } return; }
+    let started = false; x.beginPath(); l.d.forEach((v, i) => { if (v == null) { started = false; return; } started ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v)); started = true; }); x.strokeStyle = l.c; x.stroke(); });
+  x.lineWidth = 1;
+  (cfg.marks || []).forEach(m => { const yy = Y(m.v); x.fillStyle = m.c; x.beginPath(); x.arc(X(m.i), yy, 6, 0, 7); x.fill(); x.font = "800 11px Inter"; x.textAlign = "center"; x.fillText(m.t, X(m.i), m.up ? yy - 12 : yy + 20); x.textAlign = "left"; });
+  if (cfg.sub) { const top = mainH + 14, sh = subH, s = cfg.sub, sv = s.lines.flatMap(l => l.d.filter(v => v != null)).concat(s.hist ? s.hist.filter(v => v != null) : []), shi = s.range ? s.range[1] : Math.max(...sv), slo = s.range ? s.range[0] : Math.min(...sv), SY = v => top + (shi - v) / ((shi - slo) || 1) * sh;
+    x.fillStyle = "rgba(255,255,255,.02)"; x.fillRect(0, top, W - pr, sh);
+    (s.levels || []).forEach(([v, col, lab]) => { x.strokeStyle = col; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(0, SY(v)); x.lineTo(W - pr, SY(v)); x.stroke(); x.setLineDash([]); x.fillStyle = col; x.font = "600 10px 'JetBrains Mono'"; x.fillText(lab, W - pr + 6, SY(v) + 3); });
+    if (s.hist) s.hist.forEach((v, i) => { if (v == null) return; x.fillStyle = v >= 0 ? "rgba(34,211,154,.55)" : "rgba(255,84,112,.55)"; x.fillRect(X(i) - bw / 2, Math.min(SY(0), SY(v)), bw, Math.abs(SY(v) - SY(0))); });
+    s.lines.forEach(l => { x.strokeStyle = l.c; x.lineWidth = 1.8; x.beginPath(); let st = false; l.d.forEach((v, i) => { if (v == null) { st = false; return; } st ? x.lineTo(X(i), SY(v)) : x.moveTo(X(i), SY(v)); st = true; }); x.stroke(); });
+    x.fillStyle = "#cfd3df"; x.font = "700 11px Inter"; x.fillText(s.title, 6, top + 13); x.lineWidth = 1; }
+}
+/* ---------- tabs ---------- */
+const TABS = {
+  ema: { n: "📈 EMA trend 21/50/200", info: [["What it is", "An <b>exponential moving average</b> is the average price over N days, giving more weight to recent days. <b>21 EMA</b> = short-term trend, <b>50 EMA</b> = medium, <b>200 EMA</b> = the long-term line most institutions watch."], ["How to use it", "<ul><li><b>Uptrend</b>: price &gt; 21 &gt; 50 &gt; 200, all sloping up.</li><li><b>Downtrend</b>: the reverse order.</li><li>In an uptrend, pullbacks to the <b>21 or 50 EMA</b> are classic buy zones.</li><li>Below the 200 EMA? Most swing traders avoid longs.</li></ul>"], ["Traps", "<ul><li>In sideways markets EMAs tangle and give many false signals.</li><li>They lag: by the time all three line up, part of the move is done.</li><li>Don't buy just because price 'touched the EMA'; wait for a bounce candle.</li></ul>"]] },
+  cross: { n: "✨ Golden & death cross", info: [["What it is", "A <b>golden cross</b> is when the <b>50-day</b> moving average crosses <b>above</b> the <b>200-day</b>: a sign the long-term trend has turned up. A <b>death cross</b> is the 50 crossing <b>below</b> the 200. Classically simple (SMA) averages are used; many traders use EMAs."], ["How to use it", "<ul><li>A <b>trend filter</b> for longer-term investing, not a precise entry.</li><li>After a golden cross, prefer buying pullbacks; after a death cross, be defensive.</li><li>Works best on indices (Nifty) and large, liquid stocks.</li></ul>"], ["Traps", "<ul><li>Very late: the cross often happens well after the bottom or top.</li><li>In choppy markets the lines can cross back and forth (whipsaws).</li><li>Confirm with price structure: higher highs and lows for a golden cross.</li></ul>"]] },
+  vwap: { n: "📊 VWAP", info: [["What it is", "<b>Volume Weighted Average Price</b>: the average price of the day, weighted by volume. It resets every morning. Big institutions use it to judge whether they bought well."], ["How to use it", "<ul><li><b>Intraday bias</b>: price above VWAP = buyers in control; below = sellers.</li><li>Pullbacks to VWAP in a strong trend day are popular entries.</li><li>A clean break and hold above VWAP after the open can start a trend day.</li></ul>"], ["Traps", "<ul><li>Mainly an <b>intraday</b> tool; on daily charts use EMAs instead.</li><li>On range days price crosses VWAP many times: no edge.</li><li>Less reliable in the first 15 minutes when little volume has traded.</li></ul>"]] },
+  rsi: { n: "⚡ RSI", info: [["What it is", "The <b>Relative Strength Index</b> (usually 14 periods) measures the speed of recent gains vs losses on a 0–100 scale. Above <b>70</b> is called overbought, below <b>30</b> oversold."], ["How to use it", "<ul><li>In uptrends RSI tends to stay between <b>40 and 80</b>; buying when it dips to 40–50 and turns up is a common pullback entry.</li><li><b>Above 50</b> = bullish momentum, below 50 = bearish.</li><li><b>Divergence</b>: price makes a new high but RSI doesn't, so momentum is fading.</li></ul>"], ["Traps", "<ul><li>Overbought is <b>not a sell signal</b> in a strong trend; strong stocks can stay above 70 for weeks.</li><li>Oversold stocks in a downtrend often get more oversold.</li><li>Divergence can last a long time before price turns.</li></ul>"]] },
+  macd: { n: "🌊 MACD", info: [["What it is", "<b>MACD</b> = 12 EMA − 26 EMA (the MACD line). The <b>signal line</b> is a 9 EMA of MACD, and the <b>histogram</b> shows the gap between them. It tracks trend and momentum together."], ["How to use it", "<ul><li><b>Bullish crossover</b>: MACD crosses above the signal line, stronger when it happens <b>above zero</b>.</li><li>MACD above zero = the 12 EMA is above the 26 EMA, so the short-term trend is up.</li><li>A shrinking histogram warns momentum is fading.</li></ul>"], ["Traps", "<ul><li>Many crossovers in sideways markets: filter with the trend (200 EMA).</li><li>It lags price; by the crossover, part of the move is over.</li><li>Don't use it alone for exits on fast reversals.</li></ul>"]] },
+  adx: { n: "💪 ADX", info: [["What it is", "The <b>Average Directional Index</b> (usually 14) measures <b>trend strength</b>, not direction, from 0 to 100. <b>+DI</b> and <b>−DI</b> show which side is stronger."], ["How to use it", "<ul><li><b>ADX above ~20–25</b>: a trend is present; trend-following setups work better.</li><li><b>ADX below 20</b>: range-bound; avoid breakout trades or trade the range.</li><li><b>+DI above −DI</b> = buyers stronger, and the reverse.</li></ul>"], ["Traps", "<ul><li>A rising ADX can mean a strong <b>downtrend</b> too: check +DI vs −DI.</li><li>ADX peaks and turns down often before a trend ends; it doesn't mean reversal by itself.</li><li>Slow to react to new trends.</li></ul>"]] },
+  st: { n: "🟩 Supertrend", info: [["What it is", "<b>Supertrend</b> draws a line above or below price using the <b>ATR</b> (volatility). Common settings: period <b>10</b>, multiplier <b>3</b>. Green line below price = uptrend; red line above = downtrend."], ["How to use it", "<ul><li>A <b>flip to green</b> is a buy signal, a <b>flip to red</b> a sell or exit signal.</li><li>Excellent as a <b>trailing stop-loss</b>: exit when price closes on the other side of the line.</li><li>A higher multiplier = fewer, slower signals.</li></ul>"], ["Traps", "<ul><li>In sideways markets it flips often: many small losses.</li><li>Signals come after the move starts; don't chase big flip candles.</li><li>Use it with a trend filter like ADX or the 200 EMA.</li></ul>"]] },
+};
+let DATA = genDaily(S.seed), INTRA = genIntra(S.seed);
+function render() {
+  $("#tabs").innerHTML = Object.entries(TABS).map(([k, t]) => `<button data-t="${k}" class="${S.tab === k ? "on" : ""}">${t.n}</button>`).join("");
+  const T = TABS[S.tab]; $("#info").innerHTML = T.info.map(([h, b], i) => `<div class="${i === 2 ? "trap" : ""}"><h3>${i === 0 ? "📘" : i === 1 ? "🎯" : "⚠️"} ${h}</h3>${b}</div>`).join("");
+  const N = 260, all = DATA, cl = all.map(b => b.c), off = all.length - N, view = a => a.slice(off), bars = all.slice(off);
+  const ctl = [`<button class="btn" id="newChart">🎲 New chart</button>`]; let cfg, legend = [], read = "";
+  if (S.tab === "ema") {
+    const e21 = ema(cl, 21), e50 = ema(cl, 50), e200 = ema(cl, 200), L = all.length - 1, p = cl[L];
+    cfg = { bars, lines: [{ d: view(e200), c: C.e200, w: 2.2 }, { d: view(e50), c: C.e50 }, { d: view(e21), c: C.e21, w: 1.6 }] };
+    legend = [["21 EMA", C.e21], ["50 EMA", C.e50], ["200 EMA", C.e200]];
+    const up = p > e21[L] && e21[L] > e50[L] && e50[L] > e200[L], dn = p < e21[L] && e21[L] < e50[L] && e50[L] < e200[L];
+    read = up ? "📈 <b>Strong uptrend now:</b> price is above the 21, 50 and 200 EMAs, stacked in order. Pullbacks to the 21/50 EMA are the buy zones." : dn ? "📉 <b>Downtrend now:</b> price is below all three EMAs, stacked downward. Avoid longs; rallies to the 21/50 EMA often fail." : p > e200[L] ? "⚖️ <b>Mixed:</b> above the 200 EMA (long-term up) but the short EMAs are tangled. Wait for them to line up." : "⚖️ <b>Mixed, below the 200 EMA:</b> long-term weak. Most swing traders wait.";
+  } else if (S.tab === "cross") {
+    const s50 = sma(cl, 50), s200 = sma(cl, 200), marks = [];
+    for (let i = off + 1; i < all.length; i++) { if (s50[i - 1] == null || s200[i - 1] == null) continue; if (s50[i - 1] <= s200[i - 1] && s50[i] > s200[i]) marks.push({ i: i - off, v: s50[i], c: C.up, t: "GOLDEN ✨", up: true }); if (s50[i - 1] >= s200[i - 1] && s50[i] < s200[i]) marks.push({ i: i - off, v: s50[i], c: C.dn, t: "DEATH ☠️", up: false }); }
+    cfg = { bars, dim: true, lines: [{ d: view(s200), c: C.e200, w: 2.4 }, { d: view(s50), c: C.e50, w: 2.4 }], marks };
+    legend = [["50-day SMA", C.e50], ["200-day SMA", C.e200]];
+    read = marks.length ? `This chart shows <b>${marks.filter(m => m.t.startsWith("G")).length} golden</b> and <b>${marks.filter(m => m.t.startsWith("D")).length} death</b> cross(es). Notice how late they come compared with the actual turns in price.` : "No cross in this window. Press <b>New chart</b> to find one.";
+  } else if (S.tab === "vwap") {
+    const b = INTRA; let pv = 0, vv = 0; const vw = b.map(x => { pv += (x.h + x.l + x.c) / 3 * x.v; vv += x.v; return pv / vv; });
+    cfg = { bars: b, lines: [{ d: vw, c: C.vw, w: 2.4 }] }; legend = [["VWAP (resets daily)", C.vw]];
+    const above = b.filter((x, i) => x.c > vw[i]).length;
+    read = `Intraday 5-minute practice chart (9:15 to 3:30). Price closed <b>${b[74].c > vw[74] ? "above" : "below"}</b> VWAP and spent <b>${Math.round(above / 75 * 100)}%</b> of the day above it: ${above > 50 ? "buyers were in control." : above < 25 ? "sellers were in control." : "a mixed, choppy day."}`;
+  } else if (S.tab === "rsi") {
+    const r = rsi(cl, +S.rsiN), L = all.length - 1;
+    cfg = { bars, lines: [{ d: view(ema(cl, 50)), c: C.e50, w: 1.4 }], sub: { title: `RSI (${S.rsiN})`, lines: [{ d: view(r), c: "#b9a6ff" }], range: [0, 100], levels: [[70, "rgba(255,84,112,.7)", "70"], [50, "rgba(255,255,255,.3)", "50"], [30, "rgba(34,211,154,.7)", "30"]] } };
+    legend = [["50 EMA", C.e50], ["RSI", "#b9a6ff"]]; ctl.push(`<label>Period <input type="range" min="5" max="30" data-s="rsiN" value="${S.rsiN}" /><b>${S.rsiN}</b></label>`);
+    read = `Latest RSI: <b>${r[L].toFixed(1)}</b>: ${r[L] > 70 ? "overbought, but in a strong trend that can persist." : r[L] < 30 ? "oversold, but in a downtrend it can stay low." : r[L] > 50 ? "bullish momentum zone (above 50)." : "bearish momentum zone (below 50)."}`;
+  } else if (S.tab === "macd") {
+    const e26 = ema(cl, 26), m = ema(cl, 12).map((v, i) => v - e26[i]), sg = ema(m, 9), h = m.map((v, i) => v - sg[i]), L = all.length - 1;
+    cfg = { bars, lines: [], sub: { title: "MACD (12, 26, 9)", lines: [{ d: view(m), c: "#5b8cff" }, { d: view(sg), c: "#febc2e" }], hist: view(h), levels: [[0, "rgba(255,255,255,.3)", "0"]] } };
+    legend = [["MACD line", "#5b8cff"], ["Signal line", "#febc2e"], ["Histogram", "#22d39a"]];
+    read = `Now: MACD is <b>${m[L] > sg[L] ? "above" : "below"}</b> its signal line and <b>${m[L] > 0 ? "above" : "below"} zero</b>: ${m[L] > sg[L] && m[L] > 0 ? "bullish trend and momentum." : m[L] < sg[L] && m[L] < 0 ? "bearish trend and momentum." : "mixed: trend and momentum disagree."}`;
+  } else if (S.tab === "adx") {
+    const a = adx(all, +S.adxN), L = all.length - 1;
+    cfg = { bars, lines: [], sub: { title: `ADX (${S.adxN}) · +DI · −DI`, lines: [{ d: view(a.adx), c: "#ffffff" }, { d: view(a.pdi), c: C.up }, { d: view(a.mdi), c: C.dn }], range: [0, Math.max(60, ...view(a.adx), ...view(a.pdi), ...view(a.mdi))], levels: [[25, "rgba(254,188,46,.7)", "25"], [20, "rgba(254,188,46,.35)", "20"]] } };
+    legend = [["ADX (strength)", "#ffffff"], ["+DI (buyers)", C.up], ["−DI (sellers)", C.dn]]; ctl.push(`<label>Period <input type="range" min="7" max="28" data-s="adxN" value="${S.adxN}" /><b>${S.adxN}</b></label>`);
+    read = `ADX now: <b>${a.adx[L].toFixed(0)}</b> (${a.adx[L] >= 25 ? "a strong trend" : a.adx[L] >= 20 ? "a trend is forming" : "no real trend, range-bound"}). ${a.pdi[L] > a.mdi[L] ? "+DI is above −DI: buyers stronger." : "−DI is above +DI: sellers stronger."}`;
+  } else {
+    const st = supertrend(all, +S.stN, +S.stM), vl = view(st.line), vd = view(st.dir), marks = [];
+    for (let i = 1; i < vd.length; i++) if (vd[i] !== vd[i - 1]) marks.push({ i, v: vl[i], c: vd[i] === 1 ? C.up : C.dn, t: vd[i] === 1 ? "BUY" : "SELL", up: vd[i] !== 1 });
+    cfg = { bars, lines: [{ d: vl.map((v, i) => i && vd[i] !== vd[i - 1] ? null : v), colFn: i => vd[i] === 1 ? C.up : C.dn, w: 2.4 }], marks };
+    legend = [["Supertrend (uptrend)", C.up], ["Supertrend (downtrend)", C.dn]];
+    ctl.push(`<label>ATR period <input type="range" min="5" max="20" data-s="stN" value="${S.stN}" /><b>${S.stN}</b></label>`, `<label>Multiplier <input type="range" min="1" max="5" step=".5" data-s="stM" value="${S.stM}" /><b>${S.stM}</b></label>`);
+    read = `<b>${marks.length}</b> flips in this window. Try a higher multiplier for fewer, slower signals. Current trend: <b>${vd[vd.length - 1] === 1 ? "up (line below price)" : "down (line above price)"}</b>.`;
+  }
+  $("#ctl").innerHTML = ctl.join(""); $("#legend").innerHTML = legend.map(([n, c]) => `<span><i style="background:${c}"></i>${n}</span>`).join(""); $("#read").innerHTML = read;
+  draw(cfg); S.save();
+}
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (!b) return; S.tab = b.dataset.t; render(); });
+$("#ctl").addEventListener("click", e => { if (e.target.id === "newChart") { S.seed = Math.floor(Math.random() * 1e6); DATA = genDaily(S.seed); INTRA = genIntra(S.seed); render(); } });
+$("#ctl").addEventListener("input", e => { const k = e.target.dataset.s; if (!k) return; S[k] = +e.target.value; render(); });
+addEventListener("resize", () => render());
+const url = () => /^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/indicators/";
+function buildText() { return ["📈 *Indicators cheat sheet*", "", "• *EMA 21/50/200*: uptrend when price > 21 > 50 > 200", "• *Golden cross*: 50 crosses above 200 · *Death cross*: below", "• *VWAP*: intraday longs above, shorts below", "• *RSI*: 40–50 holds in uptrends; overbought ≠ sell", "• *MACD*: crossover above zero = stronger", "• *ADX*: above 20–25 = trending; check +DI vs −DI", "• *Supertrend (10,3)*: great trailing stop", "", "Try them on live practice charts 👇", url(), ...K.signoff("indicators", "Learn", "").slice(1, -1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const cv = $("#ch"), W = 1080, H = 1350, { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "LEARN · INDICATORS", 70, 186, `700 26px ${K.F.MONO}`, "#5b8cff"); K.txt(ctx, TABS[S.tab].n.replace(/^\S+\s/, ""), 70, 250, K.fit(ctx, TABS[S.tab].n.replace(/^\S+\s/, ""), 800, K.F.GROT, 56, W - 140), "#fff");
+  K.panel(ctx, 70, 290, W - 140, 560, 22, "#0a0d18", "rgba(255,255,255,.12)"); ctx.drawImage(cv, 84, 304, W - 168, 532);
+  ctx.font = `500 28px ${K.F.INTER}`; let y = 910; K.cap(K.wrap(ctx, $("#read").textContent, W - 140), 5).forEach(l => { K.txt(ctx, l, 70, y, `500 28px ${K.F.INTER}`, "#dfe6ff"); y += 40; });
+  K.footer(ctx, W, H, K.toolUrl("indicators"), "Practice chart, not a real stock · Education only · Not SEBI registered", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "indicator-" + S.tab, imgLabel: "Share this chart" });
+render();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
