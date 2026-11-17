@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>They Fell. They Rose. — comeback stories for traders</title>
+<meta name="description" content="Real stories of people who failed and came back: Amitabh Bachchan, Rakesh Jhunjhunwala, Ratan Tata, Steve Jobs, Ray Dalio, Warren Buffett and more, plus cautionary tales like Harshad Mehta and Nick Leeson. Each with a lesson for traders." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #febc2e; --acc2: #ff5470; }
+  .wrap { max-width: 1160px; }
+  .heroq { margin: 0 0 20px; padding: 20px 22px; border-radius: 22px; border: 1px solid rgba(254,188,46,.4); background: linear-gradient(135deg, rgba(254,188,46,.12), rgba(124,92,255,.08)); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+  .heroq q { font: 700 clamp(1.05rem, 3vw, 1.35rem)/1.4 "Space Grotesk"; quotes: none; }
+  .heroq small { display: block; color: var(--muted); font-size: .8rem; margin-top: 6px; }
+  .bar2 { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .flt { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .flt button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 13px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .flt button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .flt button b { font: 600 .68rem "JetBrains Mono"; opacity: .6; margin-left: 3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .st { position: relative; border: 1px solid var(--line); background: var(--card); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; scroll-margin-top: 20px; }
+  .st::before { content: ""; position: absolute; inset: 0; background: radial-gradient(360px circle at 0 0, var(--c), transparent 60%); opacity: .13; pointer-events: none; }
+  .st.warn { border-color: rgba(255,84,112,.4); }
+  .st.comp { border-style: dashed; }
+  .st.hl { box-shadow: 0 0 0 3px rgba(254,188,46,.6); }
+  .st .top { display: flex; gap: 12px; align-items: center; }
+  .st .av { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 1.6rem; background: rgba(255,255,255,.06); border: 1px solid var(--line); flex: none; }
+  .st h3 { font: 800 1.15rem/1.2 "Space Grotesk"; }
+  .st .role { font: 500 .74rem "JetBrains Mono"; color: var(--muted); margin-top: 2px; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .tags span { font: 700 .62rem "JetBrains Mono"; padding: 3px 7px; border-radius: 6px; border: 1px solid var(--line); color: #bfc4d2; }
+  .arc { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: stretch; }
+  .arc > div { border-radius: 14px; padding: 10px 12px; font-size: .84rem; line-height: 1.45; color: #d5d9e4; }
+  .arc .fall { background: rgba(255,84,112,.08); border: 1px solid rgba(255,84,112,.3); }
+  .arc .rise { background: rgba(34,211,154,.08); border: 1px solid rgba(34,211,154,.3); }
+  .st.warn .arc .rise { background: rgba(255,84,112,.05); border-color: rgba(255,84,112,.25); }
+  .arc b { display: block; font: 700 .64rem "JetBrains Mono"; letter-spacing: .08em; margin-bottom: 4px; }
+  .arc .fall b { color: #ff9aab; } .arc .rise b { color: #9be8c9; } .st.warn .arc .rise b { color: #ff9aab; }
+  .arc .arrow { display: grid; place-items: center; font-size: 1.1rem; color: var(--muted); }
+  .yrs { font: 600 .7rem "JetBrains Mono"; color: var(--muted); }
+  .les { border-radius: 14px; padding: 11px 13px; background: rgba(254,188,46,.08); border: 1px solid rgba(254,188,46,.35); font-size: .86rem; color: #f1e3c4; line-height: 1.5; }
+  .les b { color: #ffd98a; }
+  .st .more { font-size: .84rem; color: #b4b9c8; line-height: 1.55; }
+  .st .acts2 { display: flex; gap: 6px; margin-top: auto; }
+  .st .acts2 button { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: #d5d9e4; padding: 8px 11px; border-radius: 10px; font: 600 .76rem Inter; cursor: pointer; }
+  .st .acts2 button.wa { background: rgba(37,211,102,.15); border-color: rgba(37,211,102,.4); color: #8ff0b4; }
+  .sec-h { font: 800 1.35rem "Space Grotesk"; margin: 30px 0 4px; }
+  .sec-p { color: var(--muted); font-size: .9rem; margin-bottom: 14px; max-width: 760px; line-height: 1.5; }
+  .common { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .common div { border-radius: 18px; padding: 14px 16px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .common b { display: block; color: #fff; font: 700 1rem "Space Grotesk"; margin-bottom: 4px; }
+  .cta { margin-top: 22px; padding: 18px; border-radius: 22px; border: 1px solid rgba(0,224,184,.45); background: rgba(0,224,184,.07); display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+  .cta b { font: 800 1.1rem "Space Grotesk"; display: block; }
+  .cta span { color: #cfd3df; font-size: .88rem; }
+  .cta a { text-decoration: none; }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } .arc { grid-template-columns: 1fr; } .arc .arrow { transform: rotate(90deg); padding: 0; } .heroq { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../bounce-back/">💙 Recovery Room</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>They fell. <span class="grad">They rose.</span></h1>
+    <p class="sub">A superstar buried in debt. A future billionaire who borrowed $4,000 from his dad. A founder fired from his own company. Real people who hit rock bottom and came back, and a few who didn't. Read one on a bad trading day.</p>
+
+    <div class="heroq"><div><q id="dayQ"></q><small id="dayN"></small></div><button class="btn primary" id="inspire">✨ Inspire me</button></div>
+
+    <div class="bar2"><div class="flt" id="flt"></div></div>
+    <div class="grid" id="grid"></div>
+
+    <h2 class="sec-h">🔁 What every comeback had in common</h2>
+    <p class="sec-p">Different fields, same pattern. These are the habits that turn a fall into a comeback, in life and in trading.</p>
+    <div class="common">
+      <div><b>1. They survived first</b>Bachchan paid off his debts. Dalio cut his firm down to himself. Before you can win again, you must stay in the game: small size, stop-losses, no all-in bets.</div>
+      <div><b>2. They owned the mistake</b>None of them blamed the market or bad luck forever. They asked "what did I do wrong?" and changed it. That's your journal and lesson book.</div>
+      <div><b>3. They changed the method, not the dream</b>Murthy's first company failed; he started another. Jobs built NeXT. Keep the goal, fix the process.</div>
+      <div><b>4. They gave it time</b>Most comebacks took years, not days. One trade won't fix one bad month. Steady, disciplined trades will.</div>
+      <div><b>5. They didn't cheat to get back</b>The cautionary tales all share one thing: shortcuts, hidden losses or reckless leverage. There's no comeback from that.</div>
+    </div>
+
+    <div class="cta"><div><b>💙 Had a bad day yourself?</b><span>Pause, breathe, see the loss in proportion and start your own comeback ladder.</span></div><a class="btn primary" href="../bounce-back/">Open the Recovery Room →</a></div>
+
+    <div class="disclaimer"><b>📚 About these stories:</b> Summaries are based on widely reported public accounts and simplified for learning; figures are approximate. Quotes are as commonly attributed. The two everyday-trader stories are <b>composites</b> (not real individuals), clearly marked. Cautionary tales describe publicly reported events and court/regulatory outcomes. Nothing here is investment advice; I'm not SEBI-registered.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+/* g: india | world ; f: markets | business | life | caution | composite */
+const ST = [
+ { id: "bachchan", av: "🎬", c: "#febc2e", name: "Amitabh Bachchan", role: "Actor · India", g: "india", f: "life", yrs: "1999 → 2000",
+   fall: "His company ABCL collapsed in the late 1990s, leaving him with debts reported at around ₹90 crore, legal cases and creditors at his door. His films weren't working either. He has said it was the darkest phase of his life.",
+   rise: "He went to Yash Chopra and asked for work, took a TV show many stars looked down on, Kaun Banega Crorepati (2000), and acted in Mohabbatein. He paid off his debts and became bigger than ever, still working in his 80s.",
+   more: "He didn't hide or declare himself finished. He took the work that was available, paid back what he owed, and rebuilt his name step by step.",
+   les: "When you're down, <b>take the small, sure opportunities</b> and rebuild. Pay down the hole first (small size, high-quality setups) before chasing big wins." },
+ { id: "rj", av: "🐂", c: "#22d39a", name: "Rakesh Jhunjhunwala", role: "Investor · India", g: "india", f: "markets", yrs: "1985 → 2008 → 2022",
+   fall: "Started in 1985 with about ₹5,000. Like every investor, he went through crashes. In 2008 his portfolio fell sharply as markets collapsed, and he openly admitted to mistakes and losses over the years.",
+   rise: "He held his best businesses through the crash and kept learning. India's 'Big Bull' built a portfolio worth thousands of crores by holding quality companies for the long term.",
+   more: "He often said the market humbles everyone, and spoke openly about his trading losses. His biggest wins came from conviction in a few great businesses held for years.",
+   les: "<b>Crashes are temporary for great businesses.</b> Survive the bad phase with position sizing you can live with, so you're still there for the recovery." },
+ { id: "murthy", av: "💻", c: "#4fc3f7", name: "N. R. Narayana Murthy", role: "Infosys founder · India", g: "india", f: "business", yrs: "1970s → 1981",
+   fall: "His first venture, Softronics, failed within about a year and a half in the 1970s. He went back to a regular job.",
+   rise: "In 1981 he co-founded Infosys with six colleagues, using ₹10,000 borrowed from his wife Sudha Murty. Infosys became one of India's most respected global companies.",
+   more: "The first failure taught him what not to do: the market, the team and the timing. He didn't give up on the dream; he changed the plan.",
+   les: "<b>A failed strategy isn't a failed trader.</b> Review what went wrong, adjust the method, and start again with what you learned." },
+ { id: "tata", av: "🚙", c: "#5b8cff", name: "Ratan Tata", role: "Industrialist · India", g: "india", f: "business", yrs: "1999 → 2008",
+   fall: "Tata's passenger car business struggled after the Indica launch. In 1999 the Tata team went to Ford in Detroit to discuss selling it, and in widely shared accounts Ford's executives were dismissive, questioning why Tata had entered the car business at all.",
+   rise: "Tata kept the business and improved it. In 2008, Tata Motors bought Jaguar Land Rover, from Ford, and turned it around.",
+   more: "Instead of reacting to the insult, he answered with patience and results. Nine years later, the roles had reversed.",
+   les: "<b>Don't trade to prove someone wrong.</b> Quietly do the work. Results over years are the only answer that matters." },
+ { id: "yuvraj", av: "🏏", c: "#ff9f43", name: "Yuvraj Singh", role: "Cricketer · India", g: "india", f: "life", yrs: "2011 → 2012",
+   fall: "Months after being Player of the Tournament in India's 2011 World Cup win, he was diagnosed with a rare cancer (mediastinal seminoma) and went through chemotherapy in the US.",
+   rise: "He returned to play for India in the 2012 T20 World Cup, less than a year after his diagnosis, and went on to start a foundation supporting cancer patients.",
+   more: "His comeback was about one day at a time: treatment, rest, training, and patience with a body that wasn't ready yet.",
+   les: "<b>Recovery has its own pace.</b> After a big drawdown, come back slowly with small size. Rushing back at full strength usually ends in another injury." },
+ { id: "arunima", av: "🏔️", c: "#00e0b8", name: "Arunima Sinha", role: "Mountaineer · India", g: "india", f: "life", yrs: "2011 → 2013",
+   fall: "A national-level volleyball player, she was pushed off a moving train by robbers in 2011 and lost her leg below the knee.",
+   rise: "Two years later, in May 2013, she became the first female amputee to climb Mount Everest, and later climbed the highest peaks of several continents. She received the Padma Shri.",
+   more: "She trained with a prosthetic leg under Bachendri Pal, the first Indian woman to summit Everest, and refused to let the accident define her.",
+   les: "<b>Your setback doesn't decide your ceiling.</b> What you do after the fall does." },
+ { id: "kalpana", av: "🏭", c: "#ff4d8d", name: "Kalpana Saroj", role: "Entrepreneur · India", g: "india", f: "business", yrs: "1970s → 2000s",
+   fall: "Married as a child and mistreated, she escaped back home, faced harsh social stigma, and moved to Mumbai to work as a tailor for a few rupees a day.",
+   rise: "She saved, started small businesses, and later took over the debt-ridden Kamani Tubes, a company in deep trouble, and turned it around. She was awarded the Padma Shri.",
+   more: "Often called India's real 'Slumdog Millionaire', she built everything from nothing, one small step at a time.",
+   les: "<b>Start where you are, with what you have.</b> Small capital, compounded with patience, can go far." },
+ { id: "kiran", av: "🧬", c: "#9ccc65", name: "Kiran Mazumdar-Shaw", role: "Biocon founder · India", g: "india", f: "business", yrs: "1978",
+   fall: "A trained master brewer, she couldn't get a brewing job in India; she was told it was a man's job.",
+   rise: "She started Biocon in 1978 in a Bengaluru garage with about ₹10,000. It became one of India's leading biotech companies.",
+   more: "Rejection pushed her to build her own path instead of waiting for permission.",
+   les: "<b>A closed door can point you to a better one.</b> If a strategy doesn't fit you, find the one that does." },
+ { id: "kedia", av: "📈", c: "#7c5cff", name: "Vijay Kedia", role: "Investor · India", g: "india", f: "markets", yrs: "1980s → 2000s",
+   fall: "He has spoken about his early years trading in the market from a modest family background: losses, financial struggle and hard lessons from speculation.",
+   rise: "He shifted to research-based, long-term investing in quality businesses, and became one of India's best-known individual investors.",
+   more: "He often talks about patience and his 'SMILE' approach (small in size, medium in experience, large in aspiration, extra-large in market potential).",
+   les: "<b>Many great investors started as losing traders.</b> The turn came when they changed their process, not when they found a tip." },
+ { id: "jobs", av: "🍎", c: "#b9a6ff", name: "Steve Jobs", role: "Apple co-founder · USA", g: "world", f: "business", yrs: "1985 → 1997",
+   fall: "In 1985, he was pushed out of Apple, the company he co-founded, after a boardroom battle. He called it devastating and very public.",
+   rise: "He started NeXT and bought Pixar (which made Toy Story). Apple bought NeXT in 1996, he came back as CEO, and Apple went on to create the iPod and iPhone and became one of the world's most valuable companies.",
+   more: "He later said getting fired was the best thing that could have happened to him: it freed him to start over as a beginner.",
+   les: "<b>A painful exit can be a reset.</b> Sometimes stepping away from the market for a while is what lets you return sharper." },
+ { id: "rowling", av: "📚", c: "#ff9f43", name: "J. K. Rowling", role: "Author · UK", g: "world", f: "life", yrs: "1990s → 1997",
+   fall: "A single mother living on state benefits, she described herself as 'as poor as it is possible to be without being homeless'. Her first Harry Potter manuscript was rejected by many publishers (often reported as 12).",
+   rise: "Bloomsbury published it in 1997. Harry Potter became one of the best-selling book series in history.",
+   more: "She kept submitting through every rejection.",
+   les: "<b>Rejection is part of the process.</b> Losing trades are your rejections. Keep taking good setups; the winners come." },
+ { id: "disney", av: "🐭", c: "#4fc3f7", name: "Walt Disney", role: "Animator · USA", g: "world", f: "business", yrs: "1923 → 1928",
+   fall: "His first animation company, Laugh-O-Gram Studio, went bankrupt in 1923. He moved to Hollywood with very little money. He later lost the rights to an early character to his distributor.",
+   rise: "In 1928 he created Mickey Mouse, then built an entertainment empire.",
+   more: "Losing a character taught him to own his creations. Every failure taught him a business rule.",
+   les: "<b>Each blow-up teaches a rule.</b> Write it down, and never pay for the same lesson twice." },
+ { id: "sanders", av: "🍗", c: "#ff5470", name: "Colonel Harland Sanders", role: "KFC founder · USA", g: "world", f: "business", yrs: "1950s → 1960s",
+   fall: "His successful roadside restaurant lost its traffic in the mid-1950s when a new interstate highway bypassed his town. He sold at a loss and was left with little more than a Social Security cheque, in his mid-60s.",
+   rise: "He travelled from restaurant to restaurant selling franchise rights to his chicken recipe. KFC grew so big that he sold it in 1964 for $2 million.",
+   more: "Most people would have retired. He started again at an age when others stop.",
+   les: "<b>It's never too late to rebuild.</b> Age, past losses and a small account don't stop a disciplined restart." },
+ { id: "jordan", av: "🏀", c: "#ff9f43", name: "Michael Jordan", role: "Basketball · USA", g: "world", f: "life", yrs: "1978 → 1990s",
+   fall: "As a high-school sophomore he wasn't picked for his school's varsity team. He has said he went home and cried.",
+   rise: "He trained relentlessly and became one of the greatest players ever, with six NBA championships.",
+   more: "He famously said he had missed thousands of shots and lost hundreds of games, and that failing over and over is why he succeeded.",
+   les: "<b>Misses are part of the game.</b> Even the best traders lose 40–60% of their trades. Keep the losses small and keep shooting good shots." },
+ { id: "buffett", av: "🧓", c: "#22d39a", name: "Warren Buffett", role: "Investor · USA", g: "world", f: "markets", yrs: "1950 → today",
+   fall: "Harvard Business School rejected him in 1950. Years later he bought Berkshire Hathaway, a failing textile mill, partly out of irritation at a deal, and has called it one of his worst mistakes.",
+   rise: "The rejection sent him to Columbia to study under Benjamin Graham, the father of value investing. He turned Berkshire into one of the world's largest companies.",
+   more: "He writes openly about his mistakes every year in his shareholder letters.",
+   les: "<b>Admit mistakes publicly, even just to yourself.</b> Then turn them into something useful. The mistake mill became his vehicle." },
+ { id: "dalio", av: "🌊", c: "#5b8cff", name: "Ray Dalio", role: "Hedge-fund founder · USA", g: "world", f: "markets", yrs: "1982 → today",
+   fall: "In 1982 he publicly and confidently predicted a depression. He was badly wrong. The market boomed, his firm lost heavily, he let go of all his employees and had to borrow $4,000 from his father.",
+   rise: "He rebuilt Bridgewater Associates around one idea: 'I could be wrong.' He stress-tested every bet and diversified. Bridgewater became the world's largest hedge fund.",
+   more: "He calls that failure the best thing that happened to him: it turned arrogance into humility.",
+   les: "<b>Be humble about your view.</b> Always ask \"what if I'm wrong?\" That's what a stop-loss is." },
+ { id: "livermore", av: "🎩", c: "#9fb6ff", name: "Jesse Livermore", role: "Trader · USA", g: "world", f: "markets", yrs: "1900s → 1929",
+   fall: "One of history's most famous traders went broke several times, through over-leverage, ignoring his own rules and trading on others' tips.",
+   rise: "Each time he came back by returning to his rules, and he reportedly made a fortune shorting the 1929 crash. His ideas still shape how traders think about trends and cutting losses.",
+   more: "Sadly, he later lost much of his fortune again and struggled with depression. His life is a reminder that rules protect money, and that wellbeing matters more than any trade.",
+   les: "<b>Your rules only work if you follow them every time.</b> Most of his falls came when he broke his own." },
+ { id: "edison", av: "💡", c: "#febc2e", name: "Thomas Edison", role: "Inventor · USA", g: "world", f: "life", yrs: "1870s → 1914",
+   fall: "He tested thousands of materials that failed before finding a practical light bulb filament. In 1914, a huge fire destroyed much of his factory and years of work.",
+   rise: "His company rebuilt quickly. He is widely quoted as saying, 'I have not failed. I've just found 10,000 ways that won't work.'",
+   more: "He treated each failed experiment as data.",
+   les: "<b>Every losing trade is data</b> if you journal it. Enough data shows you exactly what works for you." },
+ { id: "jackma", av: "🛒", c: "#ff4d8d", name: "Jack Ma", role: "Alibaba founder · China", g: "world", f: "business", yrs: "1980s → 1999",
+   fall: "He failed China's college entrance exam twice and has said he was rejected from many jobs, including at KFC. His early internet ventures struggled.",
+   rise: "He founded Alibaba in 1999 from his apartment with a small group of friends. It grew into one of the world's biggest e-commerce companies.",
+   more: "He kept trying, again and again, until something worked.",
+   les: "<b>Persistence beats talent when talent quits.</b> Keep showing up with discipline." },
+ /* composites */
+ { id: "comp1", av: "🧑‍💻", c: "#7c5cff", name: "Rahul, 29, Pune", role: "Composite story · everyday trader", g: "india", f: "composite", yrs: "Year 1 → Year 3",
+   fall: "Started options buying with ₹4 lakh after watching YouTube 'expiry day' videos. Doubled up after losses to win them back. Lost almost all of it in 8 months and hid it from his family.",
+   rise: "He stopped F&O completely, told his family, and paper-traded for 3 months. Then he started swing trading with ₹50,000, 1% risk per trade and a journal. Two years later he has steady, modest profits and his confidence back.",
+   more: "This is a composite story, based on journeys many traders share, not one real person.",
+   les: "<b>Telling someone and starting small saved him.</b> Hiding losses and doubling up is what nearly ended him." },
+ { id: "comp2", av: "👩‍🏫", c: "#00e0b8", name: "Sunita, 41, Indore", role: "Composite story · everyday investor", g: "india", f: "composite", yrs: "2021 → 2024",
+   fall: "Put most of her savings into small-cap 'multibagger' tips from a Telegram group in 2021. When the stocks crashed, her portfolio fell more than 50%.",
+   rise: "She sold the tip stocks, moved most money to index-fund SIPs, and kept a small part for stocks she researched herself. Over the next years her SIPs recovered her losses, and she now teaches her colleagues to avoid tip groups.",
+   more: "This is a composite story, based on journeys many investors share, not one real person.",
+   les: "<b>Boring and steady beats exciting and broke.</b> Recovery often starts by doing less, not more." },
+ /* cautionary */
+ { id: "mehta", av: "⚠️", c: "#ff5470", name: "Harshad Mehta", role: "Stockbroker · India · cautionary", g: "india", f: "caution", yrs: "1992 → 2001",
+   fall: "Called a 'Big Bull' of the early-1990s rally, he was at the centre of the 1992 securities scam: bank funds were diverted into the stock market through loopholes in the banking system. When it was exposed, the market crashed.",
+   rise: "<b>No comeback.</b> He faced many criminal cases, was convicted, and died in 2001 while in judicial custody. Many investors who followed the rally lost heavily.",
+   more: "The scam led to major reforms and a much stronger SEBI.",
+   les: "<b>A rally built on borrowed or misused money ends badly</b>, for the person and for everyone following them. Never follow a 'big bull' blindly." },
+ { id: "leeson", av: "🏦", c: "#ff5470", name: "Nick Leeson", role: "Trader · UK/Singapore · cautionary", g: "world", f: "caution", yrs: "1992 → 1995",
+   fall: "A young trader at Barings Bank in Singapore, he hid growing losses in a secret account and kept doubling his bets to win them back.",
+   rise: "<b>No comeback for the bank.</b> Losses reached about £800 million+, and in 1995 Barings, a bank over 200 years old, collapsed. He went to prison in Singapore.",
+   more: "It's the textbook example of what hiding losses and revenge trading can do.",
+   les: "<b>Never hide a loss, and never double down to win it back.</b> Take the small loss; it's always cheaper than the big one." },
+ { id: "ltcm", av: "🧮", c: "#ff5470", name: "Long-Term Capital Management", role: "Hedge fund · USA · cautionary", g: "world", f: "caution", yrs: "1994 → 1998",
+   fall: "Run by star traders and two Nobel-prize-winning economists, the fund used huge leverage on trades its models said were almost riskless.",
+   rise: "<b>No comeback.</b> In 1998 a Russian debt crisis broke the models. The fund lost around $4.6 billion in months and needed a rescue organised by the US Federal Reserve to avoid wider damage.",
+   more: "Brilliant people, wrong assumption: that the past would repeat neatly.",
+   les: "<b>Leverage turns a small mistake into a fatal one.</b> No model, tip or degree removes risk." },
+];
+const FILTERS = [["all", "All stories"], ["india", "🇮🇳 India"], ["world", "🌍 World"], ["markets", "📈 Markets & investors"], ["business", "🏢 Business"], ["life", "🎬 Film, sport & life"], ["composite", "🧑 Everyday traders"], ["caution", "⚠️ Falls without a comeback"]];
+let flt = "all";
+const match = s => flt === "all" || s.g === flt || s.f === flt;
+function drawF() { $("#flt").innerHTML = FILTERS.map(([k, n]) => `<button data-k="${k}" class="${k === flt ? "on" : ""}">${n}<b>${ST.filter(s => k === "all" || s.g === k || s.f === k).length}</b></button>`).join(""); }
+function card(s) {
+  const warn = s.f === "caution", comp = s.f === "composite";
+  return `<article class="st${warn ? " warn" : ""}${comp ? " comp" : ""}" id="${s.id}" style="--c:${s.c}">
+    <div class="top"><span class="av">${s.av}</span><div><h3>${esc(s.name)}</h3><div class="role">${esc(s.role)}</div></div></div>
+    <div class="tags"><span>${s.g === "india" ? "🇮🇳 India" : "🌍 World"}</span><span>${{ markets: "📈 Markets", business: "🏢 Business", life: "🎬 Life & sport", caution: "⚠️ Cautionary", composite: "🧑 Composite" }[s.f]}</span><span class="yrs">${esc(s.yrs)}</span></div>
+    <div class="arc"><div class="fall"><b>⬇ THE FALL</b>${esc(s.fall)}</div><div class="arrow">→</div><div class="rise"><b>${warn ? "✖ THE END" : "⬆ THE COMEBACK"}</b>${s.rise.startsWith("<b>") ? s.rise : esc(s.rise)}</div></div>
+    <p class="more">${esc(s.more)}</p>
+    <div class="les">💡 <b>For traders:</b> ${s.les}</div>
+    <div class="acts2"><button class="wa" data-wa="${s.id}">💌 Share</button><button data-img="${s.id}">📸 Card</button><button data-link="${s.id}">🔗 Link</button></div>
+  </article>`;
+}
+function draw() {
+  const list = ST.filter(match), order = s => s.f === "caution" ? 2 : s.f === "composite" ? 1 : 0;
+  $("#grid").innerHTML = list.sort((a, b) => order(a) - order(b)).map(card).join("");
+}
+$("#flt").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (!b) return; flt = b.dataset.k; drawF(); draw(); });
+
+/* story of the day + inspire */
+const good = ST.filter(s => s.f !== "caution" && s.f !== "composite");
+const dayIdx = Math.floor(Date.now() / 864e5) % good.length;
+function hero(s) { $("#dayQ").innerHTML = `${s.av} ${esc(s.name)}: ${esc(s.fall.split(". ")[0].replace(/\.$/, ""))}. Then: ${esc(s.rise.split(". ")[0].replace(/<[^>]+>/g, "").replace(/\.$/, ""))}.`; $("#dayN").innerHTML = `Story of the day · <a href="#${s.id}" data-go="${s.id}" style="color:var(--acc)">read it →</a>`; }
+hero(good[dayIdx]);
+function go(id) { if (!ST.find(s => s.id === id)) return; if (!match(ST.find(s => s.id === id))) { flt = "all"; drawF(); draw(); } const el = $("#" + id); el.scrollIntoView({ behavior: "smooth", block: "center" }); el.classList.add("hl"); setTimeout(() => el.classList.remove("hl"), 2200); history.replaceState(null, "", "#" + id); }
+$("#inspire").addEventListener("click", () => { const s = good[Math.floor(Math.random() * good.length)]; hero(s); go(s.id); });
+document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); go(g.dataset.go); } });
+
+/* share */
+const pageURL = id => (/^https?:/.test(location.protocol) && !/localhost/.test(location.host) ? location.origin + location.pathname : "https://manideepcs024.github.io/comeback-stories/") + (id ? "#" + id : "");
+const strip = t => t.replace(/<[^>]+>/g, "");
+function text(s) {
+  const warn = s.f === "caution";
+  return [`${warn ? "⚠️" : "🔥"} *${s.name}*: ${warn ? "a cautionary tale" : "they fell, they rose"}`, `_${s.role} · ${s.yrs}_`, "", `⬇ *The fall:* ${s.fall}`, "", `${warn ? "✖ *The end:*" : "⬆ *The comeback:*"} ${strip(s.rise)}`, "", `💡 *For traders:* ${strip(s.les)}`, "", `📚 ${ST.length} stories of falling and rising 👇`, pageURL(s.id), "", "— MANIMINDSMONEY Community"].join("\n");
+}
+async function img(s) {
+  await K.loadFonts?.();
+  const W = 1080, H = 1350, warn = s.f === "caution", { c, ctx } = K.canvas(W, H, [[s.c + "55", .1, .05, .6], [warn ? "rgba(255,84,112,0.12)" : "rgba(34,211,154,0.12)", .95, .95, .5]]); K.brand(ctx);
+  K.txt(ctx, warn ? "A CAUTIONARY TALE" : "THEY FELL. THEY ROSE.", 70, 182, `700 24px ${K.F.MONO}`, warn ? "#ff9aab" : "#febc2e");
+  K.txt(ctx, s.av, 70, 278, `84px ${K.F.INTER}`, "#fff"); K.txt(ctx, s.name, 180, 252, K.fit(ctx, s.name, 800, K.F.GROT, 58, W - 250), "#fff"); K.txt(ctx, `${s.role} · ${s.yrs}`, 182, 296, K.fit(ctx, `${s.role} · ${s.yrs}`, 500, K.F.MONO, 22, W - 250), "#8b93a7");
+  let y = 350; const block = (lab, t, col, bg) => { ctx.font = `500 27px ${K.F.INTER}`; const lines = K.cap(K.wrap(ctx, t, W - 200), 6), h = 70 + lines.length * 38; K.panel(ctx, 70, y, W - 140, h, 22, bg, col + "66"); K.txt(ctx, lab, 100, y + 44, `700 22px ${K.F.MONO}`, col); lines.forEach((l, i) => K.txt(ctx, l, 100, y + 86 + i * 38, `500 27px ${K.F.INTER}`, "#e8ecf6")); y += h + 20; };
+  block("⬇ THE FALL", s.fall, "#ff9aab", "rgba(255,84,112,0.08)"); block(warn ? "✖ THE END" : "⬆ THE COMEBACK", strip(s.rise), warn ? "#ff9aab" : "#7be3bf", warn ? "rgba(255,84,112,0.06)" : "rgba(34,211,154,0.08)"); block("💡 FOR TRADERS", strip(s.les), "#ffd98a", "rgba(254,188,46,0.08)");
+  K.footer(ctx, W, H, K.toolUrl("comeback-stories"), "Based on public accounts · For learning", true);
+  await K.shareCanvas(c, `comeback-${s.id}.png`, text(s));
+}
+$("#grid").addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return; const s = ST.find(x => x.id === (b.dataset.wa || b.dataset.img || b.dataset.link)); if (!s) return;
+  if (b.dataset.wa) window.open("https://wa.me/?text=" + encodeURIComponent(text(s)), "_blank", "noopener");
+  if (b.dataset.img) { b.disabled = true; try { await img(s); } finally { b.disabled = false; } }
+  if (b.dataset.link) K.toast(await K.copyText(pageURL(s.id)) ? "🔗 Link copied" : "Couldn't copy");
+});
+drawF(); draw();
+if (location.hash.length > 1) setTimeout(() => go(location.hash.slice(1)), 300);
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
