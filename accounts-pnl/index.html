@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Family Accounts P&amp;L — monthly profit &amp; loss across broking accounts</title>
+<meta name="description" content="Enter the monthly net P&L of each broking account by segment (cash, F&O, intraday, commodity, currency) and get totals per account, per person and for all accounts. Share a clean summary card. Private, on your device." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #7c5cff; }
+  .monthbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .mnav { display: flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 6px; }
+  .mnav button { border: 0; background: rgba(255,255,255,.07); color: var(--fg); width: 38px; height: 38px; border-radius: 11px; font: 700 1rem Inter; cursor: pointer; }
+  .mnav b { font: 700 1.05rem "Space Grotesk"; min-width: 150px; text-align: center; }
+  .filled { font: 600 .76rem "JetBrains Mono"; color: var(--muted); }
+  .segs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .segs button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .segs button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .acct { border: 1px solid var(--line); border-radius: 20px; padding: 14px; background: rgba(0,0,0,.24); margin-top: 12px; }
+  .acct .hd { display: grid; grid-template-columns: 36px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) 36px; gap: 8px; align-items: end; }
+  .acct .num { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; font: 800 .9rem "Space Grotesk"; color: #000; margin-bottom: 4px; }
+  .acct .q { margin-top: 0 !important; }
+  .acct .rm { width: 36px; height: 36px; margin-bottom: 4px; }
+  .acct .vals { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 10px; }
+  .acct .vals .field input { font-weight: 700; }
+  .acct .vals .field.pos { border-color: rgba(34,211,154,.5); } .acct .vals .field.neg { border-color: rgba(255,84,112,.55); }
+  .acct .net { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: .84rem; color: var(--muted); }
+  .acct .net b { font: 700 1.15rem "JetBrains Mono"; }
+  .acct .net input { flex: 1; margin-right: 10px; background: none; border: 0; border-bottom: 1px solid var(--line); color: var(--fg); font: 500 .82rem Inter; padding: 4px 2px; outline: 0; min-width: 0; }
+  .hint2 { font-size: .74rem; color: var(--muted); margin-top: 6px; }
+  .grand { border-radius: 22px; padding: 18px; text-align: center; border: 1px solid; }
+  .grand span { font: 700 .72rem "JetBrains Mono"; letter-spacing: .12em; color: var(--muted); }
+  .grand strong { display: block; font: 800 clamp(2rem, 7vw, 2.8rem)/1.1 "Space Grotesk"; margin: 6px 0; }
+  .grand em { font-style: normal; font-size: .84rem; color: #cfd3df; }
+  table.t { width: 100%; border-collapse: collapse; font-size: .84rem; margin-top: 4px; }
+  table.t th { text-align: left; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; padding: 7px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  table.t td { padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: top; }
+  table.t td.n, table.t th.n { text-align: right; font-family: "JetBrains Mono"; white-space: nowrap; }
+  table.t td small { display: block; color: var(--muted); font: .68rem "JetBrains Mono"; }
+  table.t tr.sub td { background: rgba(255,255,255,.03); font-weight: 700; }
+  table.t tr.tot td { border-top: 1.5px solid rgba(255,255,255,.25); font-weight: 800; font-size: .9rem; }
+  .tblwrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+  .blk { margin-top: 16px; }
+  .blk h3 { font: 700 .98rem "Space Grotesk"; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; }
+  .blk h3 small { font: 500 .7rem "JetBrains Mono"; color: var(--muted); }
+  .bars { display: grid; gap: 7px; }
+  .bars div { display: grid; grid-template-columns: 120px minmax(0, 1fr) 104px; gap: 8px; align-items: center; font-size: .82rem; }
+  .bars .b { height: 9px; border-radius: 5px; background: rgba(255,255,255,.07); position: relative; overflow: hidden; }
+  .bars .b i { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
+  .bars .b::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: rgba(255,255,255,.3); }
+  .bars b { font: 700 .8rem "JetBrains Mono"; text-align: right; }
+  .yr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .hist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; margin-top: 8px; }
+  .hist button { border: 1px solid var(--line); border-radius: 10px; padding: 7px 2px; background: rgba(0,0,0,.25); color: var(--fg); cursor: pointer; font: 600 .7rem "JetBrains Mono"; text-align: center; }
+  .hist button small { display: block; font-size: .62rem; color: var(--muted); margin-bottom: 2px; }
+  .hist button.cur { outline: 2px solid var(--a1); }
+  .tools2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .tools2 .btn { padding: 11px 10px; font-size: .84rem; white-space: normal; line-height: 1.25; min-width: 0; }
+  @media (max-width: 640px) { .acct .hd { grid-template-columns: 36px minmax(0, 1fr) 36px; } .acct .hd .brk, .acct .hd .cid { grid-column: 2 / 3; } .acct .hd .rm { grid-column: 3; grid-row: 1; } .bars div { grid-template-columns: 90px minmax(0, 1fr) 92px; } .hist { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../report-card/">📅 Report card</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>All accounts, <span class="grad">one P&amp;L.</span></h1>
+    <p class="sub">Set up each broking account once (holder, broker, client ID). Every month, enter the <b>net profit or loss</b> per segment from the broker's P&amp;L report. You get the total for each account, each person, each segment and <b>all accounts together</b>, ready to share. Use a minus sign for a loss (e.g. <b>-12,500</b>). Everything stays on this device.</p>
+
+    <div class="monthbar">
+      <div class="mnav"><button id="prev" aria-label="Previous month">‹</button><b id="mLabel"></b><button id="next" aria-label="Next month">›</button></div>
+      <span class="filled" id="filled"></span>
+    </div>
+
+    <div class="layout">
+      <section class="card">
+        <div class="q">Segments <span class="opt">tap to show or hide</span></div>
+        <div class="segs" id="segs"></div>
+        <div id="accts"></div>
+        <button class="add" id="addAcct">＋ Add broking account</button>
+        <div class="tools2"><button class="btn" id="clearMonth">🧹 Clear this month's numbers</button><button class="btn" id="csv">⬇ Export CSV (all months)</button></div>
+        <p class="hint2">Tip: take the <b>net realised P&amp;L</b> per segment from each broker's P&amp;L / tax report (after charges if the report shows it). Turn on the <b>Charges</b> segment only if your numbers are before charges.</p>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Summary</h2><span id="meta"></span></div>
+        <div id="sum"></div>
+        <div class="share-row" id="shareRow"></div>
+        <div class="cols2" style="margin-top:12px">
+          <div><div class="q">Card title</div><label class="field sm"><input id="title" class="txt" type="text" maxlength="40" placeholder="Family accounts P&L" /></label></div>
+          <div><div class="q">Prepared by</div><label class="field sm"><input id="by" class="txt" type="text" maxlength="30" placeholder="Manideep Mittal" /></label></div>
+        </div>
+        <label class="toggle"><span>Mask client IDs when sharing<small>Shows only the last 3 characters, e.g. ••••A12</small></span><input type="checkbox" id="optMask" /><span class="sw"></span></label>
+        <label class="toggle"><span>Show financial-year total on the card<small>April to this month</small></span><input type="checkbox" id="optFY" /><span class="sw"></span></label>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Note:</b> This is a private calculator for numbers <b>you</b> enter; it doesn't connect to any broker. Totals are only as accurate as the figures entered, so cross-check with each broker's official P&amp;L / tax P&amp;L statement. For income tax, F&amp;O and intraday are treated differently from delivery (cash) gains; confirm with your CA. Data is saved only in this browser; use <a href="../backup/" style="color:inherit">💾 Backup</a> to keep a copy.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const SEGS = { cash: ["📦", "Cash / Delivery"], intra: ["⚡", "Intraday"], fno: ["📊", "F&O"], comm: ["🛢️", "Commodity"], curr: ["💱", "Currency"], chg: ["🧾", "Charges"] };
+const COLORS = ["#7c5cff", "#00e0b8", "#ffb020", "#ff5470", "#5b8cff", "#22d39a", "#ff9f43", "#b9a6ff"];
+const uid = () => "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const S = K.store("accountspnl_v1", {
+  accounts: [{ id: uid(), holder: "Narendra Mittal", broker: "", code: "" }, { id: uid() + "b", holder: "Raghuvanshmani Mittal", broker: "", code: "" }, { id: uid() + "c", holder: "Manideep Mittal", broker: "", code: "" }],
+  segs: ["cash", "fno"], months: {}, mask: true, fy: true, title: "", by: "", ym: "",
+});
+const nowYM = K.iso(K.istNow()).slice(0, 7);
+if (!S.ym) S.ym = nowYM;
+const segOrder = Object.keys(SEGS), activeSegs = () => segOrder.filter(k => S.segs.includes(k));
+const monthData = (ym = S.ym) => (S.months[ym] ||= {});
+const val = (ym, aid, seg) => num(S.months[ym]?.[aid]?.[seg]) || 0;
+const accNet = (ym, aid) => activeSegs().reduce((a, s) => a + (s === "chg" ? -Math.abs(val(ym, aid, s)) : val(ym, aid, s)), 0);
+const hasData = ym => S.accounts.some(a => activeSegs().some(s => (S.months[ym]?.[a.id]?.[s] ?? "") !== ""));
+const monthName = m => K.parseISO(m + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+const short = m => K.parseISO(m + "-01").toLocaleDateString("en-IN", { month: "short" });
+const mask = c => !c ? "" : S.mask && c.length > 3 ? "••••" + c.slice(-3) : c;
+const money = v => (v < 0 ? "−" : v > 0 ? "+" : "") + "₹" + Math.abs(Math.round(v)).toLocaleString("en-IN");
+const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
+const fyStart = ym => { const [y, m] = ym.split("-").map(Number); return `${m >= 4 ? y : y - 1}-04`; };
+const fyLabel = ym => { const s = +fyStart(ym).slice(0, 4); return `FY ${s}-${String(s + 1).slice(2)}`; };
+const fyMonths = ym => { const out = []; let [y, m] = fyStart(ym).split("-").map(Number); while (`${y}-${String(m).padStart(2, "0")}` <= ym) { out.push(`${y}-${String(m).padStart(2, "0")}`); m++; if (m > 12) { m = 1; y++; } } return out; };
+
+/* ---------- inputs ---------- */
+function drawSegs() { $("#segs").innerHTML = segOrder.map(k => `<button data-s="${k}" class="${S.segs.includes(k) ? "on" : ""}">${SEGS[k][0]} ${SEGS[k][1]}</button>`).join(""); }
+$("#segs").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; const k = b.dataset.s; if (S.segs.includes(k)) { if (S.segs.length === 1) return K.toast("Keep at least one segment"); S.segs = S.segs.filter(x => x !== k); } else S.segs.push(k); drawSegs(); drawAccts(); render(); });
+function drawAccts() {
+  const md = monthData();
+  $("#accts").innerHTML = S.accounts.map((a, i) => { const d = md[a.id] || {}, n = accNet(S.ym, a.id);
+    return `<div class="acct" data-id="${a.id}">
+      <div class="hd"><span class="num" style="background:${COLORS[i % COLORS.length]}">${i + 1}</span>
+        <div><div class="q">Account holder</div><label class="field sm"><input data-f="holder" class="txt" type="text" maxlength="40" placeholder="Name" value="${esc(a.holder)}" /></label></div>
+        <div class="brk"><div class="q">Broker</div><label class="field sm"><input data-f="broker" class="txt" type="text" maxlength="24" placeholder="e.g. Zerodha" value="${esc(a.broker)}" /></label></div>
+        <div class="cid"><div class="q">Client ID</div><label class="field sm"><input data-f="code" class="txt" type="text" maxlength="20" placeholder="e.g. AB1234" value="${esc(a.code)}" style="text-transform:uppercase" /></label></div>
+        <button class="rm" data-rm="${a.id}" title="Remove account">✕</button></div>
+      <div class="vals">${activeSegs().map(s => { const v = d[s] ?? "", nv = num(v); return `<div><div class="q">${SEGS[s][0]} ${SEGS[s][1]}${s === "chg" ? ' <span class="opt">deducted</span>' : ""}</div><label class="field sm ${v === "" ? "" : s === "chg" ? "neg" : nv > 0 ? "pos" : nv < 0 ? "neg" : ""}"><span class="unit">₹</span><input data-v="${s}" type="text" inputmode="decimal" placeholder="0" value="${esc(v)}" /></label></div>`; }).join("")}</div>
+      <div class="net"><input data-f="note" type="text" maxlength="60" placeholder="Note for this month (optional)" value="${esc(d.note || "")}" /><span>Net&nbsp;<b class="${cls(n)}" data-net="${a.id}">${money(n)}</b></span></div></div>`; }).join("");
+}
+$("#accts").addEventListener("input", e => {
+  const t = e.target, card = t.closest(".acct"); if (!card) return; const id = card.dataset.id, a = S.accounts.find(x => x.id === id);
+  if (t.dataset.v) { K.fmtNum(t, 2, t.dataset.v !== "chg"); const md = monthData(); (md[id] ||= {})[t.dataset.v] = t.value; const f = t.closest(".field"), nv = num(t.value); f.classList.toggle("pos", t.value !== "" && t.dataset.v !== "chg" && nv > 0); f.classList.toggle("neg", t.value !== "" && (t.dataset.v === "chg" || nv < 0)); const n = accNet(S.ym, id), nb = card.querySelector(`[data-net="${id}"]`); nb.textContent = money(n); nb.className = cls(n); }
+  else if (t.dataset.f === "note") { (monthData()[id] ||= {}).note = t.value; }
+  else if (t.dataset.f) { a[t.dataset.f] = t.dataset.f === "code" ? t.value.toUpperCase() : t.value; }
+  render(false);
+});
+$("#accts").addEventListener("click", e => { const b = e.target.closest("[data-rm]"); if (!b) return; const a = S.accounts.find(x => x.id === b.dataset.rm);
+  if (!confirm(`Remove ${a.holder || "this account"}${a.broker ? " (" + a.broker + ")" : ""}? Its numbers in all months will be deleted.`)) return;
+  S.accounts = S.accounts.filter(x => x.id !== a.id); Object.values(S.months).forEach(m => delete m[a.id]); drawAccts(); render(); });
+$("#addAcct").addEventListener("click", () => { const last = S.accounts[S.accounts.length - 1]; S.accounts.push({ id: uid(), holder: "", broker: "", code: "" }); drawAccts(); render(); const ins = $("#accts").querySelectorAll(".acct"); ins[ins.length - 1].querySelector("input").focus(); });
+$("#clearMonth").addEventListener("click", () => { if (!confirm(`Clear all numbers for ${monthName(S.ym)}? Accounts are kept.`)) return; S.months[S.ym] = {}; drawAccts(); render(); });
+
+/* ---------- summary ---------- */
+function totals(ym) {
+  const per = S.accounts.map((a, i) => ({ a, i, net: accNet(ym, a.id), segs: Object.fromEntries(activeSegs().map(s => [s, s === "chg" ? -Math.abs(val(ym, a.id, s)) : val(ym, a.id, s)])) }));
+  const bySeg = Object.fromEntries(activeSegs().map(s => [s, per.reduce((x, p) => x + p.segs[s], 0)]));
+  const people = {}; per.forEach(p => { const k = (p.a.holder || "Unnamed").trim(); (people[k] ||= { name: k, net: 0, list: [] }); people[k].net += p.net; people[k].list.push(p); });
+  return { per, bySeg, people: Object.values(people), total: per.reduce((x, p) => x + p.net, 0) };
+}
+function render(redraw = true) {
+  $("#mLabel").textContent = monthName(S.ym);
+  const T = totals(S.ym), filled = S.accounts.filter(a => activeSegs().some(s => (S.months[S.ym]?.[a.id]?.[s] ?? "") !== "")).length;
+  $("#filled").textContent = `${filled} of ${S.accounts.length} accounts filled`;
+  $("#meta").textContent = monthName(S.ym);
+  const segs = activeSegs(), multi = T.people.some(p => p.list.length > 1);
+  const fyM = fyMonths(S.ym), fyT = fyM.reduce((x, m) => x + totals(m).total, 0), prevYM = (() => { const [y, m] = S.ym.split("-").map(Number); return K.iso(new Date(y, m - 2, 1)).slice(0, 7); })(), prevT = hasData(prevYM) ? totals(prevYM).total : null;
+  const col = T.total > 0 ? "rgba(34,211,154,.5)" : T.total < 0 ? "rgba(255,84,112,.55)" : "var(--line)";
+  let h = `<div class="grand" style="border-color:${col};background:${T.total > 0 ? "rgba(34,211,154,.07)" : T.total < 0 ? "rgba(255,84,112,.07)" : "rgba(255,255,255,.03)"}"><span>NET P&amp;L · ALL ${S.accounts.length} ACCOUNTS</span><strong class="${cls(T.total)}">${money(T.total)}</strong><em>${monthName(S.ym)}${prevT != null ? ` · last month ${money(prevT)}` : ""}</em></div>`;
+  // per account table
+  h += `<div class="blk"><h3>By account <small>${segs.length} segment${segs.length > 1 ? "s" : ""}</small></h3><div class="tblwrap"><table class="t"><tr><th>Account</th>${segs.map(s => `<th class="n">${SEGS[s][1].replace(" / Delivery", "")}</th>`).join("")}<th class="n">Net</th></tr>`;
+  T.people.forEach(p => {
+    p.list.forEach(x => { h += `<tr><td><b style="color:${COLORS[x.i % COLORS.length]}">●</b> ${esc(x.a.holder || "Unnamed")}<small>${esc([x.a.broker, x.a.code].filter(Boolean).join(" · ") || "—")}</small></td>${segs.map(s => `<td class="n ${cls(x.segs[s])}">${x.segs[s] ? money(x.segs[s]) : "—"}</td>`).join("")}<td class="n ${cls(x.net)}"><b>${money(x.net)}</b></td></tr>`; });
+    if (multi && p.list.length > 1) h += `<tr class="sub"><td>${esc(p.name)} · total</td>${segs.map(s => { const v = p.list.reduce((a, x) => a + x.segs[s], 0); return `<td class="n ${cls(v)}">${v ? money(v) : "—"}</td>`; }).join("")}<td class="n ${cls(p.net)}">${money(p.net)}</td></tr>`;
+  });
+  h += `<tr class="tot"><td>All accounts</td>${segs.map(s => `<td class="n ${cls(T.bySeg[s])}">${money(T.bySeg[s])}</td>`).join("")}<td class="n ${cls(T.total)}">${money(T.total)}</td></tr></table></div></div>`;
+  // by person bars
+  const mx = Math.max(...T.people.map(p => Math.abs(p.net)), 1);
+  h += `<div class="blk"><h3>By person</h3><div class="bars">${T.people.map(p => { const w = Math.abs(p.net) / mx * 50; return `<div><span>${esc(p.name)}${p.list.length > 1 ? ` <small style="color:var(--muted)">×${p.list.length}</small>` : ""}</span><div class="b"><i style="${p.net >= 0 ? `left:50%;width:${w}%;background:#22d39a` : `right:50%;width:${w}%;background:#ff5470`}"></i></div><b class="${cls(p.net)}">${money(p.net)}</b></div>`; }).join("")}</div></div>`;
+  // by segment
+  h += `<div class="blk"><h3>By segment</h3><div class="mini" style="display:grid;grid-template-columns:repeat(${Math.min(segs.length, 3)},minmax(0,1fr));gap:8px">${segs.map(s => `<div class="stat" style="padding:10px"><span>${SEGS[s][0]} ${SEGS[s][1]}</span><b class="${cls(T.bySeg[s])}">${money(T.bySeg[s])}</b></div>`).join("")}</div></div>`;
+  // FY + history
+  const fyFilled = fyM.filter(hasData).length;
+  h += `<div class="blk"><h3>${fyLabel(S.ym)} so far <small>April → ${short(S.ym)} · ${fyFilled} month${fyFilled === 1 ? "" : "s"} entered</small></h3><div class="yr"><div class="stat"><span>All accounts, FY to date</span><b class="${cls(fyT)}">${money(fyT)}</b></div><div class="stat"><span>Average per month</span><b class="${cls(fyT)}">${fyFilled ? money(fyT / fyFilled) : "—"}</b></div></div>
+    <div class="hist">${fyM.map(m => { const t = hasData(m) ? totals(m).total : null; return `<button data-ym="${m}" class="${m === S.ym ? "cur" : ""}"><small>${short(m)}</small><span class="${t == null ? "" : cls(t)}">${t == null ? "—" : (t < 0 ? "−" : "+") + (Math.abs(t) >= 1e5 ? (Math.abs(t) / 1e5).toFixed(1) + "L" : Math.abs(t) >= 1e3 ? (Math.abs(t) / 1e3).toFixed(0) + "k" : Math.round(Math.abs(t)))}</span></button>`; }).join("")}</div></div>`;
+  $("#sum").innerHTML = h;
+  if (redraw) {} S.save();
+}
+$("#sum").addEventListener("click", e => { const b = e.target.closest("[data-ym]"); if (!b) return; S.ym = b.dataset.ym; drawAccts(); render(); });
+const shiftM = d => { const [y, m] = S.ym.split("-").map(Number); S.ym = K.iso(new Date(y, m - 1 + d, 1)).slice(0, 7); drawAccts(); render(); };
+$("#prev").addEventListener("click", () => shiftM(-1)); $("#next").addEventListener("click", () => shiftM(1));
+["title", "by"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { S[k] = e.target.value; S.save(); }); });
+$("#optMask").checked = S.mask; $("#optMask").addEventListener("change", e => { S.mask = e.target.checked; S.save(); });
+$("#optFY").checked = S.fy; $("#optFY").addEventListener("change", e => { S.fy = e.target.checked; S.save(); });
+
+/* ---------- CSV ---------- */
+$("#csv").addEventListener("click", () => {
+  const months = Object.keys(S.months).filter(hasData).sort(); if (!months.length) return K.toast("No numbers entered yet");
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`, segs = activeSegs();
+  const rows = [["Month", "Holder", "Broker", "Client ID", ...segs.map(s => SEGS[s][1]), "Net", "Note"].map(q).join(",")];
+  months.forEach(m => S.accounts.forEach(a => { const d = S.months[m]?.[a.id] || {}; rows.push([m, a.holder, a.broker, a.code, ...segs.map(s => num(d[s]) || 0), accNet(m, a.id).toFixed(2), d.note || ""].map(q).join(",")); }));
+  const blob = new Blob([rows.join("\n")], { type: "text/csv" }), u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = `accounts-pnl-${months[0]}-to-${months[months.length - 1]}.csv`; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000);
+});
+
+/* ---------- share ---------- */
+const valid = () => { if (!hasData(S.ym)) { K.toast(`Enter some numbers for ${monthName(S.ym)} first`); return false; } return true; };
+function buildText() {
+  const T = totals(S.ym), segs = activeSegs(), title = S.title.trim() || "Family accounts P&L";
+  const out = [`📊 *${title}: ${monthName(S.ym)}*`, ""];
+  T.people.forEach(p => {
+    out.push(`👤 *${p.name}*`);
+    p.list.forEach(x => { out.push(`${p.list.length > 1 || x.a.broker || x.a.code ? `   🏦 ${[x.a.broker, mask(x.a.code)].filter(Boolean).join(" · ") || "Account"}` : ""}`.trimEnd()); segs.forEach(s => { if (x.segs[s]) out.push(`   ${SEGS[s][0]} ${SEGS[s][1]}: ${money(x.segs[s])}`); }); out.push(`   ➡️ Net: *${money(x.net)}*`); });
+    if (p.list.length > 1) out.push(`   *${p.name} total: ${money(p.net)}*`);
+    out.push("");
+  });
+  out.push("*By segment*", ...segs.map(s => `${SEGS[s][0]} ${SEGS[s][1]}: ${money(T.bySeg[s])}`), "", `💰 *NET, ALL ACCOUNTS: ${money(T.total)}*`);
+  if (S.fy) out.push(`📅 ${fyLabel(S.ym)} to date: ${money(fyMonths(S.ym).reduce((x, m) => x + totals(m).total, 0))}`);
+  if (S.by.trim()) out.push("", `_Prepared by ${S.by.trim()}_`);
+  return out.filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n").replace(/\n\s*\n\s*\n/g, "\n\n");
+}
+async function draw() {
+  await K.loadFonts?.();
+  const T = totals(S.ym), segs = activeSegs(), W = 1080, rows = T.per.length + T.people.filter(p => p.list.length > 1).length;
+  const colW = Math.min(190, (W - 140 - 380) / (segs.length + 1)), H = 520 + rows * 86 + 90 + (S.fy ? 70 : 0) + 140;
+  const { c, ctx } = K.canvas(W, H, [[T.total >= 0 ? "rgba(34,211,154,0.22)" : "rgba(255,84,112,0.22)", .1, .05, .6], ["rgba(124,92,255,0.14)", .95, .95, .5]]); K.brand(ctx);
+  const title = (S.title.trim() || "Family accounts P&L");
+  K.txt(ctx, title.toUpperCase(), 70, 180, K.fit(ctx, title.toUpperCase(), 700, K.F.MONO, 24, W - 140), "#8b93a7");
+  K.txt(ctx, monthName(S.ym), 70, 236, `700 52px ${K.F.GROT}`, "#fff");
+  // grand total
+  const gc = T.total >= 0 ? "#22d39a" : "#ff5470";
+  K.panel(ctx, 70, 270, W - 140, 150, 26, gc + "18", gc + "77");
+  K.txt(ctx, `NET P&L · ALL ${T.per.length} ACCOUNTS`, 100, 318, `700 22px ${K.F.MONO}`, "#8b93a7");
+  K.txt(ctx, money(T.total), 100, 392, `800 64px ${K.F.GROT}`, gc);
+  // table
+  let y = 470; const x0 = 70, xn = W - 70, segX = segs.map((s, i) => xn - colW * (segs.length - i));
+  K.txt(ctx, "ACCOUNT", x0, y, `700 18px ${K.F.MONO}`, "#8b93a7"); segs.forEach((s, i) => K.txt(ctx, SEGS[s][1].replace(" / Delivery", "").toUpperCase(), segX[i], y, `700 18px ${K.F.MONO}`, "#8b93a7", "right")); K.txt(ctx, "NET", xn, y, `700 18px ${K.F.MONO}`, "#8b93a7", "right");
+  y += 16; ctx.strokeStyle = "rgba(255,255,255,.15)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(xn, y); ctx.stroke();
+  const nameW = (segs.length ? segX[0] - colW : xn - colW) - x0 - 10;
+  const row = (name, sub, vals, net, dot, bold) => {
+    y += 86; if (bold) { K.rr(ctx, x0 - 10, y - 58, W - 120, 78, 14); ctx.fillStyle = "rgba(255,255,255,.04)"; ctx.fill(); }
+    if (dot) { ctx.fillStyle = dot; ctx.beginPath(); ctx.arc(x0 + 8, y - 30, 8, 0, 7); ctx.fill(); }
+    const nx = x0 + (dot ? 26 : 0); K.txt(ctx, name, nx, y - (sub ? 26 : 16), K.fit(ctx, name, bold ? 800 : 700, K.F.INTER, 28, nameW - (dot ? 26 : 0)), "#fff");
+    if (sub) K.txt(ctx, sub, nx, y + 4, K.fit(ctx, sub, 500, K.F.MONO, 19, nameW - (dot ? 26 : 0)), "#8b93a7");
+    vals.forEach((v, i) => K.txt(ctx, v ? money(v) : "—", segX[i], y - 16, K.fit(ctx, v ? money(v) : "—", 600, K.F.MONO, 24, colW - 14), v > 0 ? "#7be3bf" : v < 0 ? "#ff9aab" : "#6c7285", "right"));
+    K.txt(ctx, money(net), xn, y - 16, K.fit(ctx, money(net), 800, K.F.MONO, 26, colW - 8), net >= 0 ? "#22d39a" : "#ff5470", "right");
+  };
+  T.people.forEach(p => { p.list.forEach(x => row(x.a.holder || "Unnamed", [x.a.broker, mask(x.a.code)].filter(Boolean).join(" · "), segs.map(s => x.segs[s]), x.net, COLORS[x.i % COLORS.length], false));
+    if (p.list.length > 1) row(`${p.name} · total`, "", segs.map(s => p.list.reduce((a, x) => a + x.segs[s], 0)), p.net, null, true); });
+  y += 30; ctx.strokeStyle = "rgba(255,255,255,.3)"; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(xn, y); ctx.stroke();
+  y += 50; K.txt(ctx, "All accounts", x0, y, `800 30px ${K.F.INTER}`, "#fff"); segs.forEach((s, i) => K.txt(ctx, money(T.bySeg[s]), segX[i], y, K.fit(ctx, money(T.bySeg[s]), 700, K.F.MONO, 24, colW - 14), T.bySeg[s] >= 0 ? "#22d39a" : "#ff5470", "right")); K.txt(ctx, money(T.total), xn, y, K.fit(ctx, money(T.total), 800, K.F.MONO, 28, colW - 4), gc, "right");
+  if (S.fy) { y += 70; const fyT = fyMonths(S.ym).reduce((x, m) => x + totals(m).total, 0); K.txt(ctx, `📅 ${fyLabel(S.ym)} to date (Apr → ${short(S.ym)}): `, x0, y, `600 26px ${K.F.INTER}`, "#cfd3df"); ctx.font = `600 26px ${K.F.INTER}`; const w = ctx.measureText(`📅 ${fyLabel(S.ym)} to date (Apr → ${short(S.ym)}): `).width; K.txt(ctx, money(fyT), x0 + w, y, `800 28px ${K.F.MONO}`, fyT >= 0 ? "#22d39a" : "#ff5470"); }
+  K.txt(ctx, `${S.by.trim() ? "Prepared by " + S.by.trim() + " · " : ""}${K.niceDate(K.iso(K.istNow()), { day: "numeric", month: "short", year: "numeric" })}`, W / 2, H - 70, `500 22px ${K.F.INTER}`, "#8b93a7", "center");
+  K.txt(ctx, "Figures as entered from broker P&L statements · Private summary", W / 2, H - 36, `400 19px ${K.F.INTER}`, "#5a6072", "center");
+  return c;
+}
+K.share({ text: buildText, valid, draw, file: () => `accounts-pnl-${S.ym}`, imgLabel: "Share P&L card" });
+drawSegs(); drawAccts(); render();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
