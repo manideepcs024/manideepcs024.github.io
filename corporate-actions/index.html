@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Corporate actions — split, bonus, dividend, record date, rights, buyback, merger, demerger</title>
+<meta name="description" content="Corporate actions explained for Indian investors: record date and ex-date (T+1), dividends, stock splits, bonus issues, rights issues, buybacks, mergers, demergers and open offers. What happens to your shares, the price and your tax. With a corporate action calculator and a 'last day to buy' finder." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #5b8cff; }
+  .wrap { max-width: 1120px; }
+  .sec2 { margin-top: 28px; } .sec2 > h2 { font: 800 1.45rem "Space Grotesk"; margin-bottom: 4px; } .sec2 > p.l { color: var(--muted); font-size: .9rem; margin-bottom: 12px; line-height: 1.55; max-width: 860px; }
+  .tline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; position: relative; margin: 8px 0 4px; }
+  .tline div { position: relative; padding: 46px 10px 10px; text-align: center; font-size: .82rem; color: #cfd3df; line-height: 1.45; }
+  .tline div::before { content: attr(data-i); position: absolute; top: 4px; left: 50%; transform: translateX(-50%); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #0b0d16; border: 2px solid var(--c, #00e0b8); font-size: 1rem; z-index: 1; }
+  .tline div:not(:last-child)::after { content: ""; position: absolute; top: 21px; left: 50%; width: 100%; height: 2px; background: linear-gradient(90deg, var(--c, #00e0b8), rgba(255,255,255,.15)); }
+  .tline b { display: block; color: #fff; font: 700 .95rem "Space Grotesk"; margin-bottom: 2px; }
+  .box5 { border-radius: 22px; padding: 18px; border: 1px solid var(--line); background: var(--card); }
+  .box5.hl { border-color: rgba(0,224,184,.45); background: linear-gradient(135deg, rgba(0,224,184,.08), rgba(91,140,255,.05)); }
+  .rowx { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+  .rowx > div { flex: 1 1 180px; }
+  .res5 { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,.3); border: 1px solid var(--line); font-size: .9rem; color: #e6e9f2; line-height: 1.55; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .chips button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .chips button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .ins { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .ba { display: grid; grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr); gap: 8px; align-items: stretch; margin-top: 14px; }
+  .ba .side { border-radius: 16px; padding: 12px 14px; background: rgba(0,0,0,.3); border: 1px solid var(--line); display: grid; gap: 6px; }
+  .ba .side h4 { font: 700 .66rem "JetBrains Mono"; color: var(--muted); letter-spacing: .06em; }
+  .ba .ar { display: grid; place-items: center; font-size: 1.5rem; color: var(--acc); }
+  .ba .ln { display: flex; justify-content: space-between; gap: 8px; font-size: .86rem; color: #cfd3df; } .ba .ln b { color: #fff; font: 700 .98rem "Space Grotesk"; white-space: nowrap; }
+  .lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+  .ca { border-radius: 20px; border: 1px solid var(--line); background: var(--card); padding: 15px; font-size: .85rem; color: #cfd3df; line-height: 1.5; display: grid; gap: 7px; align-content: start; }
+  .ca h3 { font: 800 1.12rem "Space Grotesk"; color: #fff; display: flex; gap: 8px; align-items: center; }
+  .ca .kv { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 8px; }
+  .ca .kv span:first-child { font: 700 .62rem "JetBrains Mono"; color: var(--acc); padding-top: 3px; letter-spacing: .05em; }
+  .ca .ex { font-size: .8rem; color: #b9c0d0; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.03); border-left: 3px solid var(--acc2); }
+  .gen { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .gen div { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .gen b.h { display: block; color: #fff; font: 700 .98rem "Space Grotesk"; margin-bottom: 3px; }
+  @media (max-width: 760px) { .tline { grid-template-columns: 1fr; } .tline div { text-align: left; padding: 6px 6px 14px 50px; } .tline div::before { left: 17px; top: 2px; } .tline div:not(:last-child)::after { top: 38px; left: 17px; width: 2px; height: calc(100% - 34px); background: rgba(0,224,184,.3); } .ba { grid-template-columns: 1fr; } .ba .ar { transform: rotate(90deg); } .lib { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../special-situations/">🪔 Special situations</a><a href="../results-guide/">📊 Results</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Corporate actions, <span class="grad">without the confusion.</span></h1>
+    <p class="sub">Split, bonus, dividend, rights, buyback, merger, demerger: what each does to <b>your number of shares</b>, <b>the price</b> and <b>your tax</b>, and which date actually matters.</p>
+
+    <section class="sec2">
+      <h2>📆 The dates that matter</h2>
+      <p class="l">Since India moved to <b>T+1 settlement</b>, the <b>ex-date and the record date are the same day</b>. To get a dividend, bonus or split, you must <b>buy on or before the trading day before the record date</b>. Buying on the record date itself is too late.</p>
+      <div class="tline">
+        <div data-i="📢" style="--c:#5b8cff"><b>Announcement</b>Board approves; exchange filing gives the ratio/amount and the record date.</div>
+        <div data-i="🛒" style="--c:#22d39a"><b>Last day to buy</b>The trading day before the record date ("cum" date). Buy by the close.</div>
+        <div data-i="✂️" style="--c:#febc2e"><b>Ex-date = record date</b>Price adjusts at the open. Buyers from today don't get the benefit.</div>
+        <div data-i="💰" style="--c:#00e0b8"><b>Credit / payment</b>Bonus/split shares in a few days; dividends usually within 30 days.</div>
+      </div>
+      <div class="box5 hl" style="margin-top:12px">
+        <div class="rowx"><div><div class="q">Record date</div><label class="field sm"><input id="rd" type="date" /></label></div><div style="flex:2 1 260px"><div class="res5" id="rdRes" style="margin-top:0"></div></div></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧮 Corporate action calculator</h2>
+      <p class="l">Pick the action and enter your holding. It shows your shares, the adjusted price and value before and after. On the ex-date, the <b>total value of your holding doesn't change</b> because of a split or bonus. Only the number of shares and the price do.</p>
+      <div class="box5 hl">
+        <div class="chips" id="acts"></div>
+        <div class="ins" id="ins"></div>
+        <div class="ba" id="ba"></div>
+        <div class="res5" id="caNote"></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>📚 Every corporate action, explained</h2>
+      <div class="lib" id="lib"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧠 Common mistakes</h2>
+      <div class="gen">
+        <div><b class="h">"Price halved, I lost 50%!"</b>After a 1:1 bonus or 1:2 split, you have double the shares. Check the <b>value</b>, not the price. Some apps show a temporary loss until the new shares are credited.</div>
+        <div><b class="h">Buying just for the dividend</b>The price drops by about the dividend on the ex-date, and the dividend is taxed at your slab. It's not free money.</div>
+        <div><b class="h">Bonus = free wealth?</b>No. A bonus only moves money from reserves to share capital. It can improve liquidity and sentiment, but the business is the same.</div>
+        <div><b class="h">Ignoring a rights issue</b>If you neither apply nor sell your rights entitlements (REs), they lapse worthless and your holding gets diluted.</div>
+        <div><b class="h">Wrong tax cost after a demerger</b>Split your original cost between the two companies in the ratio the company announces, or your capital gains will be wrong.</div>
+        <div><b class="h">Stop-losses after an adjustment</b>Brokers may cancel or not adjust open orders (GTT, SL) on the ex-date. Re-check them.</div>
+      </div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> adviser or a tax professional. Calculations are simplified (theoretical prices; fractions handled roughly). Tax rules change: confirm with a CA and the company's filings. For <b>education</b> only.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const S = K.store("corpact_v1", { act: "bonus", rd: "", v: {} });
+const D = { sh: "100", px: "1,200", cost: "800", a: "1", b: "1", fvo: "10", fvn: "2", rfo: "1", rfn: "10", ma: "42", mb: "25", ap: "1,600", tp: "2,600", dps: "15", ip: "900", bbp: "1,500", acc: "30", spl: "20" };
+const V = k => num(S.v[k] ?? D[k]);
+const ACT = {
+  split: { n: "✂️ Split", f: [["sh", "Shares held"], ["px", "Price before ₹"], ["fvo", "Old face value ₹"], ["fvn", "New face value ₹"]] },
+  bonus: { n: "🎁 Bonus", f: [["sh", "Shares held"], ["px", "Price before ₹"], ["a", "New shares (A)"], ["b", "For every (B) held"]] },
+  dividend: { n: "💵 Dividend", f: [["sh", "Shares held"], ["px", "Price before ₹"], ["dps", "Dividend per share ₹"]] },
+  rights: { n: "🎟️ Rights issue", f: [["sh", "Shares held"], ["px", "Price before ₹"], ["a", "Rights shares (A)"], ["b", "For every (B) held"], ["ip", "Issue price ₹"]] },
+  buyback: { n: "🔁 Buyback", f: [["sh", "Shares held"], ["px", "Market price ₹"], ["bbp", "Buyback price ₹"], ["acc", "Acceptance ratio %"]] },
+  demerger: { n: "🪓 Demerger", f: [["sh", "Shares held"], ["cost", "Your avg buy price ₹"], ["a", "New-co shares (A)"], ["b", "For every (B) held"], ["spl", "Cost to new-co %"]] },
+  merger: { n: "🤝 Merger", f: [["sh", "Target shares held"], ["tp", "Target price ₹"], ["ma", "Acquirer shares (A)"], ["mb", "For every (B) target"], ["ap", "Acquirer price ₹"]] },
+  reverse: { n: "🔼 Reverse split", f: [["sh", "Shares held"], ["px", "Price before ₹"], ["rfo", "Old face value ₹"], ["rfn", "New face value ₹"]] },
+};
+const RS = v => "₹" + (Math.abs(v) < 100 ? v.toLocaleString("en-IN", { maximumFractionDigits: 2 }) : Math.round(v).toLocaleString("en-IN"));
+const N = v => Math.floor(v).toLocaleString("en-IN");
+function drawIns() { $("#acts").innerHTML = Object.entries(ACT).map(([k, a]) => `<button data-a="${k}" class="${S.act === k ? "on" : ""}">${a.n}</button>`).join("");
+  $("#ins").innerHTML = ACT[S.act].f.map(([k, l]) => `<div><div class="q">${l}</div><label class="field sm"><input data-k="${k}" type="text" inputmode="decimal" value="${esc(S.v[k] ?? D[k])}" /></label></div>`).join(""); calc(); }
+function side(t, rows) { return `<div class="side"><h4>${t}</h4>${rows.map(([a, b]) => `<div class="ln"><span>${a}</span><b>${b}</b></div>`).join("")}</div>`; }
+function calc() { const sh = V("sh"), px = V("px"), a = V("a"), b = V("b") || 1, act = S.act; let L = [], Rr = [], note = "";
+  if (act === "split" || act === "reverse") { const rv = act === "reverse", fo = V(rv ? "rfo" : "fvo"), fn = V(rv ? "rfn" : "fvn"), r = fo / fn; if (!(r > 0)) { $("#ba").innerHTML = ""; $("#caNote").textContent = "Enter both face values."; return; }
+    const ns = sh * r, frac = ns - Math.floor(ns); L = [["Shares", N(sh)], ["Price", RS(px)], ["Face value", "₹" + fo], ["Value", RS(sh * px)]]; Rr = [["Shares", N(ns)], ["Price", RS(px / r)], ["Face value", "₹" + fn], ["Value", RS(Math.floor(ns) * px / r)]];
+    note = act === "split" ? `A <b>1:${+r.toFixed(2)}</b> split: every share becomes ${+r.toFixed(2)}. Your value is unchanged. Splits make the share price more affordable and can improve liquidity. <b>Tax:</b> your cost per share is divided by ${+r.toFixed(2)}; the holding period continues from your original purchase.` : `A <b>reverse split</b> (consolidation) combines ${+(1 / r).toFixed(2)} shares into 1. Often done by companies whose price has fallen very low.${frac > 1e-9 ? ` You hold a fraction (${frac.toFixed(2)} share), which is usually paid out in cash.` : ""}`; }
+  if (act === "bonus") { const add = Math.floor(sh * a / b), adj = px * b / (a + b); L = [["Shares", N(sh)], ["Price", RS(px)], ["Value", RS(sh * px)]]; Rr = [["Shares", N(sh + add)], ["Theoretical price", RS(adj)], ["Value", RS((sh + add) * adj)]];
+    note = `<b>${a}:${b} bonus</b> = ${a} free share${a > 1 ? "s" : ""} for every ${b} held → you get <b>${N(add)}</b> new shares, credited a couple of trading days after the record date. ${sh * a / b - add > 1e-9 ? "Fractional entitlements are sold by the company and paid in cash. " : ""}<b>Tax:</b> bonus shares have a cost of ₹0; their holding period starts from allotment. Original shares keep their cost.`; }
+  if (act === "dividend") { const d = V("dps"), cash = sh * d; L = [["Shares", N(sh)], ["Price (cum)", RS(px)], ["Value", RS(sh * px)]]; Rr = [["Shares", N(sh)], ["Price (ex) ≈", RS(px - d)], ["Value + cash", RS(sh * (px - d) + cash)]];
+    note = `You receive <b>${RS(cash)}</b> (yield ${(d / px * 100).toFixed(2)}% on today's price). On the ex-date the price falls by about ₹${d}. <b>Tax:</b> dividends are added to your income and taxed at your slab rate; the company deducts 10% TDS if your dividends from it exceed ₹10,000 in a year (with PAN).`; }
+  if (act === "rights") { const ip = V("ip"), ns = Math.floor(sh * a / b), terp = (b * px + a * ip) / (a + b), cost = ns * ip; L = [["Shares", N(sh)], ["Price", RS(px)], ["Value", RS(sh * px)]]; Rr = [["Shares if you apply", N(sh + ns)], ["Pay", RS(cost)], ["TERP*", RS(terp)], ["New value", RS((sh + ns) * terp)]];
+    const dil = sh * (px - terp); note = `<b>${a}:${b} rights at ${RS(ip)}</b>: you can buy ${N(ns)} shares at a ${((1 - ip / px) * 100).toFixed(0)}% discount. *TERP = theoretical ex-rights price. If you <b>ignore it</b>, your existing shares are worth about <b>${RS(dil)}</b> less after dilution. Either apply, or <b>sell your rights entitlements (REs)</b> on the exchange during the window.`; }
+  if (act === "buyback") { const bp = V("bbp"), ac = Math.min(Math.max(V("acc"), 0), 100), acc = Math.floor(sh * ac / 100), prem = (bp - px) * acc; L = [["Shares", N(sh)], ["Market price", RS(px)], ["Value", RS(sh * px)]]; Rr = [["Accepted", N(acc)], ["Cash received", RS(acc * bp)], ["Shares left", N(sh - acc)], ["Extra vs market", RS(prem)]];
+    note = `In a <b>tender-offer buyback</b>, you offer your shares; only a portion is accepted (the acceptance ratio). 15% of the buyback is reserved for small shareholders (holding up to ₹2 lakh), whose acceptance ratio is often much higher. Unaccepted shares come back to you, and the price often falls after the buyback closes. <b>Tax:</b> since 1 Oct 2024, the full buyback amount is taxed as dividend at your slab, and your cost of those shares becomes a capital loss.`; }
+  if (act === "demerger") { const cost = V("cost"), sp = Math.min(Math.max(V("spl"), 0), 100) / 100, ns = Math.floor(sh * a / b), tot = sh * cost; L = [["Parent shares", N(sh)], ["Your total cost", RS(tot)], ["Avg cost", RS(cost)]]; Rr = [["Parent shares", N(sh)], ["Parent cost / share", RS(cost * (1 - sp))], ["New-co shares", N(ns)], ["New-co cost / share", ns ? RS(tot * sp / ns) : "—"]];
+    note = `You keep all parent shares and get <b>${N(ns)}</b> new-company shares (${a} for every ${b}). On the ex-date the parent price drops by the value carved out; exchanges hold a <b>special pre-open session</b> for price discovery. The new shares list a few weeks later. <b>Tax:</b> split your original cost in the ratio announced by the company (entered here as ${(sp * 100).toFixed(1)}% to the new company); the holding period carries over.`; }
+  if (act === "merger") { const ap = V("ap"), px = V("tp"), a = V("ma"), b = V("mb") || 1, ex = sh * a / b, ns = Math.floor(ex); L = [["Target shares", N(sh)], ["Target price", RS(px)], ["Value", RS(sh * px)]]; Rr = [["Acquirer shares", N(ns)], ["Acquirer price", RS(ap)], ["Value", RS(ns * ap)], ["Fraction (cash)", (ex - ns).toFixed(2) + " sh"]];
+    const arb = (ap * a / b - px) / px * 100; note = `Swap ratio <b>${a} acquirer shares for every ${b}</b> target shares. Based on the prices entered, the target trades at a <b>${arb >= 0 ? arb.toFixed(1) + "% discount" : (-arb).toFixed(1) + "% premium"}</b> to its swap value; this gap reflects the risk of the deal being delayed or cancelled. Real example: HDFC Ltd shareholders got <b>42 HDFC Bank shares for every 25</b> HDFC Ltd shares (2023). <b>Tax:</b> the acquirer shares inherit your original cost and holding period.`; }
+  $("#ba").innerHTML = side("BEFORE", L) + `<div class="ar">→</div>` + side("AFTER", Rr); $("#caNote").innerHTML = note; }
+$("#acts").addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (!b) return; S.act = b.dataset.a; S.save(); drawIns(); });
+$("#ins").addEventListener("input", e => { const el = e.target.closest("[data-k]"); if (!el) return; K.fmtNum(el); S.v[el.dataset.k] = el.value; S.save(); calc(); });
+/* record date */
+function rdCalc() { const o = $("#rdRes"); if (!S.rd) { o.innerHTML = "Pick a record date to find the last day to buy."; return; }
+  const d = new Date(S.rd + "T12:00:00"), p = new Date(d); do p.setDate(p.getDate() - 1); while (p.getDay() === 0 || p.getDay() === 6);
+  const f = x => x.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  o.innerHTML = (d.getDay() === 0 || d.getDay() === 6 ? "⚠️ That record date is a weekend; check the filing. " : "") + `🛒 Buy by the close of <b>${f(p)}</b> to be eligible. Ex-date = <b>${f(d)}</b>. If ${f(p).split(",")[0]} is a market holiday, buy one trading day earlier.`; }
+$("#rd").value = S.rd; $("#rd").addEventListener("input", e => { S.rd = e.target.value; S.save(); rdCalc(); });
+const LIB = [
+  ["💵", "Dividend", "Part of profit paid to shareholders: interim, final or special.", "Shares unchanged; you get cash. Price drops ≈ dividend on ex-date.", "Taxed at slab; 10% TDS above ₹10,000 a year per company.", "A consistent dividend payer signals stable cash flows. A very high yield can be a value trap if profits are falling."],
+  ["✂️", "Stock split", "Face value is divided (₹10 → ₹2 = 1:5). More shares, lower price.", "Shares ×5, price ÷5, value same.", "Cost per share ÷5; holding period continues.", "Done when the price is 'too high' for small investors. It doesn't change the business."],
+  ["🎁", "Bonus issue", "Free shares issued from the company's reserves, e.g. 1:1.", "1:1 → shares ×2, price ÷2, value same.", "Bonus shares: cost ₹0, holding period from allotment.", "Signals confidence and large reserves. Often rallies on announcement and cools after."],
+  ["🎟️", "Rights issue", "Existing holders get the right to buy new shares at a discount, in a ratio.", "If you apply: more shares, more money invested. If you ignore: diluted.", "New shares' cost = issue price; REs sold are capital gains.", "Raises money from existing holders. Check why: growth (good) or debt repayment / stress (careful)."],
+  ["🔁", "Buyback", "The company buys back its own shares, usually at a premium (tender offer) or from the market.", "Part of your tendered shares accepted; rest returned.", "Since Oct 2024: taxed as dividend at slab; cost = capital loss.", "Signals management thinks the stock is cheap; reduces share count, raising EPS."],
+  ["🤝", "Merger / amalgamation", "Two companies combine; target shareholders get acquirer shares at a swap ratio.", "Target shares replaced by acquirer shares.", "Original cost and holding period carry over.", "Example: HDFC Ltd → HDFC Bank (42 for 25, 2023). Takes months; NCLT, SEBI and shareholder approvals."],
+  ["🪓", "Demerger", "A business is spun off into a new listed company; you get its shares.", "Keep parent shares + receive new-co shares.", "Split original cost in the announced ratio.", "Examples: Reliance → Jio Financial (1:1, 2023), ITC → ITC Hotels (1 for 10, 2025). Focused businesses can be valued better."],
+  ["🔼", "Reverse split", "Several shares consolidated into one (₹1 → ₹10 FV).", "Fewer shares, higher price, value same.", "Cost per share × ratio.", "Rare in India; often done by beaten-down companies to lift the share price."],
+  ["📣", "Open offer", "When someone acquires 25% or more of a listed company, SEBI's takeover rules require an open offer to buy at least 26% more from the public.", "You may tender at the offer price.", "Taxed as a sale (capital gains).", "A takeover can bring a premium, but acceptance may be partial."],
+  ["🏷️", "OFS / QIP / FPO", "OFS: promoters sell shares via the exchange. QIP: shares sold to institutions. FPO: a follow-on public issue.", "Your shares unchanged (QIP/FPO dilute you a little).", "—", "A big promoter OFS at a discount can weigh on the price short term."],
+];
+$("#lib").innerHTML = LIB.map(([e, n, w, h, t, x]) => `<article class="ca"><h3>${e} ${n}</h3><span>${w}</span><div class="kv"><span>YOUR SHARES</span><span>${h}</span></div><div class="kv"><span>TAX</span><span>${t}</span></div><div class="ex">💡 ${x}</div></article>`).join("");
+function buildText() { return ["🏢 *Corporate actions: cheat sheet*", "", "📆 Ex-date = record date (T+1). *Buy the day before* to be eligible.", "✂️ *Split* 1:5 → shares ×5, price ÷5, value same", "🎁 *Bonus* 1:1 → shares ×2, price ÷2, value same", "💵 *Dividend* → price drops by ≈ dividend; taxed at slab", "🎟️ *Rights* → apply or sell REs, else diluted", "🔁 *Buyback* → partial acceptance; taxed as dividend since Oct 2024", "🤝 *Merger* → swap ratio (HDFC: 42 HDFC Bank for 25)", "🪓 *Demerger* → keep parent + get new-co shares; split your cost", "", "Calculator 👇", ...K.signoff("corporate-actions", "Learn", "_Education only. Not SEBI registered._").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const Wd = 1080, H = 1500, { c, ctx } = K.canvas(Wd, H, [["rgba(0,224,184,0.22)", .9, .05, .6], ["rgba(91,140,255,0.16)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "LEARN · CORPORATE ACTIONS", 70, 186, `700 26px ${K.F.MONO}`, "#00e0b8"); K.txt(ctx, "Corporate actions cheat sheet", 70, 250, `800 52px ${K.F.GROT}`, "#fff");
+  K.panel(ctx, 70, 284, 940, 92, 20); K.txt(ctx, "📆  Ex-date = record date (T+1): buy by the trading day BEFORE", 100, 342, `700 27px ${K.F.INTER}`, "#fff");
+  const pick = [LIB[1], LIB[2], LIB[0], LIB[3], LIB[4], LIB[6]];
+  pick.forEach(([e, n, , h], i) => { const x = 70 + (i % 2) * 478, y = 400 + Math.floor(i / 2) * 262; K.panel(ctx, x, y, 462, 244, 22); K.txt(ctx, e + "  " + n, x + 26, y + 58, `800 34px ${K.F.GROT}`, "#fff"); ctx.font = `500 24px ${K.F.INTER}`; K.cap(K.wrap(ctx, h, 410), 4).forEach((l, k) => K.txt(ctx, l, x + 26, y + 106 + k * 32, `500 24px ${K.F.INTER}`, "#cfd3df")); });
+  K.footer(ctx, Wd, H, K.toolUrl("corporate-actions"), "Simplified · Confirm tax with a CA · Not SEBI registered", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "corporate-actions", imgLabel: "Share cheat sheet" });
+drawIns(); rdCalc();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

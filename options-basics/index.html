@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Options basics — CE &amp; PE, time decay, hedging, covered call, married put, naked F&amp;O</title>
+<meta name="description" content="Learn options from zero: call (CE) and put (PE), buyer vs seller, ITM/ATM/OTM, premium = intrinsic + time value, time decay (theta) with a live chart, and hedging strategies: married put, covered call, collar, hedged futures, plus why naked F&amp;O is dangerous. Interactive payoff charts." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #7c5cff; --acc2: #22d39a; }
+  .wrap { max-width: 1120px; }
+  .sec2 { margin-top: 26px; } .sec2 > h2 { font: 800 1.4rem "Space Grotesk"; margin-bottom: 4px; } .sec2 > p.l { color: var(--muted); font-size: .9rem; margin-bottom: 12px; line-height: 1.5; max-width: 840px; }
+  .four { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .oc { border-radius: 20px; border: 1px solid var(--line); background: var(--card); overflow: hidden; }
+  .oc .art { background: rgba(0,0,0,.3); border-bottom: 1px solid var(--line); padding: 4px; } .oc svg, .pay svg { width: 100%; height: auto; display: block; }
+  .oc .bd { padding: 12px 13px; font-size: .84rem; color: #cfd3df; line-height: 1.5; display: grid; gap: 5px; }
+  .oc h3 { font: 800 1.05rem "Space Grotesk"; color: #fff; }
+  .kv { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 6px; font-size: .8rem; }
+  .kv span:first-child { font: 700 .64rem "JetBrains Mono"; color: var(--muted); padding-top: 2px; letter-spacing: .05em; }
+  .box5 { border-radius: 22px; padding: 18px; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.1), rgba(34,211,154,.04)); }
+  .ins { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  table.mt { width: 100%; border-collapse: collapse; font-size: .84rem; margin-top: 12px; }
+  .mt th, .mt td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  .mt th { font: 700 .64rem "JetBrains Mono"; color: var(--muted); letter-spacing: .05em; }
+  .mt td.k { text-align: center; font: 800 .95rem "Space Grotesk"; color: #fff; background: rgba(255,255,255,.03); }
+  .mt .tag { font: 700 .62rem "JetBrains Mono"; padding: 2px 6px; border-radius: 5px; }
+  .tag.itm { color: #22d39a; background: rgba(34,211,154,.12); } .tag.atm { color: #febc2e; background: rgba(254,188,46,.13); } .tag.otm { color: #8b93a7; background: rgba(139,147,167,.12); }
+  .tblwrap { overflow-x: auto; }
+  .split { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; margin-top: 12px; }
+  .pay { border-radius: 16px; background: rgba(0,0,0,.35); border: 1px solid var(--line); padding: 6px; }
+  .stats4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .stats4 div { border-radius: 14px; padding: 10px 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .stats4 span { display: block; font: 600 .62rem "JetBrains Mono"; color: var(--muted); letter-spacing: .05em; }
+  .stats4 b { font: 800 1.08rem "Space Grotesk"; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .chips button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .chips button.dz { border-color: rgba(255,84,112,.5); }
+  .legs { font-size: .82rem; color: #cfd3df; margin-top: 10px; display: grid; gap: 4px; }
+  .note { font-size: .86rem; color: #cfd3df; line-height: 1.55; margin-top: 10px; }
+  .note b { color: #fff; }
+  .gen { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .gen div { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .gen b.h { display: block; color: #fff; font: 700 .98rem "Space Grotesk"; margin-bottom: 3px; }
+  .gen.red div { border-color: rgba(255,84,112,.35); background: rgba(255,84,112,.05); }
+  .formula { font: 700 1.05rem "JetBrains Mono"; color: #fff; padding: 12px 14px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px dashed rgba(124,92,255,.5); margin: 8px 0; text-align: center; }
+  @media (max-width: 960px) { .four { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 760px) { .four, .split { grid-template-columns: 1fr; } .ins { grid-template-columns: 1fr 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../options/">🧮 Payoff calculator</a><a href="../option-planner/">💰 Option selling</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Options, <span class="grad">from zero to hedged.</span></h1>
+    <p class="sub">CE and PE, buyer vs seller, why options lose value every day, and how to use them to <b>protect</b> your stocks (hedging) instead of only to gamble. Every chart below is live: change the numbers and watch.</p>
+
+    <section class="sec2">
+      <h2>📞 CE &amp; PE: the four basic positions</h2>
+      <p class="l">An option is a contract. <b>CE (call)</b> = the right to <b>buy</b> at the strike price. <b>PE (put)</b> = the right to <b>sell</b> at the strike price. The <b>buyer</b> pays a premium and has a right; the <b>seller (writer)</b> collects the premium and has an obligation.</p>
+      <div class="four" id="four"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🎚️ ITM, ATM, OTM and what the premium is made of</h2>
+      <div class="formula">Premium = Intrinsic value + Time value</div>
+      <p class="l"><b>Intrinsic</b> = how much the option is worth if it expired right now (call: spot − strike; put: strike − spot; never below 0). <b>Time value</b> = what people pay for the chance of a move before expiry. Time value always becomes <b>zero at expiry</b>.</p>
+      <div class="box5">
+        <div class="ins">
+          <div><div class="q">Spot price ₹</div><label class="field sm"><input id="spot" type="text" inputmode="decimal" /></label></div>
+          <div><div class="q">Volatility (IV) %</div><label class="field sm"><input id="iv" type="text" inputmode="decimal" /></label></div>
+          <div><div class="q">Days to expiry</div><label class="field sm"><input id="days" type="text" inputmode="numeric" /></label></div>
+          <div><div class="q">Lot size <span class="opt">example</span></div><label class="field sm"><input id="lot" type="text" inputmode="numeric" /></label></div>
+        </div>
+        <div class="tblwrap"><table class="mt" id="mt"></table></div>
+        <p class="note">Premiums here are estimates from the Black-Scholes model, for learning. Real premiums depend on demand, dividends and each strike's own IV. Check the actual lot size on NSE; it changes from time to time.</p>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>⏳ Time decay (theta): the option buyer's enemy</h2>
+      <p class="l">Every day that passes without a move, the time value melts. It melts <b>slowly at first and very fast in the last week</b>. Weekends and holidays count too: the market prices them in. This is why most option buyers lose even when they get the direction right, but late.</p>
+      <div class="box5">
+        <div class="chips" id="tdK"><button data-v="atm">ATM call</button><button data-v="otm">OTM call (+3%)</button><button data-v="far">Far OTM call (+7%)</button></div>
+        <div class="split">
+          <div class="pay" id="tdChart"></div>
+          <div><div class="stats4" id="tdStats"></div><div class="note" id="tdNote"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>🛡️ Hedging strategies vs naked positions</h2>
+      <p class="l"><b>Hedging</b> means taking a second position that gains when your main position loses, like insurance. You give up a little profit to cap the damage. <b>Naked</b> means no protection at all. Pick a strategy and compare the payoff at expiry (uses the inputs above).</p>
+      <div class="box5">
+        <div class="chips" id="stChips"></div>
+        <div class="split">
+          <div class="pay" id="stChart"></div>
+          <div><div class="stats4" id="stStats"></div><div class="legs" id="stLegs"></div><div class="note" id="stNote"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>☠️ Naked F&amp;O: why it blows up accounts</h2>
+      <div class="gen red">
+        <div><b class="h">Naked futures</b>No stop, no hedge. A 5% gap down on a ₹5 lakh futures position is ₹25,000 gone at the open, before you can react. Leverage cuts both ways.</div>
+        <div><b class="h">Naked option selling</b>You earn small, steady premiums for weeks, then one big move (results, budget, war news) can wipe out months of income. The loss on a naked call has <b>no ceiling</b>.</div>
+        <div><b class="h">Buying cheap OTM options</b>Not 'naked' risk-wise, but ₹2 options usually expire at ₹0. Low price ≠ low risk of losing all of it.</div>
+        <div><b class="h">Margin calls</b>When a naked position moves against you, the broker asks for more margin or squares you off at the worst moment.</div>
+        <div><b class="h">The data</b>SEBI's studies of individual F&amp;O traders found that roughly <b>9 out of 10 lost money</b>. Learn on paper, start small, and always define your maximum loss.</div>
+        <div><b class="h">The fix</b>Define risk before entry: a stop-loss, a hedge leg (spread), or a position small enough that the worst case doesn't hurt. Plan it in the <a href="../option-planner/" style="color:var(--acc)">Option Selling Planner</a>.</div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>📘 Quick glossary</h2>
+      <div class="gen">
+        <div><b class="h">Strike</b>The fixed price in the contract.</div>
+        <div><b class="h">Expiry</b>The last day the contract trades. After that, it's settled and gone.</div>
+        <div><b class="h">Lot size</b>Options trade in fixed lots (e.g. 500 shares). Premium × lot = what you pay.</div>
+        <div><b class="h">IV (implied volatility)</b>How big a move the market expects. High IV = expensive options (before results, events).</div>
+        <div><b class="h">Delta</b>How much the premium moves for ₹1 move in the stock. ATM ≈ 0.5.</div>
+        <div><b class="h">Theta</b>Value lost per day from time decay.</div>
+        <div><b class="h">Physical settlement</b>Stock F&amp;O held into expiry is settled by actual delivery of shares. ITM stock options can mean buying/selling the full lot in cash.</div>
+        <div><b class="h">Open interest (OI)</b>Number of open contracts. Rising OI + rising price = fresh buying.</div>
+      </div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> adviser. Payoffs and premiums are simplified estimates for <b>education</b> (expiry payoffs ignore costs, taxes and slippage). F&amp;O is high risk. Not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const G = "#22d39a", R = "#ff5470", Y = "#febc2e", B = "#5b8cff", M = "#8b93a7";
+const S = K.store("optbasics_v1", { spot: "1,000", iv: "30", days: "30", lot: "500", td: "atm", st: "married" });
+/* Black-Scholes */
+const ncdf = x => { const t = 1 / (1 + .2316419 * Math.abs(x)), d = .3989423 * Math.exp(-x * x / 2), p = d * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; };
+function bs(type, Sp, Kk, days, iv, r = .065) { const t = Math.max(days, 0) / 365, s = iv / 100; if (t <= 0 || s <= 0) return type === "ce" ? Math.max(Sp - Kk, 0) : Math.max(Kk - Sp, 0);
+  const d1 = (Math.log(Sp / Kk) + (r + s * s / 2) * t) / (s * Math.sqrt(t)), d2 = d1 - s * Math.sqrt(t);
+  return type === "ce" ? Sp * ncdf(d1) - Kk * Math.exp(-r * t) * ncdf(d2) : Kk * Math.exp(-r * t) * ncdf(-d2) - Sp * ncdf(-d1); }
+const stepOf = s => s < 100 ? 1 : s < 250 ? 2.5 : s < 500 ? 5 : s < 1500 ? 10 : s < 3000 ? 20 : s < 6000 ? 50 : 100;
+const rnd = (v, st) => Math.round(v / st) * st;
+const inp = () => { const spot = num(S.spot) || 1000, iv = Math.min(Math.max(num(S.iv) || 30, 1), 200), days = Math.min(Math.max(Math.round(num(S.days)), 0), 365), lot = Math.max(Math.round(num(S.lot)) || 1, 1); return { spot, iv, days, lot, st: stepOf(spot) }; };
+const f2 = v => "₹" + v.toLocaleString("en-IN", { maximumFractionDigits: v < 100 ? 2 : 0, minimumFractionDigits: v < 100 ? 2 : 0 });
+const f0 = v => (v < 0 ? "−" : "") + "₹" + Math.round(Math.abs(v)).toLocaleString("en-IN");
+/* payoff svg */
+function paySvg(fn, lo, hi, mark, w = 520, h = 280, opt = {}) {
+  const N = 160, xs = [...Array(N + 1)].map((_, i) => lo + (hi - lo) * i / N), ys = xs.map(fn);
+  let mn = Math.min(0, ...ys), mx = Math.max(0, ...ys); if (opt.yMin != null) mn = Math.min(mn, opt.yMin); const pad = (mx - mn) * .12 || 1; mn -= pad; mx += pad;
+  const L = 8, Rr = 8, T = 10, Bt = opt.noAxis ? 10 : 26, X = v => L + (v - lo) / (hi - lo) * (w - L - Rr), Yv = v => T + (mx - v) / (mx - mn) * (h - T - Bt), z = Yv(0);
+  const pts = xs.map((x, i) => [X(x), Yv(ys[i])]);
+  const poly = sign => `M${X(lo)},${z} ` + xs.map((x, i) => `L${X(x)},${Yv(sign > 0 ? Math.max(ys[i], 0) : Math.min(ys[i], 0))}`).join(" ") + ` L${X(hi)},${z} Z`;
+  let o = `<path d="${poly(1)}" fill="${G}" opacity=".18"/><path d="${poly(-1)}" fill="${R}" opacity=".18"/>`;
+  o += `<line x1="${L}" x2="${w - Rr}" y1="${z}" y2="${z}" stroke="#ffffff33"/>`;
+  if (mark) o += `<line x1="${X(mark)}" x2="${X(mark)}" y1="${T}" y2="${h - Bt}" stroke="${Y}" stroke-dasharray="4 4" opacity=".7"/>` + (opt.noAxis ? "" : `<text x="${X(mark)}" y="${h - 8}" fill="${Y}" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle">NOW ${Math.round(mark)}</text>`);
+  for (let i = 1; i < pts.length; i++) { const c = (ys[i] + ys[i - 1]) / 2 >= 0 ? G : R; o += `<line x1="${pts[i - 1][0]}" y1="${pts[i - 1][1]}" x2="${pts[i][0]}" y2="${pts[i][1]}" stroke="${c}" stroke-width="${opt.sw || 3}" stroke-linecap="round"/>`; }
+  if (!opt.noAxis) { o += `<text x="${L + 2}" y="${h - 8}" fill="${M}" font-family="JetBrains Mono" font-size="10">${Math.round(lo)}</text><text x="${w - Rr - 2}" y="${h - 8}" fill="${M}" font-family="JetBrains Mono" font-size="10" text-anchor="end">${Math.round(hi)}</text>`;
+    o += `<text x="${L + 4}" y="${T + 12}" fill="${G}" font-family="Inter" font-size="11" font-weight="700">PROFIT</text><text x="${L + 4}" y="${h - Bt - 6}" fill="${R}" font-family="Inter" font-size="11" font-weight="700">LOSS</text>`; }
+  return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${o}</svg>`;
+}
+/* four basics */
+const FOUR = [
+  ["Buy CE (call)", "ce", 1, "Bullish: you expect a rise.", "Premium paid (fixed, limited).", "Unlimited as price rises.", "Strike + premium."],
+  ["Sell CE (call)", "ce", -1, "Neutral to bearish: you expect it to stay below the strike.", "Unlimited if price shoots up.", "Premium received (limited).", "Strike + premium."],
+  ["Buy PE (put)", "pe", 1, "Bearish, or insurance for stock you own.", "Premium paid (limited).", "Large as price falls (till ₹0).", "Strike − premium."],
+  ["Sell PE (put)", "pe", -1, "Neutral to bullish: you're fine buying the stock at the strike.", "Large if price crashes.", "Premium received (limited).", "Strike − premium."],
+];
+function drawFour() { $("#four").innerHTML = FOUR.map(([n, t, q, view, risk, rew, be]) => { const fn = s => q * ((t === "ce" ? Math.max(s - 100, 0) : Math.max(100 - s, 0)) - 6);
+  return `<article class="oc"><div class="art">${paySvg(fn, 75, 125, 0, 320, 150, { noAxis: true, sw: 3 })}</div><div class="bd"><h3>${n}</h3><div class="kv"><span>VIEW</span><span>${view}</span></div><div class="kv"><span>MAX LOSS</span><span>${risk}</span></div><div class="kv"><span>MAX GAIN</span><span>${rew}</span></div><div class="kv"><span>BREAKEVEN</span><span>${be}</span></div></div></article>`; }).join(""); }
+/* moneyness table */
+function drawTable() { const { spot, iv, days, st } = inp(), atm = rnd(spot, st), ks = [-3, -2, -1, 0, 1, 2, 3].map(i => atm + i * st * Math.max(1, Math.round(spot * .02 / st)));
+  const tag = (t, k) => { const d = t === "ce" ? spot - k : k - spot; return Math.abs(k - spot) < st / 2 + 1e-9 || k === atm ? `<span class="tag atm">ATM</span>` : d > 0 ? `<span class="tag itm">ITM</span>` : `<span class="tag otm">OTM</span>`; };
+  const cell = (t, k) => { const p = bs(t, spot, k, days, iv), ins = Math.max(t === "ce" ? spot - k : k - spot, 0); return [tag(t, k), f2(ins), f2(p - ins), `<b>${f2(p)}</b>`]; };
+  $("#mt").innerHTML = `<tr><th>CE</th><th>INTRINSIC</th><th>TIME</th><th>PREMIUM</th><th style="text-align:center">STRIKE</th><th>PREMIUM</th><th>TIME</th><th>INTRINSIC</th><th>PE</th></tr>` +
+    ks.map(k => { const c = cell("ce", k), p = cell("pe", k); return `<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td><td class="k">${k.toLocaleString("en-IN")}</td><td>${p[3]}</td><td>${p[2]}</td><td>${p[1]}</td><td>${p[0]}</td></tr>`; }).join(""); }
+/* time decay */
+function drawTD() { const { spot, iv, days, lot, st } = inp(), D = Math.max(days, 1), k = rnd(spot * (S.td === "atm" ? 1 : S.td === "otm" ? 1.03 : 1.07), st);
+  const val = d => bs("ce", spot, k, d, iv), W = 520, H = 260, L = 10, T = 14, Bt = 28, mx = val(D) * 1.1 || 1;
+  const X = d => L + (D - d) / D * (W - 2 * L), Yv = v => T + (1 - v / mx) * (H - T - Bt);
+  let pts = []; for (let i = 0; i <= 120; i++) { const d = D * (1 - i / 120); pts.push(`${X(d)},${Yv(val(d))}`); }
+  const wk = Math.min(7, D);
+  let o = `<rect x="${X(wk)}" y="${T}" width="${X(0) - X(wk)}" height="${H - T - Bt}" fill="${R}" opacity=".08"/><text x="${X(wk) + 4}" y="${T + 14}" fill="${R}" font-family="Inter" font-size="11" font-weight="700">LAST WEEK</text>`;
+  o += `<polyline points="${pts.join(" ")}" fill="none" stroke="#b9a6ff" stroke-width="3" stroke-linejoin="round"/>`;
+  o += `<line x1="${L}" x2="${W - L}" y1="${H - Bt}" y2="${H - Bt}" stroke="#ffffff33"/><text x="${L}" y="${H - 8}" fill="${M}" font-family="JetBrains Mono" font-size="10">${D} days left</text><text x="${W - L}" y="${H - 8}" fill="${M}" font-family="JetBrains Mono" font-size="10" text-anchor="end">expiry</text>`;
+  o += `<text x="${L + 2}" y="${Yv(val(D)) - 8}" fill="#fff" font-family="Inter" font-size="12" font-weight="700">${f2(val(D))}</text>`;
+  $("#tdChart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${o}</svg>`;
+  const p0 = val(D), p1 = val(D - 1), half = val(D / 2), w1 = val(Math.min(7, D)), last = val(Math.min(1, D));
+  $("#tdStats").innerHTML = `<div><span>STRIKE ${k.toLocaleString("en-IN")} CE TODAY</span><b>${f2(p0)}</b></div><div><span>LOST BY TOMORROW</span><b class="down">−${f2(p0 - p1)}</b></div><div><span>HALF-WAY (${Math.round(D / 2)}d LEFT)</span><b>${f2(half)}</b></div><div><span>WITH ${Math.min(7, D)} DAYS LEFT</span><b>${f2(w1)}</b></div>`;
+  const lossLot = (p0 - p1) * lot;
+  $("#tdNote").innerHTML = `If the stock doesn't move, this option loses about <b>${f0(lossLot)}</b> per lot by tomorrow, and <b>${f0((p0 - val(Math.max(D - 3, 0))) * lot)}</b> over a long weekend (3 days). In the final day it's worth about <b>${f2(last)}</b>. ${S.td !== "atm" ? "OTM options are <b>all time value</b>: if the move doesn't come in time, they go to ₹0." : "Option <b>sellers</b> earn this decay; <b>buyers</b> pay it. Buyers need a move that is big <b>and</b> fast."}`; }
+/* strategies */
+const ST = {
+  buyce: { n: "Buy CE", legs: [["ce", 1, 0]], note: "Pay a small premium for upside. Loses everything if the stock stays below the strike at expiry. Time decay works against you." },
+  married: { n: "Married put 🛡️", legs: [["stk", 1], ["pe", 1, -3]], note: "<b>Own the stock + buy a put</b> (protective put). Like insurance on your shares: the loss is capped below the put strike, upside stays open. The cost is the put premium, paid every time you renew it. Good before results or events when you don't want to sell." },
+  covered: { n: "Covered call 💰", legs: [["stk", 1], ["ce", -1, 5]], note: "<b>Own the stock + sell an OTM call.</b> You collect premium every month as extra income. Trade-off: upside is capped at the strike, and the premium only slightly cushions a fall. Works best on stocks you're happy to hold that move sideways." },
+  collar: { n: "Collar 🔒", legs: [["stk", 1], ["pe", 1, -5], ["ce", -1, 5]], note: "<b>Stock + buy a put + sell a call.</b> The call premium pays for (most of) the put. Both loss and gain are capped: a low-cost way to protect a big gain you're sitting on." },
+  hedgefut: { n: "Future + put hedge", legs: [["fut", 1], ["pe", 1, -3]], note: "<b>Long futures + buy a put.</b> Same shape as a married put but with leverage. The put caps the gap-down risk that kills naked futures traders." },
+  bullspread: { n: "Bull call spread", legs: [["ce", 1, 0], ["ce", -1, 5]], note: "<b>Buy a call + sell a higher call.</b> The sold call cuts your cost (less time decay) but caps profit. Defined risk both ways: a beginner-friendly alternative to naked buying." },
+  nakedfut: { n: "Naked future ☠️", legs: [["fut", 1]], note: "<b>No hedge.</b> Every ₹1 fall costs you ₹1 × lot. A gap down skips your stop-loss. Leverage makes a 5% fall feel like a 25–50% loss on margin." },
+  nakedce: { n: "Naked call sell ☠️", legs: [["ce", -1, 3]], note: "<b>Sell a call with no hedge.</b> Max profit = premium; loss is <b>unlimited</b> if the stock rockets (takeover news, results). Add a further OTM call bought to cap it (bear call spread)." },
+  straddle: { n: "Short straddle ☠️", legs: [["ce", -1, 0], ["pe", -1, 0]], note: "<b>Sell both ATM call and put.</b> Profits only if the stock stays near the strike. A big move either way creates large losses. Popular, and a common account-killer on event days." },
+};
+function legsOf() { const { spot, iv, days, st } = inp(); return ST[S.st].legs.map(([t, q, off]) => { if (t === "stk" || t === "fut") return { t, q, k: spot, p: 0 }; const k = rnd(spot * (1 + off / 100), st); return { t, q, k, p: bs(t, spot, k, days, iv) }; }); }
+const payFn = legs => s => legs.reduce((a, l) => a + l.q * (l.t === "stk" || l.t === "fut" ? s - l.k : (l.t === "ce" ? Math.max(s - l.k, 0) : Math.max(l.k - s, 0)) - l.p), 0);
+function drawST() { const { spot, lot } = inp(), legs = legsOf(), fn = payFn(legs), per = s => fn(s) * lot;
+  $("#stChips").innerHTML = Object.entries(ST).map(([k, v]) => `<button data-v="${k}" class="${S.st === k ? "on" : ""} ${/☠️/.test(v.n) ? "dz" : ""}">${v.n}</button>`).join("");
+  $("#stChart").innerHTML = paySvg(per, spot * .75, spot * 1.25, spot);
+  const xs = [...Array(601)].map((_, i) => spot * 3 * i / 600), ys = xs.map(per), mx = Math.max(...ys), mn = Math.min(...ys);
+  const upInf = per(spot * 3) - per(spot * 2.9) > 1e-6, dnInf = per(spot * 3) - per(spot * 2.9) < -1e-6;
+  const bes = []; for (let i = 1; i < xs.length; i++) if ((ys[i - 1] < 0) !== (ys[i] < 0)) bes.push(xs[i - 1] + (xs[i] - xs[i - 1]) * (-ys[i - 1]) / (ys[i] - ys[i - 1]));
+  const net = legs.reduce((a, l) => a + (l.t === "ce" || l.t === "pe" ? -l.q * l.p : 0), 0) * lot, lossAtZero = per(0) < 0 && per(spot * .05) - per(0) > 1e-6;
+  $("#stStats").innerHTML = `<div><span>MAX PROFIT</span><b class="up">${upInf ? "Unlimited" : f0(mx)}</b></div><div><span>MAX LOSS</span><b class="down">${dnInf ? "Unlimited" : lossAtZero ? f0(mn) + " (if ₹0)" : f0(mn)}</b></div><div><span>BREAKEVEN</span><b>${bes.map(b => Math.round(b).toLocaleString("en-IN")).join(" / ") || "—"}</b></div><div><span>PREMIUM ${net >= 0 ? "RECEIVED" : "PAID"}</span><b>${f0(Math.abs(net))}</b></div>`;
+  const nm = { stk: "Own shares", fut: "Buy future", ce: "CE", pe: "PE" };
+  $("#stLegs").innerHTML = legs.map(l => `<div>${l.q > 0 ? "🟢 Buy" : "🔴 Sell"} ${l.t === "stk" || l.t === "fut" ? nm[l.t] + " @ " + Math.round(l.k).toLocaleString("en-IN") : l.k.toLocaleString("en-IN") + " " + nm[l.t] + " @ " + f2(l.p)} × ${inp().lot}</div>`).join("");
+  $("#stNote").innerHTML = ST[S.st].note; }
+$("#stChips").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; S.st = b.dataset.v; S.save(); drawST(); });
+$("#tdK").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; S.td = b.dataset.v; S.save(); drawTD(); });
+function all() { $("#tdK").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.v === S.td)); drawTable(); drawTD(); drawST(); }
+["spot", "iv", "days", "lot"].forEach(k => { const el = $("#" + k); el.value = S[k]; el.addEventListener("input", e => { K.fmtNum(e.target, k === "spot" ? 2 : 0); S[k] = e.target.value; S.save(); all(); }); });
+const url = () => K.toolUrl("options-basics");
+function buildText() { return ["📞 *Options basics in 1 minute*", "", "• *CE* = right to buy · *PE* = right to sell", "• Buyer pays premium (limited risk) · Seller collects premium (big risk)", "• Premium = intrinsic + time value; time value → 0 at expiry ⏳", "", "🛡️ *Hedges*", "• Married put = stock + buy PE (insurance)", "• Covered call = stock + sell OTM CE (income, capped upside)", "• Collar = stock + buy PE + sell CE", "", "☠️ *Naked F&O* = no protection. Gaps and big moves wipe out months of gains.", "", "Live payoff & time-decay charts 👇", ...K.signoff("options-basics", "Learn", "_Education only. Not SEBI registered._").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const Wd = 1080, H = 1500, { c, ctx } = K.canvas(Wd, H); K.brand(ctx);
+  K.txt(ctx, "LEARN · OPTIONS", 70, 186, `700 26px ${K.F.MONO}`, "#b9a6ff"); K.txt(ctx, "Hedge it, don't gamble it", 70, 250, `800 54px ${K.F.GROT}`, "#fff");
+  const sp = 100, picks = [["married", "Married put", "Stock + buy PE: insurance"], ["covered", "Covered call", "Stock + sell CE: income"], ["collar", "Collar", "Stock + buy PE + sell CE"], ["nakedce", "Naked call sell", "Max gain small, loss unlimited"]];
+  for (let i = 0; i < 4; i++) { const [id, n, sub] = picks[i], x = 70 + (i % 2) * 478, y = 290 + Math.floor(i / 2) * 470; K.panel(ctx, x, y, 462, 450, 22);
+    const legs = ST[id].legs.map(([t, q, off]) => t === "stk" || t === "fut" ? { t, q, k: sp, p: 0 } : { t, q, k: sp * (1 + (off || 0) / 100), p: bs(t, sp, sp * (1 + (off || 0) / 100), 30, 30) });
+    const img = new Image(); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(paySvg(payFn(legs), 75, 125, 100, 440, 260, { noAxis: true, sw: 4 })); await img.decode(); ctx.drawImage(img, x + 11, y + 14, 440, 260);
+    K.txt(ctx, n, x + 231, y + 330, `800 34px ${K.F.GROT}`, /Naked/.test(n) ? "#ff5470" : "#fff", "center"); K.txt(ctx, sub, x + 231, y + 374, `500 22px ${K.F.INTER}`, "#cfd3df", "center"); }
+  K.txt(ctx, "CE = right to buy · PE = right to sell · Time value → 0 at expiry", Wd / 2, 1250, `600 24px ${K.F.INTER}`, "#cfd3df", "center");
+  K.footer(ctx, Wd, H, K.toolUrl("options-basics"), "Education only · F&O is high risk · Not SEBI registered", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "options-basics", imgLabel: "Share hedging card" });
+drawFour(); all();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

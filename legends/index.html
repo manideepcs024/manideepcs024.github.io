@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Market legends — Minervini, O'Neil, Livermore, Darvas, Soros, PTJ, Druckenmiller, Turtles &amp; Indian greats</title>
+<meta name="description" content="How the world's famous traders and investors actually traded: Mark Minervini (SEPA, VCP, trend template), William O'Neil (CAN SLIM), Jesse Livermore, Nicolas Darvas, Stan Weinstein, Paul Tudor Jones, George Soros, Stanley Druckenmiller, Ed Seykota, Richard Dennis and the Turtles, Larry Williams, Jim Simons, Linda Raschke, Kristjan Kullamägi, Mark Douglas, Buffett, Lynch, and Indian greats. Rules, books, lessons, a trend template checker and a quote quiz." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #febc2e; --acc2: #7c5cff; }
+  .wrap { max-width: 1120px; }
+  .sec2 { margin-top: 28px; } .sec2 > h2 { font: 800 1.45rem "Space Grotesk"; margin-bottom: 4px; } .sec2 > p.l { color: var(--muted); font-size: .9rem; margin-bottom: 12px; line-height: 1.55; max-width: 860px; }
+  .flt { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .flt button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .flt button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .lg { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+  .lc { border-radius: 22px; border: 1px solid var(--line); background: var(--card); padding: 16px; display: grid; gap: 8px; align-content: start; font-size: .85rem; color: #cfd3df; line-height: 1.5; position: relative; overflow: hidden; }
+  .lc::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--c); }
+  .lc .top { display: flex; gap: 12px; align-items: center; }
+  .lc .av { width: 50px; height: 50px; border-radius: 16px; display: grid; place-items: center; font: 800 1.15rem "Space Grotesk"; color: #000; background: var(--c); flex: none; }
+  .lc h3 { font: 800 1.12rem "Space Grotesk"; color: #fff; line-height: 1.2; }
+  .lc .meta { font: 600 .68rem "JetBrains Mono"; color: var(--muted); letter-spacing: .03em; margin-top: 2px; }
+  .lc .style { display: inline-block; font: 700 .64rem "JetBrains Mono"; padding: 3px 7px; border-radius: 6px; background: rgba(255,255,255,.06); color: #fff; }
+  .lc .fame { color: #fff; font-weight: 600; }
+  .lc ul { padding-left: 18px; display: grid; gap: 3px; }
+  .lc .lbl { font: 700 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--c); }
+  .lc .book { font-size: .8rem; color: #b9c0d0; }
+  .lc .lesson { padding: 9px 11px; border-radius: 12px; background: rgba(255,255,255,.04); border-left: 3px solid var(--c); color: #e8ecf6; }
+  .lc .warn { font-size: .8rem; color: #f1c9d1; }
+  .box5 { border-radius: 22px; padding: 18px; border: 1px solid rgba(254,188,46,.45); background: linear-gradient(135deg, rgba(254,188,46,.08), rgba(124,92,255,.05)); }
+  .ins { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .tt { display: grid; gap: 6px; margin-top: 12px; }
+  .tt div { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 9px 12px; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid var(--line); font-size: .86rem; }
+  .tt .ok { color: var(--up); } .tt .no { color: var(--down); } .tt .na { color: var(--muted); }
+  .tt small { font: 600 .72rem "JetBrains Mono"; color: var(--muted); }
+  .verdict { margin-top: 10px; padding: 12px 14px; border-radius: 14px; font-size: .92rem; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .quiz { border-radius: 24px; padding: 20px; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(254,188,46,.05)); }
+  .quiz blockquote { font: 700 1.3rem "Space Grotesk"; color: #fff; line-height: 1.35; margin: 8px 0 12px; }
+  .quiz .opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .quiz .opts button { border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #fff; border-radius: 14px; padding: 12px; font: 700 .9rem Inter; cursor: pointer; }
+  .quiz .opts button.right { border-color: var(--up); background: rgba(34,211,154,.15); } .quiz .opts button.wrong { border-color: var(--down); background: rgba(255,84,112,.12); }
+  .gen { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .gen div { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .gen b.h { display: block; color: #fff; font: 700 .98rem "Space Grotesk"; margin-bottom: 3px; }
+  @media (max-width: 760px) { .lg { grid-template-columns: 1fr; } .quiz .opts { grid-template-columns: 1fr; } .quiz blockquote { font-size: 1.1rem; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../comeback-stories/">🔥 Comeback stories</a><a href="../chart-patterns/">📐 Patterns</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Market legends &amp; <span class="grad">how they really traded.</span></h1>
+    <p class="sub">Not just their returns: their <b>method</b>, their <b>rules</b>, the book to read, and the one lesson you can use. Notice how many different styles worked, and how every one of them <b>cut losses</b>.</p>
+
+    <section class="sec2">
+      <div class="flt" id="flt"></div>
+      <div class="lg" id="lg"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>📏 Minervini's Trend Template checker</h2>
+      <p class="l">Mark Minervini only buys stocks already in a strong <b>Stage 2 uptrend</b>. Enter a stock's numbers from any charting site (daily moving averages) and see if it passes his published trend criteria.</p>
+      <div class="box5">
+        <div class="ins" id="ttIn"></div>
+        <div class="tt" id="tt"></div>
+        <div class="verdict" id="ttV"></div>
+      </div>
+    </section>
+
+    <section class="sec2">
+      <h2>💬 Who said it?</h2>
+      <div class="quiz" id="quiz"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧵 What every legend had in common</h2>
+      <div class="gen">
+        <div><b class="h">✂️ Small, fast losses</b>O'Neil: 7–8% max. Minervini: often tighter. Livermore went broke when he broke this rule.</div>
+        <div><b class="h">🏃 Let winners run</b>Big money comes from a few big winners held long enough: "my sitting," as Livermore put it.</div>
+        <div><b class="h">📐 Position sizing</b>The Turtles risked a fixed small % per trade. Size decides whether a bad streak hurts or kills.</div>
+        <div><b class="h">📈 Trade with the trend</b>Weinstein's Stage 2, PTJ's 200-day average, Minervini's template: all keep you on the right side.</div>
+        <div><b class="h">📓 A written process</b>Every one of them had rules, and a journal. Discipline beats prediction.</div>
+        <div><b class="h">🧠 Psychology first</b>Douglas: think in probabilities. Any single trade can lose; the edge plays out over many.</div>
+      </div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> Returns and stories are as widely reported in books and interviews; some figures are self-reported. Quotes are widely attributed. Their methods worked in their markets and times, with their discipline. For <b>education</b> only. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const L = [
+  { id: "minervini", n: "Mark Minervini", g: "us", c: "#febc2e", m: "USA · 1980s–today", s: "Momentum growth · Swing", f: "Won the US Investing Championship in 1997 (155%) and again in 2021 (334.8%). Built SEPA® (Specific Entry Point Analysis).",
+    r: ["Only buy stocks in a Stage 2 uptrend (his 'Trend Template').", "Enter on low-risk pivots, especially the VCP (each pullback tighter than the last).", "Cut losses fast and small; never let a decent gain turn into a loss."], b: "Trade Like a Stock Market Wizard (2013); Think & Trade Like a Champion (2017)", l: "Risk management first: he says he's wrong half the time, but his losses are tiny and his winners are big." },
+  { id: "oneil", n: "William O'Neil", g: "us", c: "#5b8cff", m: "USA · 1933–2023", s: "Growth investing · CAN SLIM", f: "Founded Investor's Business Daily (1984) and studied every big winning stock back to the 1880s to find their common traits.",
+    r: ["CAN SLIM: Current & Annual earnings growth, New product/high, Supply-demand, Leader, Institutional buying, Market direction.", "Buy breakouts from bases like the cup & handle.", "Sell any stock that falls 7–8% below your buy price. No exceptions."], b: "How to Make Money in Stocks (1988)", l: "Combine strong fundamentals with a strong chart, and only buy when the overall market is in an uptrend." },
+  { id: "livermore", n: "Jesse Livermore", g: "us", c: "#ff5470", m: "USA · 1877–1940", s: "Speculator · Trend", f: "Made fortunes shorting the 1907 panic and the 1929 crash, and went broke several times.",
+    r: ["Trade with the line of least resistance (the trend).", "Pyramid: add only to winning positions.", "Wait for the market to confirm you; patience is the edge."], b: "Reminiscences of a Stock Operator (Edwin Lefèvre, 1923); How to Trade in Stocks (1940)", l: "Brilliant reading of markets wasn't enough. He lost it all whenever he broke his own rules.", w: "He died by suicide in 1940. His story is a reminder that trading must not consume your life." },
+  { id: "darvas", n: "Nicolas Darvas", g: "us", c: "#00e0b8", m: "Hungary / USA · 1920–1977", s: "Breakouts · Box theory", f: "A professional dancer who traded by telegram while touring the world, and turned a small stake into $2 million in the 1950s.",
+    r: ["Draw 'boxes' around a stock's trading range.", "Buy when it breaks above the top of the box on high volume.", "Trail a stop just below the bottom of the newest box."], b: "How I Made $2,000,000 in the Stock Market (1960)", l: "Distance from the noise helped: he saw only prices, not rumours, tips and news." },
+  { id: "weinstein", n: "Stan Weinstein", g: "us", c: "#7c5cff", m: "USA · 1970s–", s: "Stage analysis", f: "Taught millions to classify every chart into four stages using the 30-week moving average.",
+    r: ["Stage 1 basing, Stage 2 advancing, Stage 3 topping, Stage 4 declining.", "Buy only in Stage 2: a breakout above resistance and a rising 30-week average, with volume.", "Never hold or average down in Stage 4."], b: "Secrets for Profiting in Bull and Bear Markets (1988)", l: "Just avoiding Stage 4 stocks would save most retail traders from their worst losses." },
+  { id: "ptj", n: "Paul Tudor Jones", g: "us", c: "#22d39a", m: "USA · 1980–today", s: "Global macro", f: "Founded Tudor Investment Corp (1980) and famously profited from the 1987 crash.",
+    r: ["Look for trades with at least 5:1 reward to risk.", "'Losers average losers.' Never add to a losing position.", "Use the 200-day moving average: stay out of anything below it."], b: "Featured in Market Wizards (1989); documentary 'Trader' (1987)", l: "Defence first: 'Don't focus on making money; focus on protecting what you have.'" },
+  { id: "soros", n: "George Soros", g: "global", c: "#ff8a3d", m: "Hungary / UK / USA · 1970s–", s: "Global macro · Reflexivity", f: "His Quantum Fund 'broke the Bank of England' by shorting the pound on Black Wednesday (1992), making about $1 billion.",
+    r: ["Reflexivity: market beliefs can change the fundamentals they're about.", "When conviction is very high, size up.", "Admit mistakes immediately and reverse if needed."], b: "The Alchemy of Finance (1987)", l: "Being right isn't the point: how much you make when right and lose when wrong is." },
+  { id: "druck", n: "Stanley Druckenmiller", g: "us", c: "#5b8cff", m: "USA · 1981–today", s: "Global macro", f: "Ran Duquesne Capital for 30 years, reportedly without a losing year, and was the architect of the 1992 pound trade with Soros.",
+    r: ["Concentrate: put a lot on your best ideas, not a little on everything.", "Look 12–18 months ahead, not at today's news.", "Preserve capital; get out fast when you're wrong."], b: "Interviews and talks; featured in The New Market Wizards (1992)", l: "Diversification can be an excuse for not knowing what you own. Conviction plus risk control is the formula." },
+  { id: "seykota", n: "Ed Seykota", g: "us", c: "#febc2e", m: "USA · 1970s–", s: "Systematic trend following", f: "A pioneer of computerised trend-following systems; reported huge long-term returns in Market Wizards.",
+    r: ["Cut losses.", "Ride winners.", "Keep bets small and follow the rules without exception."], b: "Featured in Market Wizards (1989); The Trading Tribe (2005)", l: "A system only works if you follow it, especially when it feels wrong." },
+  { id: "dennis", n: "Richard Dennis & the Turtles", g: "us", c: "#00e0b8", m: "USA · 1970s–1980s", s: "Rules-based trend following", f: "'Prince of the Pit' bet his partner that trading could be taught. In 1983 he trained ordinary people (the Turtles) with strict rules; several became very successful traders.",
+    r: ["Buy 20- or 55-day high breakouts; sell on breakdowns.", "Size positions by volatility (ATR, called 'N') so each trade risks the same small %.", "Add to winners in steps; always exit at the stop."], b: "Way of the Turtle (Curtis Faith, 2007)", l: "Proof that a simple, written system with strict risk rules can be taught.", w: "Dennis himself later suffered large drawdowns when he overrode his rules." },
+  { id: "lwilliams", n: "Larry Williams", g: "us", c: "#ff5470", m: "USA · 1960s–today", s: "Short-term futures", f: "Turned $10,000 into over $1.1 million in a single year in the 1987 Robbins World Cup trading contest. Created the Williams %R indicator.",
+    r: ["Study seasonal and short-term patterns.", "Use money management: a winning system can still bankrupt you with bad sizing.", "Accept that big gains come with big swings."], b: "Long-Term Secrets to Short-Term Trading (1999)", l: "Contest-level returns mean contest-level risk. Even he had huge drawdowns." },
+  { id: "simons", n: "Jim Simons", g: "global", c: "#7c5cff", m: "USA · 1938–2024", s: "Quantitative", f: "A mathematician and codebreaker who founded Renaissance Technologies. Its Medallion fund reportedly averaged ~66% a year before fees from 1988 to 2018.",
+    r: ["Find small statistical edges in data and trade them thousands of times.", "Hire scientists, not Wall Street traders.", "Remove emotion: the model decides."], b: "The Man Who Solved the Market (Gregory Zuckerman, 2019)", l: "Edges are small and must be repeated many times. Emotion is the enemy of an edge." },
+  { id: "raschke", n: "Linda Raschke", g: "us", c: "#22d39a", m: "USA · 1980s–today", s: "Short-term swing", f: "Featured in The New Market Wizards; known for short-term setups like 'Holy Grail' and 'Turtle Soup' (fading false breakouts).",
+    r: ["Trade a few setups you know deeply.", "Use pullbacks in strong trends (ADX with a 20-period average).", "Respect stops: the market doesn't care about your opinion."], b: "Street Smarts (with Laurence Connors, 1995); Trading Sardines (2019)", l: "Simple, well-practised patterns beat complex systems you don't trust." },
+  { id: "qulla", n: "Kristjan Kullamägi", g: "global", c: "#00e0b8", m: "Sweden · 2010s–today", s: "Momentum swing", f: "Known online as Qullamaggie; reportedly grew a small account to over $100 million, sharing his trades publicly.",
+    r: ["Trade three setups: breakouts, episodic pivots (big news gaps) and parabolic shorts.", "Buy breakouts from tight ranges after a big prior move; stop at the day's low.", "Sell part after 3–5 days and trail the rest with the 10- or 20-day average."], b: "His public streams and blog (no book)", l: "Most trades lose small; a few huge winners pay for everything. Patience to wait for A+ setups." },
+  { id: "douglas", n: "Mark Douglas", g: "us", c: "#ff8a3d", m: "USA · 1948–2015", s: "Trading psychology", f: "The trading coach whose books are still the most-recommended on trader psychology.",
+    r: ["Think in probabilities: any single trade can lose.", "Accept the risk fully before you enter.", "Consistency comes from a mindset, not from a better indicator."], b: "Trading in the Zone (2000); The Disciplined Trader (1990)", l: "Your edge works over a series of trades, so don't judge yourself (or your system) by one trade." },
+  { id: "buffett", n: "Warren Buffett", g: "global", c: "#5b8cff", m: "USA · 1950s–today", s: "Value investing (not trading)", f: "Built Berkshire Hathaway into one of the world's largest companies by buying great businesses at fair prices.",
+    r: ["Rule No. 1: never lose money. Rule No. 2: never forget rule No. 1.", "Stay within your circle of competence.", "Be fearful when others are greedy, and greedy when others are fearful."], b: "Berkshire Hathaway shareholder letters (free online)", l: "Trading isn't the only way. Compounding in great businesses is slow, quiet and powerful." },
+  { id: "lynch", n: "Peter Lynch", g: "global", c: "#22d39a", m: "USA · 1977–1990", s: "Growth at a reasonable price", f: "Ran Fidelity Magellan for 13 years at about 29% a year; popularised the word 'tenbagger'.",
+    r: ["Invest in what you know, then do your homework.", "Know what you own, and know why you own it.", "Use the PEG ratio: growth must justify the P/E."], b: "One Up on Wall Street (1989)", l: "Everyday observation (products you use, shops you visit) can be the start of research." },
+  { id: "rj", n: "Rakesh Jhunjhunwala", g: "in", c: "#febc2e", m: "India · 1985–2022", s: "Trader & investor", f: "The 'Big Bull' started with ₹5,000 in 1985; Titan became his most famous long-term bet. Trading profits funded his investing.",
+    r: ["Be bullish on India and on great businesses.", "Have conviction, and hold winners for years.", "Respect the market; admit and cut wrong trades."], b: "Interviews and talks; see our Comeback Stories page", l: "He separated trading (short-term) from investing (long-term). Don't let a trade become an 'investment' just because it's losing." },
+  { id: "rkd", n: "Radhakishan Damani", g: "in", c: "#00e0b8", m: "India · 1980s–today", s: "Trader → investor → founder", f: "A successful market trader and Jhunjhunwala's mentor, who went on to found DMart (Avenue Supermarts, listed 2017).",
+    r: ["Stay low-profile; let results talk.", "Back simple, efficient businesses with discipline on costs.", "Patience: build for decades."], b: "No book; profiles in business media", l: "Market skill can become business-building skill. Keep it simple and avoid the noise." },
+  { id: "raamdeo", n: "Raamdeo Agrawal", g: "in", c: "#7c5cff", m: "India · 1987–today", s: "Long-term investing · QGLP", f: "Co-founder of Motilal Oswal; known for the annual Wealth Creation Study and the QGLP framework.",
+    r: ["QGLP: Quality of business and management, Growth, Longevity, Price.", "Buy right, sit tight.", "Earnings growth drives stock prices in the long run."], b: "Motilal Oswal Wealth Creation Studies (free online)", l: "For long-term picks, check all four of QGLP. Missing one usually explains a disappointing stock." },
+  { id: "kedia", n: "Vijay Kedia", g: "in", c: "#ff5470", m: "India · 1990s–today", s: "Small & mid-cap investing", f: "Grew from trading losses to one of India's best-known investors; known for the SMILE framework.",
+    r: ["SMILE: Small in size, Medium in experience, Large in aspiration, Extra-large market potential.", "Back management with integrity and vision.", "Give winners time: years, not weeks."], b: "Interviews; see our Comeback Stories page", l: "His early trading failures taught him patience. Many great investors started as struggling traders." },
+];
+const GRP = [["all", "All"], ["us", "🇺🇸 US traders"], ["global", "🌍 Global & investors"], ["in", "🇮🇳 India"]];
+const S = K.store("legends_v1", { g: "all", qs: 0, qn: 0, tt: {} });
+function drawL() { $("#flt").innerHTML = GRP.map(([k, n]) => `<button data-g="${k}" class="${S.g === k ? "on" : ""}">${n}</button>`).join("");
+  $("#lg").innerHTML = L.filter(x => S.g === "all" || x.g === S.g).map(x => `<article class="lc" style="--c:${x.c}"><div class="top"><div class="av">${x.n.split(/[ &]+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join("")}</div><div><h3>${esc(x.n)}</h3><div class="meta">${esc(x.m)}</div></div></div><span class="style">${esc(x.s)}</span><span class="fame">${esc(x.f)}</span><div class="lbl">RULES</div><ul>${x.r.map(r => `<li>${esc(r)}</li>`).join("")}</ul><div class="book">📖 ${esc(x.b)}</div><div class="lesson">💡 ${esc(x.l)}</div>${x.w ? `<div class="warn">⚠️ ${esc(x.w)}</div>` : ""}</article>`).join(""); }
+$("#flt").addEventListener("click", e => { const b = e.target.closest("[data-g]"); if (!b) return; S.g = b.dataset.g; S.save(); drawL(); });
+/* trend template */
+const TF = [["p", "Price ₹", "520"], ["m50", "50-day MA ₹", "480"], ["m150", "150-day MA ₹", "430"], ["m200", "200-day MA ₹", "400"], ["m200a", "200-day MA 1 month ago ₹", "390"], ["hi", "52-week high ₹", "560"], ["lo", "52-week low ₹", "300"]];
+$("#ttIn").innerHTML = TF.map(([k, l, ph]) => `<div><div class="q">${l}</div><label class="field sm"><input data-t="${k}" type="text" inputmode="decimal" placeholder="${ph}" value="${esc(S.tt[k] || "")}" /></label></div>`).join("");
+function tt() { const v = k => num(S.tt[k]) || num(TF.find(t => t[0] === k)[2]), p = v("p"), m50 = v("m50"), m150 = v("m150"), m200 = v("m200"), m200a = v("m200a"), hi = v("hi"), lo = v("lo"), demo = !Object.values(S.tt).some(x => x);
+  const C = [["Price above the 150-day and 200-day MA", p > m150 && p > m200, `${p} vs ${m150} / ${m200}`], ["150-day MA above the 200-day MA", m150 > m200, `${m150} vs ${m200}`], ["200-day MA rising for at least 1 month", m200 > m200a, `${m200a} → ${m200}`], ["50-day MA above the 150 and 200-day MA", m50 > m150 && m50 > m200, `${m50}`], ["Price above the 50-day MA", p > m50, `${p} vs ${m50}`], ["At least 30% above the 52-week low", p >= lo * 1.3, `+${((p / lo - 1) * 100).toFixed(0)}%`], ["Within 25% of the 52-week high", p >= hi * .75, `${((p / hi - 1) * 100).toFixed(0)}% from high`]];
+  const ok = C.filter(c => c[1]).length;
+  $("#tt").innerHTML = C.map(([t, o, d]) => `<div><span class="${o ? "ok" : "no"}">${o ? "✅" : "❌"}</span><span>${t}</span><small>${d}</small></div>`).join("") + `<div><span class="na">➖</span><span>Relative strength rating 70+ (vs the market). Check on a screener; not calculated here.</span><small></small></div>`;
+  $("#ttV").innerHTML = (demo ? "<span style='color:var(--muted)'>Example numbers shown. Enter your stock's values. </span><br>" : "") + (ok === 7 ? `✅ <b>Passes all 7.</b> A Stage 2 uptrend by Minervini's template. Now wait for a low-risk entry (like a VCP pivot), with a stop.` : ok >= 5 ? `⚠️ <b>${ok}/7.</b> Close, but not a full Stage 2 yet. Watch list, not buy list.` : `❌ <b>${ok}/7.</b> Not in a Stage 2 uptrend. Minervini would not buy this, however good the story.`); }
+$("#ttIn").addEventListener("input", e => { const el = e.target.closest("[data-t]"); if (!el) return; K.fmtNum(el); S.tt[el.dataset.t] = el.value; S.save(); tt(); });
+/* quiz */
+const QZ = [["It never was my thinking that made the big money for me. It always was my sitting.", "livermore"], ["Rule No. 1: Never lose money. Rule No. 2: Never forget rule No. 1.", "buffett"], ["Losers average losers.", "ptj"], ["Win or lose, everybody gets what they want out of the market.", "seykota"], ["Know what you own, and know why you own it.", "lynch"], ["It's not whether you're right or wrong, but how much money you make when you're right and how much you lose when you're wrong.", "soros"], ["Anything can happen. You don't need to know what is going to happen next to make money.", "douglas"], ["Buy right, sit tight.", "raamdeo"], ["Sell any stock that falls 7–8% below your purchase price, no exceptions.", "oneil"], ["Don't focus on making money; focus on protecting what you have.", "ptj"], ["Buy only in Stage 2; never hold a stock in Stage 4.", "weinstein"], ["Be fearful when others are greedy and greedy when others are fearful.", "buffett"]];
+let q, ans;
+function newQ() { const [t, id] = QZ[Math.floor(Math.random() * QZ.length)], p = L.find(x => x.id === id), o = [p, ...L.filter(x => x.id !== id).sort(() => Math.random() - .5).slice(0, 3)].sort(() => Math.random() - .5); q = { t, p }; ans = false;
+  $("#quiz").innerHTML = `<div style="font:600 .74rem 'JetBrains Mono';color:var(--muted)">SCORE ${S.qs} / ${S.qn}</div><blockquote>“${esc(t)}”</blockquote><div class="opts">${o.map(x => `<button data-q="${x.id}">${esc(x.n)}</button>`).join("")}</div><div id="qres" style="margin-top:10px;font-size:.88rem;color:#cfd3df;min-height:1.4em"></div>`; }
+$("#quiz").addEventListener("click", e => { if (e.target.closest("#qNext")) { newQ(); return; } const b = e.target.closest("[data-q]"); if (!b || ans) return; ans = true; const ok = b.dataset.q === q.p.id; S.qn++; if (ok) S.qs++; S.save();
+  $("#quiz").querySelectorAll("[data-q]").forEach(x => x.classList.add(x.dataset.q === q.p.id ? "right" : x === b ? "wrong" : "x"));
+  $("#qres").innerHTML = `${ok ? "✅ Correct!" : `❌ It's <b>${esc(q.p.n)}</b>.`} ${esc(q.p.l)} <button class="btn" id="qNext" style="padding:8px 14px;margin-left:6px">Next →</button>`; });
+function buildText() { return ["🏆 *Market legends: one rule each*", "", "📏 Minervini: buy only Stage 2 stocks, cut losses small", "📰 O'Neil: sell at −7–8%, no exceptions", "🐢 Turtles: same small risk on every trade", "📉 Paul Tudor Jones: losers average losers", "📦 Darvas: buy the box breakout, trail the stop", "🌍 Soros: how much you make when right vs lose when wrong", "🧠 Mark Douglas: think in probabilities", "🇮🇳 Raamdeo Agrawal: buy right, sit tight", "", `My quote-quiz score: ${S.qs}/${S.qn} 👇`, ...K.signoff("legends", "Learn", "_Education only. Not SEBI registered._").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const Wd = 1080, H = 1500, { c, ctx } = K.canvas(Wd, H, [["rgba(254,188,46,0.22)", .9, .05, .6], ["rgba(124,92,255,0.2)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "LEARN · MARKET LEGENDS", 70, 186, `700 26px ${K.F.MONO}`, "#febc2e"); K.txt(ctx, "One rule from each legend", 70, 250, `800 54px ${K.F.GROT}`, "#fff");
+  const pick = [["minervini", "Buy only Stage 2 uptrends. Cut losses small."], ["oneil", "Sell at −7–8% below your buy. No exceptions."], ["dennis", "Risk the same small % on every trade."], ["ptj", "Losers average losers."], ["darvas", "Buy the box breakout, trail the stop."], ["douglas", "Think in probabilities."], ["raamdeo", "Buy right, sit tight."]];
+  pick.forEach(([id, r], i) => { const x = L.find(l => l.id === id), y = 290 + i * 132; K.panel(ctx, 70, y, 940, 116, 22); ctx.fillStyle = x.c; K.rr(ctx, 94, y + 22, 72, 72, 18); ctx.fill();
+    K.txt(ctx, x.n.split(/[ &]+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join(""), 130, y + 70, `800 30px ${K.F.GROT}`, "#000", "center"); K.txt(ctx, x.n, 190, y + 50, `700 24px ${K.F.MONO}`, x.c); K.txt(ctx, r, 190, y + 92, K.fit(ctx, r, 700, K.F.GROT, 32, 790), "#fff"); });
+  K.footer(ctx, Wd, H, K.toolUrl("legends"), "As widely reported · Education only · Not SEBI registered", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "market-legends", imgLabel: "Share legends card" });
+drawL(); tt(); newQ();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
