@@ -2,9 +2,9 @@
  * Pages: network first (you always get the latest when online), cached copy when offline.
  * Static files (css/js/images/fonts/three.js): served from cache, refreshed in the background.
  * When you add a new page, add it to PAGES below and bump VERSION. Pages you visit are cached anyway. */
-const VERSION = "mmm-v6";
+const VERSION = "mmm-v7";
 const PAGES = ["", "tools/", "backup/", "levels/", "close/", "calendar/", "glossary/", "quiz/", "quiz-score/", "chart-game/",
-  "message/", "ipo/", "trade-review/", "welcome/", "status/", "contest/", "journal/", "options/", "average/", "tax/",
+  "message/", "ipo/", "trade-review/", "welcome/", "status/", "contest/", "journal/", "checklist/", "options/", "average/", "tax/",
   "sl-calculator/", "day-review/", "house/", "wish/", "trader-room/", "overtrading/", "tv-tip/", "game/", "ipo-game/", "scam-game/", "fno-game/", "mtf-game/", "fundamentals-game/"];
 const ASSETS = ["assets/tool.css", "assets/tool.js", "assets/pwa.js", "assets/vendor/qrcode.js", "manifest.webmanifest",
   "assets/icons/icon-192.png", "assets/icons/icon-512.png", "assets/icons/maskable-512.png", "assets/icons/apple-touch-icon.png", "assets/icons/favicon-32.png"];

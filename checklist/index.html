@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Pre-Trade Checklist — MANIMINDSMONEY</title>
+<meta name="description" content="A 30-second gate before every trade: trend, setup, stop-loss, risk-reward, position size, tips, revenge and overtrading checks. Get a GO / WAIT / DON'T verdict and save the trade to your journal." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #7c5cff; }
+  .grp { margin-top: 18px; }
+  .grp h3 { display: flex; align-items: center; gap: 8px; font: 700 .98rem "Space Grotesk"; margin-bottom: 8px; }
+  .grp h3 small { margin-left: auto; font: 600 .7rem "JetBrains Mono"; color: var(--muted); }
+  .it { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); margin-top: 6px; transition: border-color .2s, background .2s; }
+  .it.y { border-color: rgba(34,211,154,.45); background: rgba(34,211,154,.07); }
+  .it.n { border-color: rgba(255,84,112,.5); background: rgba(255,84,112,.08); }
+  .it .t { font-size: .88rem; line-height: 1.4; }
+  .it .t small { display: block; color: var(--muted); font-size: .74rem; margin-top: 2px; }
+  .it .t small a { color: inherit; }
+  .crit { font: 700 .58rem "JetBrains Mono"; letter-spacing: .06em; color: #ff9aab; border: 1px solid rgba(255,84,112,.45); border-radius: 5px; padding: 1px 5px; margin-left: 6px; vertical-align: 2px; white-space: nowrap; }
+  .auto { font: 700 .58rem "JetBrains Mono"; letter-spacing: .06em; color: #9be8c9; border: 1px solid rgba(34,211,154,.45); border-radius: 5px; padding: 1px 5px; margin-left: 6px; vertical-align: 2px; white-space: nowrap; }
+  .yn { display: flex; gap: 4px; }
+  .yn button { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 10px; padding: 8px 12px; font: 700 .8rem Inter; cursor: pointer; min-width: 48px; }
+  .yn button.on.yes { background: rgba(34,211,154,.2); color: var(--up); border-color: rgba(34,211,154,.6); }
+  .yn button.on.no { background: rgba(255,84,112,.2); color: var(--down); border-color: rgba(255,84,112,.6); }
+  .yn .x { min-width: 34px; padding: 8px; }
+  .astat { font: 700 .8rem "JetBrains Mono"; padding: 8px 10px; border-radius: 10px; white-space: nowrap; }
+  .astat.y { color: var(--up); background: rgba(34,211,154,.12); } .astat.n { color: var(--down); background: rgba(255,84,112,.12); } .astat.u { color: var(--muted); background: rgba(255,255,255,.05); }
+  .calc { margin-top: 12px; border-radius: 16px; border: 1px solid var(--line); background: rgba(0,0,0,.28); padding: 10px 12px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .calc div span { display: block; font: 600 .6rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+  .calc div b { font: 600 .9rem "JetBrains Mono"; overflow-wrap: anywhere; }
+  .verdict { border-radius: 22px; padding: 18px; text-align: center; border: 1px solid var(--line); background: rgba(255,255,255,.04); transition: background .3s, border-color .3s; }
+  .verdict .big { font: 800 clamp(1.7rem, 6vw, 2.3rem)/1.1 "Space Grotesk"; }
+  .verdict p { color: #cfd3df; font-size: .88rem; margin-top: 6px; line-height: 1.45; }
+  .verdict.go { background: rgba(34,211,154,.12); border-color: rgba(34,211,154,.5); } .verdict.go .big { color: var(--up); }
+  .verdict.wait { background: rgba(254,188,46,.1); border-color: rgba(254,188,46,.5); } .verdict.wait .big { color: var(--warn); }
+  .verdict.stop { background: rgba(255,84,112,.12); border-color: rgba(255,84,112,.55); } .verdict.stop .big { color: var(--down); }
+  .meter { height: 10px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin: 12px 0 4px; }
+  .meter i { display: block; height: 100%; width: 0; border-radius: 6px; transition: width .35s, background .35s; }
+  .fails { margin-top: 10px; text-align: left; display: grid; gap: 4px; }
+  .fails div { font-size: .8rem; color: #ffb3c0; } .fails div.c { color: #ff5470; font-weight: 700; }
+  .acts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+  .acts .btn { white-space: normal; line-height: 1.25; }
+  .acts .btn { padding: 13px 10px; }
+  .btn.skip { background: rgba(255,255,255,.06); }
+  .stats4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .stats4 .stat { padding: 10px; } .stats4 .stat b { font-size: .95rem; }
+  .log { display: grid; gap: 6px; margin-top: 10px; max-height: 300px; overflow: auto; }
+  .log .row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.22); font-size: .82rem; }
+  .log .row small { display: block; color: var(--muted); font: .7rem "JetBrains Mono"; }
+  .log .row .sc { font: 700 .8rem "JetBrains Mono"; }
+  .log .row button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: .9rem; }
+  .custom { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 8px; }
+  .custom .btn { padding: 10px 14px; }
+  .delc { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: .8rem; margin-left: 4px; }
+  .today { margin-top: 10px; font-size: .78rem; color: var(--muted); }
+  .today b { color: #cfd3df; }
+  details.set { margin-top: 14px; border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; background: rgba(0,0,0,.2); }
+  details.set summary { cursor: pointer; font: 600 .86rem Inter; color: #cfd3df; }
+  @media (max-width: 860px) { .calc, .stats4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 420px) { .acts { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+
+    <h1>Before you click buy, <span class="grad">tick the boxes.</span></h1>
+    <p class="sub">A 30-second gate before every trade. Enter the numbers, answer honestly, and get a <b>GO / WAIT / DON'T</b> verdict. Red-line rules can't be overridden by a good feeling. Take it and it goes straight into your <a href="../journal/" style="color:inherit">trade journal</a>; skip it and it's logged as a trade you saved yourself from. Everything stays on this device.</p>
+
+    <div class="layout">
+      <section class="card" id="formCard">
+        <div class="seg mb" id="sideSeg"><div class="pill"></div><button data-v="long">📈 Long<small>buy first</small></button><button data-v="short">📉 Short<small>sell first</small></button></div>
+        <div class="cols2">
+          <div><div class="q">Stock</div><label class="field"><input id="sym" class="name" type="text" maxlength="20" placeholder="e.g. HDFCBANK" autocomplete="off" /></label></div>
+          <div><div class="q">Setup</div><label class="field"><select id="setup"></select></label></div>
+        </div>
+        <div class="cols3">
+          <div><div class="q">Entry ₹</div><label class="field sm"><input id="entry" type="text" inputmode="decimal" placeholder="500" /></label></div>
+          <div><div class="q">Stop-loss ₹</div><label class="field sm"><input id="sl" type="text" inputmode="decimal" placeholder="490" /></label></div>
+          <div><div class="q">Target ₹</div><label class="field sm"><input id="tgt" type="text" inputmode="decimal" placeholder="525" /></label></div>
+        </div>
+        <div class="q">Quantity <span class="opt">blank = sized from your risk rule</span></div><label class="field sm"><input id="qty" type="text" inputmode="numeric" placeholder="auto" /></label>
+        <div class="ierr" id="planErr"></div>
+        <div class="calc" id="calc"></div>
+        <div id="groups"></div>
+        <div class="grp"><h3>➕ My own rules</h3>
+          <div class="custom"><label class="field sm"><input id="newRule" class="txt" type="text" maxlength="90" placeholder="e.g. Nifty is not in a downtrend" /></label><button class="btn" id="addRule">Add</button></div>
+        </div>
+      </section>
+
+      <section class="card sticky">
+        <div class="res-head"><h2>Verdict</h2><span id="meta"></span></div>
+        <div class="verdict" id="verdict"></div>
+        <div class="acts"><button class="btn primary" id="takeBtn">✅ Take it · save to journal</button><button class="btn skip" id="skipBtn">✋ Skip it · log it</button></div>
+        <div class="today" id="today"></div>
+
+        <div class="res-head" style="margin-top:20px"><h2>This month</h2><span id="mMeta"></span></div>
+        <div class="stats4" id="stats"></div>
+        <div class="log" id="log"></div>
+
+        <div class="share-row" id="shareRow"></div>
+        <label class="toggle"><span>Show stock &amp; prices on the image<small>Off: share just the checklist and verdict</small></span><input type="checkbox" id="optStock" /><span class="sw"></span></label>
+
+        <details class="set" id="setBox"><summary>⚙️ My risk rules</summary>
+          <div class="cols2">
+            <div><div class="q">Trading capital ₹</div><label class="field sm"><input id="cap" type="text" inputmode="decimal" placeholder="2,00,000" /></label></div>
+            <div><div class="q">Max risk / trade %</div><label class="field sm"><input id="riskPct" type="text" inputmode="decimal" placeholder="1" /></label></div>
+          </div>
+          <div class="cols2">
+            <div><div class="q">Minimum R:R</div><label class="field sm"><span class="unit">1 :</span><input id="minRR" type="text" inputmode="decimal" placeholder="2" /></label></div>
+            <div><div class="q">Max trades / day</div><label class="field sm"><input id="maxT" type="text" inputmode="numeric" placeholder="3" /></label></div>
+          </div>
+          <p class="hint">With ₹2,00,000 and 1% risk, a stop-loss hit costs at most ₹2,000. Today's trade count and loss streak are read from your trade journal.</p>
+        </details>
+        <div id="invite" style="margin-top:12px"></div>
+        <div class="learn"><b>How the verdict works:</b> rules marked <b>RED LINE</b> are non-negotiable: one "No" means <b>DON'T</b>, however good the rest looks. Otherwise, 85% or more ticked is <b>GO</b>, and anything less is <b>WAIT</b>: skip it, or wait for a better entry. Items marked <b>AUTO</b> are worked out from your numbers and your journal.</div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This checklist is a personal discipline tool for <b>education only</b>. It is not a trading signal or a recommendation, and a "GO" doesn't mean a trade will make money. Trading involves risk, including loss of capital.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$; K.chrome();
+const SETUPS = ["Breakout", "Pullback", "Reversal", "Trend follow", "Gap play", "Range", "News / results", "Other"];
+$("#setup").innerHTML = SETUPS.map(s => `<option>${s}</option>`).join("");
+
+/* ---------- rules ---------- */
+// crit = red line. auto = computed from numbers or the journal.
+const GROUPS = [
+  { k: "setup", h: "📈 The setup", items: [
+    { id: "trend", t: "The trend is in my direction", s: "Price vs the 200 and 50 EMA; I'm not fighting the bigger trend" },
+    { id: "play", t: "It's a setup from my playbook", s: "Breakout, pullback or range I've traded before, not a new idea today" },
+    { id: "vol", t: "Volume confirms the move", s: "Above-average volume on the breakout or bounce" },
+    { id: "rsi", t: "Not chasing a stretched move", s: "RSI not at an extreme, not 3 big green candles in a row" },
+    { id: "event", t: "No results or big event in the next few days", s: 'Check the <a href="../calendar/">results calendar</a>' },
+    { id: "fund", t: "Fundamentals pass my filters", s: "EPS growth, PE vs sector, debt (skip this one for intraday)" },
+  ] },
+  { k: "risk", h: "🎯 Risk & plan", items: [
+    { id: "slset", t: "Stop-loss is at a chart level, and I'll place it right after entry", s: "Not a random %, not a \"mental\" stop", crit: true },
+    { id: "rr", t: "Risk-reward meets my minimum", auto: true },
+    { id: "size", t: "Max loss fits my risk-per-trade rule", auto: true, crit: true },
+    { id: "limit", t: "Limit order, not chasing a gap or spike", s: "If it ran away, I let it go" },
+  ] },
+  { k: "mind", h: "🧠 My head", items: [
+    { id: "tip", t: "This is my own analysis, not a TV, Telegram or WhatsApp tip", s: 'Why it matters: <a href="../tv-tip/">The TV Tip Trap</a>', crit: true },
+    { id: "revenge", t: "I'm not trying to win back a loss", s: "No revenge trades, no doubling up", crit: true },
+    { id: "count", t: "Under my max trades for today", auto: true },
+    { id: "streak", t: "Not after 2 losses in a row today", auto: true, crit: true },
+    { id: "calm", t: "I'm calm, and I'm fine if the stop-loss hits", s: 'Why it matters: <a href="../overtrading/">The 10:30 Decision</a>' },
+  ] },
+];
+const S = K.store("checklist_v1", { f: { side: "long", sym: "", setup: "Breakout", entry: "", sl: "", tgt: "", qty: "" }, a: {}, custom: [], cap: "2,00,000", riskPct: "1", minRR: "2", maxT: "3", log: [], showStock: false });
+const F = S.f;
+
+/* ---------- journal (read today's trades, write new ones) ---------- */
+const JKEY = "journal_v1";
+const readJ = () => { try { return JSON.parse(localStorage.getItem(JKEY) || "{}"); } catch { return {}; } };
+function todayInfo() {
+  const today = K.iso(K.istNow()), J = readJ(), list = (J.trades || []).filter(t => t.date === today).sort((a, b) => a.id - b.id);
+  let streak = 0; list.forEach(t => { const E = K.num(t.entry), SL = K.num(t.sl), X = K.num(t.exit), dir = t.side === "short" ? -1 : 1; if (!(X > 0 && E > 0)) return; streak = (X - E) * dir < 0 ? streak + 1 : 0; });
+  return { n: list.length, streak };
+}
+
+/* ---------- maths ---------- */
+function math() {
+  const dir = F.side === "short" ? -1 : 1, E = K.num(F.entry), SL = K.num(F.sl), T = K.num(F.tgt), cap = K.num(S.cap), rp = K.num(S.riskPct), minRR = K.num(S.minRR) || 2;
+  const o = { E, SL, T, minRR, budget: cap > 0 && rp > 0 ? cap * rp / 100 : 0 };
+  if (!(E > 0 && SL > 0)) return o;
+  if ((E - SL) * dir <= 0) { o.err = F.side === "short" ? "For a short, the stop-loss must be above the entry." : "For a long, the stop-loss must be below the entry."; return o; }
+  o.rps = Math.abs(E - SL);
+  if (T > 0) { if ((T - E) * dir <= 0) o.err = F.side === "short" ? "For a short, the target must be below the entry." : "For a long, the target must be above the entry."; else o.rr = Math.abs(T - E) / o.rps; }
+  o.autoQ = o.budget ? Math.floor(o.budget / o.rps) : 0;
+  o.q = K.num(F.qty) > 0 ? Math.floor(K.num(F.qty)) : o.autoQ;
+  o.loss = o.q * o.rps;
+  return o;
+}
+function autoState(id, m, td) {
+  if (id === "rr") return m.rr == null ? [null, "add target"] : m.rr >= m.minRR ? [1, `1:${m.rr.toFixed(1)} ✓`] : [0, `1:${m.rr.toFixed(1)} ✗`];
+  if (id === "size") { if (!m.rps) return [null, "add entry & SL"]; if (!m.budget) return [null, "set capital"]; if (!m.q) return [0, "SL too wide"]; return m.loss <= m.budget * 1.001 ? [1, `${K.rs(m.loss)} ✓`] : [0, `${K.rs(m.loss)} ✗`]; }
+  const maxT = Math.max(1, Math.floor(K.num(S.maxT)) || 3);
+  if (id === "count") return td.n < maxT ? [1, `${td.n}/${maxT} today`] : [0, `${td.n}/${maxT} today`];
+  if (id === "streak") return td.streak >= 2 ? [0, `${td.streak} losses`] : [1, td.streak ? "1 loss" : "no losses"];
+}
+const allItems = () => [...GROUPS.flatMap(g => g.items.map(i => ({ ...i, g: g.k }))), ...S.custom.map(c => ({ id: c.id, t: c.t, g: "custom", custom: true }))];
+function evaluate() {
+  const m = math(), td = todayInfo(), items = allItems().map(i => { const [v, lab] = i.auto ? autoState(i.id, m, td) : [S.a[i.id] ?? null]; return { ...i, v, lab }; });
+  const yes = items.filter(i => i.v === 1).length, open = items.filter(i => i.v == null).length, critFail = items.filter(i => i.crit && i.v === 0);
+  const score = yes / items.length, verdict = critFail.length ? "stop" : open ? "open" : score >= .85 ? "go" : "wait";
+  return { m, td, items, yes, open, total: items.length, critFail, score, verdict };
+}
+
+/* ---------- render ---------- */
+const esc = K.esc;
+function renderGroups(ev) {
+  const byId = Object.fromEntries(ev.items.map(i => [i.id, i]));
+  const row = i => {
+    const it = byId[i.id], cls = it.v === 1 ? "y" : it.v === 0 ? "n" : "";
+    const tags = (i.crit ? '<span class="crit">RED LINE</span>' : "") + (i.auto ? '<span class="auto">AUTO</span>' : "");
+    const ctl = i.auto ? `<span class="astat ${it.v === 1 ? "y" : it.v === 0 ? "n" : "u"}">${esc(it.lab)}</span>`
+      : `<span class="yn"><button class="yes ${it.v === 1 ? "on" : ""}" data-a="${i.id}" data-v="1">Yes</button><button class="no ${it.v === 0 ? "on" : ""}" data-a="${i.id}" data-v="0">No</button>${i.custom ? `<button class="delc" data-del="${i.id}" title="Remove rule">✕</button>` : ""}</span>`;
+    return `<div class="it ${cls}"><div class="t">${esc(i.t)}${tags}${i.s ? `<small>${i.s}</small>` : ""}</div>${ctl}</div>`;
+  };
+  const g = [...GROUPS, ...(S.custom.length ? [{ k: "custom", h: "⭐ My rules", items: S.custom.map(c => ({ ...c, custom: true })) }] : [])];
+  $("#groups").innerHTML = g.map(gr => { const its = ev.items.filter(i => i.g === gr.k), y = its.filter(i => i.v === 1).length; return `<div class="grp"><h3>${gr.h}<small>${y}/${its.length}</small></h3>${gr.items.map(row).join("")}</div>`; }).join("");
+}
+function render() {
+  const ev = evaluate(), m = ev.m;
+  $("#planErr").textContent = m.err || "";
+  const cell = (k, v, cls = "") => `<div><span>${k}</span><b class="${cls}">${v}</b></div>`;
+  $("#calc").innerHTML = cell("Risk / share", m.rps ? K.money(m.rps) : "—") + cell("R:R", m.rr ? "1 : " + m.rr.toFixed(2) : "—", m.rr ? (m.rr >= m.minRR ? "up" : "down") : "") +
+    cell(K.num(F.qty) > 0 ? "Quantity" : "Qty (auto)", m.q ? K.qty(m.q) : "—") + cell("Max loss", m.q && m.rps ? K.rs(m.loss) : "—", m.q && m.budget && m.loss > m.budget * 1.001 ? "down" : "");
+  renderGroups(ev);
+  const V = { stop: ["🛑 DON'T", "A red-line rule failed. No setup is worth breaking these."], open: ["⏳ " + ev.open + " to go", "Answer every box honestly. The point is to slow down."], go: ["✅ GO", "Plan is solid. Enter with a limit order and place the stop-loss straight away."], wait: ["⚠️ WAIT", `Only ${Math.round(ev.score * 100)}% ticked. Skip it, or wait for a cleaner entry.`] }[ev.verdict];
+  const col = { stop: "var(--down)", open: "#5b8cff", go: "var(--up)", wait: "var(--warn)" }[ev.verdict];
+  const fails = ev.items.filter(i => i.v === 0);
+  $("#verdict").className = "verdict " + (ev.verdict === "open" ? "" : ev.verdict);
+  $("#verdict").innerHTML = `<div class="big">${V[0]}</div><div class="meter"><i style="width:${ev.score * 100}%;background:${col}"></i></div><div style="font:600 .78rem 'JetBrains Mono';color:var(--muted)">${ev.yes}/${ev.total} ticked</div><p>${V[1]}</p>` +
+    (fails.length ? `<div class="fails">${fails.map(i => `<div class="${i.crit ? "c" : ""}">${i.crit ? "🛑" : "✗"} ${esc(i.t)}</div>`).join("")}</div>` : "");
+  $("#meta").textContent = F.sym ? `${F.sym} · ${F.side === "short" ? "short" : "long"}` : "";
+  $("#today").innerHTML = `📒 Today in your journal: <b>${ev.td.n} trade${ev.td.n === 1 ? "" : "s"}</b>${ev.td.streak ? ` · <b>${ev.td.streak} loss${ev.td.streak === 1 ? "" : "es"} in a row</b>` : ""}`;
+  renderLog(); S.save();
+}
+function renderLog() {
+  const ym = K.iso(K.istNow()).slice(0, 7), mon = S.log.filter(l => l.date.startsWith(ym));
+  const taken = mon.filter(l => l.act === "take"), skipped = mon.filter(l => l.act === "skip"), clean = taken.filter(l => l.verdict === "go");
+  const avg = mon.length ? Math.round(mon.reduce((a, l) => a + l.yes / l.total, 0) / mon.length * 100) : 0;
+  const st = (k, v, c = "") => `<div class="stat"><span>${k}</span><b class="${c}">${v}</b></div>`;
+  $("#stats").innerHTML = st("Checked", mon.length) + st("Taken", taken.length) + st("Skipped", skipped.length, skipped.length ? "up" : "") + st("By the rules", taken.length ? Math.round(clean.length / taken.length * 100) + "%" : "—", taken.length && clean.length < taken.length ? "warnc" : "up");
+  $("#mMeta").textContent = mon.length ? `avg ${avg}% ticked` : "";
+  const ic = { go: "✅", wait: "⚠️", stop: "🛑", open: "⏳" };
+  $("#log").innerHTML = S.log.slice(0, 12).map(l => `<div class="row" data-id="${l.id}"><span>${ic[l.verdict]}</span><div><b>${esc(l.sym || "—")}</b> ${l.act === "take" ? "taken" : "skipped"}<small>${K.niceDate(l.date, { day: "numeric", month: "short" })} · ${esc(l.setup)}</small></div><span class="sc">${l.yes}/${l.total}</span><button data-dl="${l.id}" title="Delete">✕</button></div>`).join("") ||
+    `<div class="placeholder" style="padding:18px">Every trade you check shows up here. A month of "skipped" entries is money you didn't lose.</div>`;
+}
+
+/* ---------- events ---------- */
+const NUMS = ["entry", "sl", "tgt"];
+function fill() { ["sym", "setup", "entry", "sl", "tgt", "qty"].forEach(k => $("#" + k).value = F[k] ?? ""); ["cap", "riskPct", "minRR", "maxT"].forEach(k => $("#" + k).value = S[k] ?? ""); $("#optStock").checked = S.showStock; placeSide(); render(); }
+NUMS.forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); F[k] = e.target.value; e.target.closest(".field").classList.remove("err"); render(); }));
+$("#qty").addEventListener("input", e => { K.fmtNum(e.target, 0); F.qty = e.target.value; render(); });
+$("#sym").addEventListener("input", e => { F.sym = e.target.value.toUpperCase(); render(); });
+$("#setup").addEventListener("input", e => { F.setup = e.target.value; S.save(); });
+["cap", "riskPct", "minRR"].forEach(k => $("#" + k).addEventListener("input", e => { K.fmtNum(e.target); S[k] = e.target.value; render(); }));
+$("#maxT").addEventListener("input", e => { K.fmtNum(e.target, 0); S.maxT = e.target.value; render(); });
+$("#optStock").addEventListener("change", e => { S.showStock = e.target.checked; S.save(); });
+const placeSide = K.seg("#sideSeg", () => F.side, v => { F.side = v; render(); });
+$("#groups").addEventListener("click", e => {
+  const d = e.target.closest("[data-del]"); if (d) { S.custom = S.custom.filter(c => c.id !== d.dataset.del); delete S.a[d.dataset.del]; render(); return; }
+  const b = e.target.closest("[data-a]"); if (!b) return; const id = b.dataset.a, v = +b.dataset.v; S.a[id] = S.a[id] === v ? null : v; render();
+});
+function addRule() { const t = $("#newRule").value.trim(); if (!t) { K.shake($("#newRule").closest(".field")); return; } S.custom.push({ id: "c" + Date.now(), t }); $("#newRule").value = ""; render(); K.toast("Rule added ✓"); }
+$("#addRule").addEventListener("click", addRule); $("#newRule").addEventListener("keydown", e => { if (e.key === "Enter") addRule(); });
+$("#log").addEventListener("click", e => { const b = e.target.closest("[data-dl]"); if (!b) return; S.log = S.log.filter(l => l.id !== +b.dataset.dl); render(); });
+
+function record(act) {
+  const ev = evaluate();
+  if (!F.sym.trim()) { K.shake($("#sym").closest(".field")); K.toast("Add the stock name"); return; }
+  if (act === "take") {
+    if (!ev.m.rps) { ["entry", "sl"].forEach(k => !(K.num(F[k]) > 0) && K.shake($("#" + k).closest(".field"))); K.toast(ev.m.err ? "Check the stop-loss" : "Entry and stop-loss are needed"); return; }
+    if (ev.m.err) { K.toast("Check the highlighted values"); return; }
+    if (ev.verdict === "stop" && !confirm("🛑 A red-line rule failed. The checklist says DON'T.\n\nTake this trade anyway?")) return;
+    if (ev.verdict === "open" && !confirm(`${ev.open} box(es) not answered yet. Save the trade anyway?`)) return;
+    const J = readJ(); J.trades = J.trades || [];
+    J.trades.unshift({ side: F.side, sym: F.sym, date: K.iso(K.istNow()), entry: F.entry, sl: F.sl, tgt: F.tgt, qty: ev.m.q ? K.qty(ev.m.q) : "", risk: "", exit: "", setup: F.setup, note: `Checklist ${ev.yes}/${ev.total}${ev.verdict === "go" ? " ✅" : ev.verdict === "stop" ? " 🛑 broke a red line" : ""}`, id: Date.now() });
+    try { localStorage.setItem(JKEY, JSON.stringify(J)); } catch {}
+  }
+  S.log.unshift({ id: Date.now(), date: K.iso(K.istNow()), sym: F.sym, side: F.side, setup: F.setup, yes: ev.yes, total: ev.total, verdict: ev.verdict, act });
+  S.log = S.log.slice(0, 500);
+  K.toast(act === "take" ? "✅ Saved to your journal as an open trade" : "✋ Skipped and logged. Good discipline.", 2600);
+  Object.assign(F, { sym: "", entry: "", sl: "", tgt: "", qty: "" }); S.a = {}; fill();
+}
+$("#takeBtn").addEventListener("click", () => record("take"));
+$("#skipBtn").addEventListener("click", () => record("skip"));
+K.inviteField("#invite");
+
+/* ---------- share ---------- */
+function buildText() {
+  const out = ["📋 *My pre-trade checklist*", "_I tick every box before I take a trade:_", ""];
+  GROUPS.forEach(g => { out.push(`*${g.h}*`); g.items.forEach(i => out.push(`☐ ${i.t}${i.crit ? " 🛑" : ""}`)); out.push(""); });
+  if (S.custom.length) { out.push("*⭐ My rules*"); S.custom.forEach(c => out.push(`☐ ${c.t}`)); out.push(""); }
+  out.push(`🛑 = red line: one "No" and I don't take the trade.`);
+  return [...out, ...K.signoff("checklist", "Use the checklist", "Education only · Not SEBI registered")].join("\n");
+}
+async function draw() {
+  await K.loadFonts?.();
+  const ev = evaluate(), W = 1080, rows = ev.items.length, nG = GROUPS.length + (S.custom.length ? 1 : 0), H = 230 + (S.showStock && F.sym ? 60 : 0) + 160 + nG * 66 + rows * 54 + 30 + K.footerH(true);
+  const { c, ctx } = K.canvas(W, H); K.brand(ctx);
+  K.txt(ctx, "Pre-trade checklist", 70, 190, `700 58px ${K.F.GROT}`, "#fff");
+  let y = 230;
+  if (S.showStock && F.sym) { const m = ev.m; K.txt(ctx, `${F.sym} · ${F.side === "short" ? "SHORT" : "LONG"}${m.rps ? ` · entry ${K.money(m.E)} · SL ${K.money(m.SL)}` : ""}${m.rr ? ` · R:R 1:${m.rr.toFixed(1)}` : ""}`, 70, y + 10, K.fit(ctx, `${F.sym} · ${F.side === "short" ? "SHORT" : "LONG"}${m.rps ? ` · entry ${K.money(m.E)} · SL ${K.money(m.SL)}` : ""}${m.rr ? ` · R:R 1:${m.rr.toFixed(1)}` : ""}`, 600, K.F.MONO, 28, W - 140), "#c9bcff"); y += 60; }
+  const col = { stop: "#ff5470", open: "#5b8cff", go: "#22d39a", wait: "#febc2e" }[ev.verdict], lab = { stop: "🛑 DON'T TAKE IT", open: `⏳ ${ev.open} LEFT`, go: "✅ GO", wait: "⚠️ WAIT" }[ev.verdict];
+  K.panel(ctx, 70, y, W - 140, 120, 26, col + "22", col + "88");
+  K.txt(ctx, lab, 110, y + 76, `800 52px ${K.F.GROT}`, col); K.txt(ctx, `${ev.yes}/${ev.total} ticked`, W - 110, y + 74, `700 34px ${K.F.MONO}`, "#e8ecf6", "right");
+  y += 160;
+  const groups = [...GROUPS.map(g => g.k), ...(S.custom.length ? ["custom"] : [])], names = { custom: "⭐ My rules", ...Object.fromEntries(GROUPS.map(g => [g.k, g.h])) };
+  groups.forEach(gk => {
+    K.txt(ctx, names[gk], 70, y + 24, `700 28px ${K.F.GROT}`, "#c9bcff"); y += 46;
+    ev.items.filter(i => i.g === gk).forEach(i => {
+      const mk = i.v === 1 ? ["✓", "#22d39a"] : i.v === 0 ? ["✗", "#ff5470"] : ["○", "#6c7285"];
+      K.txt(ctx, mk[0], 86, y + 28, `800 32px ${K.F.INTER}`, mk[1]);
+      ctx.font = `500 28px ${K.F.INTER}`; K.txt(ctx, K.clip(ctx, i.t, W - 300), 136, y + 28, `500 28px ${K.F.INTER}`, i.v === 0 ? "#ffb3c0" : "#e8ecf6");
+      if (i.crit) K.pill(ctx, "RED LINE", W - 70, y, "#ff5470", 16, "right");
+      y += 54;
+    });
+    y += 20;
+  });
+  K.footer(ctx, W, H, K.toolUrl("checklist"), "Discipline tool for learning · Not a recommendation · Not SEBI registered", true);
+  return c;
+}
+K.share({ text: buildText, draw, file: () => `checklist-${K.iso(K.istNow())}`, imgLabel: "Share my checklist card" });
+addEventListener("storage", e => { if (e.key === JKEY) render(); });
+addEventListener("focus", render);
+fill();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
