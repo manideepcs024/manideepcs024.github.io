@@ -53,10 +53,18 @@
   .pickb button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #cfd3df; padding: 7px 10px; border-radius: 10px; font: 600 .76rem Inter; cursor: pointer; }
   .pickb button.on { background: rgba(124,92,255,.3); border-color: #7c5cff; color: #fff; }
   .solo { grid-column: 1 / -1; border: 1px solid rgba(0,224,184,.4); background: rgba(0,224,184,.07); color: #9ff3df; border-radius: 10px; padding: 8px; font: 700 .76rem Inter; cursor: pointer; }
+  .lst { border-radius: 16px; border: 1px solid var(--line); background: rgba(0,0,0,.22); padding: 10px; margin-top: 10px; }
+  .lst-h { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) 36px 36px; gap: 6px; align-items: center; }
+  .lst select, .lr select { width: 100%; background: rgba(0,0,0,.35); color: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 9px 8px; font: 600 .82rem Inter; }
+  .lst .one { border: 1px solid rgba(0,224,184,.4); background: rgba(0,224,184,.07); border-radius: 10px; height: 36px; cursor: pointer; }
+  .lr { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, .8fr) 34px; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,.06); }
+  .lr .w3 { grid-column: span 2; }
+  .lr .field, .lst-h .field { padding: 0 9px; border-radius: 12px; } .lr .field input, .lst-h .field input { font-size: .86rem; padding: 9px 0; }
+  .lr .dd { grid-column: 1 / -1; font: 600 .7rem "JetBrains Mono"; color: var(--muted); margin-left: 4px; }
   .modes { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
   .modes button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 7px 11px; border-radius: 999px; font: 600 .76rem Inter; cursor: pointer; }
   .modes button.on { background: var(--fg); color: #000; border-color: var(--fg); }
-  @media (max-width: 560px) { .cm { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px 36px !important; } .cm > :nth-child(1) { grid-column: 1 / 3; grid-row: 1; } .cm > .one { grid-column: 3; grid-row: 1; } .cm > .rm { grid-column: 4; grid-row: 1; } .cm > :nth-child(2), .cm > :nth-child(3) { grid-row: 2; } .cm > :nth-child(6) { display: none; } .cm .pct { grid-column: 1 / -1; grid-row: 3; } .cm-head { display: none !important; } .sk { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sk .w2 { grid-column: 1 / -1; } .er { grid-template-columns: repeat(3, minmax(0, 1fr)) 34px; gap: 5px; } .er > :nth-child(1) { grid-column: 1 / 4; grid-row: 1; } .er > .rm { grid-column: 4; grid-row: 1; } .er > :nth-child(2), .er > :nth-child(3), .er > :nth-child(4) { grid-row: 2; } .er-head { display: none; } .er .field input::placeholder { font-size: .78rem; } }
+  @media (max-width: 560px) { .lst-h { grid-template-columns: minmax(0, 1fr) 36px 36px; } .lst-h > select { grid-column: 1 / -1; } .lr { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px; } .lr > :nth-child(1) { grid-column: 1 / 3; grid-row: 1; } .lr > :nth-child(4) { grid-column: 3; grid-row: 1; } .lr > :nth-child(2), .lr > :nth-child(3) { grid-row: 2; } .lr > :nth-child(5) { grid-column: 1; grid-row: 3; } .lr > :nth-child(7) { grid-column: 2; grid-row: 3; } .lr > :nth-child(6) { grid-column: 1 / -1; grid-row: 4; } .lr > .dd { grid-row: 5; } .cm { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px 36px !important; } .cm > :nth-child(1) { grid-column: 1 / 3; grid-row: 1; } .cm > .one { grid-column: 3; grid-row: 1; } .cm > .rm { grid-column: 4; grid-row: 1; } .cm > :nth-child(2), .cm > :nth-child(3) { grid-row: 2; } .cm > :nth-child(6) { display: none; } .cm .pct { grid-column: 1 / -1; grid-row: 3; } .cm-head { display: none !important; } .sk { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sk .w2 { grid-column: 1 / -1; } .er { grid-template-columns: repeat(3, minmax(0, 1fr)) 34px; gap: 5px; } .er > :nth-child(1) { grid-column: 1 / 4; grid-row: 1; } .er > .rm { grid-column: 4; grid-row: 1; } .er > :nth-child(2), .er > :nth-child(3), .er > :nth-child(4) { grid-row: 2; } .er-head { display: none; } .er .field input::placeholder { font-size: .78rem; } }
 </style>
 <link rel="manifest" href="../manifest.webmanifest" />
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
@@ -130,6 +138,12 @@
           <button class="addb" id="stkAdd">＋ Add stock</button>
         </div>
 
+        <div class="xsec">
+          <h3>📋 Stock lists <small>52-week highs/lows, breakouts…</small></h3>
+          <div id="lists"></div>
+          <div class="sets" id="listAdd" style="margin-top:10px"></div>
+        </div>
+
         <div class="q">Your view <span class="opt">optional · one or two lines</span></div>
         <textarea id="note" maxlength="240" placeholder="e.g. Banks led the recovery after a weak start. All eyes on US inflation data tonight."></textarea>
         <label class="toggle"><span>Add disclaimer<small>Not SEBI registered · information only</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
@@ -137,7 +151,7 @@
 
       <section class="card sticky">
         <div class="res-head"><h2>Market close</h2><span id="meta"></span></div>
-        <div class="modes" id="modes"><button data-m="all">📋 Full wrap</button><button data-m="com">🪙 Commodities</button><button data-m="ema">📈 EMA check</button><button data-m="stk">🔍 Stocks</button><button data-m="pick">☑️ Pick items</button></div>
+        <div class="modes" id="modes"><button data-m="all">📋 Full wrap</button><button data-m="com">🪙 Commodities</button><button data-m="ema">📈 EMA check</button><button data-m="stk">🔍 Stocks</button><button data-m="lst">📋 Lists</button><button data-m="pick">☑️ Pick items</button></div>
         <div id="pickBox"></div>
         <div id="prev"></div>
         <div class="share-row" id="shareRow"></div>
@@ -162,10 +176,11 @@ function lastSession() {
   return K.iso(d);
 }
 const blankMv = () => [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }];
+const blankLr = () => ({ n: "", c: "", p: "", lv: "", bt: "", vol: "" });
 const blankStk = () => ({ n: "", c: "", p: "", rsi: "", e50: "", e200: "", mc: "", pe: "", eps: "", note: "" });
 const S = K.store("close_v1", { date: "", mood: "auto", idx: [{ n: "NIFTY 50", c: "", ch: "" }, { n: "SENSEX", c: "", ch: "" }, { n: "BANK NIFTY", c: "", ch: "" }], gain: blankMv(), lose: blankMv(), sect: [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }], adv: "", dec: "", fii: "", dii: "", note: "", disc: true,
-  com: [{ n: "GOLD ₹/10g", c: "", ch: "" }, { n: "SILVER ₹/kg", c: "", ch: "" }, { n: "CRUDE ₹/bbl", c: "", ch: "" }], ema: [{ n: "NIFTY 50", c: "", e50: "", e200: "" }, { n: "BANK NIFTY", c: "", e50: "", e200: "" }], br200: "", br50: "", stk: [blankStk()], mode: "all", pick: [] });
-if (!S.com) S.com = []; if (!S.ema) S.ema = []; if (!S.stk) S.stk = [blankStk()]; if (!S.mode) S.mode = "all"; if (!S.pick) S.pick = [];
+  com: [{ n: "GOLD ₹/10g", c: "", ch: "" }, { n: "SILVER ₹/kg", c: "", ch: "" }, { n: "CRUDE ₹/bbl", c: "", ch: "" }], ema: [{ n: "NIFTY 50", c: "", e50: "", e200: "" }, { n: "BANK NIFTY", c: "", e50: "", e200: "" }], br200: "", br50: "", stk: [blankStk()], mode: "all", pick: [], lists: [{ t: "h52", title: "", rows: [blankLr(), blankLr()] }, { t: "bo", title: "", rows: [blankLr(), blankLr()] }] });
+if (!S.com) S.com = []; if (!S.ema) S.ema = []; if (!S.stk) S.stk = [blankStk()]; if (!S.mode) S.mode = "all"; if (!S.pick) S.pick = []; if (!S.lists) S.lists = [];
 if (!S.date || S.date < lastSession()) S.date = lastSession();
 
 /* ---------- inputs ---------- */
@@ -238,6 +253,28 @@ $("#stkAdd").onclick = () => { if (S.stk.length >= 5) { K.toast("Up to 5 stocks"
 
 $("#note").value = S.note; $("#note").addEventListener("input", e => { S.note = e.target.value; render(); });
 $("#optDisc").checked = S.disc; $("#optDisc").addEventListener("change", e => { S.disc = e.target.checked; render(); });
+const LT = { h52: ["🚀", "Fresh 52-week highs", "52W high", "#22d39a"], l52: ["📉", "Fresh 52-week lows", "52W low", "#ff5470"], ath: ["🏆", "New all-time highs", "Prev ATH", "#febc2e"], bo: ["📈", "Closed above breakout level", "Breakout", "#22d39a"], bd: ["🔻", "Closed below support", "Support", "#ff5470"], vol: ["🔊", "Volume breakouts", "Level", "#5b8cff"], gu: ["⬆️", "Gap-up stocks", "Prev close", "#22d39a"], gd: ["⬇️", "Gap-down stocks", "Prev close", "#ff5470"], cu: ["✨", "Custom list", "Level", "#b9a6ff"] };
+const BT = ["Range / consolidation", "Cup & handle", "Flag & pole", "Triangle", "VCP", "Double bottom (W)", "Inverse H&S", "Trendline breakout", "Rectangle", "Resistance / pivot", "52-week high", "All-time high", "Gap & go", "Retest of breakout", "Support breakdown", "Double top (M)", "H&S neckline break", "Trendline breakdown"];
+function drawLists() {
+  $("#lists").innerHTML = S.lists.map((L, li) => `<div class="lst" data-l="${li}"><div class="lst-h"><select data-lf="t">${Object.entries(LT).map(([k, v]) => `<option value="${k}" ${L.t === k ? "selected" : ""}>${v[0]} ${v[1]}</option>`).join("")}</select><label class="field"><input data-lf="title" type="text" maxlength="40" value="${K.esc(L.title)}" placeholder="Title (optional)" /></label><button class="one" data-lone="${li}" title="Share only this list">📤</button><button class="rm" data-lrm="${li}" title="Remove list">✕</button></div>
+    ${L.rows.map((r, ri) => `<div class="lr" data-r="${ri}"><label class="field"><input class="name" data-f="n" type="text" maxlength="20" value="${K.esc(r.n)}" placeholder="Stock" /></label><label class="field"><input data-f="c" type="text" inputmode="decimal" value="${r.c}" placeholder="Close ₹" /></label><label class="field"><input data-f="p" type="text" inputmode="decimal" value="${r.p}" placeholder="Chg %" /></label><button class="rm" data-rrm="${ri}" title="Remove">✕</button>
+      <label class="field"><input data-f="lv" type="text" inputmode="decimal" value="${r.lv}" placeholder="${LT[L.t][2]} ₹" /></label><select data-f="bt" class="w3"><option value="">Pattern / type (optional)</option>${BT.map(b => `<option ${r.bt === b ? "selected" : ""}>${b}</option>`).join("")}</select><label class="field"><input data-f="vol" type="text" inputmode="decimal" value="${r.vol}" placeholder="Vol ×" /></label><span class="dd"></span></div>`).join("")}
+    <button class="addb" data-ladd="${li}">＋ Add stock to this list</button></div>`).join("");
+  $("#listAdd").innerHTML = `<span>Add list:</span>` + ["h52", "l52", "bo", "bd", "ath", "vol", "gu", "gd", "cu"].map(k => `<button data-newl="${k}">${LT[k][0]} ${LT[k][1].replace("Closed above breakout level", "Breakouts").replace("Closed below support", "Breakdowns")}</button>`).join("");
+}
+$("#lists").addEventListener("input", e => { const L = S.lists[+e.target.closest(".lst")?.dataset.l]; if (!L) return; const lf = e.target.dataset.lf, f = e.target.dataset.f;
+  if (lf) { L[lf] = e.target.value; if (lf === "t") { drawLists(); } render(); return; }
+  const r = L.rows[+e.target.closest(".lr").dataset.r]; if (f === "p") K.fmtNum(e.target, 2, true); else if (["c", "lv", "vol"].includes(f)) K.fmtNum(e.target, 2); r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render(); });
+$("#lists").addEventListener("change", e => { if (e.target.tagName === "SELECT") e.target.dispatchEvent(new Event("input", { bubbles: true })); });
+$("#lists").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; const li = +b.closest(".lst").dataset.l, L = S.lists[li];
+  if (b.dataset.ladd != null) { if (L.rows.length >= 12) { K.toast("Up to 12 stocks per list"); return; } L.rows.push(blankLr()); drawLists(); }
+  else if (b.dataset.rrm != null) { L.rows.splice(+b.dataset.rrm, 1); if (!L.rows.length) L.rows.push(blankLr()); drawLists(); render(); }
+  else if (b.dataset.lrm != null) { S.lists.splice(li, 1); S.pick = S.pick.filter(k => !k.startsWith("lst:")); drawLists(); render(); }
+  else if (b.dataset.lone != null) { if (!L.rows.some(r => r.n.trim())) { K.toast("Add at least one stock to this list"); return; } S.mode = "pick"; S.pick = ["lst:" + li]; render(); $("#prev").scrollIntoView({ behavior: "smooth", block: "center" }); K.toast("Ready: share this list below"); } });
+$("#listAdd").addEventListener("click", e => { const b = e.target.closest("[data-newl]"); if (!b) return; if (S.lists.length >= 6) { K.toast("Up to 6 lists"); return; } S.lists.push({ t: b.dataset.newl, title: "", rows: [blankLr(), blankLr()] }); drawLists(); render(); });
+function lstData() { return S.lists.map((L, i) => { const rows = L.rows.map(r => { const n = (r.n || "").trim(); if (!n) return null; const c = K.num(r.c), p = K.num(r.p), lv = K.num(r.lv), vol = K.num(r.vol); return { n, c, p, lv, bt: r.bt || "", vol, d: c > 0 && lv > 0 ? (c / lv - 1) * 100 : null }; }).filter(Boolean);
+  const T = LT[L.t] || LT.cu; return { i, t: L.t, emo: T[0], col: T[3], lvl: T[2], title: (L.title || "").trim() || T[1], rows }; }).filter(l => l.rows.length); }
+const lrDetail = (l, r) => [r.lv > 0 ? `${l.lvl} ₹${K.nf(r.lv)}${r.d != null ? ` (${r.d >= 0 ? "+" : "−"}${Math.abs(r.d).toFixed(1)}%)` : ""}` : "", r.bt, r.vol > 0 ? `Vol ${+r.vol.toFixed(1)}×` : ""].filter(Boolean).join(" · ");
 $("#modes").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (!b) return; S.mode = b.dataset.m; render(); });
 $("#pickBox").addEventListener("click", e => { const b = e.target.closest("[data-pk]"); if (!b) return; const k = b.dataset.pk;
   if (k === "__clear") S.pick = []; else if (k === "__all") S.pick = pickables().map(x => x[0]); else S.pick = S.pick.includes(k) ? S.pick.filter(x => x !== k) : [...S.pick, k]; render(); });
@@ -285,26 +322,27 @@ function data() {
   let br200 = K.num(S.br200), br50 = K.num(S.br50);
   const lead = idx.find(x => !x.vix);
   let mood = S.mood; if (mood === "auto") mood = !lead ? "flat" : lead.p > .25 ? "bull" : lead.p < -.25 ? "bear" : "flat";
-  const stk = stkData(), P = S.mode === "pick", pk = (t, n) => S.pick.includes(t + ":" + n);
+  const stk = stkData(), lst = lstData(), P = S.mode === "pick", pk = (t, n) => S.pick.includes(t + ":" + n);
   const fCom = P ? com.filter(x => pk("com", x.n)) : com, fEma = P ? ema.filter(x => pk("ema", x.n)) : ema, fStk = P ? stk.filter(x => pk("stk", x.n)) : stk;
   if (P) { br200 = NaN; br50 = NaN; }
-  return { idx, com: fCom, ema: fEma, stk: fStk, allCom: com, allEma: ema, allStk: stk, br200: br200 >= 0 && br200 <= 100 ? br200 : NaN, br50: br50 >= 0 && br50 <= 100 ? br50 : NaN, gain: mv(S.gain), lose: mv(S.lose), sect: mv(S.sect).sort((a, b) => b.p - a.p), adv: adv >= 0 ? adv : NaN, dec: dec >= 0 ? dec : NaN, fii, dii, mood };
+  return { idx, com: fCom, ema: fEma, stk: fStk, lst: P ? lst.filter(l => pk("lst", l.i)) : lst, allLst: lst, allCom: com, allEma: ema, allStk: stk, br200: br200 >= 0 && br200 <= 100 ? br200 : NaN, br50: br50 >= 0 && br50 <= 100 ? br50 : NaN, gain: mv(S.gain), lose: mv(S.lose), sect: mv(S.sect).sort((a, b) => b.p - a.p), adv: adv >= 0 ? adv : NaN, dec: dec >= 0 ? dec : NaN, fii, dii, mood };
 }
 const MOOD = { bull: ["BULLISH DAY", "#22d39a", "🟢"], flat: ["FLAT / MIXED DAY", "#c9cfdb", "⚪"], bear: ["BEARISH DAY", "#ff5470", "🔴"] };
-const MODE = { all: "MARKET CLOSE", com: "COMMODITIES", ema: "TREND CHECK · 50 & 200 EMA", stk: "STOCKS IN FOCUS" };
+const MODE = { all: "MARKET CLOSE", com: "COMMODITIES", ema: "TREND CHECK · 50 & 200 EMA", stk: "STOCKS IN FOCUS", lst: "STOCK LISTS" };
 const arrow = v => v > 0 ? "▲" : v < 0 ? "▼" : "•";
 const col = (v, vix) => (vix ? -v : v) > 0 ? "up" : (vix ? -v : v) < 0 ? "down" : "";
 const crore = v => `${K.sgn(v)}₹${K.nf(Math.abs(v), 2).replace(/\.00$/, "")} cr`;
 const niceD = () => K.niceDate(S.date);
-const has = (D, k) => k === "com" ? D.com.length > 0 : k === "ema" ? D.ema.length > 0 || !isNaN(D.br200) || !isNaN(D.br50) : k === "stk" ? D.stk.length > 0 : D.idx.length > 0;
+const has = (D, k) => k === "com" ? D.com.length > 0 : k === "ema" ? D.ema.length > 0 || !isNaN(D.br200) || !isNaN(D.br50) : k === "stk" ? D.stk.length > 0 : k === "lst" ? D.lst.length > 0 : D.idx.length > 0;
 const show = (D, k) => (S.mode === "all" || S.mode === k || S.mode === "pick") && has(D, k);
-const secs = D => ["com", "ema", "stk"].filter(k => show(D, k));
+const secs = D => ["com", "ema", "stk", "lst"].filter(k => show(D, k));
 const multi = D => S.mode === "all" || (S.mode === "pick" && secs(D).length > 1);
-const SEC_EMO = { com: "🪙", ema: "📈", stk: "🔍" }, SEC_COL = { com: "#febc2e", ema: "#7c5cff", stk: "#00e0b8" };
-function title(D) { if (S.mode !== "pick") return MODE[S.mode]; const s = secs(D); if (s.length !== 1) return "MARKET UPDATE"; if (s[0] === "stk") return D.stk.length === 1 ? "STOCK IN FOCUS" : "STOCKS IN FOCUS"; if (s[0] === "com") return D.com.length === 1 ? D.com[0].n.replace(/\s*[₹$].*$/, "") + " UPDATE" : D.com.every(x => /GOLD|SILVER/.test(x.n)) ? "GOLD & SILVER" : "COMMODITIES"; return MODE.ema; }
+const SEC_EMO = { com: "🪙", ema: "📈", stk: "🔍", lst: "📋" }, SEC_COL = { com: "#febc2e", ema: "#7c5cff", stk: "#00e0b8", lst: "#5b8cff" };
+function title(D) { if (S.mode === "lst" || (S.mode === "pick" && secs(D).length === 1 && secs(D)[0] === "lst")) return D.lst.length === 1 ? D.lst[0].title.toUpperCase() : "STOCK LISTS"; if (S.mode !== "pick") return MODE[S.mode]; const s = secs(D); if (s.length !== 1) return "MARKET UPDATE"; if (s[0] === "stk") return D.stk.length === 1 ? "STOCK IN FOCUS" : "STOCKS IN FOCUS"; if (s[0] === "com") return D.com.length === 1 ? D.com[0].n.replace(/\s*[₹$].*$/, "") + " UPDATE" : D.com.every(x => /GOLD|SILVER/.test(x.n)) ? "GOLD & SILVER" : "COMMODITIES"; return MODE.ema; }
+const lstHead = D => multi(D) || D.lst.length > 1;
 const secKey = D => S.mode === "pick" ? (secs(D).length === 1 ? secs(D)[0] : "") : S.mode;
 const cur = n => /\$/.test(n) ? "$" : /₹/.test(n) ? "₹" : "";
-function pickables() { const D = data(); return [...D.allCom.map(x => ["com:" + x.n, "🪙 " + x.n]), ...D.allEma.map(x => ["ema:" + x.n, "📈 " + x.n]), ...D.allStk.map(x => ["stk:" + x.n, "🔍 " + x.n])]; }
+function pickables() { const D = data(); return [...D.allCom.map(x => ["com:" + x.n, "🪙 " + x.n]), ...D.allEma.map(x => ["ema:" + x.n, "📈 " + x.n]), ...D.allStk.map(x => ["stk:" + x.n, "🔍 " + x.n]), ...D.allLst.map(l => ["lst:" + l.i, `${l.emo} ${l.title} (${l.rows.length})`])]; }
 
 function render() {
   const D = data();
@@ -312,11 +350,12 @@ function render() {
   document.querySelectorAll(".er").forEach(row => { const r = S.ema[+row.dataset.i], st = r && emaState(K.num(r.c), K.num(r.e50), K.num(r.e200)); row.querySelector(".est").innerHTML = st ? `${st.e} ${st.t}${st.d200 != null ? ` · ${dpct(st.d200)} vs 200 EMA` : ""}${st.d50 != null ? ` · ${dpct(st.d50)} vs 50 EMA` : ""}` : ""; });
   document.querySelectorAll(".sk").forEach(row => { const r = S.stk[+row.dataset.i]; if (!r) return; const s = stkData().find(x => x.n === (r.n || "").trim()); const el = row.querySelector(".tags"); if (!s) { el.innerHTML = ""; return; }
     el.innerHTML = tagsOf(s).map(([t, k]) => `<span class="tg ${k}">${K.esc(t)}</span>`).join("") + (s.peAuto ? `<span class="tg">P/E ${s.pe.toFixed(1)} (auto)</span>` : "") + (s.epsAuto ? `<span class="tg">EPS ₹${K.nf(s.eps, 2)} (auto)</span>` : ""); });
+  document.querySelectorAll(".lst").forEach(el => { const L = S.lists[+el.dataset.l]; if (!L) return; const T = LT[L.t]; el.querySelectorAll(".lr").forEach(row => { const r = L.rows[+row.dataset.r], c = K.num(r.c), lv = K.num(r.lv); row.querySelector(".dd").textContent = c > 0 && lv > 0 ? `${(c / lv - 1) * 100 >= 0 ? "+" : "−"}${Math.abs((c / lv - 1) * 100).toFixed(1)}% vs ${T[2].toLowerCase()}` : ""; }); });
   $("#modes").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.m === S.mode));
   $("#meta").textContent = niceD();
   if (S.mode === "pick") { const pk = pickables(); $("#pickBox").innerHTML = `<div class="pickb"><div class="lb2">TAP WHAT TO SHARE</div><div class="cs">${pk.length ? pk.map(([k, l]) => `<button data-pk="${K.esc(k)}" class="${S.pick.includes(k) ? "on" : ""}">${K.esc(l)}</button>`).join("") + `<button data-pk="__all">All</button><button data-pk="__clear">Clear</button>` : `<span style="font-size:.82rem;color:var(--muted)">Fill in commodities, EMA rows or stocks first.</span>`}</div></div>`; } else $("#pickBox").innerHTML = "";
   const any = S.mode === "all" ? D.idx.length > 0 : S.mode === "pick" ? secs(D).length > 0 : has(D, S.mode);
-  if (!any) { $("#prev").innerHTML = `<div class="placeholder">${{ all: "Enter at least one index close to build the card.", com: "Enter at least one commodity price.", ema: "Enter a price and its 50 or 200 EMA.", stk: "Enter at least one stock name.", pick: "Tap the items above to choose what to share." }[S.mode]}</div>`; S.save(); return; }
+  if (!any) { $("#prev").innerHTML = `<div class="placeholder">${{ all: "Enter at least one index close to build the card.", com: "Enter at least one commodity price.", ema: "Enter a price and its 50 or 200 EMA.", stk: "Enter at least one stock name.", lst: "Add stocks to a list (52-week highs, breakouts…).", pick: "Tap the items above to choose what to share." }[S.mode]}</div>`; S.save(); return; }
   let h = "";
   if (S.mode === "all") { const [ml, mc] = MOOD[D.mood];
     h += `<span class="mood" style="color:${mc};background:${mc}1f;border:1px solid ${mc}66">${ml}</span><div class="prev-idx">`;
@@ -332,6 +371,7 @@ function render() {
   if (show(D, "ema")) { h += (multi(D) ? `<div class="ph">📈 TREND CHECK · 50 &amp; 200 EMA</div>` : "") + `<div class="prev-idx">` + D.ema.map(x => `<div class="pi"><span><b>${x.st.e} ${K.esc(x.n)}</b><span class="sub2">${x.st.t}${x.st.cross ? " · " + x.st.cross : ""}</span></span><div class="v">${K.nf(x.c)}<small style="color:var(--muted)">${x.st.d200 != null ? dpct(x.st.d200) + " vs 200" : dpct(x.st.d50) + " vs 50"}</small></div></div>`).join("") + "</div>";
     if (!isNaN(D.br200) || !isNaN(D.br50)) h += `<div class="stats">${!isNaN(D.br200) ? `<div class="stat"><span>Stocks above 200 EMA</span><b class="${D.br200 >= 50 ? "up" : "down"}">${D.br200}%</b></div>` : ""}${!isNaN(D.br50) ? `<div class="stat"><span>Stocks above 50 EMA</span><b class="${D.br50 >= 50 ? "up" : "down"}">${D.br50}%</b></div>` : ""}</div>`; }
   if (show(D, "stk")) h += (multi(D) ? `<div class="ph">🔍 STOCKS IN FOCUS</div>` : "") + `<div class="prev-idx">` + D.stk.map(s => `<div class="pi" style="grid-template-columns:1fr"><div style="display:flex;justify-content:space-between;gap:8px"><b>${K.esc(s.n)}</b>${s.c > 0 ? `<span class="v">₹${K.nf(s.c)}${!isNaN(s.p) ? ` <small class="${col(s.p)}" style="display:inline">${K.pct(s.p)}</small>` : ""}</span>` : ""}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${tagsOf(s).map(([t, k]) => `<span class="tg ${k}">${K.esc(t)}</span>`).join("")}</div>${metricsOf(s).length ? `<span class="sub2" style="font-family:'JetBrains Mono'">${metricsOf(s).join(" · ")}</span>` : ""}${s.note ? `<span class="sub2" style="color:#d5d8e3">📝 ${K.esc(s.note)}</span>` : ""}</div>`).join("") + "</div>";
+  if (show(D, "lst")) D.lst.forEach(l => { h += (lstHead(D) ? `<div class="ph" style="color:${l.col}">${l.emo} ${K.esc(l.title.toUpperCase())} (${l.rows.length})</div>` : "") + `<div class="prev-idx">` + l.rows.map(r => `<div class="pi"><span><b>${K.esc(r.n)}</b>${lrDetail(l, r) ? `<span class="sub2">${K.esc(lrDetail(l, r))}</span>` : ""}</span><div class="v">${r.c > 0 ? "₹" + K.nf(r.c) : ""}${!isNaN(r.p) ? `<small class="${col(r.p)}">${K.pct(r.p)}</small>` : ""}</div></div>`).join("") + "</div>"; });
   if (S.note.trim()) h += `<div class="tip" style="color:#d5d8e3">📝 ${K.esc(S.note.trim())}</div>`;
   $("#prev").innerHTML = h; S.save();
 }
@@ -340,7 +380,7 @@ function render() {
 function valid() { const D = data();
   if (S.mode === "all") { if (D.idx.length) return true; K.shake($("#idx .field:nth-child(2)")); K.toast("Enter at least one index close"); return false; }
   if (S.mode === "pick") { if (secs(D).length) return true; K.toast("Tap at least one item to share"); return false; }
-  if (has(D, S.mode)) return true; K.toast({ com: "Enter at least one commodity price", ema: "Enter a price and its 50/200 EMA", stk: "Enter at least one stock" }[S.mode]); return false; }
+  if (has(D, S.mode)) return true; K.toast({ com: "Enter at least one commodity price", ema: "Enter a price and its 50/200 EMA", stk: "Enter at least one stock", lst: "Add at least one stock to a list" }[S.mode]); return false; }
 function buildText() {
   const D = data(), out = [];
   if (S.mode === "all") { const [ml, , me] = MOOD[D.mood]; out.push(`🔔 *MARKET CLOSE* · ${niceD()}`, `${me} _${ml.charAt(0) + ml.slice(1).toLowerCase()}_`, "");
@@ -350,13 +390,14 @@ function buildText() {
     if (D.sect.length) out.push("", `🏭 *Sectors:* ${D.sect.map(s => `${s.n} ${K.pct(s.p)}`).join(" · ")}`);
     if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) out.push(`📊 *Breadth:* ${K.qty(D.adv)} advances / ${K.qty(D.dec)} declines`);
     if (!isNaN(D.fii) || !isNaN(D.dii)) out.push(`💰 *FII:* ${isNaN(D.fii) ? "—" : crore(D.fii)} · *DII:* ${isNaN(D.dii) ? "—" : crore(D.dii)} _(provisional)_`);
-  } else out.push(`${SEC_EMO[secKey(D)] || "📊"} *${title(D)}* · ${niceD()}`);
+  } else out.push(`${secKey(D) === "lst" && D.lst.length === 1 ? D.lst[0].emo : SEC_EMO[secKey(D)] || "📊"} *${title(D)}* · ${niceD()}`);
   if (show(D, "com")) { out.push("", multi(D) ? "🪙 *Commodities & currency*" : ""); D.com.forEach(x => out.push(`${x.ch > 0 ? "🟢" : x.ch < 0 ? "🔴" : "⚪"} *${x.n}*: ${cur(x.n)}${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`)); }
   if (show(D, "ema")) { out.push("", multi(D) ? "📈 *Trend check (50 & 200 EMA)*" : "");
     D.ema.forEach(x => out.push(`${x.st.e} *${x.n}* ${K.nf(x.c)}: ${x.st.t}${x.st.d200 != null ? ` (${dpct(x.st.d200)} vs 200 EMA)` : x.st.d50 != null ? ` (${dpct(x.st.d50)} vs 50 EMA)` : ""}`));
     if (!isNaN(D.br200) || !isNaN(D.br50)) out.push(`📊 Stocks above 200 EMA: ${isNaN(D.br200) ? "—" : D.br200 + "%"} · above 50 EMA: ${isNaN(D.br50) ? "—" : D.br50 + "%"}`); }
   if (show(D, "stk")) { out.push("", multi(D) ? "🔍 *Stocks in focus*" : "");
     D.stk.forEach(s => { out.push(`▪️ *${s.n}*${s.c > 0 ? ` ₹${K.nf(s.c)}` : ""}${!isNaN(s.p) ? ` (${K.pct(s.p)})` : ""}`); const t = tagsOf(s).map(x => x[0]); if (t.length) out.push(`   ${t.join(" · ")}`); const m = metricsOf(s); if (m.length) out.push(`   ${m.join(" · ")}`); if (s.note) out.push(`   📝 ${K.clean(s.note)}`); }); }
+  if (show(D, "lst")) D.lst.forEach(l => { out.push("", lstHead(D) ? `${l.emo} *${l.title}* (${l.rows.length})` : ""); l.rows.forEach(r => { const d = lrDetail(l, r); out.push(`▪️ *${r.n}*${r.c > 0 ? ` ₹${K.nf(r.c)}` : ""}${!isNaN(r.p) ? ` (${K.pct(r.p)})` : ""}${d ? ` · ${d}` : ""}`); }); });
   if (S.note.trim()) out.push("", `📝 ${K.clean(S.note)}`);
   return out.filter((l, i, a) => !(l === "" && (i === 0 || a[i - 1] === ""))).concat(K.signoff("close", "Daily wrap", S.disc ? "⚠️ _Information only, not investment advice. Not SEBI registered._" : "")).join("\n");
 }
@@ -372,7 +413,8 @@ async function draw() {
   const brE = !isNaN(D.br200) || !isNaN(D.br50), emaH = show(D, "ema") ? emaT + D.ema.length * 84 + (brE ? 64 : 0) + 6 : 0;
   m.font = `400 24px ${K.F.INTER}`; const skNotes = D.stk.map(s => s.note ? K.cap(K.wrap(m, "📝 " + K.clean(s.note), W - 260), 2) : []);
   const skH = show(D, "stk") ? (multi(D) ? 76 : 6) + D.stk.reduce((a, s, i) => a + 150 + (metricsOf(s).length ? 34 : 0) + skNotes[i].length * 32 + 14, 0) : 0;
-  const blocks = [mvH, sectH, brH, flowH, comH, emaH, skH, noteH].filter(Boolean);
+  const lH = lstHead(D) ? 80 : 24, lstH = show(D, "lst") ? D.lst.reduce((a, l) => a + lH + l.rows.length * 76 + 18, 0) - 18 : 0;
+  const blocks = [mvH, sectH, brH, flowH, comH, emaH, skH, lstH, noteH].filter(Boolean);
   const top = all ? 360 : 320, H = top + idxH + blocks.reduce((a, b) => a + b + 20, 0) + 20 + K.footerH(true);
   const [ml, mc] = MOOD[D.mood], gc = all ? mc : SEC_COL[secKey(D)] || "#00e0b8";
   const { c, ctx } = K.canvas(W, H, [[gc + "33", .9, .08, .55], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .55]]);
@@ -450,6 +492,16 @@ async function draw() {
       skNotes[i].forEach(l => { K.txt(ctx, l, 100, ly, `400 24px ${K.F.INTER}`, "#d5d8e3"); ly += 32; });
       sy += hh + 14; });
   });
+  if (lstH) block(lstH, by => {
+    let ly = by; D.lst.forEach(l => { const ph = lH + l.rows.length * 76; K.panel(ctx, 70, ly, W - 140, ph, 22, l.col + "0d", l.col + "55");
+      if (lH > 24) K.txt(ctx, `${l.emo} ${l.title.toUpperCase()} (${l.rows.length})`, 100, ly + 50, K.fit(ctx, `${l.emo} ${l.title.toUpperCase()} (${l.rows.length})`, 700, K.F.MONO, 24, W - 200), l.col);
+      l.rows.forEach((r, k) => { const ry = ly + lH + k * 76; if (k) { ctx.strokeStyle = "rgba(255,255,255,.07)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(100, ry - 6); ctx.lineTo(W - 100, ry - 6); ctx.stroke(); }
+        ctx.font = K.fit(ctx, r.n, 700, K.F.GROT, 30, 470); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(r.n, 100, ry + 26);
+        if (r.c > 0) K.txt(ctx, "₹" + K.nf(r.c), !isNaN(r.p) ? W - 250 : W - 100, ry + 26, `700 28px ${K.F.MONO}`, "#ffffff", "right");
+        if (!isNaN(r.p)) K.txt(ctx, K.pct(r.p), W - 100, ry + 26, `700 26px ${K.F.MONO}`, r.p > 0 ? "#22d39a" : r.p < 0 ? "#ff5470" : "#c9cfdb", "right");
+        const d = lrDetail(l, r); if (d) { ctx.font = K.fit(ctx, d, 500, K.F.INTER, 22, W - 200); ctx.fillStyle = "#b9c0d0"; ctx.textAlign = "left"; ctx.fillText(d, 100, ry + 58); } });
+      ly += ph + 18; });
+  });
   if (noteH) block(noteH, (by, h) => {
     K.panel(ctx, 70, by, W - 140, h, 22, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
     K.txt(ctx, "VIEW", 100, by + 46, `600 22px ${K.F.MONO}`, "#b6a6ff");
@@ -460,7 +512,7 @@ async function draw() {
 }
 K.share({ text: buildText, valid, draw, file: () => (S.mode === "all" ? "market-close-" : "market-" + (secKey(data()) || "update") + "-") + S.date });
 
-drawIdx(); drawCom(); drawEma(); drawStk(); render();
+drawIdx(); drawCom(); drawEma(); drawStk(); drawLists(); render();
 </script>
 <script src="../assets/pwa.js" defer></script>
 </body>
