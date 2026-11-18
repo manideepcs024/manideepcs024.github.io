@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Trade Reports — upload your Zerodha Console tradebook &amp; P&amp;L, get full analysis</title>
+<meta name="description" content="Upload your Zerodha Console tradebook and P&amp;L files (Excel or CSV) and get a complete trading report: win rate, profit factor, monthly P&amp;L, equity curve, best and worst stocks, intraday vs delivery, holding periods, charges and MTF interest, behaviour insights like revenge trading and holding losers, plus a shareable report card. Files are processed only on your device." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #7c5cff; }
+  .wrap { max-width: 1180px; }
+  .priv { display: inline-flex; gap: 8px; align-items: center; margin-top: 10px; padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(34,211,154,.45); background: rgba(34,211,154,.08); font: 600 .8rem Inter; color: #9ff3d5; }
+  .drop { display: block; margin-top: 16px; border-radius: 24px; border: 2px dashed rgba(0,224,184,.45); background: linear-gradient(135deg, rgba(0,224,184,.06), rgba(124,92,255,.06)); padding: 24px; text-align: center; cursor: pointer; transition: background .2s, border-color .2s; }
+  .drop.over { background: rgba(0,224,184,.14); border-color: var(--acc); }
+  .drop .ic { font-size: 2.4rem; } .drop h3 { font: 800 1.2rem "Space Grotesk"; margin-top: 6px; } .drop p { color: var(--muted); font-size: .86rem; margin-top: 4px; line-height: 1.5; }
+  .files { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .files span { padding: 7px 11px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); font-size: .8rem; color: #dfe3ee; }
+  .files span b { color: var(--acc); }
+  .bar3 { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+  .bar3 .btn { padding: 10px 14px; font-size: .86rem; }
+  .how { margin-top: 12px; border-radius: 18px; border: 1px solid var(--line); background: var(--card); padding: 14px 16px; font-size: .86rem; color: #cfd3df; line-height: 1.6; }
+  .how ol { padding-left: 20px; }
+  .rep { display: none; } .rep.on { display: block; }
+  .per { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
+  .per button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 600 .8rem Inter; cursor: pointer; }
+  .per button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .demo { margin-top: 12px; padding: 10px 14px; border-radius: 14px; background: rgba(254,188,46,.1); border: 1px solid rgba(254,188,46,.45); color: #ffd98a; font-size: .86rem; }
+  .sec2 { margin-top: 26px; } .sec2 > h2 { font: 800 1.35rem "Space Grotesk"; margin-bottom: 4px; } .sec2 > p.l { color: var(--muted); font-size: .86rem; margin-bottom: 12px; line-height: 1.5; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .kp { border-radius: 18px; padding: 14px; border: 1px solid var(--line); background: var(--card); }
+  .kp span { display: block; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); }
+  .kp b { display: block; font: 800 1.45rem "Space Grotesk"; margin-top: 4px; } .kp small { font-size: .76rem; color: var(--muted); }
+  .kp.big { grid-column: span 2; background: linear-gradient(135deg, rgba(0,224,184,.1), rgba(124,92,255,.07)); border-color: rgba(0,224,184,.4); } .kp.big b { font-size: 2rem; }
+  .cardx { border-radius: 20px; border: 1px solid var(--line); background: var(--card); padding: 14px; }
+  .cardx svg { width: 100%; height: auto; display: block; }
+  .g2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  table.t { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  .t th, .t td { padding: 8px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  .t th { font: 700 .62rem "JetBrains Mono"; letter-spacing: .05em; color: var(--muted); cursor: default; }
+  .t th:first-child, .t td:first-child { text-align: left; }
+  .t td.s { font-weight: 700; color: #fff; }
+  .tw { overflow-x: auto; }
+  .ins { display: grid; gap: 8px; }
+  .ins div { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); font-size: .88rem; color: #dfe3ee; line-height: 1.5; }
+  .ins div.bad { border-color: rgba(255,84,112,.4); background: rgba(255,84,112,.05); } .ins div.good { border-color: rgba(34,211,154,.4); background: rgba(34,211,154,.05); } .ins div.warn { border-color: rgba(254,188,46,.4); background: rgba(254,188,46,.05); }
+  .ins span:first-child { font-size: 1.35rem; } .ins b { color: #fff; }
+  .split3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .split3 > div { border-radius: 18px; padding: 14px; border: 1px solid var(--line); background: var(--card); font-size: .84rem; color: #cfd3df; display: grid; gap: 4px; }
+  .split3 h4 { font: 800 1rem "Space Grotesk"; color: #fff; } .split3 .v { font: 800 1.3rem "Space Grotesk"; }
+  .hb { display: grid; gap: 5px; }
+  .hb div { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr) 92px; gap: 8px; align-items: center; font-size: .82rem; }
+  .hb .tr { height: 12px; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; } .hb .tr i { display: block; height: 100%; border-radius: 99px; }
+  .hb b { font: 700 .78rem "JetBrains Mono"; text-align: right; }
+  .tl-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .tl-tools input { background: rgba(0,0,0,.3); border: 1px solid var(--line); color: #fff; border-radius: 12px; padding: 9px 12px; font: 500 .86rem Inter; }
+  .pg { display: flex; gap: 6px; justify-content: center; margin-top: 10px; } .pg button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #fff; border-radius: 10px; padding: 7px 12px; cursor: pointer; }
+  .tag2 { font: 700 .6rem "JetBrains Mono"; padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,.07); color: #cfd3df; }
+  .tag2.i { color: #8fb0ff; background: rgba(91,140,255,.14); } .tag2.d { color: #9ff3d5; background: rgba(0,224,184,.12); } .tag2.sh { color: #ffb3c0; background: rgba(255,84,112,.12); }
+  @media (max-width: 860px) { .kpis { grid-template-columns: 1fr 1fr; } .kp.big { grid-column: 1 / -1; } .g2, .split3 { grid-template-columns: 1fr; } .hb div { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 84px; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../report-card/">📝 Report card</a><a href="../journal/">📓 Journal</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Your trades, <span class="grad">fully analysed.</span></h1>
+    <p class="sub">Upload your <b>Zerodha Console</b> tradebook and P&amp;L files. Get win rate, monthly P&amp;L, equity curve, best and worst stocks, intraday vs delivery, charges, MTF interest and honest behaviour insights.</p>
+    <div class="priv">🔒 Your files never leave this device. Everything is calculated in your browser.</div>
+
+    <label class="drop" id="drop"><input type="file" id="file" accept=".xlsx,.csv" multiple hidden /><div class="ic">📂</div><h3>Drop or tap to upload files</h3><p>Tradebook (Equity or F&amp;O) and P&amp;L statement · Excel (.xlsx) or CSV · several files at once is fine</p></label>
+    <div class="files" id="files"></div>
+    <div class="bar3"><button class="btn" id="demoB">🎲 Try with demo data</button><label class="toggle" style="margin:0;flex:1;min-width:240px"><span>Remember on this device<small>Saved only in this browser</small></span><input type="checkbox" id="rem" /><span class="sw"></span></label><button class="btn" id="clearB">🗑️ Clear data</button></div>
+    <details class="how"><summary style="cursor:pointer;font-weight:700;color:#fff">📥 How to download the files from Zerodha Console</summary><ol style="margin-top:8px"><li>Open <b>console.zerodha.com</b> and log in.</li><li><b>Reports → Tradebook</b>: choose segment (Equity / F&amp;O), pick the date range, and download as <b>XLSX</b> or CSV.</li><li><b>Reports → P&amp;L</b>: choose the same segment and range, and download as <b>XLSX</b> (it includes charges and other debits).</li><li>Upload both here. Add more tradebooks (other years or F&amp;O) anytime; duplicate trades are skipped automatically.</li></ol></details>
+
+    <div class="rep" id="rep">
+      <div id="demoNote"></div>
+      <div class="per" id="per"></div>
+      <div class="kpis" id="kpis"></div>
+
+      <section class="sec2"><h2>📈 Equity curve</h2><p class="l">Cumulative realised P&amp;L from closed trades (before charges), by exit date. Shaded red = drawdown from the previous peak.</p><div class="cardx" id="curve"></div></section>
+
+      <section class="sec2"><h2>🧠 Behaviour insights</h2><p class="l">Patterns in how you trade, not just what you made.</p><div class="ins" id="ins"></div></section>
+
+      <section class="sec2"><h2>📅 Month by month</h2><div class="g2"><div class="cardx" id="mBars"></div><div class="cardx tw"><table class="t" id="mTab"></table></div></div></section>
+
+      <section class="sec2"><h2>⚖️ Intraday vs delivery vs short</h2><div class="split3" id="split"></div></section>
+
+      <section class="sec2"><h2>🏆 Stocks: best and worst</h2><p class="l" id="symNote"></p><div class="g2"><div class="cardx tw"><table class="t" id="topW"></table></div><div class="cardx tw"><table class="t" id="topL"></table></div></div></section>
+
+      <section class="sec2"><h2>🗓️ When you trade best</h2><div class="g2"><div class="cardx"><div style="font:700 .68rem 'JetBrains Mono';color:var(--muted);margin-bottom:8px">BY DAY OF ENTRY</div><div class="hb" id="wd"></div></div><div class="cardx"><div style="font:700 .68rem 'JetBrains Mono';color:var(--muted);margin-bottom:8px">BY ENTRY TIME</div><div class="hb" id="hr"></div></div></div></section>
+
+      <section class="sec2" id="chgSec"><h2>💸 Charges &amp; other costs</h2><p class="l" id="chgNote"></p><div class="g2"><div class="cardx" id="chg"></div><div class="cardx" id="oth"></div></div></section>
+
+      <section class="sec2"><h2>📦 Open positions</h2><p class="l" id="opNote"></p><div class="cardx tw"><table class="t" id="opTab"></table></div></section>
+
+      <section class="sec2"><h2>📜 All trades</h2><p class="l">Each row is one full trade: from opening a position to closing it (fills of the same order are combined; multiple buys/sells are matched first-in-first-out).</p>
+        <div class="tl-tools"><input id="q" type="search" placeholder="Search symbol…" /><div class="per" id="tf" style="margin:0"></div></div>
+        <div class="cardx tw"><table class="t" id="tl"></table><div class="pg" id="pg"></div></div>
+        <p class="l" id="unm" style="margin-top:10px"></p></section>
+
+      <section class="sec2"><h2>📤 Share your report card</h2>
+        <label class="toggle" style="max-width:560px"><span>Hide ₹ amounts on the card<small>Shows % and ratios only: safe to post in groups</small></span><input type="checkbox" id="hide" /><span class="sw"></span></label>
+        <div class="share-row card" id="shareRow" style="max-width:560px;margin:10px 0 0;padding:14px"></div></section>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Note:</b> Trade-level P&amp;L is rebuilt from your tradebook using first-in-first-out matching and <b>excludes charges</b>; your <b>official</b> figures are in the broker's P&amp;L statement (shown in the charges section when uploaded). Positions bought before the tradebook's start date can't be matched and are listed separately. Not affiliated with Zerodha. For personal analysis and <b>education</b> only; not tax or investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const S = K.store("tradereports_v1", { remember: true, hide: false, per: "all", data: null, tf: "all" });
+let DATA = S.remember && S.data ? S.data : { ex: [], pnl: null, files: [], demo: false }, A = null, page = 0;
+const UP = "#22d39a", DN = "#ff5470", M = "#8b93a7";
+/* ---------- file reading (zip + xlsx + csv, no libraries) ---------- */
+async function unzip(buf) { const dv = new DataView(buf), u8 = new Uint8Array(buf); let e = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 70000); i--) if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error("Not a valid .xlsx file"); const n = dv.getUint16(e + 10, true); let p = dv.getUint32(e + 16, true); const files = {}, td = new TextDecoder();
+  for (let k = 0; k < n; k++) { if (dv.getUint32(p, true) !== 0x02014b50) break; const m = dv.getUint16(p + 10, true), cs = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lo = dv.getUint32(p + 42, true);
+    const name = td.decode(u8.subarray(p + 46, p + 46 + nl)), lnl = dv.getUint16(lo + 26, true), lel = dv.getUint16(lo + 28, true), ds = lo + 30 + lnl + lel; files[name] = { m, data: u8.subarray(ds, ds + cs) }; p += 46 + nl + el + cl; }
+  return files; }
+async function inflate(f) { if (!f) return ""; if (f.m === 0) return new TextDecoder().decode(f.data); if (!("DecompressionStream" in window)) throw new Error("Please update your browser to read .xlsx (or upload CSV)"); return new Response(new Blob([f.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text(); }
+const xml = s => new DOMParser().parseFromString(s, "application/xml");
+const colIdx = r => { const m = /^([A-Z]+)/.exec(r || ""); if (!m) return -1; let n = 0; for (const ch of m[1]) n = n * 26 + ch.charCodeAt(0) - 64; return n - 1; };
+async function readXlsx(buf) { const z = await unzip(buf), wb = xml(await inflate(z["xl/workbook.xml"])), rels = xml(await inflate(z["xl/_rels/workbook.xml.rels"]));
+  const rmap = {}; [...rels.getElementsByTagName("Relationship")].forEach(r => rmap[r.getAttribute("Id")] = r.getAttribute("Target"));
+  const ss = z["xl/sharedStrings.xml"] ? [...xml(await inflate(z["xl/sharedStrings.xml"])).getElementsByTagName("si")].map(si => [...si.getElementsByTagName("t")].map(t => t.textContent).join("")) : [];
+  const out = [];
+  for (const sh of wb.getElementsByTagName("sheet")) { const rid = sh.getAttribute("r:id") || sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id"); let tg = rmap[rid] || ""; tg = tg.replace(/^\//, ""); if (!tg.startsWith("xl/")) tg = "xl/" + tg;
+    const doc = xml(await inflate(z[tg])), rows = [];
+    for (const row of doc.getElementsByTagName("row")) { const arr = []; let ci = 0;
+      for (const c of row.getElementsByTagName("c")) { const i = colIdx(c.getAttribute("r")); if (i >= 0) ci = i; const t = c.getAttribute("t"), v = c.getElementsByTagName("v")[0]?.textContent;
+        let val = ""; if (t === "s") val = ss[+v] ?? ""; else if (t === "inlineStr") val = [...c.getElementsByTagName("t")].map(x => x.textContent).join(""); else if (t === "b") val = v === "1"; else if (t === "str" || t === "e") val = v ?? ""; else if (v != null && v !== "") val = +v;
+        arr[ci] = val; ci++; }
+      rows.push([...arr].map(x => x === undefined ? "" : x)); }
+    out.push({ name: sh.getAttribute("name"), rows }); }
+  return out; }
+function readCsv(text) { const rows = []; let row = [], cur = "", q = false;
+  for (let i = 0; i < text.length; i++) { const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+    else if (ch === '"') q = true; else if (ch === ",") { row.push(cur); cur = ""; } else if (ch === "\n" || ch === "\r") { if (ch === "\r" && text[i + 1] === "\n") i++; row.push(cur); rows.push(row); row = []; cur = ""; } else cur += ch; }
+  if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
+  return [{ name: "CSV", rows: rows.map(r => r.map(v => { const s = v.trim(); return s !== "" && !isNaN(+s) && !/^0\d/.test(s) && !/^\d{4}-\d\d-\d\d/.test(s) ? +s : s; })) }]; }
+const xlDate = v => typeof v === "number" && v > 20000 && v < 80000 ? new Date(Math.round((v - 25569) * 864e5)).toISOString().slice(0, 19) : String(v || "");
+/* ---------- recognise Console formats ---------- */
+function findHeader(rows, need) { for (let i = 0; i < Math.min(rows.length, 40); i++) { const r = rows[i].map(x => String(x).trim().toLowerCase()); if (need.every(n => r.includes(n.toLowerCase()))) return i; } return -1; }
+function parseSheets(sheets, fname) { const found = [];
+  for (const sh of sheets) { const R = sh.rows;
+    let h = findHeader(R, ["Symbol", "Trade Type", "Quantity", "Price"]);
+    if (h >= 0) { const H = R[h].map(x => String(x).trim().toLowerCase()), c = n => H.indexOf(n.toLowerCase()), ex = [];
+      for (const r of R.slice(h + 1)) { const sym = String(r[c("Symbol")] || "").trim(); if (!sym) continue; const side = /^b/i.test(r[c("Trade Type")]) ? 1 : /^s/i.test(r[c("Trade Type")]) ? -1 : 0, qty = +r[c("Quantity")], px = +r[c("Price")]; if (!side || !(qty > 0) || !(px >= 0)) continue;
+        const date = xlDate(r[c("Trade Date")]).slice(0, 10), t0 = c("Order Execution Time") >= 0 ? xlDate(r[c("Order Execution Time")]) : "", time = (t0 && t0.length >= 16 ? t0.replace(" ", "T") : date + "T00:00:00").slice(0, 19);
+        ex.push([sym, String(r[c("Segment")] || "EQ").toUpperCase(), date, time, side, qty, px, String(r[c("Trade ID")] ?? ""), String(r[c("Order ID")] ?? ""), String(r[c("Exchange")] || "")]); }
+      found.push({ type: "tradebook", ex, label: `Tradebook · ${ex.length} fills` }); continue; }
+    h = findHeader(R, ["Symbol", "Realized P&L"]);
+    if (h >= 0 || R.some(r => r.some(x => String(x).trim() === "Realized P&L"))) { const P = { summary: {}, heads: [], syms: [], period: "", seg: sh.name };
+      const cr = r => r.filter(x => x !== "" && x != null);
+      R.forEach(r0 => { const r = cr(r0), a = String(r[0] ?? "").trim(); const m = /from (\d{4}-\d\d-\d\d) to (\d{4}-\d\d-\d\d)/.exec(r.join(" ")); if (m) P.period = m[1] + " to " + m[2]; if (["Charges", "Other Credit & Debit", "Realized P&L", "Unrealized P&L"].includes(a) && typeof r[1] === "number" && P.summary[a] == null) P.summary[a] = r[1]; });
+      const ah = R.findIndex(r => String(cr(r)[0] ?? "").trim() === "Account Head"); if (ah >= 0) for (const r0 of R.slice(ah + 1)) { const r = cr(r0), a = String(r[0] ?? "").trim(); if (!a || a === "Symbol") break; if (typeof r[1] === "number") P.heads.push([a.replace(/ - Z$/, ""), r[1]]); }
+      if (h >= 0) { const H = R[h].map(x => String(x).trim()), c = n => H.indexOf(n); for (const r of R.slice(h + 1)) { const s = String(r[c("Symbol")] || "").trim(); if (!s) continue; P.syms.push({ s, rp: +r[c("Realized P&L")] || 0, bv: +r[c("Buy Value")] || 0, sv: +r[c("Sell Value")] || 0, oq: +r[c("Open Quantity")] || 0, ov: +r[c("Open Value")] || 0, up: +r[c("Unrealized P&L")] || 0, pc: +r[c("Previous Closing Price")] || 0 }); } }
+      found.push({ type: "pnl", pnl: P, label: `P&L ${P.period ? "(" + P.period + ")" : ""}` }); continue; }
+    h = findHeader(R, ["Particulars", "Debit", "Credit"]);
+    if (h >= 0) { const H = R[h].map(x => String(x).trim()), c = n => H.indexOf(n), od = []; for (const r of R.slice(h + 1)) { const p = String(r[c("Particulars")] || "").trim(); if (!p) continue; od.push([p, xlDate(r[c("Posting Date")]).slice(0, 10), +r[c("Debit")] || 0, +r[c("Credit")] || 0]); }
+      found.push({ type: "other", od, label: `Other debits & credits · ${od.length}` }); continue; } }
+  return found; }
+async function addFiles(list) { let added = 0, msgs = [];
+  for (const f of list) { try { const buf = await f.arrayBuffer(), sheets = /\.csv$/i.test(f.name) ? readCsv(new TextDecoder().decode(buf)) : await readXlsx(buf), got = parseSheets(sheets, f.name);
+      if (!got.length) { msgs.push(`⚠️ ${f.name}: not recognised as a Console tradebook or P&L`); continue; }
+      if (DATA.demo) DATA = { ex: [], pnl: null, files: [], demo: false };
+      for (const g of got) { if (g.type === "tradebook") { const seen = new Set(DATA.ex.map(e => e[7] + "|" + e[8] + "|" + e[0] + "|" + e[4])); let n = 0; g.ex.forEach(e => { const k = e[7] + "|" + e[8] + "|" + e[0] + "|" + e[4]; if (!e[7] || !seen.has(k)) { DATA.ex.push(e); seen.add(k); n++; } }); g.label = `Tradebook · ${n} new fills`; }
+        else if (g.type === "pnl") { DATA.pnl = { ...(DATA.pnl || {}), ...g.pnl, od: DATA.pnl?.od || [] }; }
+        else if (g.type === "other") { DATA.pnl = DATA.pnl || { summary: {}, heads: [], syms: [], period: "" }; DATA.pnl.od = g.od; }
+        added++; }
+      DATA.files.push({ n: f.name, t: got.map(g => g.label).join(" + ") }); }
+    catch (err) { msgs.push(`⚠️ ${f.name}: ${err.message}`); } }
+  if (msgs.length) K.toast(msgs[0]); if (added) { save(); run(); K.toast("Report ready ✓"); } }
+function save() { if (S.remember) { S.data = DATA; try { S.save(); } catch { K.toast("Too large to remember; it will work until you close the page"); S.data = null; S.save(); } } else { S.data = null; S.save(); } }
+/* ---------- analysis ---------- */
+function analyze(ex) {
+  const om = new Map(); for (const e of ex) { const [sym, seg, date, time, side, qty, px, tid, oid] = e, k = (oid || tid || time) + "|" + side + "|" + sym; let o = om.get(k); if (!o) { o = { sym, seg, date, time, side, qty: 0, val: 0 }; om.set(k, o); } o.qty += qty; o.val += qty * px; if (time < o.time) o.time = time; }
+  const orders = [...om.values()].map(o => ({ ...o, px: o.val / o.qty })).sort((a, b) => a.time < b.time ? -1 : a.time > b.time ? 1 : b.side - a.side);
+  const by = new Map(); orders.forEach(o => { const k = o.sym + "|" + o.seg; if (!by.has(k)) by.set(k, []); by.get(k).push(o); });
+  const cyc = [], open = [], unm = [];
+  for (const [, L] of by) { let c = null, lots = [], pos = 0;
+    L.forEach((o, i) => { let q = o.qty;
+      while (q > 1e-9 && pos !== 0 && Math.sign(pos) !== o.side) { const lot = lots[0], m = Math.min(lot.q, q); c.pnl += (o.px - lot.px) * m * c.side; c.ev += lot.px * m; c.xv += o.px * m; c.qm += m; lot.q -= m; q -= m; pos += o.side * m; if (lot.q <= 1e-9) lots.shift(); c.c = o.time; c.n++;
+        if (Math.abs(pos) < 1e-9) { pos = 0; lots = []; cyc.push(fin(c)); c = null; } }
+      if (q > 1e-9) { if (pos === 0) { if (o.side === -1 && o.seg === "EQ" && !L.slice(i + 1).some(x => x.date === o.date && x.side === 1)) { unm.push({ sym: o.sym, date: o.date, qty: q, px: o.px }); return; }
+          c = { sym: o.sym, seg: o.seg, side: o.side, o: o.time, c: o.time, pnl: 0, ev: 0, xv: 0, mq: 0, qm: 0, n: 0 }; }
+        lots.push({ q, px: o.px }); pos += o.side * q; c.mq = Math.max(c.mq, Math.abs(pos)); c.n++; } });
+    if (c && pos !== 0) { const tq = lots.reduce((a, l) => a + l.q, 0); open.push({ sym: c.sym, seg: c.seg, side: c.side, qty: tq, avg: lots.reduce((a, l) => a + l.q * l.px, 0) / tq, since: c.o.slice(0, 10), part: c.pnl }); } }
+  return { orders, cyc: cyc.sort((a, b) => a.c < b.c ? -1 : 1), open, unm };
+  function fin(c) { const od = c.o.slice(0, 10), cd = c.c.slice(0, 10); return { ...c, od, cd, intra: od === cd, days: Math.round((Date.parse(cd) - Date.parse(od)) / 864e5), ret: c.ev ? c.pnl / c.ev * 100 : 0 }; } }
+function stats(cyc, orders) {
+  const n = cyc.length, W = cyc.filter(t => t.pnl > 0), L = cyc.filter(t => t.pnl <= 0), gp = W.reduce((a, t) => a + t.pnl, 0), gl = -L.reduce((a, t) => a + t.pnl, 0), net = gp - gl;
+  let cum = 0, peak = 0, dd = 0, ddAt = "", streak = 0, maxStreak = 0; const curve = cyc.map(t => { cum += t.pnl; peak = Math.max(peak, cum); if (peak - cum > dd) { dd = peak - cum; ddAt = t.cd; } streak = t.pnl <= 0 ? streak + 1 : 0; maxStreak = Math.max(maxStreak, streak); return [t.cd, cum, peak]; });
+  const avgW = W.length ? gp / W.length : 0, avgL = L.length ? gl / L.length : 0, hw = W.length ? W.reduce((a, t) => a + t.days, 0) / W.length : 0, hl = L.length ? L.reduce((a, t) => a + t.days, 0) / L.length : 0;
+  const grp = (f) => { const m = new Map(); cyc.forEach(t => { const k = f(t); const g = m.get(k) || { k, n: 0, w: 0, p: 0 }; g.n++; if (t.pnl > 0) g.w++; g.p += t.pnl; m.set(k, g); }); return [...m.values()]; };
+  const turnover = orders.reduce((a, o) => a + o.val, 0), days = new Set(orders.map(o => o.date)).size;
+  const after = cyc.filter(t => cyc.some(x => x.cd === t.od && x.c < t.o && x.pnl < 0)), afterP = after.reduce((a, t) => a + t.pnl, 0);
+  const perDay = grp(t => t.od).sort((a, b) => b.n - a.n);
+  return { n, W: W.length, L: L.length, wr: n ? W.length / n * 100 : 0, gp, gl, net, pf: gl ? gp / gl : gp ? Infinity : 0, avgW, avgL, pay: avgL ? avgW / avgL : 0, exp: n ? net / n : 0, best: cyc.reduce((a, t) => !a || t.pnl > a.pnl ? t : a, null), worst: cyc.reduce((a, t) => !a || t.pnl < a.pnl ? t : a, null), dd, ddAt, maxStreak, curve, hw, hl, turnover, days, after, afterP,
+    month: grp(t => t.cd.slice(0, 7)).sort((a, b) => a.k < b.k ? -1 : 1), sym: grp(t => t.sym), kind: grp(t => t.side === -1 ? "short" : t.intra ? "intra" : "deliv"), wd: grp(t => new Date(t.od + "T12:00:00").getDay()), hr: grp(t => +t.o.slice(11, 13)), perDay }; }
+/* ---------- formatting ---------- */
+const R = (v, d = 0) => (v < 0 ? "−" : "") + "₹" + Math.abs(v).toLocaleString("en-IN", { maximumFractionDigits: d, minimumFractionDigits: d });
+const SR = v => (v > 0 ? "+" : "") + R(v);
+const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
+const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], mlab = k => MN[+k.slice(5, 7) - 1] + " " + k.slice(2, 4);
+const WD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+/* ---------- render ---------- */
+function months() { return [...new Set(A.cyc.map(t => t.cd.slice(0, 7)))].sort(); }
+function inPer(d) { if (S.per === "all") return true; if (S.per.startsWith("fy")) { const y = +S.per.slice(2); return d >= `${y}-04-01` && d <= `${y + 1}-03-31`; } return d.slice(0, 7) === S.per; }
+function run() { $("#files").innerHTML = DATA.files.map(f => `<span>📄 ${esc(f.n)} · <b>${esc(f.t)}</b></span>`).join("");
+  if (!DATA.ex.length && !DATA.pnl) { $("#rep").classList.remove("on"); return; }
+  $("#rep").classList.add("on"); A = analyze(DATA.ex); render(); }
+function render() {
+  $("#demoNote").innerHTML = DATA.demo ? `<div class="demo">🎲 <b>Demo data</b>: made-up trades to show what the report looks like. Upload your own files to replace it.</div>` : "";
+  const ms = months(), fys = [...new Set(ms.map(m => +m.slice(0, 4) - (+m.slice(5, 7) < 4 ? 1 : 0)))];
+  $("#per").innerHTML = `<span style="font-size:.8rem;color:var(--muted)">Period:</span><button data-p="all" class="${S.per === "all" ? "on" : ""}">All</button>` + (fys.length > 1 ? fys.map(y => `<button data-p="fy${y}" class="${S.per === "fy" + y ? "on" : ""}">FY ${String(y).slice(2)}-${String(y + 1).slice(2)}</button>`).join("") : "") + ms.map(m => `<button data-p="${m}" class="${S.per === m ? "on" : ""}">${mlab(m)}</button>`).join("");
+  const cyc = A.cyc.filter(t => inPer(t.cd)), ord = A.orders.filter(o => inPer(o.date)), st = stats(cyc, ord); window._st = st;
+  const P = DATA.pnl, ch = P?.summary?.Charges, oth = P?.summary?.["Other Credit & Debit"];
+  /* KPIs */
+  $("#kpis").innerHTML = !cyc.length ? `<div class="kp" style="grid-column:1/-1">${DATA.ex.length ? "No closed trades in this period." : "Upload a tradebook to see trade-level analysis. Your P&L statement details are below."}</div>` :
+    `<div class="kp big"><span>REALISED P&amp;L · CLOSED TRADES (BEFORE CHARGES)</span><b class="${cls(st.net)}">${SR(st.net)}</b><small>${st.n} trades · ${st.days} trading days · ${R(st.turnover)} turnover</small>${S.per === "all" && P?.summary?.["Realized P&L"] != null && Math.abs(P.summary["Realized P&L"] - st.net) > 1 && !DATA.demo ? `<small style="display:block;margin-top:4px">Official realised (P&amp;L statement): <strong class="${cls(P.summary["Realized P&L"])}">${SR(P.summary["Realized P&L"])}</strong>. It also includes shares bought before your tradebook starts.</small>` : ""}</div>
+    <div class="kp"><span>WIN RATE</span><b>${st.wr.toFixed(0)}%</b><small>${st.W} won · ${st.L} lost</small></div><div class="kp"><span>PROFIT FACTOR</span><b class="${st.pf >= 1.5 ? "up" : st.pf >= 1 ? "" : "down"}">${isFinite(st.pf) ? st.pf.toFixed(2) : "∞"}</b><small>gross profit ÷ gross loss</small></div>
+    <div class="kp"><span>AVG WIN / AVG LOSS</span><b><span class="up" style="font-size:inherit;display:inline;color:var(--up)">${R(st.avgW)}</span> / <span style="display:inline;font-size:inherit;color:var(--down)">${R(st.avgL)}</span></b><small>payoff ratio ${st.pay.toFixed(2)}</small></div><div class="kp"><span>EXPECTANCY</span><b class="${cls(st.exp)}">${SR(st.exp)}</b><small>average per trade</small></div>
+    <div class="kp"><span>MAX DRAWDOWN</span><b class="down">${R(-st.dd)}</b><small>${st.ddAt ? "deepest on " + K.niceDate(st.ddAt, { day: "numeric", month: "short" }) : "—"}</small></div><div class="kp"><span>LONGEST LOSING STREAK</span><b>${st.maxStreak}</b><small>trades in a row</small></div>`;
+  /* curve */
+  $("#curve").innerHTML = st.curve.length > 1 ? curveSvg(st.curve) : `<div style="color:var(--muted)">Not enough closed trades for a curve.</div>`;
+  /* insights */
+  $("#ins").innerHTML = insights(st, cyc).map(([e, k, t]) => `<div class="${k}"><span>${e}</span><span>${t}</span></div>`).join("") || `<div><span>ℹ️</span><span>Upload a tradebook to see behaviour insights.</span></div>`;
+  /* months */
+  $("#mBars").innerHTML = st.month.length ? barsSvg(st.month.map(m => [mlab(m.k), m.p])) : "";
+  $("#mTab").innerHTML = `<tr><th>MONTH</th><th>TRADES</th><th>WIN %</th><th>P&amp;L</th></tr>` + st.month.map(m => `<tr><td class="s">${mlab(m.k)}</td><td>${m.n}</td><td>${Math.round(m.w / m.n * 100)}%</td><td class="${cls(m.p)}">${SR(m.p)}</td></tr>`).join("");
+  /* split */
+  const KN = { intra: ["⚡ Intraday", "Opened and closed the same day"], deliv: ["📦 Delivery / swing", "Held overnight or longer"], short: ["🔻 Short", "Sold first, bought back later"] };
+  $("#split").innerHTML = ["intra", "deliv", "short"].map(k => { const g = st.kind.find(x => x.k === k); return `<div><h4>${KN[k][0]}</h4><small style="color:var(--muted)">${KN[k][1]}</small>${g ? `<span class="v ${cls(g.p)}">${SR(g.p)}</span><span>${g.n} trades · win ${Math.round(g.w / g.n * 100)}% · avg ${SR(g.p / g.n)}</span>` : `<span class="v" style="color:var(--muted)">—</span><span>No trades</span>`}</div>`; }).join("");
+  /* stocks */
+  const useOff = S.per === "all" && P?.syms?.length && !DATA.demo, offMap = useOff ? Object.fromEntries(P.syms.map(x => [x.s, x])) : null;
+  const symRows = useOff ? P.syms.filter(x => Math.abs(x.rp) > .005).map(x => { const g = st.sym.find(y => y.k === x.s); return { k: x.s, n: g ? g.n : "—", w: g ? g.w : 0, p: x.rp, off: 1 }; }) : st.sym;
+  const sy = symRows.slice().sort((a, b) => b.p - a.p), tb = (rows, t) => `<tr><th>${t}</th><th>TRADES</th><th>WIN %</th><th>P&amp;L</th></tr>` + rows.map(g => `<tr><td class="s">${esc(g.k)}</td><td>${g.n}</td><td>${typeof g.n === "number" && g.n ? Math.round(g.w / g.n * 100) + "%" : "—"}</td><td class="${cls(g.p)}">${SR(g.p)}</td></tr>`).join("");
+  if ($("#symNote")) $("#symNote").textContent = useOff ? "Realised P&L per stock from your official P&L statement (includes older holdings); trades and win % from the tradebook." : "Realised P&L per stock rebuilt from closed trades in this period (before charges).";
+  $("#topW").innerHTML = tb(sy.filter(g => g.p > 0).slice(0, 10), "🏆 TOP WINNERS"); $("#topL").innerHTML = tb(sy.filter(g => g.p < 0).reverse().slice(0, 10), "🩸 BIGGEST LOSERS");
+  /* weekday / hour */
+  $("#wd").innerHTML = hbars([1, 2, 3, 4, 5].map(d => { const g = st.wd.find(x => x.k === d); return [WD[d], g]; }));
+  $("#hr").innerHTML = hbars([9, 10, 11, 12, 13, 14, 15].map(h => { const g = st.hr.find(x => x.k === h); return [`${h}:00–${h + 1}:00`, g]; }));
+  /* charges */
+  drawCharges(st);
+  /* open positions */
+  if (P?.syms?.some(s => s.oq)) { const op = P.syms.filter(s => s.oq); $("#opNote").textContent = `From your P&L statement${P.period ? " (" + P.period + ")" : ""}. Unrealised P&L is at the previous closing price.`;
+    $("#opTab").innerHTML = `<tr><th>SYMBOL</th><th>QTY</th><th>VALUE</th><th>LAST PRICE</th><th>UNREALISED</th></tr>` + op.map(s => `<tr><td class="s">${esc(s.s)}</td><td>${s.oq.toLocaleString("en-IN")}</td><td>${R(s.ov)}</td><td>${s.pc ? R(s.pc, 2) : "—"}</td><td class="${cls(s.up)}">${SR(s.up)}${s.ov ? ` <small>(${(s.up / s.ov * 100).toFixed(1)}%)</small>` : ""}</td></tr>`).join("") + `<tr><td class="s">Total</td><td></td><td>${R(op.reduce((a, s) => a + s.ov, 0))}</td><td></td><td class="${cls(op.reduce((a, s) => a + s.up, 0))}"><b>${SR(op.reduce((a, s) => a + s.up, 0))}</b></td></tr>`; }
+  else if (A.open.length) { $("#opNote").innerHTML = "Positions still open at the end of your tradebook (average cost from the trades in the file; shares held from before the tradebook period aren't included)." + (P?.summary?.["Unrealized P&L"] != null ? ` Total unrealised P&amp;L per your statement: <b class="${cls(P.summary["Unrealized P&L"])}">${SR(P.summary["Unrealized P&L"])}</b>.` : " Upload the P&L statement for unrealised P&L."); $("#opTab").innerHTML = `<tr><th>SYMBOL</th><th>SIDE</th><th>QTY</th><th>AVG PRICE</th><th>INVESTED</th><th>SINCE</th></tr>` + A.open.map(o => `<tr><td class="s">${esc(o.sym)}</td><td>${o.side > 0 ? "Long" : "Short"}</td><td>${o.qty.toLocaleString("en-IN")}</td><td>${R(o.avg, 2)}</td><td>${R(o.avg * o.qty)}</td><td>${K.niceDate(o.since, { day: "numeric", month: "short", year: "2-digit" })}</td></tr>`).join(""); }
+  else { $("#opNote").textContent = ""; $("#opTab").innerHTML = `<tr><td style="color:var(--muted)">No open positions found.</td></tr>`; }
+  drawTrades(cyc);
+  $("#unm").innerHTML = A.unm.length ? `ℹ️ <b>${A.unm.length} sell orders</b> (${[...new Set(A.unm.map(u => u.sym))].slice(0, 8).join(", ")}${A.unm.length > 8 ? "…" : ""}) were for shares bought <b>before</b> this tradebook starts, so their profit can't be calculated here. Upload an older tradebook to include them; your official figure is in the P&L statement.` : "";
+}
+function curveSvg(c) { const W = 900, H = 260, L = 64, Rr = 12, T = 14, B = 26, ys = c.map(x => x[1]).concat(0), mn = Math.min(...ys), mx = Math.max(...ys), sp = (mx - mn) || 1, X = i => L + i / (c.length - 1) * (W - L - Rr), Y = v => T + (mx - v) / sp * (H - T - B);
+  let o = ""; for (let k = 0; k <= 4; k++) { const v = mn + sp * k / 4, y = Y(v); o += `<line x1="${L}" x2="${W - Rr}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.06)"/><text x="${L - 6}" y="${y + 4}" fill="${M}" font-size="11" font-family="JetBrains Mono" text-anchor="end">${Math.abs(v) >= 1e5 ? (v / 1e5).toFixed(1) + "L" : Math.round(v / 1000) + "k"}</text>`; }
+  o += `<line x1="${L}" x2="${W - Rr}" y1="${Y(0)}" y2="${Y(0)}" stroke="rgba(255,255,255,.25)" stroke-dasharray="4 4"/>`;
+  o += `<path d="M${X(0)},${Y(c[0][2])} ${c.map((p, i) => `L${X(i)},${Y(p[2])}`).join(" ")} ${c.slice().reverse().map((p, j) => `L${X(c.length - 1 - j)},${Y(p[1])}`).join(" ")} Z" fill="${DN}" opacity=".18"/>`;
+  o += `<polyline points="${c.map((p, i) => `${X(i)},${Y(p[1])}`).join(" ")}" fill="none" stroke="${c[c.length - 1][1] >= 0 ? UP : DN}" stroke-width="2.6" stroke-linejoin="round"/>`;
+  const lab = [0, Math.floor(c.length / 2), c.length - 1]; lab.forEach(i => o += `<text x="${X(i)}" y="${H - 6}" fill="${M}" font-size="11" font-family="JetBrains Mono" text-anchor="${i === 0 ? "start" : i === c.length - 1 ? "end" : "middle"}">${K.niceDate(c[i][0], { day: "numeric", month: "short" })}</text>`);
+  return `<svg viewBox="0 0 ${W} ${H}">${o}</svg>`; }
+function barsSvg(d) { const W = 520, H = 230, L = 10, T = 18, B = 26, mx = Math.max(...d.map(x => Math.abs(x[1])), 1), hasNeg = d.some(x => x[1] < 0), hasPos = d.some(x => x[1] > 0), z = hasNeg && hasPos ? T + (H - T - B) * mx / (2 * mx) : hasNeg ? T : H - B, sc = (H - T - B) / (hasNeg && hasPos ? 2 * mx : mx), bw = (W - 2 * L) / d.length;
+  return `<svg viewBox="0 0 ${W} ${H}"><line x1="${L}" x2="${W - L}" y1="${z}" y2="${z}" stroke="rgba(255,255,255,.2)"/>` + d.map(([l, v], i) => { const h = Math.abs(v) * sc, x = L + i * bw + bw * .18, y = v >= 0 ? z - h : z; return `<rect x="${x}" y="${y}" width="${bw * .64}" height="${Math.max(h, 1)}" rx="4" fill="${v >= 0 ? UP : DN}"/><text x="${x + bw * .32}" y="${H - 8}" fill="${M}" font-size="10.5" font-family="JetBrains Mono" text-anchor="middle">${l.split(" ")[0]}</text><text x="${x + bw * .32}" y="${v >= 0 ? y - 4 : y + h + 12}" fill="${v >= 0 ? UP : DN}" font-size="10" font-family="JetBrains Mono" text-anchor="middle">${Math.abs(v) >= 1e5 ? (v / 1e5).toFixed(1) + "L" : Math.round(v / 1000) + "k"}</text>`; }).join("") + `</svg>`; }
+function hbars(rows) { const mx = Math.max(...rows.map(([, g]) => g ? Math.abs(g.p) : 0), 1);
+  return rows.map(([l, g]) => `<div><span>${l}${g ? ` <small style="color:var(--muted)">· ${g.n} · ${Math.round(g.w / g.n * 100)}%</small>` : ""}</span><span class="tr"><i style="width:${g ? Math.abs(g.p) / mx * 100 : 0}%;background:${g && g.p < 0 ? DN : UP}"></i></span><b class="${g ? cls(g.p) : ""}">${g ? SR(g.p) : "—"}</b></div>`).join(""); }
+function insights(st, cyc) { const o = []; if (!st.n) return o;
+  if (st.wr >= 50 && st.pay < 1) o.push(["⚖️", "warn", `You win <b>${st.wr.toFixed(0)}%</b> of trades, but your average loss (<b>${R(st.avgL)}</b>) is bigger than your average win (<b>${R(st.avgW)}</b>). Letting winners run a little longer, or cutting losers earlier, is your biggest lever.`]);
+  else if (st.wr < 45 && st.pay > 1.5) o.push(["🎯", "good", `Classic trend-follower profile: you win only <b>${st.wr.toFixed(0)}%</b> of the time, but your wins are <b>${st.pay.toFixed(1)}×</b> your losses. Keep cutting losers fast.`]);
+  if (st.pf >= 1.5) o.push(["✅", "good", `Profit factor <b>${st.pf.toFixed(2)}</b>: you make ₹${st.pf.toFixed(2)} for every ₹1 you lose. That's a healthy edge.`]); else if (st.pf < 1) o.push(["🚨", "bad", `Profit factor <b>${st.pf.toFixed(2)}</b>: losses are larger than profits in this period. Reduce size and trade only your best setup until this turns above 1.`]);
+  const dW = cyc.filter(t => t.pnl > 0 && !t.intra), dL = cyc.filter(t => t.pnl <= 0 && !t.intra);
+  if (dW.length >= 3 && dL.length >= 3) { const hw = dW.reduce((a, t) => a + t.days, 0) / dW.length, hl = dL.reduce((a, t) => a + t.days, 0) / dL.length;
+    if (hl > hw * 1.3) o.push(["⏳", "bad", `You hold losing delivery trades for <b>${hl.toFixed(1)} days</b> on average but winners only <b>${hw.toFixed(1)} days</b>. This is the "sell winners early, hold losers" trap. A fixed stop-loss fixes it.`]);
+    else o.push(["⏳", "good", `Winners held <b>${hw.toFixed(1)} days</b> vs losers <b>${hl.toFixed(1)} days</b> on average: you aren't sitting on losers. 👍`]); }
+  if (st.worst && st.worst.pnl < 0 && st.gp > 0 && -st.worst.pnl > .25 * st.gp) o.push(["💥", "bad", `Your single worst trade (<b>${esc(st.worst.sym)}, ${R(st.worst.pnl)}</b>) wiped out <b>${Math.round(-st.worst.pnl / st.gp * 100)}%</b> of all your gross profit. One trade shouldn't be able to do that: cap risk per trade.`]);
+  if (st.after.length >= 3) { const wr = st.after.filter(t => t.pnl > 0).length / st.after.length * 100; o.push([wr < st.wr - 5 || st.afterP < 0 ? "😤" : "🧘", wr < st.wr - 5 || st.afterP < 0 ? "bad" : "good", `<b>${st.after.length} trades</b> were opened on the same day after a losing trade. Their win rate was <b>${wr.toFixed(0)}%</b> (vs ${st.wr.toFixed(0)}% overall) and they made <b>${SR(st.afterP)}</b>. ${wr < st.wr - 5 || st.afterP < 0 ? "That's the revenge-trading pattern: try a rule of no new trade for 30 minutes after a loss." : "You handle losses calmly."}`]); }
+  const busy = st.perDay.filter(d => d.n >= 6); if (busy.length) { const bp = busy.reduce((a, d) => a + d.p, 0); o.push(["🔁", bp < 0 ? "bad" : "warn", `On <b>${busy.length} day${busy.length > 1 ? "s" : ""}</b> you opened 6+ trades. Those days made <b>${SR(bp)}</b> in total. ${bp < 0 ? "Busy days cost you money: set a max-trades-per-day rule." : "Watch that busy days don't become overtrading."}`]); }
+  const ks = st.kind.filter(k => k.n >= 3).sort((a, b) => b.p / b.n - a.p / a.n); if (ks.length >= 2 && ks[ks.length - 1].p < 0) { const nm = { intra: "intraday", deliv: "delivery/swing", short: "short" }; o.push(["🧭", "warn", `Your <b>${nm[ks[0].k]}</b> trades average <b>${SR(ks[0].p / ks[0].n)}</b>, while <b>${nm[ks[ks.length - 1].k]}</b> trades lost <b>${SR(ks[ks.length - 1].p)}</b> overall. Do more of what works.`]); }
+  const hh = st.hr.filter(h => h.n >= 4).sort((a, b) => a.p - b.p); if (hh.length >= 2 && hh[0].p < 0) o.push(["🕐", "warn", `Trades entered between <b>${hh[0].k}:00 and ${hh[0].k + 1}:00</b> lost <b>${R(hh[0].p)}</b>. Your best entry hour was <b>${hh[hh.length - 1].k}:00</b>.`]);
+  const P = DATA.pnl; if (P?.summary?.Charges && P.summary["Realized P&L"] > 0) { const c = P.summary.Charges, pct = c / P.summary["Realized P&L"] * 100; o.push(["💸", pct > 25 ? "bad" : pct > 12 ? "warn" : "good", `Charges were <b>${R(c)}</b>: <b>${pct.toFixed(0)}%</b> of your realised profit. ${pct > 25 ? "That's a big slice. Fewer, bigger-conviction trades would keep more of it." : "Reasonable for your activity level."}`]); }
+  const mtf = (P?.od || []).filter(r => /MTF funded/i.test(r[0])).reduce((a, r) => a + r[2], 0); if (mtf > 0) o.push(["🏦", "warn", `You paid <b>${R(mtf)}</b> as MTF (margin) interest. Make sure leveraged trades earn more than this, and keep MTF positions short-term.`]);
+  return o; }
+function drawCharges(st) { const P = DATA.pnl;
+  if (!P) { $("#chgNote").textContent = "Upload your P&L statement (Console → Reports → P&L) to see brokerage, STT, GST, DP charges, MTF interest and your official net P&L."; $("#chg").innerHTML = ""; $("#oth").innerHTML = ""; return; }
+  const s = P.summary, rp = s["Realized P&L"] ?? 0, ch = s.Charges ?? 0, oc = s["Other Credit & Debit"] ?? 0, net = rp - ch + oc;
+  $("#chgNote").innerHTML = `Official figures from your P&L statement${P.period ? " (" + P.period + ")" : ""}. These don't change with the period filter above.`;
+  const hm = Math.max(...P.heads.map(h => h[1]), 1);
+  $("#chg").innerHTML = `<div class="kpis" style="grid-template-columns:1fr 1fr;margin-top:0"><div class="kp"><span>REALISED P&amp;L (OFFICIAL)</span><b class="${cls(rp)}">${SR(rp)}</b></div><div class="kp"><span>UNREALISED P&amp;L</span><b class="${cls(s["Unrealized P&L"] || 0)}">${s["Unrealized P&L"] != null ? SR(s["Unrealized P&L"]) : "—"}</b></div><div class="kp"><span>CHARGES</span><b class="down">${R(-ch)}</b></div><div class="kp"><span>OTHER DEBITS/CREDITS</span><b class="${cls(oc)}">${SR(oc)}</b></div><div class="kp big" style="grid-column:1/-1"><span>NET REALISED AFTER ALL COSTS</span><b class="${cls(net)}">${SR(net)}</b><small>Realised − charges ± other debits/credits</small></div></div>
+    <div class="hb" style="margin-top:12px">${P.heads.filter(h => h[1] > .5).sort((a, b) => b[1] - a[1]).map(([n, v]) => `<div><span>${esc(n)}</span><span class="tr"><i style="width:${v / hm * 100}%;background:#ff8a3d"></i></span><b>${R(v)}</b></div>`).join("")}</div>`;
+  const od = P.od || [], cat = r => /DP Charges/i.test(r[0]) ? "DP charges (per stock sold)" : /Interest for MTF|MTF funded/i.test(r[0]) ? "MTF interest" : /MTF (un)?pledge/i.test(r[0]) ? "MTF pledge / unpledge" : /AMC/i.test(r[0]) ? "Demat AMC" : /Muhurat|Reversal|refund/i.test(r[0]) ? "Reversals & refunds" : "Other", g = {};
+  od.forEach(r => { const k = cat(r); g[k] = g[k] || { n: 0, d: 0, c: 0 }; g[k].n++; g[k].d += r[2]; g[k].c += r[3]; });
+  const gm = Math.max(...Object.values(g).map(x => x.d), 1);
+  $("#oth").innerHTML = od.length ? `<div style="font:700 .68rem 'JetBrains Mono';color:var(--muted);margin-bottom:8px">OTHER DEBITS &amp; CREDITS · ${od.length} ENTRIES</div><div class="hb">${Object.entries(g).sort((a, b) => b[1].d - a[1].d).map(([k, x]) => `<div><span>${k} <small style="color:var(--muted)">× ${x.n}</small></span><span class="tr"><i style="width:${x.d / gm * 100}%;background:#b9a6ff"></i></span><b class="${x.c > x.d ? "up" : ""}">${x.c > x.d ? "+" + R(x.c - x.d) : R(x.d - x.c)}</b></div>`).join("")}</div>` : `<div style="color:var(--muted);font-size:.86rem">No "Other Debits and Credits" sheet found.</div>`; }
+function drawTrades(cyc) { const q = ($("#q").value || "").trim().toUpperCase();
+  $("#tf").innerHTML = [["all", "All"], ["w", "Winners"], ["l", "Losers"], ["i", "Intraday"], ["d", "Delivery"]].map(([k, l]) => `<button data-tf="${k}" class="${S.tf === k ? "on" : ""}">${l}</button>`).join("");
+  const rows = cyc.filter(t => (!q || t.sym.includes(q)) && (S.tf === "all" || (S.tf === "w" && t.pnl > 0) || (S.tf === "l" && t.pnl <= 0) || (S.tf === "i" && t.intra) || (S.tf === "d" && !t.intra))).slice().reverse(), PS = 25, pages = Math.max(1, Math.ceil(rows.length / PS)); page = Math.min(page, pages - 1);
+  $("#tl").innerHTML = `<tr><th>SYMBOL</th><th>TYPE</th><th>ENTRY</th><th>EXIT</th><th>QTY</th><th>AVG IN</th><th>AVG OUT</th><th>HELD</th><th>P&amp;L</th></tr>` + rows.slice(page * PS, page * PS + PS).map(t => `<tr><td class="s">${esc(t.sym)}</td><td><span class="tag2 ${t.side < 0 ? "sh" : t.intra ? "i" : "d"}">${t.side < 0 ? "SHORT" : t.intra ? "INTRA" : "DELIV"}</span></td><td>${K.niceDate(t.od, { day: "numeric", month: "short", year: "2-digit" })}</td><td>${K.niceDate(t.cd, { day: "numeric", month: "short", year: "2-digit" })}</td><td>${t.qm.toLocaleString("en-IN")}</td><td>${R(t.ev / t.qm, 2)}</td><td>${R(t.xv / t.qm, 2)}</td><td>${t.intra ? t.o.slice(11, 16) + "–" + t.c.slice(11, 16) : t.days + "d"}</td><td class="${cls(t.pnl)}">${SR(t.pnl)} <small>(${t.ret >= 0 ? "+" : ""}${t.ret.toFixed(1)}%)</small></td></tr>`).join("") + (rows.length ? "" : `<tr><td colspan="9" style="color:var(--muted);text-align:left">No trades match.</td></tr>`);
+  $("#pg").innerHTML = pages > 1 ? `<button data-pg="-1" ${page ? "" : "disabled"}>←</button><span style="padding:7px;color:var(--muted);font-size:.84rem">${page + 1} / ${pages} · ${rows.length} trades</span><button data-pg="1" ${page < pages - 1 ? "" : "disabled"}>→</button>` : ""; }
+/* ---------- events ---------- */
+const drop = $("#drop"), fi = $("#file");
+fi.addEventListener("change", () => { addFiles([...fi.files]); fi.value = ""; });
+["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => addFiles([...e.dataTransfer.files]));
+$("#rem").checked = S.remember; $("#rem").addEventListener("change", e => { S.remember = e.target.checked; save(); K.toast(S.remember ? "Saved on this device" : "Won't be remembered after you close the page"); });
+$("#hide").checked = S.hide; $("#hide").addEventListener("change", e => { S.hide = e.target.checked; S.save(); });
+$("#clearB").onclick = () => { if (!confirm("Remove all uploaded data from this page and device?")) return; DATA = { ex: [], pnl: null, files: [], demo: false }; S.data = null; S.per = "all"; S.save(); run(); K.toast("Cleared"); };
+$("#per").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (!b) return; S.per = b.dataset.p; S.save(); page = 0; render(); });
+$("#tf").addEventListener("click", e => { const b = e.target.closest("[data-tf]"); if (!b) return; S.tf = b.dataset.tf; S.save(); page = 0; drawTrades(A.cyc.filter(t => inPer(t.cd))); });
+$("#q").addEventListener("input", () => { page = 0; drawTrades(A.cyc.filter(t => inPer(t.cd))); });
+$("#pg").addEventListener("click", e => { const b = e.target.closest("[data-pg]"); if (!b) return; page += +b.dataset.pg; drawTrades(A.cyc.filter(t => inPer(t.cd))); });
+/* demo data */
+$("#demoB").onclick = () => { const syms = ["TATAMOTORS", "INFY", "HDFCBANK", "RELIANCE", "BEL", "HAL", "TITAN", "DIXON", "IRFC", "ZOMATO", "SBIN", "LT", "TRENT", "POLYCAB", "BSE", "CDSL"], ex = []; let s = 7;
+  const r = () => (s = (s * 16807) % 2147483647) / 2147483647, pad = n => String(n).padStart(2, "0"); let d = new Date("2026-04-02T12:00:00"), id = 1;
+  while (d < new Date("2026-11-15")) { if (d.getDay() > 0 && d.getDay() < 6 && r() < .55) { const k = 1 + Math.floor(r() * 3);
+      for (let j = 0; j < k; j++) { const sym = syms[Math.floor(r() * syms.length)], px = 100 + Math.floor(r() * 3000), q = Math.max(1, Math.round(60000 / px)), intra = r() < .55, edge = (r() - .44) * (intra ? .03 : .12), h = 9 + Math.floor(r() * 5), mi = pad(15 + Math.floor(r() * 40)), date = d.toISOString().slice(0, 10);
+        ex.push([sym, "EQ", date, `${date}T${pad(h)}:${mi}:00`, 1, q, px, String(id++), "o" + id, "NSE"]);
+        let ed = new Date(d); if (!intra) { ed.setDate(ed.getDate() + 1 + Math.floor(r() * (edge < 0 ? 14 : 8))); while (ed.getDay() === 0 || ed.getDay() === 6) ed.setDate(ed.getDate() + 1); }
+        const edate = ed.toISOString().slice(0, 10); ex.push([sym, "EQ", edate, `${edate}T${pad(intra ? Math.min(15, h + 1 + Math.floor(r() * 2)) : 10 + Math.floor(r() * 5))}:${pad(Math.floor(r() * 59))}:00`, -1, q, +(px * (1 + edge)).toFixed(2), String(id++), "o" + id, "NSE"]); } }
+    d.setDate(d.getDate() + 1); }
+  DATA = { ex, pnl: { summary: { Charges: 9840, "Other Credit & Debit": -2310, "Realized P&L": 0, "Unrealized P&L": -6200 }, heads: [["Securities Transaction Tax", 6120], ["Brokerage", 1450], ["Exchange Transaction Charges", 690], ["Stamp Duty", 820], ["Integrated GST", 380], ["SEBI Turnover Fees", 25]], syms: [], period: "2026-04-01 to 2026-11-15", od: [["DP Charges for Sale of TITAN", "2026-06-02", 15.34, 0], ["Interest for MTF funded value", "2026-07-01", 210, 0], ["AMC for Demat Account", "2026-08-14", 88.5, 0]] }, files: [{ n: "demo-tradebook.xlsx", t: "Demo data" }], demo: true };
+  A = analyze(ex); DATA.pnl.summary["Realized P&L"] = Math.round(A.cyc.reduce((a, t) => a + t.pnl, 0)); S.per = "all"; save(); run(); $("#rep").scrollIntoView({ behavior: "smooth", block: "start" }); };
+/* ---------- share ---------- */
+const H$ = v => S.hide ? "₹•••" : SR(v);
+function perLabel() { return S.per === "all" ? (() => { const m = months(); return m.length ? `${mlab(m[0])} – ${mlab(m[m.length - 1])}` : ""; })() : S.per.startsWith("fy") ? `FY ${S.per.slice(4)}-${String(+S.per.slice(2) + 1).slice(2)}` : mlab(S.per); }
+function buildText() { const st = window._st; if (!st || !st.n) return ""; const best = st.sym.slice().sort((a, b) => b.p - a.p)[0], ins = insights(st, A.cyc.filter(t => inPer(t.cd))).slice(0, 2).map(x => "• " + x[2].replace(/<[^>]+>/g, ""));
+  return [`📊 *My trading report · ${perLabel()}*`, "", `💰 Realised P&L: *${H$(st.net)}* (before charges)`, `🎯 Win rate: *${st.wr.toFixed(0)}%* (${st.W}W / ${st.L}L)`, `⚖️ Profit factor: *${isFinite(st.pf) ? st.pf.toFixed(2) : "∞"}* · Payoff ratio: *${st.pay.toFixed(2)}*`, `📉 Max drawdown: ${S.hide ? "—" : R(-st.dd)} · Longest losing streak: ${st.maxStreak}`, best ? `🏆 Best stock: ${best.k}` : "", "", "🧠 *What my data says:*", ...ins, "", "Analyse your own Zerodha tradebook (files stay on your phone) 👇", ...K.signoff("trade-reports", "Trade Reports", "").slice(1)].filter(x => x !== null).join("\n"); }
+async function drawImg() { const st = window._st; await K.loadFonts?.(); const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H, [["rgba(0,224,184,0.2)", .9, .05, .6], ["rgba(124,92,255,0.22)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "MY TRADING REPORT", 70, 186, `700 26px ${K.F.MONO}`, "#00e0b8"); K.txt(ctx, perLabel(), 70, 250, K.fit(ctx, perLabel(), 800, K.F.GROT, 56, 940), "#fff");
+  K.panel(ctx, 70, 290, 940, 190, 26, "rgba(0,224,184,0.08)", "rgba(0,224,184,0.4)"); K.txt(ctx, "REALISED P&L (BEFORE CHARGES)", 104, 340, `700 22px ${K.F.MONO}`, "#8b93a7");
+  K.txt(ctx, S.hide ? (st.net >= 0 ? "In profit ✅" : "In loss 🔻") : SR(st.net), 104, 430, `800 78px ${K.F.GROT}`, st.net >= 0 ? UP : DN); K.txt(ctx, `${st.n} trades`, 976, 430, `600 30px ${K.F.INTER}`, "#cfd3df", "right");
+  const k = [["WIN RATE", st.wr.toFixed(0) + "%"], ["PROFIT FACTOR", isFinite(st.pf) ? st.pf.toFixed(2) : "∞"], ["PAYOFF RATIO", st.pay.toFixed(2)], ["LOSING STREAK", String(st.maxStreak)]];
+  k.forEach(([a, b], i) => { const x = 70 + (i % 2) * 478, y = 500 + Math.floor(i / 2) * 150; K.panel(ctx, x, y, 462, 134, 22); K.txt(ctx, a, x + 28, y + 48, `700 21px ${K.F.MONO}`, "#8b93a7"); K.txt(ctx, b, x + 28, y + 108, `800 52px ${K.F.GROT}`, "#fff"); });
+  const ins = insights(st, A.cyc.filter(t => inPer(t.cd))).slice(0, 2); let y = 830; K.txt(ctx, "WHAT MY DATA SAYS", 70, y, `700 22px ${K.F.MONO}`, "#b9a6ff"); y += 18;
+  ins.forEach(([e, , t]) => { const plain = t.replace(/<[^>]+>/g, "").replace(S.hide ? /[+−]?₹\d{1,3}(,\d{2,3})+(\.\d+)?|[+−]?₹\d{3,}(\.\d+)?/g : /$^/, "₹•••"); K.panel(ctx, 70, y, 940, 138, 20); K.txt(ctx, e, 100, y + 82, `44px ${K.F.INTER}`, "#fff"); ctx.font = `500 25px ${K.F.INTER}`; K.cap(K.wrap(ctx, plain, 800), 3).forEach((l, i) => K.txt(ctx, l, 170, y + 48 + i * 34, `500 25px ${K.F.INTER}`, "#e6e9f2")); y += 154; });
+  K.footer(ctx, W, H, K.toolUrl("trade-reports"), "Rebuilt from my broker tradebook · Before charges · Not advice", true); return c; }
+K.share({ text: buildText, valid: () => { if (window._st?.n) return true; K.toast("Upload a tradebook first"); return false; }, draw: drawImg, file: () => "my-trading-report", imgLabel: "Share report card" });
+run();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
