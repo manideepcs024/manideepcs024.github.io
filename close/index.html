@@ -13,6 +13,8 @@
 <style>
   :root { --acc: #22d39a; --acc2: #ff5470; }
   .idx, .cm { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 40px; gap: 6px; align-items: center; margin-top: 8px; }
+  .cm, .cm-head { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 36px 36px !important; }
+  .cm .one { border: 1px solid rgba(0,224,184,.4); background: rgba(0,224,184,.07); border-radius: 10px; height: 36px; cursor: pointer; font-size: .9rem; }
   .idx-head { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 40px; gap: 6px; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); }
   .er, .er-head { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 6px; align-items: center; }
   .er { margin-top: 8px; } .er-head { font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); margin-top: 10px; }
@@ -54,7 +56,7 @@
   .modes { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
   .modes button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 7px 11px; border-radius: 999px; font: 600 .76rem Inter; cursor: pointer; }
   .modes button.on { background: var(--fg); color: #000; border-color: var(--fg); }
-  @media (max-width: 560px) { .sk { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sk .w2 { grid-column: 1 / -1; } .er { grid-template-columns: repeat(3, minmax(0, 1fr)) 34px; gap: 5px; } .er > :nth-child(1) { grid-column: 1 / 4; grid-row: 1; } .er > .rm { grid-column: 4; grid-row: 1; } .er > :nth-child(2), .er > :nth-child(3), .er > :nth-child(4) { grid-row: 2; } .er-head { display: none; } .er .field input::placeholder { font-size: .78rem; } }
+  @media (max-width: 560px) { .cm { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px 36px !important; } .cm > :nth-child(1) { grid-column: 1 / 3; grid-row: 1; } .cm > .one { grid-column: 3; grid-row: 1; } .cm > .rm { grid-column: 4; grid-row: 1; } .cm > :nth-child(2), .cm > :nth-child(3) { grid-row: 2; } .cm > :nth-child(6) { display: none; } .cm .pct { grid-column: 1 / -1; grid-row: 3; } .cm-head { display: none !important; } .sk { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sk .w2 { grid-column: 1 / -1; } .er { grid-template-columns: repeat(3, minmax(0, 1fr)) 34px; gap: 5px; } .er > :nth-child(1) { grid-column: 1 / 4; grid-row: 1; } .er > .rm { grid-column: 4; grid-row: 1; } .er > :nth-child(2), .er > :nth-child(3), .er > :nth-child(4) { grid-row: 2; } .er-head { display: none; } .er .field input::placeholder { font-size: .78rem; } }
 </style>
 <link rel="manifest" href="../manifest.webmanifest" />
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
@@ -105,9 +107,10 @@
           <h3>🪙 Commodities &amp; currency <small>optional · price & change</small></h3>
           <div class="sets" id="comSets"><span>Quick set:</span><button data-set="inr">₹ India (MCX)</button><button data-set="usd">$ Global</button><button data-set="both">₹ + $ both</button></div>
           <div class="chips-in" id="comPresets" style="margin-top:8px"></div>
-          <div class="idx-head" style="margin-top:10px"><span>NAME</span><span>PRICE</span><span>CHANGE</span><span></span></div>
+          <div class="idx-head cm-head" style="margin-top:10px"><span>NAME</span><span>PRICE</span><span>CHANGE</span><span title="Share only this">📤</span><span></span></div>
           <div id="com"></div>
           <button class="addb" id="comAdd">＋ Add row</button>
+          <button class="solo" id="comOnly" style="width:100%;margin-top:8px;padding:10px">📤 Share commodities only</button>
         </div>
 
         <div class="xsec">
@@ -184,7 +187,7 @@ const rowHtml = (cls, r, i, ph) => `<div class="${cls}" data-i="${i}">
     <label class="field"><input class="name" data-f="n" type="text" maxlength="16" value="${K.esc(r.n)}" placeholder="${ph[0]}" /></label>
     <label class="field"><input data-f="c" type="text" inputmode="decimal" value="${r.c}" placeholder="${ph[1]}" /></label>
     <label class="field"><input data-f="ch" type="text" inputmode="decimal" value="${r.ch}" placeholder="${ph[2]}" /></label>
-    <button class="rm" title="Remove">✕</button><span></span><span class="pct"></span></div>`;
+    ${cls === "cm" ? `<button class="one" data-one="${i}" title="Share only this">📤</button>` : ""}<button class="rm" title="Remove">✕</button><span></span><span class="pct"></span></div>`;
 function drawIdx() { $("#idx").innerHTML = S.idx.map((r, i) => rowHtml("idx", r, i, ["Index", "24,500", "+120"])).join(""); }
 function drawCom() { $("#com").innerHTML = S.com.map((r, i) => rowHtml("cm", r, i, ["Commodity", "76,500", "+420"])).join(""); }
 function bindRows(el, cls, arr, redraw) {
@@ -196,6 +199,10 @@ function bindRows(el, cls, arr, redraw) {
   $(el).addEventListener("click", e => { const row = e.target.closest("." + cls); if (row && e.target.closest(".rm")) { arr().splice(+row.dataset.i, 1); redraw(); render(); } });
 }
 bindRows("#idx", "idx", () => S.idx, drawIdx); bindRows("#com", "cm", () => S.com, drawCom);
+const goPrev = msg => { render(); $("#prev").scrollIntoView({ behavior: "smooth", block: "center" }); K.toast(msg); };
+$("#com").addEventListener("click", e => { const b = e.target.closest("[data-one]"); if (!b) return; const r = S.com[+b.dataset.one], n = (r.n || "").trim();
+  if (!n || !(K.num(r.c) > 0)) { K.toast("Enter the name and price first"); return; } S.mode = "pick"; S.pick = ["com:" + n]; goPrev(`Ready: share ${n} below`); });
+$("#comOnly").onclick = () => { if (!data().allCom.length) { K.toast("Enter at least one commodity price"); return; } S.mode = "com"; goPrev("Ready: share commodities below"); };
 $("#comAdd").onclick = () => { if (S.com.length >= 8) { K.toast("Up to 8 rows"); return; } S.com.push({ n: "", c: "", ch: "" }); drawCom(); };
 
 function drawMv(id, list, ph) {
@@ -294,7 +301,7 @@ const show = (D, k) => (S.mode === "all" || S.mode === k || S.mode === "pick") &
 const secs = D => ["com", "ema", "stk"].filter(k => show(D, k));
 const multi = D => S.mode === "all" || (S.mode === "pick" && secs(D).length > 1);
 const SEC_EMO = { com: "🪙", ema: "📈", stk: "🔍" }, SEC_COL = { com: "#febc2e", ema: "#7c5cff", stk: "#00e0b8" };
-function title(D) { if (S.mode !== "pick") return MODE[S.mode]; const s = secs(D); if (s.length !== 1) return "MARKET UPDATE"; if (s[0] === "stk") return D.stk.length === 1 ? "STOCK IN FOCUS" : "STOCKS IN FOCUS"; if (s[0] === "com") return D.com.every(x => /GOLD|SILVER/.test(x.n)) ? "GOLD & SILVER" : "COMMODITIES"; return MODE.ema; }
+function title(D) { if (S.mode !== "pick") return MODE[S.mode]; const s = secs(D); if (s.length !== 1) return "MARKET UPDATE"; if (s[0] === "stk") return D.stk.length === 1 ? "STOCK IN FOCUS" : "STOCKS IN FOCUS"; if (s[0] === "com") return D.com.length === 1 ? D.com[0].n.replace(/\s*[₹$].*$/, "") + " UPDATE" : D.com.every(x => /GOLD|SILVER/.test(x.n)) ? "GOLD & SILVER" : "COMMODITIES"; return MODE.ema; }
 const secKey = D => S.mode === "pick" ? (secs(D).length === 1 ? secs(D)[0] : "") : S.mode;
 const cur = n => /\$/.test(n) ? "$" : /₹/.test(n) ? "₹" : "";
 function pickables() { const D = data(); return [...D.allCom.map(x => ["com:" + x.n, "🪙 " + x.n]), ...D.allEma.map(x => ["ema:" + x.n, "📈 " + x.n]), ...D.allStk.map(x => ["stk:" + x.n, "🔍 " + x.n])]; }
@@ -337,14 +344,14 @@ function valid() { const D = data();
 function buildText() {
   const D = data(), out = [];
   if (S.mode === "all") { const [ml, , me] = MOOD[D.mood]; out.push(`🔔 *MARKET CLOSE* · ${niceD()}`, `${me} _${ml.charAt(0) + ml.slice(1).toLowerCase()}_`, "");
-    D.idx.forEach(x => out.push(`${(x.vix ? -x.ch : x.ch) > 0 ? "🟢" : (x.vix ? -x.ch : x.ch) < 0 ? "🔴" : "⚪"} *${x.n}*: ${cur(x.n)}${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`));
+    D.idx.forEach(x => out.push(`${(x.vix ? -x.ch : x.ch) > 0 ? "🟢" : (x.vix ? -x.ch : x.ch) < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`));
     if (D.gain.length) out.push("", `📈 *Top gainers:* ${D.gain.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
     if (D.lose.length) out.push(`${D.gain.length ? "" : "\n"}📉 *Top losers:* ${D.lose.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
     if (D.sect.length) out.push("", `🏭 *Sectors:* ${D.sect.map(s => `${s.n} ${K.pct(s.p)}`).join(" · ")}`);
     if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) out.push(`📊 *Breadth:* ${K.qty(D.adv)} advances / ${K.qty(D.dec)} declines`);
     if (!isNaN(D.fii) || !isNaN(D.dii)) out.push(`💰 *FII:* ${isNaN(D.fii) ? "—" : crore(D.fii)} · *DII:* ${isNaN(D.dii) ? "—" : crore(D.dii)} _(provisional)_`);
   } else out.push(`${SEC_EMO[secKey(D)] || "📊"} *${title(D)}* · ${niceD()}`);
-  if (show(D, "com")) { out.push("", multi(D) ? "🪙 *Commodities & currency*" : ""); D.com.forEach(x => out.push(`${x.ch > 0 ? "🟢" : x.ch < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`)); }
+  if (show(D, "com")) { out.push("", multi(D) ? "🪙 *Commodities & currency*" : ""); D.com.forEach(x => out.push(`${x.ch > 0 ? "🟢" : x.ch < 0 ? "🔴" : "⚪"} *${x.n}*: ${cur(x.n)}${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`)); }
   if (show(D, "ema")) { out.push("", multi(D) ? "📈 *Trend check (50 & 200 EMA)*" : "");
     D.ema.forEach(x => out.push(`${x.st.e} *${x.n}* ${K.nf(x.c)}: ${x.st.t}${x.st.d200 != null ? ` (${dpct(x.st.d200)} vs 200 EMA)` : x.st.d50 != null ? ` (${dpct(x.st.d50)} vs 50 EMA)` : ""}`));
     if (!isNaN(D.br200) || !isNaN(D.br50)) out.push(`📊 Stocks above 200 EMA: ${isNaN(D.br200) ? "—" : D.br200 + "%"} · above 50 EMA: ${isNaN(D.br50) ? "—" : D.br50 + "%"}`); }
