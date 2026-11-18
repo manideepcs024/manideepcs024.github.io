@@ -6,6 +6,8 @@
   const MMM = window.MMM = window.MMM || {};
   MMM.root = ROOT;
   if (!window.MMMi18n && !document.querySelector('script[src$="assets/i18n.js"]')) { const s = document.createElement("script"); s.src = ROOT + "assets/i18n.js"; document.head.appendChild(s); }
+  // Remember which pages were opened (used by the course page to show "visited").
+  try { const m = location.pathname.match(/\/([a-z0-9-]+)\/(?:index\.html)?$/); if (m) { const v = JSON.parse(localStorage.getItem("mmm_visits") || "{}"); v[m[1]] = Date.now(); localStorage.setItem("mmm_visits", JSON.stringify(v)); } } catch (e) {}
   MMM.standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
   MMM.ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   MMM.canInstall = false;

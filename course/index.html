@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Stock Market Learning Path — free course with tests &amp; certificate</title>
+<meta name="description" content="A free, step-by-step stock market course: 6 levels from money basics to charts, company analysis, risk management, options and trader mindset. Track your progress, pass a short test at each level and earn a shareable MANIMINDSMONEY certificate." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #7c5cff; --acc2: #00e0b8; }
+  .wrap { max-width: 1040px; }
+  .hero3 { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 22px; align-items: center; margin-top: 18px; border-radius: 26px; padding: 22px; border: 1px solid rgba(124,92,255,.45); background: radial-gradient(circle at 90% 0%, rgba(0,224,184,.16), transparent 50%), linear-gradient(135deg, rgba(124,92,255,.14), rgba(0,0,0,.2)); }
+  .ring { width: 160px; height: 160px; position: relative; } .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring div { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; } .ring b { font: 800 2.3rem "Space Grotesk"; display: block; line-height: 1; } .ring small { font: 600 .66rem "JetBrains Mono"; color: var(--muted); letter-spacing: .05em; }
+  .hero3 h2 { font: 800 1.35rem "Space Grotesk"; } .hero3 p { color: #cfd3df; font-size: .9rem; margin-top: 4px; line-height: 1.5; }
+  .hero3 .cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .lvls { display: grid; gap: 14px; margin-top: 20px; }
+  .lv { border-radius: 24px; border: 1px solid var(--line); background: var(--card); overflow: hidden; }
+  .lv.pass { border-color: rgba(34,211,154,.5); }
+  .lvh { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 16px 18px; cursor: pointer; }
+  .lvh .ic { width: 54px; height: 54px; border-radius: 17px; display: grid; place-items: center; font-size: 1.6rem; background: color-mix(in srgb, var(--c) 18%, transparent); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); }
+  .lvh small { font: 700 .66rem "JetBrains Mono"; color: var(--c); letter-spacing: .07em; } .lvh h3 { font: 800 1.2rem "Space Grotesk"; } .lvh p { font-size: .84rem; color: var(--muted); }
+  .badge { font: 700 .7rem "JetBrains Mono"; padding: 6px 10px; border-radius: 99px; white-space: nowrap; background: rgba(255,255,255,.06); color: #bfc4d2; }
+  .badge.ok { background: rgba(34,211,154,.15); color: var(--up); }
+  .mini { height: 5px; border-radius: 99px; background: rgba(255,255,255,.07); margin-top: 7px; overflow: hidden; } .mini i { display: block; height: 100%; background: var(--c); }
+  .lvb { display: none; padding: 0 18px 18px; } .lv.open .lvb { display: block; }
+  .ls { display: grid; gap: 6px; }
+  .ls a.row { display: grid; grid-template-columns: 34px 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); text-decoration: none; color: #fff; }
+  .ls a.row:hover { border-color: color-mix(in srgb, var(--c) 60%, transparent); }
+  .tick { width: 30px; height: 30px; border-radius: 9px; border: 1.5px solid var(--line); display: grid; place-items: center; background: transparent; color: #000; font-weight: 800; cursor: pointer; }
+  .tick.on { background: var(--up); border-color: var(--up); }
+  .ls .em { font-size: 1.3rem; text-align: center; }
+  .ls .t b { display: block; font: 700 .95rem "Space Grotesk"; } .ls .t span { font-size: .8rem; color: var(--muted); }
+  .ls .go { font: 700 .72rem "JetBrains Mono"; color: var(--c); white-space: nowrap; } .ls .seen { color: var(--muted); font-weight: 600; margin-right: 6px; }
+  .testb { margin-top: 12px; border-radius: 18px; padding: 14px; border: 1px dashed color-mix(in srgb, var(--c) 55%, transparent); background: color-mix(in srgb, var(--c) 6%, transparent); }
+  .qq { display: grid; gap: 12px; margin-top: 10px; }
+  .qq .qn { font: 700 .98rem "Space Grotesk"; margin-bottom: 6px; }
+  .qq .op { display: grid; gap: 6px; }
+  .qq .op button { text-align: left; border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #e8ecf6; border-radius: 12px; padding: 10px 12px; font: 500 .87rem Inter; cursor: pointer; }
+  .qq .op button.sel { border-color: var(--acc); background: rgba(124,92,255,.16); }
+  .qq .op button.right { border-color: var(--up); background: rgba(34,211,154,.14); } .qq .op button.wrong { border-color: var(--down); background: rgba(255,84,112,.12); }
+  .qq .why { font-size: .82rem; color: #cfd3df; margin-top: 6px; display: none; } .qq.show .why { display: block; }
+  .tres { margin-top: 12px; padding: 12px 14px; border-radius: 14px; font-size: .92rem; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .cert { margin-top: 24px; border-radius: 26px; padding: 20px; border: 1px solid rgba(254,188,46,.5); background: linear-gradient(135deg, rgba(254,188,46,.1), rgba(124,92,255,.06)); display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: center; }
+  .cert h2 { font: 800 1.4rem "Space Grotesk"; } .cert p { color: #cfd3df; font-size: .9rem; line-height: 1.5; margin: 4px 0 12px; }
+  .cert img { width: 100%; border-radius: 14px; border: 1px solid var(--line); display: block; }
+  .lockd { filter: grayscale(.8) brightness(.6); }
+  @media (max-width: 760px) { .hero3, .cert { grid-template-columns: 1fr; justify-items: start; } .ring { width: 130px; height: 130px; } .lvh { grid-template-columns: 46px minmax(0, 1fr); } .lvh .badge { grid-column: 2; justify-self: start; } .lvh .ic { width: 46px; height: 46px; } .ls a.row { grid-template-columns: 34px minmax(0, 1fr) auto; } .ls .em { display: none; } .cert { justify-items: stretch; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../replay/">🎮 Chart Replay</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>The stock market <span class="grad">learning path.</span></h1>
+    <p class="sub">Six levels, in the right order: money first, then how the market works, charts, company analysis, risk and options, and finally the mindset. Open each lesson, tick it off, pass the 5-question test, and earn your <b>certificate</b>. Progress is saved on this device.</p>
+
+    <div class="hero3">
+      <div class="ring" id="ring"></div>
+      <div><h2 id="hTitle"></h2><p id="hSub"></p><div class="cta" id="hCta"></div></div>
+    </div>
+
+    <div class="lvls" id="lvls"></div>
+
+    <section class="cert" id="cert">
+      <div>
+        <h2>🏆 Your certificate</h2>
+        <p id="certP"></p>
+        <div class="q">Name on certificate</div>
+        <label class="field sm"><input id="nm" type="text" maxlength="40" placeholder="Your name" autocomplete="name" /></label>
+      </div>
+      <img id="certImg" alt="Certificate preview" />
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Note:</b> This is a free <b>community learning path</b>, not an accredited or SEBI-recognised qualification. I am <b>not a SEBI-registered</b> adviser. Everything here is for <b>education</b> only; nothing is investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const LV = [
+  { id: "L1", ic: "🪜", c: "#22d39a", t: "Money first", d: "Protect yourself before you trade.", ls: [["money-ladder", "🪜", "The Money Ladder", "Insurance, emergency fund, SIP, then trading"], ["goals", "🎯", "Goal & SIP Planner", "Plan what your money is for"], ["etf", "📦", "ETFs explained", "The simplest smart core portfolio"], ["myths", "🃏", "Myth or Fact?", "Bust 24 common beliefs"], ["fomo", "🚨", "FOMO Trap Detector", "Spot hype messages and tips"], ["scam-game", "🎣", "Tip Trap game", "Survive a pump & dump"]],
+    q: [["Before you start trading, what should already be in place?", ["A margin account with high leverage", "Health insurance, term insurance and an emergency fund", "A list of penny stocks", "A paid Telegram tips group"], 1, "Protection first: insurance and an emergency fund mean a bad trade or a hospital bill can't destroy your family's finances."],
+      ["How big should an emergency fund usually be?", ["About 6 months of household expenses", "One week of expenses", "Whatever is left after buying stocks", "Not needed if you trade"], 0, "Around 6 months of expenses, kept safe and liquid (savings, FD, liquid fund)."],
+      ["A message says: \"Aaj ka dhamaka! 100% sure target, don't miss!\" What's the right response?", ["Buy quickly before it runs", "Forward it to friends", "Ignore it, or verify facts on exchange filings yourself", "Buy a small quantity just in case"], 2, "Urgency and certainty words are trap signals. Real information is on NSE/BSE filings and company reports."],
+      ["What does an index ETF do?", ["Guarantees a fixed return", "Tracks an index at low cost and trades like a share", "Can only be bought during an NFO", "Picks the best stocks every day"], 1, "An index ETF holds the index's stocks, so you get the market's return minus a small cost."],
+      ["How does a typical penny-stock pump & dump end?", ["Everyone who bought makes money", "SEBI pays back the losses", "The stock becomes a large-cap", "Operators sell to late buyers and the price crashes"], 3, "The operators bought early and exit into the hype. Late buyers are left holding a falling stock."]] },
+  { id: "L2", ic: "🏛️", c: "#5b8cff", t: "How the market works", d: "Accounts, orders, products and events.", ls: [["market-basics", "🏛️", "Market Basics", "Demat, broker, CNC/MIS, circuits, F&O ban"], ["ipo-game", "🎟️", "IPO Mania game", "Apply, allotment and listing day"], ["corporate-actions", "🏢", "Corporate Actions", "Split, bonus, dividend, record date"], ["special-situations", "🪔", "Special situations", "Muhurat, holiday expiry, delisting"], ["sectors", "🧭", "Sector Explorer", "What every sector does"]],
+    q: [["Where are your shares actually held?", ["In your trading account", "In your bank account", "In your demat account", "In the broker's own name"], 2, "The demat account (with CDSL/NSDL via your DP) holds the shares. The trading account is for placing orders."],
+      ["You bought with MIS (intraday) and forgot to sell. What happens?", ["The broker auto-squares off near the market close", "You get delivery for free", "It converts to F&O", "The order is cancelled with no effect"], 0, "MIS positions are squared off by the broker before the close (often with an extra charge)."],
+      ["A stock is in the upper circuit. That means:", ["It's banned from trading forever", "It hit the maximum rise allowed for the day: buyers, almost no sellers", "It's guaranteed to rise tomorrow", "Only F&O traders can buy it"], 1, "The circuit limit caps the day's move. Getting out of a lower circuit can be just as hard."],
+      ["The record date for a bonus is Monday (T+1 settlement). The last day to buy is:", ["Monday", "Tuesday", "Any day that week", "The previous Friday (trading day before)"], 3, "Ex-date = record date under T+1, so you must buy by the trading day before the record date."],
+      ["You hold 100 shares at ₹1,000 and the company gives a 1:1 bonus. After the ex-date you have about:", ["100 shares at ₹2,000", "200 shares at ₹1,000", "200 shares at ~₹500", "100 shares at ₹500"], 2, "Shares double, the price halves, and the value stays about ₹1,00,000."]] },
+  { id: "L3", ic: "🕯️", c: "#febc2e", t: "Reading charts", d: "Candles, patterns, indicators and practice.", ls: [["candlesticks", "🕯️", "Candlesticks", "OHLC and 22 candle patterns"], ["chart-patterns", "📐", "Chart Patterns", "Trendlines, W/M, cup & handle, VCP"], ["indicators", "📈", "Indicators", "EMA, VWAP, RSI, MACD, ADX, Supertrend"], ["chart-game", "🎯", "Read the Chart game", "Spot the setup"], ["replay", "🎮", "Chart Replay", "Paper trade one candle at a time"]],
+    q: [["A hammer (long lower wick) after a downtrend suggests:", ["Sellers are fully in control", "Buyers rejected lower prices; wait for confirmation", "The stock will hit the upper circuit", "Nothing; wicks don't matter"], 1, "The long lower wick shows price was pushed down and bought back up. Confirm with the next candle."],
+      ["Price is above the 200 EMA, and the 50 EMA is above the 200 EMA. This usually means:", ["A long-term uptrend", "A long-term downtrend", "The stock is about to be delisted", "The RSI is above 70"], 0, "Price and the faster average above the 200 EMA is the classic sign of a primary uptrend."],
+      ["A golden cross is when:", ["RSI crosses 50", "Price touches the upper Bollinger band", "The 50-day average crosses above the 200-day average", "Volume doubles"], 2, "The 50-day crossing above the 200-day is a slow, trend-confirming signal."],
+      ["A double bottom (W) is confirmed when:", ["The second low forms", "Price closes above the neckline (the middle peak)", "Volume falls", "RSI drops below 30"], 1, "Until price closes above the neckline, it's just a possible pattern."],
+      ["RSI is 78. What's the sensible reading?", ["Short it immediately", "The stock must fall tomorrow", "Strong momentum; overbought, but it can stay high in strong trends", "The data is wrong"], 2, "Overbought isn't a sell signal by itself. In strong uptrends, RSI can stay above 70 for weeks."]] },
+  { id: "L4", ic: "🔍", c: "#00e0b8", t: "Analysing companies", d: "Fundamentals, results and valuation.", ls: [["concepts", "📐", "Dow, Piotroski & PEG", "Trend theory and quality checks"], ["results-guide", "📊", "Results & Concalls", "Why stocks react to numbers"], ["fundamentals-game", "🕵️", "Stock Detective game", "Find strong vs weak companies"], ["calendar", "📅", "Results Calendar", "Track upcoming results and events"]],
+    q: [["The PEG ratio is:", ["P/E divided by earnings growth rate", "Price divided by book value", "Dividend divided by price", "Debt divided by equity"], 0, "PEG adjusts P/E for growth. Around 1 or below is often considered reasonable."],
+      ["The Piotroski F-Score measures:", ["How popular a stock is on social media", "Daily price volatility", "Promoter holding only", "Financial strength on 9 yes/no tests"], 3, "Profitability, leverage/liquidity and efficiency tests: 8–9 is strong, 0–2 is weak."],
+      ["Profit grew 20%, yet the stock fell 8% on results day. The most likely reason:", ["The exchange made an error", "Results or guidance were below what the market expected", "Profit growth is always bad", "Promoters bought shares"], 1, "Prices react to the surprise vs expectations and to future guidance, not just to growth."],
+      ["In Dow Theory, a primary uptrend shows:", ["Lower highs and lower lows", "A flat price for months", "Higher highs and higher lows", "Rising volume only"], 2, "Higher highs and higher lows define an uptrend; it continues until clearly reversed."],
+      ["On a concall, what usually matters most for the stock?", ["The CEO's tone only", "The number of analysts on the call", "Management's guidance on demand, margins and growth", "How long the call lasts"], 2, "Forward guidance changes expectations, and expectations move prices."]] },
+  { id: "L5", ic: "⚖️", c: "#ff8a3d", t: "Risk, trading & options", d: "Size, stops, plans, leverage and F&O.", ls: [["sl-calculator", "🛑", "Stop-Loss & Position Size", "Never risk more than you planned"], ["checklist", "✅", "Pre-Trade Checklist", "Rules before every trade"], ["journal", "📓", "Risk-Reward & Journal", "Plan R:R and record every trade"], ["mtf-game", "🧪", "Leverage Lab game", "Intraday vs positional vs MTF"], ["options-basics", "📞", "Options Basics & Hedging", "CE/PE, theta, hedges, naked risk"], ["fno-game", "🎲", "F&O Survival game", "Learn F&O by playing"]],
+    q: [["Capital ₹2,00,000, risk 1% per trade, entry ₹500, stop ₹490. How many shares?", ["20", "200", "400", "2,000"], 1, "Risk = ₹2,000. Risk per share = ₹10. ₹2,000 ÷ ₹10 = 200 shares."],
+      ["Many traders only take trades with a reward-to-risk of at least:", ["2 : 1", "1 : 5", "1 : 1 always", "It doesn't matter"], 0, "With 2:1, you can be right only 40% of the time and still make money."],
+      ["A 'married put' is:", ["Selling a call and a put together", "Buying a call with borrowed money", "Owning the stock and buying a put to protect it", "A put bought by two people"], 2, "It's insurance: the loss below the put strike is capped."],
+      ["Selling a naked call option has:", ["Limited risk", "No risk if it's OTM", "Unlimited risk if the price shoots up", "Risk only on expiry day"], 2, "The premium is the maximum gain; the loss has no ceiling."],
+      ["Time decay (theta) hurts option buyers most:", ["On the first day of the series", "In the last week before expiry", "Only on holidays", "Never, if IV is high"], 1, "Time value melts slowly at first, then very fast as expiry approaches."]] },
+  { id: "L6", ic: "🧠", c: "#ff5470", t: "Trader mindset", d: "Discipline, recovery and learning from legends.", ls: [["overtrading", "🎬", "The 10:30 Decision", "Why overtrading gives it all back"], ["tv-tip", "📺", "The TV Tip Trap", "How front-running works"], ["bounce-back", "💙", "Recovery Room", "What to do after a big loss"], ["legends", "🏆", "Market Legends", "How the greats really traded"], ["comeback-stories", "🔥", "Comeback Stories", "People who fell and rose"], ["report-card", "📝", "Monthly Report Card", "Grade your own month"]],
+    q: [["You've had 3 losing trades in a row today. The best move:", ["Double your size to win it back", "Switch to options for faster recovery", "Stop for the day, review the trades, and reduce size", "Keep trading until you're green"], 2, "Revenge trading turns a bad day into a disaster. Stop, review, come back smaller."],
+      ["You're up ₹6,000 by 10:30 AM. Overtrading after that usually leads to:", ["Giving back the gains through low-quality trades", "Doubling the profit", "Lower brokerage", "Better discipline"], 0, "Early profit + boredom = forced trades. Having a daily stop (and a daily profit plan) helps."],
+      ["Paul Tudor Jones' rule \"losers average losers\" means:", ["Losing traders are average", "Average down to lower your cost", "Losses average out over time", "Don't add to a losing position"], 3, "Averaging down on a loser increases risk on a trade that's already proving you wrong."],
+      ["What did almost every market legend have in common?", ["They used the same indicator", "They cut losses quickly and let winners run", "They never had losing years", "They only traded options"], 1, "Different styles, same core: small losses, big winners, strict rules."],
+      ["In a TV/Telegram 'tip' front-running scheme, who usually profits?", ["The viewers who buy first", "The exchange", "The operators who bought before the tip and sell to viewers", "Nobody; it's random"], 2, "The tip creates buyers for the operators' shares. Viewers buy their exit."]] },
+];
+const S = K.store("course_v1", { done: {}, best: {}, open: "L1", name: "", certDate: "" });
+let visits = {}; try { visits = JSON.parse(localStorage.getItem("mmm_visits") || "{}"); } catch {}
+const ans = {}; let showing = null;
+const lsCount = () => LV.reduce((a, l) => a + l.ls.length, 0), doneCount = () => LV.reduce((a, l) => a + l.ls.filter(x => S.done[x[0]]).length, 0);
+const passed = l => (S.best[l.id] || 0) >= 4, allPass = () => LV.every(passed);
+function pct() { return Math.round((doneCount() + LV.filter(passed).length * 3) / (lsCount() + LV.length * 3) * 100); }
+function drawHero() { const p = pct(), r = 70, C = 2 * Math.PI * r;
+  $("#ring").innerHTML = `<svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12"/><circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#gr)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p / 100)}"/><defs><linearGradient id="gr"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#00e0b8"/></linearGradient></defs></svg><div><span><b>${p}%</b><small>COMPLETE</small></span></div>`;
+  const np = LV.filter(passed).length, nextL = LV.find(l => !passed(l)), nextLesson = nextL && nextL.ls.find(x => !S.done[x[0]]);
+  $("#hTitle").textContent = allPass() ? "🎉 Course complete!" : np ? `${np} of 6 levels passed` : "Start with Level 1";
+  $("#hSub").innerHTML = allPass() ? "You've passed every level. Your certificate is ready below." : `${doneCount()} of ${lsCount()} lessons ticked. ${nextL ? `Next up: <b>Level ${LV.indexOf(nextL) + 1}: ${nextL.t}</b>.` : ""}`;
+  $("#hCta").innerHTML = allPass() ? `<a class="btn primary" href="#cert" style="text-decoration:none">🏆 Get my certificate</a>` : nextLesson ? `<a class="btn primary" href="../${nextLesson[0]}/" style="text-decoration:none">▶ Continue: ${esc(nextLesson[2])}</a><button class="btn" data-test="${nextL.id}">📝 Take Level ${LV.indexOf(nextL) + 1} test</button>` : `<button class="btn primary" data-test="${nextL.id}">📝 Take Level ${LV.indexOf(nextL) + 1} test</button>`; }
+function drawLevels() { $("#lvls").innerHTML = LV.map((l, n) => { const d = l.ls.filter(x => S.done[x[0]]).length, b = S.best[l.id], ok = passed(l);
+  return `<article class="lv ${S.open === l.id ? "open" : ""} ${ok ? "pass" : ""}" style="--c:${l.c}" id="lv-${l.id}"><div class="lvh" data-toggle="${l.id}"><div class="ic">${l.ic}</div><div><small>LEVEL ${n + 1}</small><h3>${l.t}</h3><p>${l.d} · ${d}/${l.ls.length} lessons</p><div class="mini"><i style="width:${d / l.ls.length * 100}%"></i></div></div><span class="badge ${ok ? "ok" : ""}">${ok ? `✅ Passed ${b}/5` : b != null ? `Test: ${b}/5` : "Test pending"}</span></div>
+    <div class="lvb"><div class="ls">${l.ls.map(([s, e, t, g]) => `<a class="row" href="../${s}/"><button class="tick ${S.done[s] ? "on" : ""}" data-tick="${s}" aria-label="Mark done">${S.done[s] ? "✓" : ""}</button><span class="em">${e}</span><span class="t"><b>${esc(t)}</b><span>${esc(g)}</span></span><span class="go">${visits[s] && !S.done[s] ? `<span class="seen">👀 visited</span>` : ""}Open ↗</span></a>`).join("")}</div>
+    <div class="testb" id="tb-${l.id}">${showing === l.id ? testHtml(l) : `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:.88rem;color:#cfd3df">📝 <b>Level ${n + 1} test</b>: 5 questions, pass with 4. ${ok ? "You can retake it any time." : ""}</span><button class="btn" data-test="${l.id}" style="padding:10px 16px">${b != null ? "Retake test" : "Start test"}</button></div>`}</div></div></article>`; }).join(""); }
+function testHtml(l) { const a = ans[l.id] || {}, sub = a.sub;
+  return `<div class="qq-wrap">${l.q.map(([q, o, c, w], i) => `<div class="qq ${sub ? "show" : ""}"><div class="qn">${i + 1}. ${esc(q)}</div><div class="op">${o.map((x, j) => `<button data-q="${l.id}:${i}:${j}" class="${sub ? (j === c ? "right" : a[i] === j ? "wrong" : "") : a[i] === j ? "sel" : ""}">${esc(x)}</button>`).join("")}</div><div class="why">💡 ${esc(w)}</div></div>`).join("")}
+    ${sub ? `<div class="tres">${a.score >= 4 ? `✅ <b>${a.score}/5: passed!</b> ${LV.indexOf(l) < 5 ? "On to the next level." : "That's the last level. Check your certificate below."}` : `❌ <b>${a.score}/5.</b> You need 4. Revisit the lessons above and try again.`}</div><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn" data-retake="${l.id}">🔁 Retake</button>${a.score >= 4 && LV.indexOf(l) < 5 ? `<button class="btn primary" data-goto="${LV[LV.indexOf(l) + 1].id}">Next level →</button>` : ""}</div>`
+      : `<button class="btn primary" data-submit="${l.id}" style="margin-top:12px">Submit answers</button>`}</div>`; }
+function renderAll() { drawHero(); drawLevels(); drawCert(); }
+document.addEventListener("click", e => { const t = e.target.closest("[data-tick],[data-toggle],[data-test],[data-q],[data-submit],[data-retake],[data-goto]"); if (!t) return; const ds = t.dataset;
+  if (ds.tick) { e.preventDefault(); e.stopPropagation(); S.done[ds.tick] = !S.done[ds.tick]; if (!S.done[ds.tick]) delete S.done[ds.tick]; S.save(); renderAll(); return; }
+  if (ds.toggle) { S.open = S.open === ds.toggle ? "" : ds.toggle; S.save(); drawLevels(); return; }
+  if (ds.test || ds.retake) { const id = ds.test || ds.retake; ans[id] = {}; showing = id; S.open = id; S.save(); drawLevels(); setTimeout(() => $("#tb-" + id).scrollIntoView({ behavior: "smooth", block: "start" }), 30); return; }
+  if (ds.goto) { S.open = ds.goto; showing = null; S.save(); drawLevels(); setTimeout(() => $("#lv-" + ds.goto).scrollIntoView({ behavior: "smooth", block: "start" }), 30); return; }
+  if (ds.q) { const [id, i, j] = ds.q.split(":"); const a = ans[id] = ans[id] || {}; if (a.sub) return; a[+i] = +j; $("#tb-" + id).innerHTML = testHtml(LV.find(l => l.id === id)); return; }
+  if (ds.submit) { const l = LV.find(x => x.id === ds.submit), a = ans[l.id] || {}; if (Object.keys(a).length < 5) { K.toast(`Answer all 5 questions (${Object.keys(a).length}/5 done)`); return; }
+    a.sub = true; a.score = l.q.filter((q, i) => a[i] === q[2]).length; S.best[l.id] = Math.max(S.best[l.id] || 0, a.score); if (allPass() && !S.certDate) S.certDate = K.iso(new Date()); S.save(); drawHero(); drawLevels(); drawCert(); setTimeout(() => $("#tb-" + l.id).querySelector(".tres").scrollIntoView({ behavior: "smooth", block: "center" }), 30); } });
+/* certificate */
+const certId = () => { let h = 2166136261; for (const ch of (S.name || "") + S.certDate) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return "MMM-" + (h >>> 0).toString(36).toUpperCase().padStart(7, "0").slice(0, 7); };
+async function certCanvas() { await K.loadFonts?.(); const Wd = 1080, H = 1350, { c, ctx } = K.canvas(Wd, H, [["rgba(254,188,46,0.2)", .5, 0, .7], ["rgba(124,92,255,0.22)", .5, 1, .7]]);
+  const done = allPass(), gold = "#febc2e";
+  ctx.strokeStyle = gold; ctx.lineWidth = 4; K.rr(ctx, 36, 36, Wd - 72, H - 72, 30); ctx.stroke(); ctx.strokeStyle = "rgba(254,188,46,.35)"; ctx.lineWidth = 2; K.rr(ctx, 52, 52, Wd - 104, H - 104, 22); ctx.stroke();
+  K.txt(ctx, "₹ MANIMINDSMONEY", Wd / 2, 140, `800 34px ${K.F.GROT}`, "#fff", "center");
+  K.txt(ctx, done ? "CERTIFICATE OF COMPLETION" : "LEARNING PATH · IN PROGRESS", Wd / 2, 214, `700 30px ${K.F.MONO}`, gold, "center");
+  K.txt(ctx, "🏆", Wd / 2, 340, `110px ${K.F.INTER}`, "#fff", "center");
+  K.txt(ctx, done ? "This certifies that" : "Learning progress of", Wd / 2, 430, `500 30px ${K.F.INTER}`, "#cfd3df", "center");
+  const nm = (S.name || "Your Name").trim() || "Your Name"; K.txt(ctx, nm, Wd / 2, 520, K.fit(ctx, nm, 800, K.F.GROT, 80, 860), "#fff", "center");
+  ctx.strokeStyle = "rgba(255,255,255,.3)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(220, 550); ctx.lineTo(860, 550); ctx.stroke();
+  ctx.font = `500 30px ${K.F.INTER}`; K.wrap(ctx, done ? "has completed all six levels of the MANIMINDSMONEY Stock Market Learning Path" : `has passed ${LV.filter(passed).length} of 6 levels of the MANIMINDSMONEY Stock Market Learning Path`, 820).forEach((l, k) => K.txt(ctx, l, Wd / 2, 610 + k * 42, `500 30px ${K.F.INTER}`, "#e6e9f2", "center"));
+  LV.forEach((l, i) => { const x = 110 + (i % 2) * 440, y = 720 + Math.floor(i / 2) * 104, ok = passed(l); K.panel(ctx, x, y, 420, 88, 18); K.txt(ctx, l.ic, x + 26, y + 58, `38px ${K.F.INTER}`, "#fff"); K.txt(ctx, `Level ${i + 1}`, x + 84, y + 36, `700 18px ${K.F.MONO}`, l.c); K.txt(ctx, l.t, x + 84, y + 66, K.fit(ctx, l.t, 700, K.F.GROT, 26, 230), "#fff"); K.txt(ctx, ok ? `${S.best[l.id]}/5` : "—", x + 396, y + 56, `800 28px ${K.F.GROT}`, ok ? "#22d39a" : "#8b93a7", "right"); });
+  const dt = done && S.certDate ? K.niceDate(S.certDate, { day: "numeric", month: "long", year: "numeric" }) : K.niceDate(K.iso(new Date()), { day: "numeric", month: "long", year: "numeric" });
+  K.txt(ctx, (done ? "Completed on " : "As of ") + dt, Wd / 2, 1080, `600 28px ${K.F.INTER}`, "#fff", "center");
+  if (done) K.txt(ctx, "Certificate ID: " + certId(), Wd / 2, 1122, `600 22px ${K.F.MONO}`, "#8b93a7", "center");
+  K.txt(ctx, "— Manideep Mittal, MANIMINDSMONEY Community", Wd / 2, 1190, `italic 500 26px ${K.F.INTER}`, "#cfd3df", "center");
+  K.txt(ctx, K.toolUrl("course"), Wd / 2, 1246, `600 22px ${K.F.MONO}`, "#b9a6ff", "center");
+  K.txt(ctx, "Community learning certificate · not an accredited qualification", Wd / 2, 1280, `500 18px ${K.F.INTER}`, "#8b93a7", "center");
+  return c; }
+let certT; function drawCert() { const n = LV.filter(passed).length;
+  $("#certP").innerHTML = allPass() ? `🎉 All 6 levels passed. Add your name and share your certificate in the group.` : `Pass all 6 level tests to unlock your certificate. You've passed <b>${n} of 6</b> so far. Until then, you can share your progress card.`;
+  clearTimeout(certT); certT = setTimeout(async () => { const c = await certCanvas(); $("#certImg").src = c.toDataURL("image/png"); $("#certImg").classList.toggle("lockd", !allPass()); }, 150); }
+const nmEl = $("#nm"); nmEl.value = S.name; nmEl.addEventListener("input", () => { S.name = nmEl.value; S.save(); drawCert(); });
+function buildText() { const n = LV.filter(passed).length;
+  return (allPass() ? [`🏆 *${S.name || "I"} completed the MANIMINDSMONEY Stock Market Learning Path!*`, "", "All 6 levels passed ✅", ...LV.map((l, i) => `${l.ic} Level ${i + 1}: ${l.t} (${S.best[l.id]}/5)`), "", "Free course: money basics → charts → analysis → risk & options → mindset 👇"]
+    : [`🎓 *My stock market learning progress: ${pct()}%*`, "", `${n}/6 levels passed · ${doneCount()}/${lsCount()} lessons done`, ...LV.map((l, i) => `${passed(l) ? "✅" : "⬜"} Level ${i + 1}: ${l.t}`), "", "Free course with tests & certificate 👇"]).concat(K.signoff("course", "Learn", "_Community course. Education only, not SEBI registered._").slice(1)).join("\n"); }
+K.share({ text: buildText, draw: certCanvas, file: () => allPass() ? "mmm-certificate" : "mmm-learning-progress", imgLabel: "Share certificate / progress" });
+renderAll();
+addEventListener("pageshow", () => { try { visits = JSON.parse(localStorage.getItem("mmm_visits") || "{}"); } catch {} drawLevels(); });
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

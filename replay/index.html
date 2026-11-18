@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Chart Replay — paper trade one candle at a time</title>
+<meta name="description" content="Practise trading with zero risk: a hidden chart is revealed one candle at a time. Buy or short with a stop-loss and target, position size by risk %, and get graded on P&amp;L, drawdown, stop-loss discipline and overtrading. Free paper-trading simulator." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #5b8cff; }
+  .wrap { max-width: 1180px; }
+  .game { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; margin-top: 16px; align-items: start; }
+  .chartc { border-radius: 22px; border: 1px solid var(--line); background: var(--card); padding: 12px; }
+  .chead { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .chead h3 { font: 800 1.05rem "Space Grotesk"; }
+  .chead .px { font: 800 1.2rem "Space Grotesk"; } .chead small { font: 600 .74rem "JetBrains Mono"; color: var(--muted); }
+  #cv { width: 100%; height: 400px; display: block; border-radius: 14px; background: rgba(0,0,0,.35); touch-action: manipulation; }
+  .bar2 { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+  .bar2 .btn { padding: 11px 16px; }
+  .bar2 .grow { flex: 1 1 auto; }
+  .prog { height: 6px; border-radius: 99px; background: rgba(255,255,255,.07); overflow: hidden; margin-top: 10px; } .prog i { display: block; height: 100%; background: linear-gradient(90deg, var(--acc2), var(--acc)); transition: width .2s; }
+  .side { display: grid; gap: 12px; }
+  .pn { border-radius: 20px; border: 1px solid var(--line); background: var(--card); padding: 14px; }
+  .pn h4 { font: 700 .68rem "JetBrains Mono"; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
+  .acct { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .acct div span { display: block; font: 600 .6rem "JetBrains Mono"; color: var(--muted); letter-spacing: .05em; } .acct div b { font: 800 1.1rem "Space Grotesk"; }
+  .bs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bs button { border: 0; border-radius: 14px; padding: 13px; font: 800 1rem "Space Grotesk"; cursor: pointer; color: #000; }
+  .bs .buy { background: var(--up); } .bs .sell { background: var(--down); color: #fff; }
+  .bs button:disabled { opacity: .35; cursor: not-allowed; }
+  .tk { display: grid; gap: 8px; margin-top: 10px; }
+  .tk .r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tk .info { font-size: .82rem; color: #cfd3df; line-height: 1.5; padding: 9px 11px; border-radius: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .tk .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; } .rk button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #bfc4d2; border-radius: 10px; padding: 11px 0; font: 700 .82rem Inter; cursor: pointer; } .rk button.on { background: var(--fg); color: #000; }
+  .posb { border-radius: 14px; padding: 11px 12px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-size: .84rem; color: #cfd3df; display: grid; gap: 6px; }
+  .posb .big { font: 800 1.35rem "Space Grotesk"; }
+  .log { display: grid; gap: 5px; max-height: 220px; overflow: auto; font-size: .8rem; }
+  .log div { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,.03); }
+  .log small { color: var(--muted); }
+  .res { margin-top: 18px; border-radius: 24px; padding: 20px; border: 1px solid rgba(34,211,154,.45); background: linear-gradient(135deg, rgba(34,211,154,.1), rgba(91,140,255,.06)); display: none; }
+  .res.on { display: block; }
+  .res .top { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 18px; align-items: center; }
+  .grade { width: 110px; height: 110px; border-radius: 30px; display: grid; place-items: center; font: 800 3.6rem "Space Grotesk"; color: #000; }
+  .stats6 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+  .stats6 div { border-radius: 14px; padding: 10px 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .stats6 span { display: block; font: 600 .6rem "JetBrains Mono"; color: var(--muted); letter-spacing: .05em; } .stats6 b { font: 800 1.08rem "Space Grotesk"; }
+  .fb { margin-top: 12px; display: grid; gap: 6px; font-size: .88rem; color: #dfe3ee; line-height: 1.5; }
+  .gen { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .gen div { border-radius: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); font-size: .86rem; color: #cfd3df; line-height: 1.5; }
+  .gen b.h { display: block; color: #fff; font: 700 .98rem "Space Grotesk"; margin-bottom: 3px; }
+  .sec2 { margin-top: 26px; } .sec2 > h2 { font: 800 1.35rem "Space Grotesk"; margin-bottom: 10px; }
+  .hist { display: grid; gap: 6px; }
+  .hist div { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-size: .85rem; }
+  .hist .g { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; font: 800 1rem "Space Grotesk"; color: #000; }
+  .kbd { font: 600 .7rem "JetBrains Mono"; color: var(--muted); margin-top: 8px; }
+  .kbd b { color: #fff; padding: 1px 6px; border-radius: 5px; background: rgba(255,255,255,.08); }
+  @media (max-width: 900px) { .game { grid-template-columns: 1fr; } #cv { height: 320px; } .stats6 { grid-template-columns: 1fr 1fr; } .res .top { grid-template-columns: 1fr; justify-items: start; } .kbd { display: none; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../course/">🎓 Course</a><a href="../chart-patterns/">📐 Patterns</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Chart Replay: <span class="grad">practise with ₹0 at risk.</span></h1>
+    <p class="sub">A hidden daily chart is revealed <b>one candle at a time</b>. You start with <b>₹1,00,000</b> of paper money. Buy or short with a stop-loss, size your position by risk, and press Next. After 100 candles you get a grade on profit, drawdown, stop-loss discipline and overtrading.</p>
+
+    <div class="game">
+      <div class="chartc">
+        <div class="chead"><div><h3 id="tkr">Mystery stock</h3><small id="day"></small></div><div style="text-align:right"><div class="px" id="px"></div><small id="chg"></small></div></div>
+        <canvas id="cv"></canvas>
+        <div class="prog"><i id="prog"></i></div>
+        <div class="bar2">
+          <button class="btn primary grow" id="next">▶ Next candle</button>
+          <button class="btn" id="next5">⏩ +5</button>
+          <button class="btn" id="auto">▶▶ Auto</button>
+          <button class="btn" id="emaT">EMA 21/50</button>
+          <button class="btn" id="endB">⏹ End</button>
+        </div>
+        <div class="kbd">Keys: <b>Space</b>/<b>→</b> next · <b>B</b> buy · <b>S</b> short · <b>X</b> close position</div>
+      </div>
+      <div class="side">
+        <div class="pn"><h4>ACCOUNT</h4><div class="acct" id="acct"></div></div>
+        <div class="pn" id="tradePn"></div>
+        <div class="pn"><h4>TRADE LOG</h4><div class="log" id="log"></div></div>
+      </div>
+    </div>
+
+    <section class="res" id="res"></section>
+
+    <section class="sec2">
+      <h2>📒 Your sessions</h2>
+      <div class="hist" id="hist"></div>
+    </section>
+
+    <section class="sec2">
+      <h2>🧭 How to practise well</h2>
+      <div class="gen">
+        <div><b class="h">📏 Decide before you click</b>Know your setup (pattern, EMA trend, breakout), your stop and your target before entering. The ticket fills a suggestion; change it to your plan.</div>
+        <div><b class="h">⚖️ Risk 1% per trade</b>The quantity is calculated so a stop-loss hit costs about 1% of your capital. Ten losers in a row still leave you 90% of your money.</div>
+        <div><b class="h">✂️ Don't remove the stop</b>Moving a stop further away is how small losses become big ones. Trail it in your favour only.</div>
+        <div><b class="h">🧘 Sitting out is allowed</b>No clear setup? Press Next. Fewer, better trades usually grade higher than many random ones.</div>
+        <div><b class="h">🔁 Repeat</b>Play 10 sessions and compare. Look at your log: which setups worked, and where did you break rules?</div>
+        <div><b class="h">🧪 Then go real, small</b>Paper trading has no fear or greed. When you move to real money, start with tiny size.</div>
+      </div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> Charts are <b>computer-generated</b> for practice, not real stocks. Fills are simplified (entries at the candle close; stops fill at the stop or at the open on a gap; charges approximated at 0.1% per round trip). Paper results don't predict real results. For <b>education</b> only. Not SEBI registered.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc, num = K.num; K.chrome();
+const UP = "#22d39a", DN = "#ff5470", Y = "#febc2e", M = "#8b93a7";
+const S = K.store("replay_v1", { risk: "1", ema: true, hist: [], played: 0 });
+function rng(seed) { let s = seed >>> 0 || 1; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+function genDaily(seed, n) {
+  const r = rng(seed), regs = []; let left = n; const pat = [.0028, -.0032, .0004, .0030, -.0026, .0022];
+  let k = Math.floor(r() * 6); while (left > 0) { const len = 50 + Math.floor(r() * 80); regs.push([pat[k % 6] * (.7 + r() * .6), Math.min(len, left)]); left -= len; k++; }
+  const bars = []; let p = 1000; regs.forEach(([d, len]) => { for (let i = 0; i < len; i++) { const vol = .012 + r() * .008, gap = r() < .04 ? (r() - .5) * vol * 4 : 0, ch = d + (r() - .5) * 2 * vol; const o = p * (1 + gap), c = o * (1 + ch), h = Math.max(o, c) * (1 + r() * vol * .7), l = Math.min(o, c) * (1 - r() * vol * .7); bars.push({ o, h, l, c, v: 1e5 * (.6 + r() + Math.abs(ch) * 40 + Math.abs(gap) * 60) }); p = c; } });
+  return bars;
+}
+const ema = (a, n) => { const k = 2 / (n + 1), o = []; a.forEach((v, i) => o.push(i ? v * k + o[i - 1] * (1 - k) : v)); return o; };
+const CAP = 100000, START = 140, LEN = 100, FEE = .0005;
+const NAMES = ["Mystery Ltd", "Stock X", "Bharat Widgets", "Nova Industries", "Sunrise Infra", "Pixel Tech", "Ganga Foods", "Orbit Pharma", "Delta Motors", "Lotus Finance"];
+const f2 = v => (v < 0 ? "−" : "") + "₹" + Math.abs(v).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const f0 = v => (v < 0 ? "−" : v > 0 ? "+" : "") + "₹" + Math.round(Math.abs(v)).toLocaleString("en-IN");
+let G, tk = null, autoT = null;
+function newGame() {
+  const seed = (Date.now() ^ Math.floor(Math.random() * 1e9)) >>> 0, raw = genDaily(seed, START + LEN + 1), sc = [.12, .35, .8, 1.6, 2.8][seed % 5];
+  const bars = raw.map(b => ({ o: b.o * sc, h: b.h * sc, l: b.l * sc, c: b.c * sc, v: b.v }));
+  G = { seed, bars, e21: ema(bars.map(b => b.c), 21), e50: ema(bars.map(b => b.c), 50), i: START, cash: CAP, pos: null, trades: [], eq: [CAP], peak: CAP, dd: 0, done: false, name: NAMES[seed % NAMES.length] };
+  tk = null; stopAuto(); $("#res").classList.remove("on"); render();
+}
+const cur = () => G.bars[G.i];
+const openPnl = () => G.pos ? G.pos.side * (cur().c - G.pos.entry) * G.pos.qty : 0;
+const equity = () => G.cash + openPnl();
+function closePos(price, why) { const p = G.pos; if (!p) return; const gross = p.side * (price - p.entry) * p.qty, fee = FEE * (p.entry + price) * p.qty, pnl = gross - fee;
+  G.cash += pnl; G.trades.push({ side: p.side, entry: p.entry, exit: price, qty: p.qty, pnl, R: p.r0 ? pnl / (p.r0 * p.qty) : null, why, hadSL: p.sl0 != null, ei: p.ei, xi: G.i, moved: p.widened }); G.pos = null; }
+function step() { if (G.done) return; G.i++; const b = cur(), p = G.pos;
+  if (p) { const sl = p.sl, tg = p.tg;
+    if (p.side === 1) { if (sl != null && b.o <= sl) closePos(b.o, "Gap below stop"); else if (sl != null && b.l <= sl) closePos(sl, "Stop-loss"); else if (tg != null && b.o >= tg) closePos(b.o, "Gap to target"); else if (tg != null && b.h >= tg) closePos(tg, "Target"); }
+    else { if (sl != null && b.o >= sl) closePos(b.o, "Gap above stop"); else if (sl != null && b.h >= sl) closePos(sl, "Stop-loss"); else if (tg != null && b.o <= tg) closePos(b.o, "Gap to target"); else if (tg != null && b.l <= tg) closePos(tg, "Target"); } }
+  const e = equity(); G.eq.push(e); G.peak = Math.max(G.peak, e); G.dd = Math.max(G.dd, (G.peak - e) / G.peak);
+  if (G.i >= START + LEN) finish(); }
+function finish() { stopAuto(); if (G.pos) closePos(cur().c, "Session end"); G.done = true; G.eq[G.eq.length - 1] = G.cash; tk = null; render(); showRes(); }
+/* ---------- chart ---------- */
+function drawChart() {
+  const cv = $("#cv"), dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr;
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+  const N = W < 560 ? 60 : 96, RS = W < 560 ? 8 : 12, a = Math.max(0, G.i - (N - RS) + 1), vis = G.bars.slice(a, G.i + 1), PR = 58, vh = H * .16, ph = H - vh - 14;
+  let lo = Math.min(...vis.map(b => b.l)), hi = Math.max(...vis.map(b => b.h)); const lines = [];
+  if (G.pos) { lines.push([G.pos.entry, "#ffffff", "ENTRY"]); if (G.pos.sl != null) lines.push([G.pos.sl, DN, "SL"]); if (G.pos.tg != null) lines.push([G.pos.tg, Y, "TGT"]); }
+  if (tk) { if (num(tk.sl)) lines.push([num(tk.sl), DN, "SL?"]); if (num(tk.tg)) lines.push([num(tk.tg), Y, "TGT?"]); }
+  lines.forEach(([v]) => { lo = Math.min(lo, v); hi = Math.max(hi, v); }); const pad = (hi - lo) * .06; lo -= pad; hi += pad;
+  const cw = (W - PR - 6) / N, X = j => 4 + (j - a + .5) * cw + (N - vis.length) * 0, Yp = v => 8 + (hi - v) / (hi - lo) * (ph - 8);
+  ctx.font = "600 10px 'JetBrains Mono'"; ctx.textAlign = "left";
+  for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, y = Yp(v); ctx.strokeStyle = "rgba(255,255,255,.05)"; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W - PR, y); ctx.stroke(); ctx.fillStyle = M; ctx.fillText(v.toFixed(v < 100 ? 2 : 0), W - PR + 6, y + 3); }
+  if (START >= a) { const x = X(START); ctx.strokeStyle = "rgba(91,140,255,.45)"; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, 4); ctx.lineTo(x, H - 4); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#8fb0ff"; ctx.fillText("REPLAY STARTS", x + 4, 16); }
+  const vmax = Math.max(...vis.map(b => b.v));
+  vis.forEach((b, k) => { const j = a + k, x = X(j), col = b.c >= b.o ? UP : DN; ctx.fillStyle = col; ctx.globalAlpha = .25; const vv = b.v / vmax * vh; ctx.fillRect(x - cw * .35, H - 4 - vv, cw * .7, vv); ctx.globalAlpha = 1;
+    ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, Yp(b.h)); ctx.lineTo(x, Yp(b.l)); ctx.stroke(); const y1 = Yp(Math.max(b.o, b.c)), y2 = Yp(Math.min(b.o, b.c)); ctx.fillRect(x - cw * .35, y1, Math.max(cw * .7, 1), Math.max(y2 - y1, 1)); });
+  if (S.ema) [[G.e21, "#b9a6ff"], [G.e50, "#5b8cff"]].forEach(([e, c]) => { ctx.strokeStyle = c; ctx.lineWidth = 1.6; ctx.beginPath(); for (let j = a; j <= G.i; j++) { const x = X(j), y = Yp(e[j]); j === a ? ctx.moveTo(x, y) : ctx.lineTo(x, y); } ctx.stroke(); });
+  G.trades.concat(G.pos ? [{ side: G.pos.side, entry: G.pos.entry, ei: G.pos.ei, open: 1 }] : []).forEach(t => { if (t.ei >= a) { const x = X(t.ei), b = G.bars[t.ei], y = t.side === 1 ? Yp(b.l) + 12 : Yp(b.h) - 12; ctx.fillStyle = t.side === 1 ? UP : DN; ctx.beginPath(); if (t.side === 1) { ctx.moveTo(x, y - 7); ctx.lineTo(x - 6, y + 4); ctx.lineTo(x + 6, y + 4); } else { ctx.moveTo(x, y + 7); ctx.lineTo(x - 6, y - 4); ctx.lineTo(x + 6, y - 4); } ctx.fill(); }
+    if (!t.open && t.xi >= a) { ctx.strokeStyle = t.pnl >= 0 ? UP : DN; ctx.lineWidth = 2; const x = X(t.xi), y = Yp(t.exit); ctx.beginPath(); ctx.arc(x, y, 5, 0, 7); ctx.stroke(); if (t.ei >= a) { ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(X(t.ei), Yp(t.entry)); ctx.lineTo(x, y); ctx.stroke(); ctx.setLineDash([]); } } });
+  lines.forEach(([v, c, t]) => { const y = Yp(v); ctx.strokeStyle = c; ctx.globalAlpha = .85; ctx.setLineDash(t === "ENTRY" ? [6, 4] : [3, 3]); ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W - PR, y); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.fillStyle = c; K.rr(ctx, W - PR + 2, y - 8, PR - 4, 16, 4); ctx.fill(); ctx.fillStyle = "#000"; ctx.fillText(t, W - PR + 6, y + 3.5); });
+  const lc = cur().c, ly = Yp(lc); ctx.fillStyle = cur().c >= cur().o ? UP : DN; K.rr(ctx, W - PR + 2, ly - 8, PR - 4, 16, 4); ctx.fill(); ctx.fillStyle = "#000"; ctx.fillText(lc.toFixed(lc < 100 ? 2 : 0), W - PR + 6, ly + 3.5);
+}
+/* ---------- panels ---------- */
+function suggest(side) { const b = G.bars, i = G.i, lows = b.slice(i - 4, i + 1).map(x => x.l), highs = b.slice(i - 4, i + 1).map(x => x.h), px = cur().c;
+  let sl = side === 1 ? Math.min(...lows) * .997 : Math.max(...highs) * 1.003; if (Math.abs(px - sl) / px < .01) sl = side === 1 ? px * .985 : px * 1.015;
+  const tg = px + side * 2 * Math.abs(px - sl), d = px < 100 ? 2 : 1; return { side, sl: sl.toFixed(d), tg: tg.toFixed(d), qty: "", manual: false }; }
+function tkCalc() { const px = cur().c, sl = num(tk.sl), tg = num(tk.tg), eq = equity(), riskAmt = eq * (num(S.risk) || 1) / 100, valid = sl > 0 && (tk.side === 1 ? sl < px : sl > px);
+  const maxQ = Math.floor(eq / px); let qty = tk.manual ? Math.floor(num(tk.qty)) : valid ? Math.min(Math.floor(riskAmt / Math.abs(px - sl)), maxQ) : Math.floor(maxQ * .5); qty = Math.max(0, Math.min(qty, maxQ));
+  const rr = valid && tg > 0 ? Math.abs(tg - px) / Math.abs(px - sl) : null; return { px, sl, tg, valid, qty, risk: valid ? qty * Math.abs(px - sl) : null, rr, maxQ }; }
+function renderTicket() { const pn = $("#tradePn");
+  if (G.done) { pn.innerHTML = `<h4>SESSION OVER</h4><button class="btn" id="again" style="width:100%">🔁 New chart</button>`; return; }
+  if (G.pos) { const p = G.pos, op = openPnl(), r = p.r0 ? op / (p.r0 * p.qty) : null, d = p.entry < 100 ? 2 : 1;
+    pn.innerHTML = `<h4>OPEN POSITION</h4><div class="posb"><div>${p.side === 1 ? "🟢 LONG" : "🔴 SHORT"} ${p.qty.toLocaleString("en-IN")} @ ${f2(p.entry)}</div><div class="big ${op >= 0 ? "up" : "down"}">${f0(op)}${r != null ? ` <small style="font-size:.8rem">(${r >= 0 ? "+" : ""}${r.toFixed(1)}R)</small>` : ""}</div></div>
+      <div class="tk"><div class="r2"><div><div class="q">Stop-loss ₹</div><label class="field sm"><input id="pSl" type="text" inputmode="decimal" value="${p.sl != null ? p.sl.toFixed(d) : ""}" /></label></div><div><div class="q">Target ₹</div><label class="field sm"><input id="pTg" type="text" inputmode="decimal" value="${p.tg != null ? p.tg.toFixed(d) : ""}" /></label></div></div>
+      <div class="acts"><button class="btn" id="pUpd">Update SL/TG</button><button class="btn" id="pBe">SL → breakeven</button></div><button class="btn" id="pClose" style="background:#fff;color:#000">✖ Close at ${f2(cur().c)}</button></div>`; return; }
+  if (tk) { const c = tkCalc();
+    pn.innerHTML = `<h4>${tk.side === 1 ? "🟢 BUY" : "🔴 SHORT"} TICKET · ENTRY ≈ ${f2(c.px)}</h4><div class="tk"><div class="r2"><div><div class="q">Stop-loss ₹</div><label class="field sm"><input id="tSl" type="text" inputmode="decimal" value="${esc(tk.sl)}" /></label></div><div><div class="q">Target ₹ <span class="opt">optional</span></div><label class="field sm"><input id="tTg" type="text" inputmode="decimal" value="${esc(tk.tg)}" /></label></div></div>
+      <div class="r2"><div><div class="q">Risk per trade</div><div class="rk" id="rk">${["0.5", "1", "2"].map(v => `<button data-rk="${v}" class="${S.risk === v ? "on" : ""}">${v}%</button>`).join("")}</div></div><div><div class="q">Quantity</div><label class="field sm"><input id="tQ" type="text" inputmode="numeric" value="${tk.manual ? esc(tk.qty) : c.qty}" /></label></div></div>
+      <div class="info" id="tInfo"></div><div class="acts"><button class="btn" id="tCancel">Cancel</button><button class="btn" id="tOk" style="background:${tk.side === 1 ? UP : DN};color:${tk.side === 1 ? "#000" : "#fff"}">Confirm ${tk.side === 1 ? "buy" : "short"}</button></div></div>`;
+    tkInfo(); return; }
+  pn.innerHTML = `<h4>NEW TRADE · PRICE ${f2(cur().c)}</h4><div class="bs"><button class="buy" id="bBuy">BUY</button><button class="sell" id="bSell">SHORT</button></div><div class="kbd" style="display:block;margin-top:10px">No setup? Just press <b>Next</b>. Sitting out is a position too.</div>`; }
+function tkInfo() { const c = tkCalc(), el = $("#tInfo"); if (!el) return;
+  el.innerHTML = !c.valid ? `⚠️ <b>${num(tk.sl) ? "Stop-loss is on the wrong side of the price." : "No stop-loss."}</b> ${num(tk.sl) ? "" : "You can trade without one, but it will cost you grade points and possibly much more."}`
+    : `Risk if stopped: <b class="down">${f0(-c.risk)}</b> (${(c.risk / equity() * 100).toFixed(1)}% of capital)${c.rr ? ` · Reward:risk <b class="${c.rr >= 2 ? "up" : "warnc"}">${c.rr.toFixed(1)}:1</b>` : ""} · Uses ${f0(c.qty * c.px).replace("+", "")} of ${f0(equity()).replace("+", "")}`; }
+function render() { const b = cur(), pb = G.bars[G.i - 1], ch = (b.c / pb.c - 1) * 100, eq = G.done ? G.cash : equity(), d = G.i - START;
+  $("#tkr").textContent = G.name; $("#day").textContent = `Day ${d} of ${LEN}`; $("#px").textContent = f2(b.c); $("#chg").innerHTML = `<span class="${ch >= 0 ? "up" : "down"}">${ch >= 0 ? "+" : ""}${ch.toFixed(2)}%</span>`;
+  $("#prog").style.width = d / LEN * 100 + "%";
+  const wins = G.trades.filter(t => t.pnl > 0).length;
+  $("#acct").innerHTML = `<div><span>EQUITY</span><b>${f2(eq).replace(".00", "")}</b></div><div><span>P&amp;L</span><b class="${eq >= CAP ? "up" : "down"}">${f0(eq - CAP)}</b></div><div><span>TRADES</span><b>${G.trades.length}</b></div><div><span>WIN RATE</span><b>${G.trades.length ? Math.round(wins / G.trades.length * 100) + "%" : "—"}</b></div>`;
+  $("#log").innerHTML = G.trades.length ? G.trades.slice().reverse().map(t => `<div><span>${t.pnl >= 0 ? "✅" : "❌"}</span><span>${t.side === 1 ? "Long" : "Short"} ${t.entry.toFixed(1)} → ${t.exit.toFixed(1)} <small>${t.why}</small></span><b class="${t.pnl >= 0 ? "up" : "down"}">${f0(t.pnl)}</b></div>`).join("") : `<div style="grid-template-columns:1fr;color:var(--muted)">No trades yet.</div>`;
+  ["next", "next5", "auto"].forEach(id => $("#" + id).disabled = G.done); $("#emaT").classList.toggle("on", S.ema); $("#emaT").style.opacity = S.ema ? 1 : .55;
+  renderTicket(); drawChart(); }
+/* ---------- results ---------- */
+function grade() { const T = G.trades, ret = (G.cash - CAP) / CAP * 100, sl = T.length ? T.filter(t => t.hadSL).length / T.length : 1, big = T.filter(t => t.R != null && t.R < -1.6).length, noSL = T.filter(t => !t.hadSL).length, bh = (G.bars[G.i].c / G.bars[START].c - 1) * 100;
+  let s = 55 + Math.max(-30, Math.min(25, ret * 4)); const fb = [];
+  if (!T.length) return { g: "—", s: 0, ret, bh, fb: ["You didn't take a trade. Sitting out is fine when there's no setup, but practise taking a few planned trades next time."] };
+  s += sl * 12; if (noSL) { s -= 8; fb.push(`❌ ${noSL} trade${noSL > 1 ? "s" : ""} had no stop-loss. That's how one trade wipes out a month.`); } else fb.push("✅ Every trade had a stop-loss. That's the habit that keeps traders alive.");
+  if (big) { s -= 8; fb.push(`⚠️ ${big} loss${big > 1 ? "es were" : " was"} bigger than 1.5R (a gap, a widened stop or no stop).`); }
+  if (G.dd > .1) { s -= 10; fb.push(`📉 Max drawdown ${(G.dd * 100).toFixed(1)}%: too much risk per trade.`); } else if (G.dd > .05) { s -= 4; fb.push(`📉 Max drawdown ${(G.dd * 100).toFixed(1)}%: acceptable, but try smaller size.`); } else fb.push(`✅ Max drawdown only ${(G.dd * 100).toFixed(1)}%: well-controlled risk.`);
+  if (T.length > 12) { s -= 10; fb.push(`🔁 ${T.length} trades in 100 days looks like overtrading. Wait for the best setups.`); }
+  const W = T.filter(t => t.pnl > 0), L = T.filter(t => t.pnl <= 0), aw = W.length ? W.reduce((a, t) => a + t.pnl, 0) / W.length : 0, al = L.length ? -L.reduce((a, t) => a + t.pnl, 0) / L.length : 0;
+  if (W.length && L.length) fb.push(aw >= al ? `✅ Average win (${f0(aw)}) is bigger than average loss (${f0(-al)}). You can be wrong often and still make money.` : `⚠️ Average loss (${f0(-al)}) is bigger than average win (${f0(aw)}). Let winners run longer or cut losers faster.`);
+  fb.push(ret > bh ? `🏁 You beat buy-and-hold (${bh >= 0 ? "+" : ""}${bh.toFixed(1)}%).` : `🏁 Buy-and-hold made ${bh >= 0 ? "+" : ""}${bh.toFixed(1)}% vs your ${ret >= 0 ? "+" : ""}${ret.toFixed(1)}%.`);
+  s = Math.max(0, Math.min(100, s)); return { g: s >= 85 ? "A" : s >= 70 ? "B" : s >= 55 ? "C" : s >= 40 ? "D" : "F", s, ret, bh, fb, aw, al }; }
+const GC = { A: "#22d39a", B: "#5b8cff", C: "#febc2e", D: "#ff8a3d", F: "#ff5470", "—": "#8b93a7" };
+let last;
+function showRes() { const r = grade(), T = G.trades, wins = T.filter(t => t.pnl > 0).length; last = { ...r, days: G.i - START, trades: T.length, win: T.length ? wins / T.length * 100 : 0, dd: G.dd * 100, pnl: G.cash - CAP, eq: G.eq.slice() };
+  S.hist.unshift({ d: K.iso ? K.iso(new Date()) : new Date().toISOString().slice(0, 10), g: r.g, ret: +r.ret.toFixed(2), n: T.length }); S.hist = S.hist.slice(0, 20); S.played = (S.played || 0) + 1; S.save();
+  $("#res").innerHTML = `<div class="top"><div class="grade" style="background:${GC[r.g]}">${r.g}</div><div><div style="font:600 .74rem 'JetBrains Mono';color:var(--muted)">SESSION RESULT · ${G.name.toUpperCase()}</div><h2 style="font:800 1.7rem 'Space Grotesk'">${r.g === "—" ? "No trades taken" : `${f0(G.cash - CAP)} <span style="font-size:1rem;color:var(--muted)">(${r.ret >= 0 ? "+" : "−"}${Math.abs(r.ret).toFixed(2)}%)</span>`}</h2></div></div>
+    <div class="stats6"><div><span>TRADES</span><b>${T.length}</b></div><div><span>WIN RATE</span><b>${T.length ? Math.round(last.win) + "%" : "—"}</b></div><div><span>MAX DRAWDOWN</span><b>${(G.dd * 100).toFixed(1)}%</b></div><div><span>BUY &amp; HOLD</span><b>${r.bh >= 0 ? "+" : ""}${r.bh.toFixed(1)}%</b></div></div>
+    <div class="fb">${r.fb.map(x => `<div>${x}</div>`).join("")}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn" id="again2">🔁 Play a new chart</button><a class="btn" href="../course/" style="text-decoration:none">🎓 Back to course</a></div>`;
+  $("#res").classList.add("on"); drawHist(); setTimeout(() => $("#res").scrollIntoView({ behavior: "smooth", block: "start" }), 50); }
+function drawHist() { $("#hist").innerHTML = S.hist.length ? S.hist.slice(0, 10).map(h => `<div><span class="g" style="background:${GC[h.g]}">${h.g}</span><span>${esc(h.d)}</span><small style="color:var(--muted)">${h.n} trades</small><b class="${h.ret >= 0 ? "up" : "down"}">${h.ret >= 0 ? "+" : ""}${h.ret}%</b></div>`).join("") : `<div style="grid-template-columns:1fr;color:var(--muted)">Finish a session to see it here.</div>`; }
+/* ---------- events ---------- */
+function stopAuto() { clearInterval(autoT); autoT = null; const a = $("#auto"); if (a) a.textContent = "▶▶ Auto"; }
+$("#next").onclick = () => { step(); render(); };
+$("#next5").onclick = () => { for (let k = 0; k < 5 && !G.done; k++) { const had = !!G.pos; step(); if (had && !G.pos) break; } render(); };
+$("#auto").onclick = () => { if (autoT) { stopAuto(); return; } $("#auto").textContent = "⏸ Pause"; autoT = setInterval(() => { const had = !!G.pos; step(); render(); if (G.done || (had && !G.pos)) stopAuto(); }, 450); };
+$("#emaT").onclick = () => { S.ema = !S.ema; S.save(); render(); };
+$("#endB").onclick = () => { if (G.done) return; if (G.i - START < 20 && !confirm("End this session early?")) return; finish(); };
+document.addEventListener("click", e => { const t = e.target.closest("button"); if (!t) return;
+  if (t.id === "bBuy" || t.id === "bSell") { stopAuto(); tk = suggest(t.id === "bBuy" ? 1 : -1); render(); }
+  else if (t.dataset.rk) { S.risk = t.dataset.rk; S.save(); tk.manual = false; renderTicket(); drawChart(); }
+  else if (t.id === "tCancel") { tk = null; render(); }
+  else if (t.id === "tOk") { const c = tkCalc(); if (c.qty < 1) { K.toast("Quantity must be at least 1"); return; } if (num(tk.sl) && !c.valid) { K.toast("Fix the stop-loss side"); K.shake?.($("#tSl")); return; }
+    G.pos = { side: tk.side, qty: c.qty, entry: c.px, sl: c.valid ? c.sl : null, sl0: c.valid ? c.sl : null, r0: c.valid ? Math.abs(c.px - c.sl) : null, tg: c.tg > 0 && (tk.side === 1 ? c.tg > c.px : c.tg < c.px) ? c.tg : null, ei: G.i }; tk = null; render(); }
+  else if (t.id === "pClose") { closePos(cur().c, "Manual exit"); render(); }
+  else if (t.id === "pBe") { const p = G.pos; if (p.side * (cur().c - p.entry) <= 0) { K.toast("Price must be in profit to move SL to breakeven"); return; } p.sl = p.entry; render(); K.toast("Stop moved to breakeven"); }
+  else if (t.id === "pUpd") { const p = G.pos, sl = num($("#pSl").value), tg = num($("#pTg").value), px = cur().c;
+    if (sl && (p.side === 1 ? sl >= px : sl <= px)) { K.toast("Stop must be below price (long) / above price (short)"); return; }
+    if (sl && p.sl != null && p.side * (sl - p.sl) < 0) { p.widened = true; K.toast("⚠️ You widened your stop. Noted in your grade."); }
+    p.sl = sl || null; p.tg = tg && (p.side === 1 ? tg > px : tg < px) ? tg : null; render(); }
+  else if (t.id === "again" || t.id === "again2") { newGame(); scrollTo({ top: 0, behavior: "smooth" }); } });
+document.addEventListener("input", e => { if (!tk) return; const id = e.target.id; if (id === "tSl") { tk.sl = e.target.value; if (!tk.manual) $("#tQ").value = tkCalc().qty; } else if (id === "tTg") tk.tg = e.target.value; else if (id === "tQ") { tk.qty = e.target.value; tk.manual = true; } else return; tkInfo(); drawChart(); });
+document.addEventListener("keydown", e => { if (/INPUT|TEXTAREA/.test(document.activeElement?.tagName)) return; const k = e.key.toLowerCase();
+  if (k === " " || k === "arrowright") { e.preventDefault(); if (!G.done) { step(); render(); } } else if (k === "b" && !G.pos && !G.done) $("#bBuy")?.click(); else if (k === "s" && !G.pos && !G.done) $("#bSell")?.click(); else if (k === "x" && G.pos) $("#pClose")?.click(); });
+addEventListener("resize", () => drawChart());
+/* ---------- share ---------- */
+function buildText() { const r = last; if (!r) return ""; return ["🎮 *Chart Replay: paper-trading session*", "", `Grade: *${r.g}*`, `P&L: ${f0(r.pnl)} (${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(2)}%) on ₹1,00,000`, `Trades: ${r.trades} · Win rate: ${Math.round(r.win)}% · Max drawdown: ${r.dd.toFixed(1)}%`, `Buy & hold: ${r.bh >= 0 ? "+" : ""}${r.bh.toFixed(1)}%`, "", "Practise with ₹0 at risk, one candle at a time 👇", ...K.signoff("replay", "Play", "_Paper trading on computer-generated charts. Education only._").slice(1)].join("\n"); }
+async function drawImg() { const r = last; await K.loadFonts?.(); const Wd = 1080, H = 1350, { c, ctx } = K.canvas(Wd, H); K.brand(ctx);
+  K.txt(ctx, "PRACTICE · CHART REPLAY", 70, 186, `700 26px ${K.F.MONO}`, "#22d39a"); K.txt(ctx, "My paper-trading session", 70, 250, `800 54px ${K.F.GROT}`, "#fff");
+  ctx.fillStyle = GC[r.g]; K.rr(ctx, 70, 290, 200, 200, 44); ctx.fill(); K.txt(ctx, r.g, 170, 432, `800 130px ${K.F.GROT}`, "#000", "center");
+  K.txt(ctx, f0(r.pnl), 310, 380, `800 70px ${K.F.GROT}`, r.pnl >= 0 ? UP : DN); K.txt(ctx, `${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(2)}% on ₹1,00,000 · ${r.days} days`, 310, 440, `500 28px ${K.F.INTER}`, "#cfd3df");
+  K.panel(ctx, 70, 530, 940, 360, 24); const eq = r.eq, mn = Math.min(...eq, CAP), mx = Math.max(...eq, CAP), X = i => 110 + i / (eq.length - 1) * 860, Yv = v => 860 - (v - mn) / ((mx - mn) || 1) * 240;
+  ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(110, Yv(CAP)); ctx.lineTo(970, Yv(CAP)); ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle = r.pnl >= 0 ? UP : DN; ctx.lineWidth = 5; ctx.lineJoin = "round"; ctx.beginPath(); eq.forEach((v, i) => i ? ctx.lineTo(X(i), Yv(v)) : ctx.moveTo(X(i), Yv(v))); ctx.stroke();
+  K.txt(ctx, "EQUITY CURVE", 110, 580, `700 22px ${K.F.MONO}`, "#8b93a7");
+  [["TRADES", String(r.trades)], ["WIN RATE", r.trades ? Math.round(r.win) + "%" : "—"], ["MAX DD", r.dd.toFixed(1) + "%"], ["BUY & HOLD", (r.bh >= 0 ? "+" : "") + r.bh.toFixed(1) + "%"]].forEach(([a, b], i) => { const x = 70 + i * 240; K.panel(ctx, x, 910, 220, 120, 20); K.txt(ctx, a, x + 22, 952, `700 20px ${K.F.MONO}`, "#8b93a7"); K.txt(ctx, b, x + 22, 1006, `800 42px ${K.F.GROT}`, "#fff"); });
+  K.footer(ctx, Wd, H, K.toolUrl("replay"), "Paper trading on computer-generated charts · Education only", true); return c; }
+K.share({ text: buildText, valid: () => !!last, draw: drawImg, file: () => "chart-replay-" + (last?.g || ""), imgLabel: "Share my result" });
+drawHist(); newGame();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
