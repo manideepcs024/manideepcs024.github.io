@@ -2,9 +2,9 @@
  * Pages: network first (you always get the latest when online), cached copy when offline.
  * Static files (css/js/images/fonts/three.js): served from cache, refreshed in the background.
  * When you add a new page, add it to PAGES below and bump VERSION. Pages you visit are cached anyway. */
-const VERSION = "mmm-v19";
+const VERSION = "mmm-v20";
 const PAGES = ["", "tools/", "sectors/", "backup/", "levels/", "close/", "calendar/", "glossary/", "quiz/", "quiz-score/", "chart-game/",
-  "message/", "ipo/", "trade-review/", "welcome/", "status/", "contest/", "journal/", "report-card/", "accounts-pnl/", "goals/", "money-ladder/", "fomo/", "myths/", "etf/", "concepts/", "results-guide/", "market-basics/", "candlesticks/", "indicators/", "chart-patterns/", "options-basics/", "special-situations/", "corporate-actions/", "legends/", "course/", "replay/", "checklist/", "options/", "option-planner/", "average/", "tax/",
+  "message/", "ipo/", "trade-review/", "welcome/", "status/", "contest/", "journal/", "report-card/", "accounts-pnl/", "goals/", "money-ladder/", "fomo/", "myths/", "etf/", "concepts/", "results-guide/", "market-basics/", "candlesticks/", "indicators/", "chart-patterns/", "options-basics/", "special-situations/", "corporate-actions/", "legends/", "course/", "replay/", "fundamentals/", "checklist/", "options/", "option-planner/", "average/", "tax/",
   "sl-calculator/", "day-review/", "bounce-back/", "comeback-stories/", "house/", "wish/", "trader-room/", "overtrading/", "tv-tip/", "game/", "ipo-game/", "scam-game/", "fno-game/", "mtf-game/", "fundamentals-game/"];
 const ASSETS = ["assets/tool.css", "assets/tool.js", "assets/pwa.js", "assets/i18n.js", "assets/i18n/common.js", "assets/vendor/qrcode.js", "manifest.webmanifest",
   "assets/icons/icon-192.png", "assets/icons/icon-512.png", "assets/icons/maskable-512.png", "assets/icons/apple-touch-icon.png", "assets/icons/favicon-32.png"];
