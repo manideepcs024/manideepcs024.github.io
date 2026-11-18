@@ -5,28 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#05060a" />
 <title>Market Close Summary Card — MANIMINDSMONEY</title>
-<meta name="description" content="Post the day's market wrap: index closes, top gainers and losers, sectors, breadth and FII/DII flows, as WhatsApp text or a branded image." />
+<meta name="description" content="Post the day's market wrap: index closes, top gainers and losers, sectors, breadth, FII/DII flows, gold, silver and crude prices, a 50/200 EMA trend check, and stocks in focus with RSI, EMA, market cap, P/E and EPS. Share as WhatsApp text or a branded image." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../assets/tool.css" />
 <style>
   :root { --acc: #22d39a; --acc2: #ff5470; }
-  .idx { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 40px; gap: 6px; align-items: center; margin-top: 8px; }
+  .idx, .cm { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 40px; gap: 6px; align-items: center; margin-top: 8px; }
   .idx-head { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 40px; gap: 6px; font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); }
-  .idx .field, .mv .field { padding: 0 9px; border-radius: 12px; }
-  .idx .field input, .mv .field input { font-size: .88rem; padding: 9px 0; }
+  .er, .er-head { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 6px; align-items: center; }
+  .er { margin-top: 8px; } .er-head { font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); margin-top: 10px; }
+  .idx .field, .mv .field, .cm .field, .er .field, .sk .field { padding: 0 9px; border-radius: 12px; }
+  .idx .field input, .mv .field input, .cm .field input, .er .field input, .sk .field input { font-size: .88rem; padding: 9px 0; }
   .pct { font: 600 .72rem "JetBrains Mono"; grid-column: 2 / 4; margin: -2px 0 0 4px; }
+  .est { font: 600 .72rem "JetBrains Mono"; grid-column: 1 / -1; margin: -2px 0 0 4px; color: var(--muted); }
   .mv { display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 6px; margin-top: 6px; }
   .mvgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
   .mvgrid h4 { font: 600 .7rem "JetBrains Mono"; letter-spacing: .1em; margin-top: 16px; }
+  .xsec { margin-top: 22px; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .xsec > h3 { font: 700 1rem "Space Grotesk"; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .xsec > h3 small { font: 500 .74rem Inter; color: var(--muted); }
+  .addb { margin-top: 8px; border: 1px dashed var(--line); background: transparent; color: #bfc4d2; border-radius: 12px; padding: 9px 12px; font: 600 .8rem Inter; cursor: pointer; width: 100%; }
+  .sk { border-radius: 16px; border: 1px solid var(--line); background: rgba(0,0,0,.22); padding: 10px; margin-top: 10px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; position: relative; }
+  .sk .w2 { grid-column: span 2; } .sk .w4 { grid-column: 1 / -1; }
+  .sk .lb { font: 600 .58rem "JetBrains Mono"; letter-spacing: .05em; color: var(--muted); margin: 0 0 3px 3px; }
+  .sk .rmx { position: absolute; top: 6px; right: 6px; }
+  .sk .tags { grid-column: 1 / -1; display: flex; gap: 5px; flex-wrap: wrap; }
+  .tg { font: 700 .64rem "JetBrains Mono"; padding: 3px 7px; border-radius: 6px; background: rgba(255,255,255,.06); color: #dfe3ee; }
+  .tg.g { color: #22d39a; background: rgba(34,211,154,.12); } .tg.r { color: #ff5470; background: rgba(255,84,112,.12); } .tg.y { color: #febc2e; background: rgba(254,188,46,.12); } .tg.b { color: #8fb0ff; background: rgba(91,140,255,.14); }
   .prev-idx { display: grid; gap: 6px; }
   .pi { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); }
   .pi b { font: 700 .95rem "Space Grotesk"; }
   .pi .v { text-align: right; font: 600 .95rem "JetBrains Mono"; }
   .pi .v small { display: block; font-size: .74rem; }
+  .pi .sub2 { display: block; font: 500 .72rem Inter; color: var(--muted); margin-top: 2px; }
+  .ph { font: 700 .66rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); margin: 14px 0 6px; }
   .breadth { display: flex; height: 10px; border-radius: 6px; overflow: hidden; margin-top: 6px; }
   .mood { display: inline-block; font: 700 .7rem "JetBrains Mono"; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .modes { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+  .modes button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 7px 11px; border-radius: 999px; font: 600 .76rem Inter; cursor: pointer; }
+  .modes button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  @media (max-width: 560px) { .sk { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sk .w2 { grid-column: 1 / -1; } .er { grid-template-columns: repeat(3, minmax(0, 1fr)) 34px; gap: 5px; } .er > :nth-child(1) { grid-column: 1 / 4; grid-row: 1; } .er > .rm { grid-column: 4; grid-row: 1; } .er > :nth-child(2), .er > :nth-child(3), .er > :nth-child(4) { grid-row: 2; } .er-head { display: none; } .er .field input::placeholder { font-size: .78rem; } }
 </style>
 <link rel="manifest" href="../manifest.webmanifest" />
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
@@ -44,7 +64,7 @@
     </header>
 
     <h1>Today's market, <span class="grad">wrapped up.</span></h1>
-    <p class="sub">Fill in the closing numbers after 3:30 PM: indices, top movers, sectors, breadth and FII/DII flows. Post a clean evening wrap in a minute. It pairs well with the morning Levels card.</p>
+    <p class="sub">Fill in the closing numbers after 3:30 PM: indices, top movers, sectors, breadth and FII/DII flows, plus <b>gold, silver &amp; crude</b>, a <b>50/200 EMA trend check</b> and <b>stocks in focus</b>. Post everything as one wrap, or any section on its own.</p>
 
     <div class="layout">
       <section class="card">
@@ -73,6 +93,31 @@
           <div><div class="q">DII net ₹ cr</div><label class="field sm"><input id="dii" type="text" inputmode="decimal" placeholder="2,100" /></label></div>
         </div>
 
+        <div class="xsec">
+          <h3>🪙 Commodities &amp; currency <small>optional · price & change</small></h3>
+          <div class="chips-in" id="comPresets" style="margin-top:8px"></div>
+          <div class="idx-head" style="margin-top:10px"><span>NAME</span><span>PRICE</span><span>CHANGE</span><span></span></div>
+          <div id="com"></div>
+          <button class="addb" id="comAdd">＋ Add row</button>
+        </div>
+
+        <div class="xsec">
+          <h3>📈 Trend check: 50 &amp; 200 EMA <small>optional</small></h3>
+          <div class="er-head"><span>NAME</span><span>PRICE</span><span>50 EMA</span><span>200 EMA</span><span></span></div>
+          <div id="ema"></div>
+          <button class="addb" id="emaAdd">＋ Add index or stock</button>
+          <div class="cols2" style="margin-top:10px">
+            <div><div class="q">% above 200 EMA</div><label class="field sm"><input id="br200" type="text" inputmode="decimal" placeholder="58 (Nifty 500)" /></label></div>
+            <div><div class="q">% above 50 EMA</div><label class="field sm"><input id="br50" type="text" inputmode="decimal" placeholder="46" /></label></div>
+          </div>
+        </div>
+
+        <div class="xsec">
+          <h3>🔍 Stocks in focus <small>optional · up to 5</small></h3>
+          <div id="stk"></div>
+          <button class="addb" id="stkAdd">＋ Add stock</button>
+        </div>
+
         <div class="q">Your view <span class="opt">optional · one or two lines</span></div>
         <textarea id="note" maxlength="240" placeholder="e.g. Banks led the recovery after a weak start. All eyes on US inflation data tonight."></textarea>
         <label class="toggle"><span>Add disclaimer<small>Not SEBI registered · information only</small></span><input type="checkbox" id="optDisc" checked /><span class="sw"></span></label>
@@ -80,13 +125,14 @@
 
       <section class="card sticky">
         <div class="res-head"><h2>Market close</h2><span id="meta"></span></div>
+        <div class="modes" id="modes"><button data-m="all">📋 Full wrap</button><button data-m="com">🪙 Commodities</button><button data-m="ema">📈 EMA check</button><button data-m="stk">🔍 Stocks</button></div>
         <div id="prev"></div>
         <div class="share-row" id="shareRow"></div>
-        <div class="tip"><b>Where to get the numbers:</b> NSE and BSE websites or your broker app for closes, movers and advances/declines. FII/DII figures are published by NSE in the evening and are <b>provisional</b>. Double-check before posting.</div>
+        <div class="tip"><b>Where to get the numbers:</b> NSE/BSE or your broker app for closes and movers; MCX or your broker for gold, silver and crude; any charting site (TradingView, broker charts) for RSI and EMAs; Screener for market cap, P/E and EPS. FII/DII figures are <b>provisional</b>. Double-check before posting.</div>
       </section>
     </div>
 
-    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This card summarises market data you enter, for <b>information and educational purposes only</b>. It is not investment advice or a recommendation to buy or sell any security.</div>
+    <div class="disclaimer"><b>⚠️ Disclaimer:</b> I am <b>not a SEBI-registered</b> investment adviser or research analyst. This card summarises market data you enter, for <b>information and educational purposes only</b>. Stocks in focus are not recommendations. It is not investment advice or a recommendation to buy or sell any security.</div>
     <footer>Built by <a href="../">Manideep Mittal</a> · MANIMINDSMONEY</footer>
   </div>
 
@@ -95,6 +141,7 @@
 const K = Kit, $ = K.$;
 K.chrome();
 const PRESETS = ["NIFTY 50", "SENSEX", "BANK NIFTY", "NIFTY IT", "MIDCAP 100", "SMALLCAP 100", "INDIA VIX", "USD/INR"];
+const COM_PRESETS = ["GOLD ₹/10g", "SILVER ₹/kg", "CRUDE ₹/bbl", "NATURAL GAS", "COPPER ₹/kg", "GOLD $/oz", "BRENT $", "USD/INR", "DOLLAR INDEX"];
 function lastSession() {
   const d = K.istNow(), mins = d.getHours() * 60 + d.getMinutes();
   if (d.getDay() >= 1 && d.getDay() <= 5 && mins < 930) d.setDate(d.getDate() - 1);
@@ -102,33 +149,44 @@ function lastSession() {
   return K.iso(d);
 }
 const blankMv = () => [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }];
-const S = K.store("close_v1", { date: "", mood: "auto", idx: [{ n: "NIFTY 50", c: "", ch: "" }, { n: "SENSEX", c: "", ch: "" }, { n: "BANK NIFTY", c: "", ch: "" }], gain: blankMv(), lose: blankMv(), sect: [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }], adv: "", dec: "", fii: "", dii: "", note: "", disc: true });
+const blankStk = () => ({ n: "", c: "", p: "", rsi: "", e50: "", e200: "", mc: "", pe: "", eps: "", note: "" });
+const S = K.store("close_v1", { date: "", mood: "auto", idx: [{ n: "NIFTY 50", c: "", ch: "" }, { n: "SENSEX", c: "", ch: "" }, { n: "BANK NIFTY", c: "", ch: "" }], gain: blankMv(), lose: blankMv(), sect: [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }], adv: "", dec: "", fii: "", dii: "", note: "", disc: true,
+  com: [{ n: "GOLD ₹/10g", c: "", ch: "" }, { n: "SILVER ₹/kg", c: "", ch: "" }, { n: "CRUDE ₹/bbl", c: "", ch: "" }], ema: [{ n: "NIFTY 50", c: "", e50: "", e200: "" }, { n: "BANK NIFTY", c: "", e50: "", e200: "" }], br200: "", br50: "", stk: [blankStk()], mode: "all" });
+if (!S.com) S.com = []; if (!S.ema) S.ema = []; if (!S.stk) S.stk = [blankStk()]; if (!S.mode) S.mode = "all";
 if (!S.date || S.date < lastSession()) S.date = lastSession();
 
 /* ---------- inputs ---------- */
 $("#date").value = S.date; $("#date").addEventListener("change", e => { S.date = e.target.value; render(); });
 const placeMood = K.seg("#moodSeg", () => S.mood, v => { S.mood = v; render(); });
-$("#idxPresets").innerHTML = PRESETS.map(p => `<button data-p="${p}">＋ ${p}</button>`).join("");
-$("#idxPresets").addEventListener("click", e => {
-  const b = e.target.closest("[data-p]"); if (!b) return;
-  if (S.idx.some(r => r.n === b.dataset.p)) { K.toast("Already added"); return; }
-  if (S.idx.length >= 6) { K.toast("Up to 6 indices"); return; }
-  const empty = S.idx.find(r => !r.n.trim()); if (empty) empty.n = b.dataset.p; else S.idx.push({ n: b.dataset.p, c: "", ch: "" });
-  drawIdx(); render();
-});
-function drawIdx() {
-  $("#idx").innerHTML = S.idx.map((r, i) => `<div class="idx" data-i="${i}">
-    <label class="field"><input class="name" data-f="n" type="text" maxlength="16" value="${K.esc(r.n)}" placeholder="Index" /></label>
-    <label class="field"><input data-f="c" type="text" inputmode="decimal" value="${r.c}" placeholder="24,500" /></label>
-    <label class="field"><input data-f="ch" type="text" inputmode="decimal" value="${r.ch}" placeholder="+120" /></label>
-    <button class="rm" title="Remove">✕</button><span></span><span class="pct"></span></div>`).join("");
+function presetChips(el, list, arr, max, redraw) {
+  $(el).innerHTML = list.map(p => `<button data-p="${p}">＋ ${p}</button>`).join("");
+  $(el).addEventListener("click", e => {
+    const b = e.target.closest("[data-p]"); if (!b) return;
+    if (arr().some(r => r.n === b.dataset.p)) { K.toast("Already added"); return; }
+    if (arr().length >= max) { K.toast(`Up to ${max} rows`); return; }
+    const empty = arr().find(r => !r.n.trim()); if (empty) empty.n = b.dataset.p; else arr().push({ n: b.dataset.p, c: "", ch: "" });
+    redraw(); render();
+  });
 }
-$("#idx").addEventListener("input", e => {
-  const row = e.target.closest(".idx"), f = e.target.dataset.f; if (!row) return; const r = S.idx[+row.dataset.i];
-  if (f === "c") K.fmtNum(e.target); if (f === "ch") K.fmtNum(e.target, 2, true);
-  r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render();
-});
-$("#idx").addEventListener("click", e => { const row = e.target.closest(".idx"); if (row && e.target.closest(".rm")) { S.idx.splice(+row.dataset.i, 1); drawIdx(); render(); } });
+presetChips("#idxPresets", PRESETS, () => S.idx, 6, () => drawIdx());
+presetChips("#comPresets", COM_PRESETS, () => S.com, 8, () => drawCom());
+const rowHtml = (cls, r, i, ph) => `<div class="${cls}" data-i="${i}">
+    <label class="field"><input class="name" data-f="n" type="text" maxlength="16" value="${K.esc(r.n)}" placeholder="${ph[0]}" /></label>
+    <label class="field"><input data-f="c" type="text" inputmode="decimal" value="${r.c}" placeholder="${ph[1]}" /></label>
+    <label class="field"><input data-f="ch" type="text" inputmode="decimal" value="${r.ch}" placeholder="${ph[2]}" /></label>
+    <button class="rm" title="Remove">✕</button><span></span><span class="pct"></span></div>`;
+function drawIdx() { $("#idx").innerHTML = S.idx.map((r, i) => rowHtml("idx", r, i, ["Index", "24,500", "+120"])).join(""); }
+function drawCom() { $("#com").innerHTML = S.com.map((r, i) => rowHtml("cm", r, i, ["Commodity", "76,500", "+420"])).join(""); }
+function bindRows(el, cls, arr, redraw) {
+  $(el).addEventListener("input", e => {
+    const row = e.target.closest("." + cls), f = e.target.dataset.f; if (!row) return; const r = arr()[+row.dataset.i];
+    if (f === "c") K.fmtNum(e.target); if (f === "ch") K.fmtNum(e.target, 2, true);
+    r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render();
+  });
+  $(el).addEventListener("click", e => { const row = e.target.closest("." + cls); if (row && e.target.closest(".rm")) { arr().splice(+row.dataset.i, 1); redraw(); render(); } });
+}
+bindRows("#idx", "idx", () => S.idx, drawIdx); bindRows("#com", "cm", () => S.com, drawCom);
+$("#comAdd").onclick = () => { if (S.com.length >= 8) { K.toast("Up to 8 rows"); return; } S.com.push({ n: "", c: "", ch: "" }); drawCom(); };
 
 function drawMv(id, list, ph) {
   $("#" + id).innerHTML = list.map((r, i) => `<div class="mv" data-i="${i}"><label class="field"><input class="name" data-f="n" type="text" maxlength="18" value="${K.esc(r.n)}" placeholder="${ph[i] || "Name"}" /></label><label class="field"><input data-f="p" type="text" inputmode="decimal" value="${r.p}" placeholder="%" /></label></div>`).join("");
@@ -140,72 +198,153 @@ function drawMv(id, list, ph) {
 drawMv("gain", S.gain, ["Stock", "", ""]); drawMv("lose", S.lose, ["Stock", "", ""]); drawMv("sect", S.sect, ["e.g. IT", "Bank", "Auto", "Pharma"]);
 ["adv", "dec"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { K.fmtNum(e.target, 0); S[k] = e.target.value; render(); }); });
 ["fii", "dii"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { K.fmtNum(e.target, 2, true); S[k] = e.target.value; render(); }); });
+["br200", "br50"].forEach(k => { $("#" + k).value = S[k]; $("#" + k).addEventListener("input", e => { K.fmtNum(e.target, 1); S[k] = e.target.value; render(); }); });
+
+/* EMA rows */
+function drawEma() { $("#ema").innerHTML = S.ema.map((r, i) => `<div class="er" data-i="${i}">
+    <label class="field"><input class="name" data-f="n" type="text" maxlength="16" value="${K.esc(r.n)}" placeholder="Name" /></label>
+    <label class="field"><input data-f="c" type="text" inputmode="decimal" value="${r.c}" placeholder="Price" /></label>
+    <label class="field"><input data-f="e50" type="text" inputmode="decimal" value="${r.e50}" placeholder="50 EMA" /></label>
+    <label class="field"><input data-f="e200" type="text" inputmode="decimal" value="${r.e200}" placeholder="200 EMA" /></label>
+    <button class="rm" title="Remove">✕</button><span class="est"></span></div>`).join(""); }
+$("#ema").addEventListener("input", e => { const row = e.target.closest(".er"), f = e.target.dataset.f; if (!row) return; const r = S.ema[+row.dataset.i]; if (f !== "n") K.fmtNum(e.target); r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render(); });
+$("#ema").addEventListener("click", e => { const row = e.target.closest(".er"); if (row && e.target.closest(".rm")) { S.ema.splice(+row.dataset.i, 1); drawEma(); render(); } });
+$("#emaAdd").onclick = () => { if (S.ema.length >= 6) { K.toast("Up to 6 rows"); return; } S.ema.push({ n: "", c: "", e50: "", e200: "" }); drawEma(); };
+
+/* stock cards */
+const SF = [["n", "STOCK", "w2", "TATA MOTORS", "t"], ["c", "PRICE ₹", "", "1,020"], ["p", "CHANGE %", "", "+2.4"], ["rsi", "RSI (14)", "", "62"], ["e50", "50 EMA", "", "985"], ["e200", "200 EMA", "", "940"], ["mc", "MKT CAP ₹ CR", "", "3,75,000"], ["pe", "P/E", "", "auto"], ["eps", "EPS ₹", "", "auto"], ["note", "NOTE", "w4", "Breakout above 1,000 with volume; results next week", "t"]];
+function drawStk() { $("#stk").innerHTML = S.stk.map((r, i) => `<div class="sk" data-i="${i}">${SF.map(([k, l, w, ph, t]) => `<div class="${w}"><div class="lb">${l}</div><label class="field"><input data-f="${k}" type="text" ${t ? "" : 'inputmode="decimal"'} maxlength="${k === "note" ? 110 : k === "n" ? 20 : 14}" value="${K.esc(r[k] || "")}" placeholder="${ph}" /></label></div>`).join("")}<div class="tags"></div>${S.stk.length > 1 ? `<button class="rm rmx" title="Remove">✕</button>` : ""}</div>`).join(""); }
+$("#stk").addEventListener("input", e => { const row = e.target.closest(".sk"), f = e.target.dataset.f; if (!row) return; const r = S.stk[+row.dataset.i];
+  if (f === "p") K.fmtNum(e.target, 2, true); else if (!["n", "note"].includes(f)) K.fmtNum(e.target, 2); r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render(); });
+$("#stk").addEventListener("click", e => { const row = e.target.closest(".sk"); if (row && e.target.closest(".rm")) { S.stk.splice(+row.dataset.i, 1); drawStk(); render(); } });
+$("#stkAdd").onclick = () => { if (S.stk.length >= 5) { K.toast("Up to 5 stocks"); return; } S.stk.push(blankStk()); drawStk(); };
+
 $("#note").value = S.note; $("#note").addEventListener("input", e => { S.note = e.target.value; render(); });
 $("#optDisc").checked = S.disc; $("#optDisc").addEventListener("change", e => { S.disc = e.target.checked; render(); });
+$("#modes").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (!b) return; S.mode = b.dataset.m; render(); });
+
+/* ---------- analysis helpers ---------- */
+function emaState(c, e50, e200) {
+  if (!(c > 0)) return null; const h50 = e50 > 0, h200 = e200 > 0; if (!h50 && !h200) return null;
+  const a50 = h50 ? c > e50 : null, a200 = h200 ? c > e200 : null, d200 = h200 ? (c / e200 - 1) * 100 : null, d50 = h50 ? (c / e50 - 1) * 100 : null;
+  let t, k, e;
+  if (h50 && h200) {
+    if (a50 && a200) { t = e50 > e200 ? "Strong uptrend" : "Above both EMAs (early recovery)"; k = "g"; e = "🟢"; }
+    else if (!a50 && a200) { t = "Pullback in uptrend"; k = "y"; e = "🟡"; }
+    else if (a50 && !a200) { t = "Bounce below 200 EMA"; k = "y"; e = "🟡"; }
+    else { t = "Downtrend"; k = "r"; e = "🔴"; }
+  } else if (h200) { t = a200 ? "Above 200 EMA" : "Below 200 EMA"; k = a200 ? "g" : "r"; e = a200 ? "🟢" : "🔴"; }
+  else { t = a50 ? "Above 50 EMA" : "Below 50 EMA"; k = a50 ? "g" : "r"; e = a50 ? "🟢" : "🔴"; }
+  const cross = h50 && h200 ? (e50 > e200 ? "50 above 200" : "50 below 200") : "";
+  return { t, k, e, d50, d200, cross };
+}
+const dpct = v => v == null ? "" : `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(1)}%`;
+function rsiTag(r) { if (!(r >= 0)) return null; return r >= 70 ? ["Overbought", "y"] : r <= 30 ? ["Oversold", "y"] : r >= 50 ? ["Bullish momentum", "g"] : ["Weak momentum", "r"]; }
+function capTag(mc) { if (!(mc > 0)) return null; return mc >= 100000 ? ["Large cap", "b"] : mc >= 30000 ? ["Mid cap", "b"] : ["Small cap", "b"]; }
+const fmtCap = mc => mc >= 100000 ? `₹${(mc / 100000).toFixed(2).replace(/\.?0+$/, "")}L cr` : `₹${K.nf(mc, 0)} cr`;
+function stkData() {
+  return S.stk.map(r => { const n = (r.n || "").trim(), c = K.num(r.c); if (!n) return null; const p = K.num(r.p), rsi = K.num(r.rsi), e50 = K.num(r.e50), e200 = K.num(r.e200), mc = K.num(r.mc);
+    let pe = K.num(r.pe), eps = K.num(r.eps), peAuto = false, epsAuto = false;
+    if (!(pe > 0) && eps > 0 && c > 0) { pe = c / eps; peAuto = true; } if (!(eps > 0) && pe > 0 && c > 0) { eps = c / pe; epsAuto = true; }
+    return { n, c, p, rsi, e50, e200, mc, pe, eps, peAuto, epsAuto, note: (r.note || "").trim(), st: emaState(c, e50, e200), rt: rsiTag(rsi), ct: capTag(mc) }; }).filter(Boolean);
+}
+function tagsOf(s) { const t = []; if (s.st) t.push([s.st.t, s.st.k]); if (s.rt) t.push([`RSI ${Math.round(s.rsi)}: ${s.rt[0]}`, s.rt[1]]); if (s.ct) t.push([s.ct[0], s.ct[1]]); return t; }
+function metricsOf(s) { const m = []; if (s.pe > 0) m.push(`P/E ${s.pe.toFixed(1)}`); if (s.eps > 0) m.push(`EPS ₹${K.nf(s.eps, 2)}`); if (s.mc > 0) m.push(`Mcap ${fmtCap(s.mc)}`); if (s.e50 > 0) m.push(`50 EMA ${K.nf(s.e50)}`); if (s.e200 > 0) m.push(`200 EMA ${K.nf(s.e200)}`); return m; }
 
 /* ---------- data ---------- */
 function data() {
-  const idx = S.idx.map(r => { const c = K.num(r.c), ch = K.num(r.ch); if (!(c > 0) || !r.n.trim()) return null; const v = isNaN(ch) ? 0 : ch; return { n: r.n.trim(), c, ch: v, p: c - v ? v / (c - v) * 100 : 0, vix: /VIX/.test(r.n) }; }).filter(Boolean);
+  const rows = l => l.map(r => { const c = K.num(r.c), ch = K.num(r.ch); if (!(c > 0) || !r.n.trim()) return null; const v = isNaN(ch) ? 0 : ch; return { n: r.n.trim(), c, ch: v, p: c - v ? v / (c - v) * 100 : 0, vix: /VIX/.test(r.n) }; }).filter(Boolean);
+  const idx = rows(S.idx), com = rows(S.com);
   const mv = l => l.map(r => ({ n: r.n.trim(), p: K.num(r.p) })).filter(r => r.n && !isNaN(r.p));
   const adv = K.num(S.adv), dec = K.num(S.dec), fii = K.num(S.fii), dii = K.num(S.dii);
+  const ema = S.ema.map(r => { const c = K.num(r.c), st = emaState(c, K.num(r.e50), K.num(r.e200)); return r.n.trim() && st ? { n: r.n.trim(), c, e50: K.num(r.e50), e200: K.num(r.e200), st } : null; }).filter(Boolean);
+  const br200 = K.num(S.br200), br50 = K.num(S.br50);
   const lead = idx.find(x => !x.vix);
   let mood = S.mood; if (mood === "auto") mood = !lead ? "flat" : lead.p > .25 ? "bull" : lead.p < -.25 ? "bear" : "flat";
-  return { idx, gain: mv(S.gain), lose: mv(S.lose), sect: mv(S.sect).sort((a, b) => b.p - a.p), adv: adv >= 0 ? adv : NaN, dec: dec >= 0 ? dec : NaN, fii, dii, mood };
+  return { idx, com, ema, br200: br200 >= 0 && br200 <= 100 ? br200 : NaN, br50: br50 >= 0 && br50 <= 100 ? br50 : NaN, stk: stkData(), gain: mv(S.gain), lose: mv(S.lose), sect: mv(S.sect).sort((a, b) => b.p - a.p), adv: adv >= 0 ? adv : NaN, dec: dec >= 0 ? dec : NaN, fii, dii, mood };
 }
 const MOOD = { bull: ["BULLISH DAY", "#22d39a", "🟢"], flat: ["FLAT / MIXED DAY", "#c9cfdb", "⚪"], bear: ["BEARISH DAY", "#ff5470", "🔴"] };
+const MODE = { all: "MARKET CLOSE", com: "COMMODITIES", ema: "TREND CHECK · 50 & 200 EMA", stk: "STOCKS IN FOCUS" };
 const arrow = v => v > 0 ? "▲" : v < 0 ? "▼" : "•";
 const col = (v, vix) => (vix ? -v : v) > 0 ? "up" : (vix ? -v : v) < 0 ? "down" : "";
 const crore = v => `${K.sgn(v)}₹${K.nf(Math.abs(v), 2).replace(/\.00$/, "")} cr`;
 const niceD = () => K.niceDate(S.date);
+const has = (D, k) => k === "com" ? D.com.length > 0 : k === "ema" ? D.ema.length > 0 || !isNaN(D.br200) || !isNaN(D.br50) : k === "stk" ? D.stk.length > 0 : D.idx.length > 0;
+const show = (D, k) => (S.mode === "all" || S.mode === k) && has(D, k);
 
 function render() {
   const D = data();
-  document.querySelectorAll(".idx").forEach((row, i) => { const r = S.idx[i], c = K.num(r.c), ch = K.num(r.ch); row.querySelector(".pct").innerHTML = c > 0 && !isNaN(ch) && c - ch ? `<span class="${col(ch, /VIX/.test(r.n))}">${K.pct(ch / (c - ch) * 100)}</span>` : ""; });
+  document.querySelectorAll(".idx, .cm").forEach(row => { const arr = row.classList.contains("idx") ? S.idx : S.com, r = arr[+row.dataset.i]; if (!r) return; const c = K.num(r.c), ch = K.num(r.ch); row.querySelector(".pct").innerHTML = c > 0 && !isNaN(ch) && c - ch ? `<span class="${col(ch, /VIX/.test(r.n))}">${K.pct(ch / (c - ch) * 100)}</span>` : ""; });
+  document.querySelectorAll(".er").forEach(row => { const r = S.ema[+row.dataset.i], st = r && emaState(K.num(r.c), K.num(r.e50), K.num(r.e200)); row.querySelector(".est").innerHTML = st ? `${st.e} ${st.t}${st.d200 != null ? ` · ${dpct(st.d200)} vs 200 EMA` : ""}${st.d50 != null ? ` · ${dpct(st.d50)} vs 50 EMA` : ""}` : ""; });
+  document.querySelectorAll(".sk").forEach(row => { const r = S.stk[+row.dataset.i]; if (!r) return; const s = stkData().find(x => x.n === (r.n || "").trim()); const el = row.querySelector(".tags"); if (!s) { el.innerHTML = ""; return; }
+    el.innerHTML = tagsOf(s).map(([t, k]) => `<span class="tg ${k}">${K.esc(t)}</span>`).join("") + (s.peAuto ? `<span class="tg">P/E ${s.pe.toFixed(1)} (auto)</span>` : "") + (s.epsAuto ? `<span class="tg">EPS ₹${K.nf(s.eps, 2)} (auto)</span>` : ""); });
+  $("#modes").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.m === S.mode));
   $("#meta").textContent = niceD();
-  if (!D.idx.length) { $("#prev").innerHTML = `<div class="placeholder">Enter at least one index close to build the card.</div>`; S.save(); return; }
-  const [ml, mc] = MOOD[D.mood];
-  let h = `<span class="mood" style="color:${mc};background:${mc}1f;border:1px solid ${mc}66">${ml}</span><div class="prev-idx">`;
-  h += D.idx.map(x => `<div class="pi"><b>${K.esc(x.n)}</b><div class="v">${K.nf(x.c)}<small class="${col(x.ch, x.vix)}">${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})</small></div></div>`).join("") + "</div><div class='stats'>";
-  if (D.gain.length) h += `<div class="stat"><span>Top gainers</span>${D.gain.map(g => `<div style="font:500 .84rem 'JetBrains Mono'">${K.esc(g.n)} <b class="up" style="font-size:.84rem">${K.pct(g.p)}</b></div>`).join("")}</div>`;
-  if (D.lose.length) h += `<div class="stat"><span>Top losers</span>${D.lose.map(g => `<div style="font:500 .84rem 'JetBrains Mono'">${K.esc(g.n)} <b class="down" style="font-size:.84rem">${K.pct(g.p)}</b></div>`).join("")}</div>`;
-  if (D.sect.length) h += `<div class="stat wide"><span>Sectors</span><div style="font:500 .84rem 'JetBrains Mono'">${D.sect.map(s => `${K.esc(s.n)} <b class="${col(s.p)}" style="font-size:.84rem">${K.pct(s.p)}</b>`).join(" · ")}</div></div>`;
-  if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) h += `<div class="stat wide"><span>Breadth · ${K.qty(D.adv)} up / ${K.qty(D.dec)} down</span><div class="breadth"><i style="width:${D.adv / (D.adv + D.dec) * 100}%;background:var(--up)"></i><i style="flex:1;background:var(--down)"></i></div></div>`;
-  if (!isNaN(D.fii)) h += `<div class="stat"><span>FII net</span><b class="${col(D.fii)}">${crore(D.fii)}</b></div>`;
-  if (!isNaN(D.dii)) h += `<div class="stat"><span>DII net</span><b class="${col(D.dii)}">${crore(D.dii)}</b></div>`;
-  h += "</div>";
+  const any = S.mode === "all" ? D.idx.length > 0 : has(D, S.mode);
+  if (!any) { $("#prev").innerHTML = `<div class="placeholder">${{ all: "Enter at least one index close to build the card.", com: "Enter at least one commodity price.", ema: "Enter a price and its 50 or 200 EMA.", stk: "Enter at least one stock name." }[S.mode]}</div>`; S.save(); return; }
+  let h = "";
+  if (S.mode === "all") { const [ml, mc] = MOOD[D.mood];
+    h += `<span class="mood" style="color:${mc};background:${mc}1f;border:1px solid ${mc}66">${ml}</span><div class="prev-idx">`;
+    h += D.idx.map(x => `<div class="pi"><b>${K.esc(x.n)}</b><div class="v">${K.nf(x.c)}<small class="${col(x.ch, x.vix)}">${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})</small></div></div>`).join("") + "</div><div class='stats'>";
+    if (D.gain.length) h += `<div class="stat"><span>Top gainers</span>${D.gain.map(g => `<div style="font:500 .84rem 'JetBrains Mono'">${K.esc(g.n)} <b class="up" style="font-size:.84rem">${K.pct(g.p)}</b></div>`).join("")}</div>`;
+    if (D.lose.length) h += `<div class="stat"><span>Top losers</span>${D.lose.map(g => `<div style="font:500 .84rem 'JetBrains Mono'">${K.esc(g.n)} <b class="down" style="font-size:.84rem">${K.pct(g.p)}</b></div>`).join("")}</div>`;
+    if (D.sect.length) h += `<div class="stat wide"><span>Sectors</span><div style="font:500 .84rem 'JetBrains Mono'">${D.sect.map(s => `${K.esc(s.n)} <b class="${col(s.p)}" style="font-size:.84rem">${K.pct(s.p)}</b>`).join(" · ")}</div></div>`;
+    if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) h += `<div class="stat wide"><span>Breadth · ${K.qty(D.adv)} up / ${K.qty(D.dec)} down</span><div class="breadth"><i style="width:${D.adv / (D.adv + D.dec) * 100}%;background:var(--up)"></i><i style="flex:1;background:var(--down)"></i></div></div>`;
+    if (!isNaN(D.fii)) h += `<div class="stat"><span>FII net</span><b class="${col(D.fii)}">${crore(D.fii)}</b></div>`;
+    if (!isNaN(D.dii)) h += `<div class="stat"><span>DII net</span><b class="${col(D.dii)}">${crore(D.dii)}</b></div>`;
+    h += "</div>"; }
+  if (show(D, "com")) h += `<div class="ph">🪙 COMMODITIES &amp; CURRENCY</div><div class="prev-idx">` + D.com.map(x => `<div class="pi"><b>${K.esc(x.n)}</b><div class="v">${K.nf(x.c)}<small class="${col(x.ch)}">${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})</small></div></div>`).join("") + "</div>";
+  if (show(D, "ema")) { h += `<div class="ph">📈 TREND CHECK · 50 &amp; 200 EMA</div><div class="prev-idx">` + D.ema.map(x => `<div class="pi"><span><b>${x.st.e} ${K.esc(x.n)}</b><span class="sub2">${x.st.t}${x.st.cross ? " · " + x.st.cross : ""}</span></span><div class="v">${K.nf(x.c)}<small style="color:var(--muted)">${x.st.d200 != null ? dpct(x.st.d200) + " vs 200" : dpct(x.st.d50) + " vs 50"}</small></div></div>`).join("") + "</div>";
+    if (!isNaN(D.br200) || !isNaN(D.br50)) h += `<div class="stats">${!isNaN(D.br200) ? `<div class="stat"><span>Stocks above 200 EMA</span><b class="${D.br200 >= 50 ? "up" : "down"}">${D.br200}%</b></div>` : ""}${!isNaN(D.br50) ? `<div class="stat"><span>Stocks above 50 EMA</span><b class="${D.br50 >= 50 ? "up" : "down"}">${D.br50}%</b></div>` : ""}</div>`; }
+  if (show(D, "stk")) h += `<div class="ph">🔍 STOCKS IN FOCUS</div><div class="prev-idx">` + D.stk.map(s => `<div class="pi" style="grid-template-columns:1fr"><div style="display:flex;justify-content:space-between;gap:8px"><b>${K.esc(s.n)}</b>${s.c > 0 ? `<span class="v">₹${K.nf(s.c)}${!isNaN(s.p) ? ` <small class="${col(s.p)}" style="display:inline">${K.pct(s.p)}</small>` : ""}</span>` : ""}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${tagsOf(s).map(([t, k]) => `<span class="tg ${k}">${K.esc(t)}</span>`).join("")}</div>${metricsOf(s).length ? `<span class="sub2" style="font-family:'JetBrains Mono'">${metricsOf(s).join(" · ")}</span>` : ""}${s.note ? `<span class="sub2" style="color:#d5d8e3">📝 ${K.esc(s.note)}</span>` : ""}</div>`).join("") + "</div>";
   if (S.note.trim()) h += `<div class="tip" style="color:#d5d8e3">📝 ${K.esc(S.note.trim())}</div>`;
   $("#prev").innerHTML = h; S.save();
 }
 
 /* ---------- share ---------- */
-function valid() { if (data().idx.length) return true; K.shake($("#idx .field:nth-child(2)")); K.toast("Enter at least one index close"); return false; }
+function valid() { const D = data();
+  if (S.mode === "all") { if (D.idx.length) return true; K.shake($("#idx .field:nth-child(2)")); K.toast("Enter at least one index close"); return false; }
+  if (has(D, S.mode)) return true; K.toast({ com: "Enter at least one commodity price", ema: "Enter a price and its 50/200 EMA", stk: "Enter at least one stock" }[S.mode]); return false; }
 function buildText() {
-  const D = data(), [ml, , me] = MOOD[D.mood], out = [`🔔 *MARKET CLOSE* · ${niceD()}`, `${me} _${ml.charAt(0) + ml.slice(1).toLowerCase()}_`, ""];
-  D.idx.forEach(x => out.push(`${(x.vix ? -x.ch : x.ch) > 0 ? "🟢" : (x.vix ? -x.ch : x.ch) < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`));
-  if (D.gain.length) out.push("", `📈 *Top gainers:* ${D.gain.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
-  if (D.lose.length) out.push(`${D.gain.length ? "" : "\n"}📉 *Top losers:* ${D.lose.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
-  if (D.sect.length) out.push("", `🏭 *Sectors:* ${D.sect.map(s => `${s.n} ${K.pct(s.p)}`).join(" · ")}`);
-  if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) out.push(`📊 *Breadth:* ${K.qty(D.adv)} advances / ${K.qty(D.dec)} declines`);
-  if (!isNaN(D.fii) || !isNaN(D.dii)) out.push(`💰 *FII:* ${isNaN(D.fii) ? "—" : crore(D.fii)} · *DII:* ${isNaN(D.dii) ? "—" : crore(D.dii)} _(provisional)_`);
+  const D = data(), out = [];
+  if (S.mode === "all") { const [ml, , me] = MOOD[D.mood]; out.push(`🔔 *MARKET CLOSE* · ${niceD()}`, `${me} _${ml.charAt(0) + ml.slice(1).toLowerCase()}_`, "");
+    D.idx.forEach(x => out.push(`${(x.vix ? -x.ch : x.ch) > 0 ? "🟢" : (x.vix ? -x.ch : x.ch) < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`));
+    if (D.gain.length) out.push("", `📈 *Top gainers:* ${D.gain.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
+    if (D.lose.length) out.push(`${D.gain.length ? "" : "\n"}📉 *Top losers:* ${D.lose.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
+    if (D.sect.length) out.push("", `🏭 *Sectors:* ${D.sect.map(s => `${s.n} ${K.pct(s.p)}`).join(" · ")}`);
+    if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) out.push(`📊 *Breadth:* ${K.qty(D.adv)} advances / ${K.qty(D.dec)} declines`);
+    if (!isNaN(D.fii) || !isNaN(D.dii)) out.push(`💰 *FII:* ${isNaN(D.fii) ? "—" : crore(D.fii)} · *DII:* ${isNaN(D.dii) ? "—" : crore(D.dii)} _(provisional)_`);
+  } else out.push(`${{ com: "🪙", ema: "📈", stk: "🔍" }[S.mode]} *${MODE[S.mode]}* · ${niceD()}`);
+  if (show(D, "com")) { out.push("", S.mode === "all" ? "🪙 *Commodities & currency*" : ""); D.com.forEach(x => out.push(`${x.ch > 0 ? "🟢" : x.ch < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`)); }
+  if (show(D, "ema")) { out.push("", S.mode === "all" ? "📈 *Trend check (50 & 200 EMA)*" : "");
+    D.ema.forEach(x => out.push(`${x.st.e} *${x.n}* ${K.nf(x.c)}: ${x.st.t}${x.st.d200 != null ? ` (${dpct(x.st.d200)} vs 200 EMA)` : x.st.d50 != null ? ` (${dpct(x.st.d50)} vs 50 EMA)` : ""}`));
+    if (!isNaN(D.br200) || !isNaN(D.br50)) out.push(`📊 Stocks above 200 EMA: ${isNaN(D.br200) ? "—" : D.br200 + "%"} · above 50 EMA: ${isNaN(D.br50) ? "—" : D.br50 + "%"}`); }
+  if (show(D, "stk")) { out.push("", S.mode === "all" ? "🔍 *Stocks in focus*" : "");
+    D.stk.forEach(s => { out.push(`▪️ *${s.n}*${s.c > 0 ? ` ₹${K.nf(s.c)}` : ""}${!isNaN(s.p) ? ` (${K.pct(s.p)})` : ""}`); const t = tagsOf(s).map(x => x[0]); if (t.length) out.push(`   ${t.join(" · ")}`); const m = metricsOf(s); if (m.length) out.push(`   ${m.join(" · ")}`); if (s.note) out.push(`   📝 ${K.clean(s.note)}`); }); }
   if (S.note.trim()) out.push("", `📝 ${K.clean(S.note)}`);
-  return out.concat(K.signoff("close", "Daily wrap", S.disc ? "⚠️ _Information only, not investment advice. Not SEBI registered._" : "")).join("\n");
+  return out.filter((l, i, a) => !(l === "" && (i === 0 || a[i - 1] === ""))).concat(K.signoff("close", "Daily wrap", S.disc ? "⚠️ _Information only, not investment advice. Not SEBI registered._" : "")).join("\n");
 }
 async function draw() {
   await K.loadFonts();
   const D = data(), W = 1080, m = K.measure(); m.font = `400 28px ${K.F.INTER}`;
+  const all = S.mode === "all";
   const noteL = S.note.trim() ? K.cap(K.wrap(m, K.clean(S.note), W - 200), 4) : [];
-  const idxH = D.idx.length * 104, mvRows = Math.max(D.gain.length, D.lose.length), mvH = mvRows ? 80 + mvRows * 50 + 20 : 0;
-  const sectH = D.sect.length ? 120 : 0, brH = D.adv + D.dec > 0 ? 120 : 0, flowH = !isNaN(D.fii) || !isNaN(D.dii) ? 120 : 0, noteH = noteL.length ? 70 + noteL.length * 40 + 20 : 0;
-  const blocks = [mvH, sectH, brH, flowH, noteH].filter(Boolean);
-  const top = 360, H = top + idxH + blocks.reduce((a, b) => a + b + 20, 0) + 20 + K.footerH(true);
-  const [ml, mc] = MOOD[D.mood];
-  const { c, ctx } = K.canvas(W, H, [[mc + "33", .9, .08, .55], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .55]]);
+  const idxH = all ? D.idx.length * 104 : 0, mvRows = all ? Math.max(D.gain.length, D.lose.length) : 0, mvH = mvRows ? 80 + mvRows * 50 + 20 : 0;
+  const sectH = all && D.sect.length ? 120 : 0, brH = all && D.adv + D.dec > 0 ? 120 : 0, flowH = all && (!isNaN(D.fii) || !isNaN(D.dii)) ? 120 : 0, noteH = noteL.length ? 70 + noteL.length * 40 + 20 : 0;
+  const comH = show(D, "com") ? 76 + D.com.length * 58 + 10 : 0;
+  const brE = !isNaN(D.br200) || !isNaN(D.br50), emaH = show(D, "ema") ? 76 + D.ema.length * 84 + (brE ? 64 : 0) + 6 : 0;
+  m.font = `400 24px ${K.F.INTER}`; const skNotes = D.stk.map(s => s.note ? K.cap(K.wrap(m, "📝 " + K.clean(s.note), W - 260), 2) : []);
+  const skH = show(D, "stk") ? (all ? 76 : 6) + D.stk.reduce((a, s, i) => a + 150 + (metricsOf(s).length ? 34 : 0) + skNotes[i].length * 32 + 14, 0) : 0;
+  const blocks = [mvH, sectH, brH, flowH, comH, emaH, skH, noteH].filter(Boolean);
+  const top = all ? 360 : 320, H = top + idxH + blocks.reduce((a, b) => a + b + 20, 0) + 20 + K.footerH(true);
+  const [ml, mc] = MOOD[D.mood], gc = all ? mc : { com: "#febc2e", ema: "#7c5cff", stk: "#00e0b8" }[S.mode];
+  const { c, ctx } = K.canvas(W, H, [[gc + "33", .9, .08, .55], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .55]]);
   K.brand(ctx);
-  K.txt(ctx, "MARKET CLOSE", 70, 205, `600 26px ${K.F.MONO}`, "#00e0b8");
+  K.txt(ctx, MODE[S.mode], 70, 205, `600 26px ${K.F.MONO}`, all ? "#00e0b8" : gc);
   ctx.font = K.fit(ctx, niceD(), 700, K.F.GROT, 72, W - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(niceD(), 70, 282);
-  K.pill(ctx, ml, 70, 300, mc, 20);
+  if (all) K.pill(ctx, ml, 70, 300, mc, 20);
   let y = top;
-  D.idx.forEach(x => {
+  if (all) D.idx.forEach(x => {
     const cc = (x.vix ? -x.ch : x.ch) > 0 ? "#22d39a" : (x.vix ? -x.ch : x.ch) < 0 ? "#ff5470" : "#c9cfdb";
     K.panel(ctx, 70, y, W - 140, 88, 22, "rgba(0,0,0,0.40)");
     K.rr(ctx, 70, y + 18, 6, 52, 3); ctx.fillStyle = cc; ctx.fill();
@@ -214,7 +353,6 @@ async function draw() {
     const chg = `${arrow(x.ch)} ${K.nf(Math.abs(x.ch))}  ${K.pct(x.p)}`; ctx.font = K.fit(ctx, chg, 600, K.F.MONO, 28, 330); ctx.fillStyle = cc; ctx.textAlign = "right"; ctx.fillText(chg, W - 100, y + 55);
     y += 104;
   });
-  y += 0;
   const block = (h, draw) => { draw(y, h); y += h + 20; };
   if (mvH) block(mvH, (by, h) => {
     const cw = (W - 160) / 2;
@@ -244,6 +382,37 @@ async function draw() {
       K.txt(ctx, isNaN(v) ? "—" : crore(v), bx + 26, by + 92, `700 34px ${K.F.MONO}`, isNaN(v) ? "#8a90a2" : v >= 0 ? "#22d39a" : "#ff5470");
     });
   });
+  if (comH) block(comH, (by, h) => {
+    K.panel(ctx, 70, by, W - 140, h, 22, "rgba(254,188,46,0.06)", "rgba(254,188,46,0.35)");
+    K.txt(ctx, "🪙 COMMODITIES & CURRENCY", 100, by + 48, `700 22px ${K.F.MONO}`, "#febc2e");
+    D.com.forEach((x, i) => { const ry = by + 100 + i * 58, cc = x.ch > 0 ? "#22d39a" : x.ch < 0 ? "#ff5470" : "#c9cfdb";
+      ctx.font = K.fit(ctx, x.n, 600, K.F.INTER, 28, 360); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(x.n, 100, ry);
+      K.txt(ctx, K.nf(x.c), 650, ry, `700 30px ${K.F.MONO}`, "#ffffff", "right");
+      const chg = `${arrow(x.ch)} ${K.nf(Math.abs(x.ch))}  ${K.pct(x.p)}`; ctx.font = K.fit(ctx, chg, 600, K.F.MONO, 26, 300); ctx.fillStyle = cc; ctx.textAlign = "right"; ctx.fillText(chg, W - 100, ry); });
+  });
+  if (emaH) block(emaH, (by, h) => {
+    K.panel(ctx, 70, by, W - 140, h, 22, "rgba(124,92,255,0.07)", "rgba(124,92,255,0.38)");
+    K.txt(ctx, "📈 TREND CHECK · 50 & 200 EMA", 100, by + 48, `700 22px ${K.F.MONO}`, "#b6a6ff");
+    D.ema.forEach((x, i) => { const ry = by + 76 + i * 84, cc = { g: "#22d39a", y: "#febc2e", r: "#ff5470" }[x.st.k];
+      K.rr(ctx, 100, ry + 10, 8, 56, 4); ctx.fillStyle = cc; ctx.fill();
+      ctx.font = K.fit(ctx, x.n, 700, K.F.GROT, 30, 400); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(x.n, 126, ry + 38);
+      const sub = x.st.t + (x.st.cross ? " · " + x.st.cross : ""); ctx.font = K.fit(ctx, sub, 600, K.F.INTER, 22, 520); ctx.fillStyle = cc; ctx.fillText(sub, 126, ry + 68);
+      K.txt(ctx, K.nf(x.c), W - 100, ry + 38, `700 30px ${K.F.MONO}`, "#ffffff", "right");
+      const dd = [x.st.d50 != null ? `50: ${dpct(x.st.d50)}` : "", x.st.d200 != null ? `200: ${dpct(x.st.d200)}` : ""].filter(Boolean).join("  "); K.txt(ctx, dd, W - 100, ry + 68, `600 21px ${K.F.MONO}`, "#8a90a2", "right"); });
+    if (brE) { const ry = by + 76 + D.ema.length * 84 + 40; K.txt(ctx, `Stocks above 200 EMA: ${isNaN(D.br200) ? "—" : D.br200 + "%"}   ·   above 50 EMA: ${isNaN(D.br50) ? "—" : D.br50 + "%"}`, 100, ry, `600 24px ${K.F.MONO}`, "#e3e6ee"); }
+  });
+  if (skH) block(skH, (by, h) => {
+    if (all) K.txt(ctx, "🔍 STOCKS IN FOCUS", 70, by + 40, `700 22px ${K.F.MONO}`, "#00e0b8");
+    let sy = by + (all ? 66 : 0);
+    D.stk.forEach((s, i) => { const mt = metricsOf(s), hh = 150 + (mt.length ? 34 : 0) + skNotes[i].length * 32; K.panel(ctx, 70, sy, W - 140, hh, 22, "rgba(0,0,0,0.40)");
+      ctx.font = K.fit(ctx, s.n, 700, K.F.GROT, 36, 520); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(s.n, 100, sy + 54);
+      if (s.c > 0) K.txt(ctx, "₹" + K.nf(s.c), !isNaN(s.p) ? W - 260 : W - 100, sy + 54, `700 32px ${K.F.MONO}`, "#ffffff", "right");
+      if (!isNaN(s.p)) K.txt(ctx, K.pct(s.p), W - 100, sy + 54, `700 28px ${K.F.MONO}`, s.p > 0 ? "#22d39a" : s.p < 0 ? "#ff5470" : "#c9cfdb", "right");
+      let tx = 100; tagsOf(s).forEach(([t, k]) => { const cc = { g: "#22d39a", y: "#febc2e", r: "#ff5470", b: "#8fb0ff" }[k]; ctx.font = `700 21px ${K.F.MONO}`; const w = ctx.measureText(t).width + 24; if (tx + w > W - 90) return; K.rr(ctx, tx, sy + 76, w, 38, 10); ctx.fillStyle = cc + "22"; ctx.fill(); K.txt(ctx, t, tx + 12, sy + 102, `700 21px ${K.F.MONO}`, cc); tx += w + 8; });
+      let ly = sy + 146; if (mt.length) { const mtt = mt.join(" · "); ctx.font = K.fit(ctx, mtt, 500, K.F.MONO, 22, W - 200); ctx.fillStyle = "#b9c0d0"; ctx.textAlign = "left"; ctx.fillText(mtt, 100, ly); ly += 34; }
+      skNotes[i].forEach(l => { K.txt(ctx, l, 100, ly, `400 24px ${K.F.INTER}`, "#d5d8e3"); ly += 32; });
+      sy += hh + 14; });
+  });
   if (noteH) block(noteH, (by, h) => {
     K.panel(ctx, 70, by, W - 140, h, 22, "rgba(124,92,255,0.09)", "rgba(124,92,255,0.38)");
     K.txt(ctx, "VIEW", 100, by + 46, `600 22px ${K.F.MONO}`, "#b6a6ff");
@@ -252,9 +421,9 @@ async function draw() {
   K.footer(ctx, W, H, K.toolUrl("close"), S.disc ? "Information only · Not investment advice · Not SEBI registered" : "", true);
   return c;
 }
-K.share({ text: buildText, valid, draw, file: () => "market-close-" + S.date });
+K.share({ text: buildText, valid, draw, file: () => (S.mode === "all" ? "market-close-" : "market-" + S.mode + "-") + S.date });
 
-drawIdx(); render();
+drawIdx(); drawCom(); drawEma(); drawStk(); render();
 </script>
 <script src="../assets/pwa.js" defer></script>
 </body>
