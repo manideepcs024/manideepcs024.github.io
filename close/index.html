@@ -43,6 +43,14 @@
   .ph { font: 700 .66rem "JetBrains Mono"; letter-spacing: .08em; color: var(--muted); margin: 14px 0 6px; }
   .breadth { display: flex; height: 10px; border-radius: 6px; overflow: hidden; margin-top: 6px; }
   .mood { display: inline-block; font: 700 .7rem "JetBrains Mono"; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .sets { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 8px; font-size: .78rem; color: var(--muted); }
+  .sets button { border: 1px solid rgba(254,188,46,.45); background: rgba(254,188,46,.08); color: #ffd98a; padding: 7px 11px; border-radius: 999px; font: 700 .76rem Inter; cursor: pointer; }
+  .pickb { border-radius: 14px; border: 1px dashed rgba(124,92,255,.5); background: rgba(124,92,255,.06); padding: 10px; margin-bottom: 12px; }
+  .pickb .lb2 { font: 700 .62rem "JetBrains Mono"; letter-spacing: .07em; color: var(--muted); margin: 4px 0 6px; }
+  .pickb .cs { display: flex; gap: 5px; flex-wrap: wrap; }
+  .pickb button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #cfd3df; padding: 7px 10px; border-radius: 10px; font: 600 .76rem Inter; cursor: pointer; }
+  .pickb button.on { background: rgba(124,92,255,.3); border-color: #7c5cff; color: #fff; }
+  .solo { grid-column: 1 / -1; border: 1px solid rgba(0,224,184,.4); background: rgba(0,224,184,.07); color: #9ff3df; border-radius: 10px; padding: 8px; font: 700 .76rem Inter; cursor: pointer; }
   .modes { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
   .modes button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #bfc4d2; padding: 7px 11px; border-radius: 999px; font: 600 .76rem Inter; cursor: pointer; }
   .modes button.on { background: var(--fg); color: #000; border-color: var(--fg); }
@@ -95,6 +103,7 @@
 
         <div class="xsec">
           <h3>🪙 Commodities &amp; currency <small>optional · price & change</small></h3>
+          <div class="sets" id="comSets"><span>Quick set:</span><button data-set="inr">₹ India (MCX)</button><button data-set="usd">$ Global</button><button data-set="both">₹ + $ both</button></div>
           <div class="chips-in" id="comPresets" style="margin-top:8px"></div>
           <div class="idx-head" style="margin-top:10px"><span>NAME</span><span>PRICE</span><span>CHANGE</span><span></span></div>
           <div id="com"></div>
@@ -125,7 +134,8 @@
 
       <section class="card sticky">
         <div class="res-head"><h2>Market close</h2><span id="meta"></span></div>
-        <div class="modes" id="modes"><button data-m="all">📋 Full wrap</button><button data-m="com">🪙 Commodities</button><button data-m="ema">📈 EMA check</button><button data-m="stk">🔍 Stocks</button></div>
+        <div class="modes" id="modes"><button data-m="all">📋 Full wrap</button><button data-m="com">🪙 Commodities</button><button data-m="ema">📈 EMA check</button><button data-m="stk">🔍 Stocks</button><button data-m="pick">☑️ Pick items</button></div>
+        <div id="pickBox"></div>
         <div id="prev"></div>
         <div class="share-row" id="shareRow"></div>
         <div class="tip"><b>Where to get the numbers:</b> NSE/BSE or your broker app for closes and movers; MCX or your broker for gold, silver and crude; any charting site (TradingView, broker charts) for RSI and EMAs; Screener for market cap, P/E and EPS. FII/DII figures are <b>provisional</b>. Double-check before posting.</div>
@@ -141,7 +151,7 @@
 const K = Kit, $ = K.$;
 K.chrome();
 const PRESETS = ["NIFTY 50", "SENSEX", "BANK NIFTY", "NIFTY IT", "MIDCAP 100", "SMALLCAP 100", "INDIA VIX", "USD/INR"];
-const COM_PRESETS = ["GOLD ₹/10g", "SILVER ₹/kg", "CRUDE ₹/bbl", "NATURAL GAS", "COPPER ₹/kg", "GOLD $/oz", "BRENT $", "USD/INR", "DOLLAR INDEX"];
+const COM_PRESETS = ["GOLD ₹/10g", "SILVER ₹/kg", "CRUDE ₹/bbl", "NATURAL GAS", "COPPER ₹/kg", "GOLD $/oz", "SILVER $/oz", "BRENT $", "CRUDE WTI $", "USD/INR", "DOLLAR INDEX"];
 function lastSession() {
   const d = K.istNow(), mins = d.getHours() * 60 + d.getMinutes();
   if (d.getDay() >= 1 && d.getDay() <= 5 && mins < 930) d.setDate(d.getDate() - 1);
@@ -151,8 +161,8 @@ function lastSession() {
 const blankMv = () => [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }];
 const blankStk = () => ({ n: "", c: "", p: "", rsi: "", e50: "", e200: "", mc: "", pe: "", eps: "", note: "" });
 const S = K.store("close_v1", { date: "", mood: "auto", idx: [{ n: "NIFTY 50", c: "", ch: "" }, { n: "SENSEX", c: "", ch: "" }, { n: "BANK NIFTY", c: "", ch: "" }], gain: blankMv(), lose: blankMv(), sect: [{ n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }, { n: "", p: "" }], adv: "", dec: "", fii: "", dii: "", note: "", disc: true,
-  com: [{ n: "GOLD ₹/10g", c: "", ch: "" }, { n: "SILVER ₹/kg", c: "", ch: "" }, { n: "CRUDE ₹/bbl", c: "", ch: "" }], ema: [{ n: "NIFTY 50", c: "", e50: "", e200: "" }, { n: "BANK NIFTY", c: "", e50: "", e200: "" }], br200: "", br50: "", stk: [blankStk()], mode: "all" });
-if (!S.com) S.com = []; if (!S.ema) S.ema = []; if (!S.stk) S.stk = [blankStk()]; if (!S.mode) S.mode = "all";
+  com: [{ n: "GOLD ₹/10g", c: "", ch: "" }, { n: "SILVER ₹/kg", c: "", ch: "" }, { n: "CRUDE ₹/bbl", c: "", ch: "" }], ema: [{ n: "NIFTY 50", c: "", e50: "", e200: "" }, { n: "BANK NIFTY", c: "", e50: "", e200: "" }], br200: "", br50: "", stk: [blankStk()], mode: "all", pick: [] });
+if (!S.com) S.com = []; if (!S.ema) S.ema = []; if (!S.stk) S.stk = [blankStk()]; if (!S.mode) S.mode = "all"; if (!S.pick) S.pick = [];
 if (!S.date || S.date < lastSession()) S.date = lastSession();
 
 /* ---------- inputs ---------- */
@@ -213,7 +223,7 @@ $("#emaAdd").onclick = () => { if (S.ema.length >= 6) { K.toast("Up to 6 rows");
 
 /* stock cards */
 const SF = [["n", "STOCK", "w2", "TATA MOTORS", "t"], ["c", "PRICE ₹", "", "1,020"], ["p", "CHANGE %", "", "+2.4"], ["rsi", "RSI (14)", "", "62"], ["e50", "50 EMA", "", "985"], ["e200", "200 EMA", "", "940"], ["mc", "MKT CAP ₹ CR", "", "3,75,000"], ["pe", "P/E", "", "auto"], ["eps", "EPS ₹", "", "auto"], ["note", "NOTE", "w4", "Breakout above 1,000 with volume; results next week", "t"]];
-function drawStk() { $("#stk").innerHTML = S.stk.map((r, i) => `<div class="sk" data-i="${i}">${SF.map(([k, l, w, ph, t]) => `<div class="${w}"><div class="lb">${l}</div><label class="field"><input data-f="${k}" type="text" ${t ? "" : 'inputmode="decimal"'} maxlength="${k === "note" ? 110 : k === "n" ? 20 : 14}" value="${K.esc(r[k] || "")}" placeholder="${ph}" /></label></div>`).join("")}<div class="tags"></div>${S.stk.length > 1 ? `<button class="rm rmx" title="Remove">✕</button>` : ""}</div>`).join(""); }
+function drawStk() { $("#stk").innerHTML = S.stk.map((r, i) => `<div class="sk" data-i="${i}">${SF.map(([k, l, w, ph, t]) => `<div class="${w}"><div class="lb">${l}</div><label class="field"><input data-f="${k}" type="text" ${t ? "" : 'inputmode="decimal"'} maxlength="${k === "note" ? 110 : k === "n" ? 20 : 14}" value="${K.esc(r[k] || "")}" placeholder="${ph}" /></label></div>`).join("")}<div class="tags"></div><button class="solo" data-solo="${i}">📤 Share only this stock</button>${S.stk.length > 1 ? `<button class="rm rmx" title="Remove">✕</button>` : ""}</div>`).join(""); }
 $("#stk").addEventListener("input", e => { const row = e.target.closest(".sk"), f = e.target.dataset.f; if (!row) return; const r = S.stk[+row.dataset.i];
   if (f === "p") K.fmtNum(e.target, 2, true); else if (!["n", "note"].includes(f)) K.fmtNum(e.target, 2); r[f] = f === "n" ? e.target.value.toUpperCase() : e.target.value; render(); });
 $("#stk").addEventListener("click", e => { const row = e.target.closest(".sk"); if (row && e.target.closest(".rm")) { S.stk.splice(+row.dataset.i, 1); drawStk(); render(); } });
@@ -222,6 +232,13 @@ $("#stkAdd").onclick = () => { if (S.stk.length >= 5) { K.toast("Up to 5 stocks"
 $("#note").value = S.note; $("#note").addEventListener("input", e => { S.note = e.target.value; render(); });
 $("#optDisc").checked = S.disc; $("#optDisc").addEventListener("change", e => { S.disc = e.target.checked; render(); });
 $("#modes").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (!b) return; S.mode = b.dataset.m; render(); });
+$("#pickBox").addEventListener("click", e => { const b = e.target.closest("[data-pk]"); if (!b) return; const k = b.dataset.pk;
+  if (k === "__clear") S.pick = []; else if (k === "__all") S.pick = pickables().map(x => x[0]); else S.pick = S.pick.includes(k) ? S.pick.filter(x => x !== k) : [...S.pick, k]; render(); });
+$("#stk").addEventListener("click", e => { const b = e.target.closest("[data-solo]"); if (!b) return; const r = S.stk[+b.dataset.solo], n = (r.n || "").trim();
+  if (!n) { K.toast("Enter the stock name first"); return; } S.mode = "pick"; S.pick = ["stk:" + n]; render(); $("#prev").scrollIntoView({ behavior: "smooth", block: "center" }); K.toast("Ready: share this stock below"); });
+const SETS = { inr: ["GOLD ₹/10g", "SILVER ₹/kg", "CRUDE ₹/bbl"], usd: ["GOLD $/oz", "SILVER $/oz", "BRENT $"], both: ["GOLD ₹/10g", "SILVER ₹/kg", "GOLD $/oz", "SILVER $/oz", "CRUDE ₹/bbl", "BRENT $"] };
+$("#comSets").addEventListener("click", e => { const b = e.target.closest("[data-set]"); if (!b) return; const names = SETS[b.dataset.set], inSet = new Set(Object.values(SETS).flat());
+  const old = Object.fromEntries(S.com.map(r => [r.n, r])); S.com = names.map(n => old[n] || { n, c: "", ch: "" }).concat(S.com.filter(r => r.n && !inSet.has(r.n))).slice(0, 8); drawCom(); render(); });
 
 /* ---------- analysis helpers ---------- */
 function emaState(c, e50, e200) {
@@ -258,10 +275,13 @@ function data() {
   const mv = l => l.map(r => ({ n: r.n.trim(), p: K.num(r.p) })).filter(r => r.n && !isNaN(r.p));
   const adv = K.num(S.adv), dec = K.num(S.dec), fii = K.num(S.fii), dii = K.num(S.dii);
   const ema = S.ema.map(r => { const c = K.num(r.c), st = emaState(c, K.num(r.e50), K.num(r.e200)); return r.n.trim() && st ? { n: r.n.trim(), c, e50: K.num(r.e50), e200: K.num(r.e200), st } : null; }).filter(Boolean);
-  const br200 = K.num(S.br200), br50 = K.num(S.br50);
+  let br200 = K.num(S.br200), br50 = K.num(S.br50);
   const lead = idx.find(x => !x.vix);
   let mood = S.mood; if (mood === "auto") mood = !lead ? "flat" : lead.p > .25 ? "bull" : lead.p < -.25 ? "bear" : "flat";
-  return { idx, com, ema, br200: br200 >= 0 && br200 <= 100 ? br200 : NaN, br50: br50 >= 0 && br50 <= 100 ? br50 : NaN, stk: stkData(), gain: mv(S.gain), lose: mv(S.lose), sect: mv(S.sect).sort((a, b) => b.p - a.p), adv: adv >= 0 ? adv : NaN, dec: dec >= 0 ? dec : NaN, fii, dii, mood };
+  const stk = stkData(), P = S.mode === "pick", pk = (t, n) => S.pick.includes(t + ":" + n);
+  const fCom = P ? com.filter(x => pk("com", x.n)) : com, fEma = P ? ema.filter(x => pk("ema", x.n)) : ema, fStk = P ? stk.filter(x => pk("stk", x.n)) : stk;
+  if (P) { br200 = NaN; br50 = NaN; }
+  return { idx, com: fCom, ema: fEma, stk: fStk, allCom: com, allEma: ema, allStk: stk, br200: br200 >= 0 && br200 <= 100 ? br200 : NaN, br50: br50 >= 0 && br50 <= 100 ? br50 : NaN, gain: mv(S.gain), lose: mv(S.lose), sect: mv(S.sect).sort((a, b) => b.p - a.p), adv: adv >= 0 ? adv : NaN, dec: dec >= 0 ? dec : NaN, fii, dii, mood };
 }
 const MOOD = { bull: ["BULLISH DAY", "#22d39a", "🟢"], flat: ["FLAT / MIXED DAY", "#c9cfdb", "⚪"], bear: ["BEARISH DAY", "#ff5470", "🔴"] };
 const MODE = { all: "MARKET CLOSE", com: "COMMODITIES", ema: "TREND CHECK · 50 & 200 EMA", stk: "STOCKS IN FOCUS" };
@@ -270,7 +290,14 @@ const col = (v, vix) => (vix ? -v : v) > 0 ? "up" : (vix ? -v : v) < 0 ? "down" 
 const crore = v => `${K.sgn(v)}₹${K.nf(Math.abs(v), 2).replace(/\.00$/, "")} cr`;
 const niceD = () => K.niceDate(S.date);
 const has = (D, k) => k === "com" ? D.com.length > 0 : k === "ema" ? D.ema.length > 0 || !isNaN(D.br200) || !isNaN(D.br50) : k === "stk" ? D.stk.length > 0 : D.idx.length > 0;
-const show = (D, k) => (S.mode === "all" || S.mode === k) && has(D, k);
+const show = (D, k) => (S.mode === "all" || S.mode === k || S.mode === "pick") && has(D, k);
+const secs = D => ["com", "ema", "stk"].filter(k => show(D, k));
+const multi = D => S.mode === "all" || (S.mode === "pick" && secs(D).length > 1);
+const SEC_EMO = { com: "🪙", ema: "📈", stk: "🔍" }, SEC_COL = { com: "#febc2e", ema: "#7c5cff", stk: "#00e0b8" };
+function title(D) { if (S.mode !== "pick") return MODE[S.mode]; const s = secs(D); if (s.length !== 1) return "MARKET UPDATE"; if (s[0] === "stk") return D.stk.length === 1 ? "STOCK IN FOCUS" : "STOCKS IN FOCUS"; if (s[0] === "com") return D.com.every(x => /GOLD|SILVER/.test(x.n)) ? "GOLD & SILVER" : "COMMODITIES"; return MODE.ema; }
+const secKey = D => S.mode === "pick" ? (secs(D).length === 1 ? secs(D)[0] : "") : S.mode;
+const cur = n => /\$/.test(n) ? "$" : /₹/.test(n) ? "₹" : "";
+function pickables() { const D = data(); return [...D.allCom.map(x => ["com:" + x.n, "🪙 " + x.n]), ...D.allEma.map(x => ["ema:" + x.n, "📈 " + x.n]), ...D.allStk.map(x => ["stk:" + x.n, "🔍 " + x.n])]; }
 
 function render() {
   const D = data();
@@ -280,8 +307,9 @@ function render() {
     el.innerHTML = tagsOf(s).map(([t, k]) => `<span class="tg ${k}">${K.esc(t)}</span>`).join("") + (s.peAuto ? `<span class="tg">P/E ${s.pe.toFixed(1)} (auto)</span>` : "") + (s.epsAuto ? `<span class="tg">EPS ₹${K.nf(s.eps, 2)} (auto)</span>` : ""); });
   $("#modes").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.m === S.mode));
   $("#meta").textContent = niceD();
-  const any = S.mode === "all" ? D.idx.length > 0 : has(D, S.mode);
-  if (!any) { $("#prev").innerHTML = `<div class="placeholder">${{ all: "Enter at least one index close to build the card.", com: "Enter at least one commodity price.", ema: "Enter a price and its 50 or 200 EMA.", stk: "Enter at least one stock name." }[S.mode]}</div>`; S.save(); return; }
+  if (S.mode === "pick") { const pk = pickables(); $("#pickBox").innerHTML = `<div class="pickb"><div class="lb2">TAP WHAT TO SHARE</div><div class="cs">${pk.length ? pk.map(([k, l]) => `<button data-pk="${K.esc(k)}" class="${S.pick.includes(k) ? "on" : ""}">${K.esc(l)}</button>`).join("") + `<button data-pk="__all">All</button><button data-pk="__clear">Clear</button>` : `<span style="font-size:.82rem;color:var(--muted)">Fill in commodities, EMA rows or stocks first.</span>`}</div></div>`; } else $("#pickBox").innerHTML = "";
+  const any = S.mode === "all" ? D.idx.length > 0 : S.mode === "pick" ? secs(D).length > 0 : has(D, S.mode);
+  if (!any) { $("#prev").innerHTML = `<div class="placeholder">${{ all: "Enter at least one index close to build the card.", com: "Enter at least one commodity price.", ema: "Enter a price and its 50 or 200 EMA.", stk: "Enter at least one stock name.", pick: "Tap the items above to choose what to share." }[S.mode]}</div>`; S.save(); return; }
   let h = "";
   if (S.mode === "all") { const [ml, mc] = MOOD[D.mood];
     h += `<span class="mood" style="color:${mc};background:${mc}1f;border:1px solid ${mc}66">${ml}</span><div class="prev-idx">`;
@@ -293,10 +321,10 @@ function render() {
     if (!isNaN(D.fii)) h += `<div class="stat"><span>FII net</span><b class="${col(D.fii)}">${crore(D.fii)}</b></div>`;
     if (!isNaN(D.dii)) h += `<div class="stat"><span>DII net</span><b class="${col(D.dii)}">${crore(D.dii)}</b></div>`;
     h += "</div>"; }
-  if (show(D, "com")) h += `<div class="ph">🪙 COMMODITIES &amp; CURRENCY</div><div class="prev-idx">` + D.com.map(x => `<div class="pi"><b>${K.esc(x.n)}</b><div class="v">${K.nf(x.c)}<small class="${col(x.ch)}">${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})</small></div></div>`).join("") + "</div>";
-  if (show(D, "ema")) { h += `<div class="ph">📈 TREND CHECK · 50 &amp; 200 EMA</div><div class="prev-idx">` + D.ema.map(x => `<div class="pi"><span><b>${x.st.e} ${K.esc(x.n)}</b><span class="sub2">${x.st.t}${x.st.cross ? " · " + x.st.cross : ""}</span></span><div class="v">${K.nf(x.c)}<small style="color:var(--muted)">${x.st.d200 != null ? dpct(x.st.d200) + " vs 200" : dpct(x.st.d50) + " vs 50"}</small></div></div>`).join("") + "</div>";
+  if (show(D, "com")) h += (multi(D) ? `<div class="ph">🪙 COMMODITIES &amp; CURRENCY</div>` : "") + `<div class="prev-idx">` + D.com.map(x => `<div class="pi"><b>${K.esc(x.n)}</b><div class="v">${cur(x.n)}${K.nf(x.c)}<small class="${col(x.ch)}">${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})</small></div></div>`).join("") + "</div>";
+  if (show(D, "ema")) { h += (multi(D) ? `<div class="ph">📈 TREND CHECK · 50 &amp; 200 EMA</div>` : "") + `<div class="prev-idx">` + D.ema.map(x => `<div class="pi"><span><b>${x.st.e} ${K.esc(x.n)}</b><span class="sub2">${x.st.t}${x.st.cross ? " · " + x.st.cross : ""}</span></span><div class="v">${K.nf(x.c)}<small style="color:var(--muted)">${x.st.d200 != null ? dpct(x.st.d200) + " vs 200" : dpct(x.st.d50) + " vs 50"}</small></div></div>`).join("") + "</div>";
     if (!isNaN(D.br200) || !isNaN(D.br50)) h += `<div class="stats">${!isNaN(D.br200) ? `<div class="stat"><span>Stocks above 200 EMA</span><b class="${D.br200 >= 50 ? "up" : "down"}">${D.br200}%</b></div>` : ""}${!isNaN(D.br50) ? `<div class="stat"><span>Stocks above 50 EMA</span><b class="${D.br50 >= 50 ? "up" : "down"}">${D.br50}%</b></div>` : ""}</div>`; }
-  if (show(D, "stk")) h += `<div class="ph">🔍 STOCKS IN FOCUS</div><div class="prev-idx">` + D.stk.map(s => `<div class="pi" style="grid-template-columns:1fr"><div style="display:flex;justify-content:space-between;gap:8px"><b>${K.esc(s.n)}</b>${s.c > 0 ? `<span class="v">₹${K.nf(s.c)}${!isNaN(s.p) ? ` <small class="${col(s.p)}" style="display:inline">${K.pct(s.p)}</small>` : ""}</span>` : ""}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${tagsOf(s).map(([t, k]) => `<span class="tg ${k}">${K.esc(t)}</span>`).join("")}</div>${metricsOf(s).length ? `<span class="sub2" style="font-family:'JetBrains Mono'">${metricsOf(s).join(" · ")}</span>` : ""}${s.note ? `<span class="sub2" style="color:#d5d8e3">📝 ${K.esc(s.note)}</span>` : ""}</div>`).join("") + "</div>";
+  if (show(D, "stk")) h += (multi(D) ? `<div class="ph">🔍 STOCKS IN FOCUS</div>` : "") + `<div class="prev-idx">` + D.stk.map(s => `<div class="pi" style="grid-template-columns:1fr"><div style="display:flex;justify-content:space-between;gap:8px"><b>${K.esc(s.n)}</b>${s.c > 0 ? `<span class="v">₹${K.nf(s.c)}${!isNaN(s.p) ? ` <small class="${col(s.p)}" style="display:inline">${K.pct(s.p)}</small>` : ""}</span>` : ""}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${tagsOf(s).map(([t, k]) => `<span class="tg ${k}">${K.esc(t)}</span>`).join("")}</div>${metricsOf(s).length ? `<span class="sub2" style="font-family:'JetBrains Mono'">${metricsOf(s).join(" · ")}</span>` : ""}${s.note ? `<span class="sub2" style="color:#d5d8e3">📝 ${K.esc(s.note)}</span>` : ""}</div>`).join("") + "</div>";
   if (S.note.trim()) h += `<div class="tip" style="color:#d5d8e3">📝 ${K.esc(S.note.trim())}</div>`;
   $("#prev").innerHTML = h; S.save();
 }
@@ -304,22 +332,23 @@ function render() {
 /* ---------- share ---------- */
 function valid() { const D = data();
   if (S.mode === "all") { if (D.idx.length) return true; K.shake($("#idx .field:nth-child(2)")); K.toast("Enter at least one index close"); return false; }
+  if (S.mode === "pick") { if (secs(D).length) return true; K.toast("Tap at least one item to share"); return false; }
   if (has(D, S.mode)) return true; K.toast({ com: "Enter at least one commodity price", ema: "Enter a price and its 50/200 EMA", stk: "Enter at least one stock" }[S.mode]); return false; }
 function buildText() {
   const D = data(), out = [];
   if (S.mode === "all") { const [ml, , me] = MOOD[D.mood]; out.push(`🔔 *MARKET CLOSE* · ${niceD()}`, `${me} _${ml.charAt(0) + ml.slice(1).toLowerCase()}_`, "");
-    D.idx.forEach(x => out.push(`${(x.vix ? -x.ch : x.ch) > 0 ? "🟢" : (x.vix ? -x.ch : x.ch) < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`));
+    D.idx.forEach(x => out.push(`${(x.vix ? -x.ch : x.ch) > 0 ? "🟢" : (x.vix ? -x.ch : x.ch) < 0 ? "🔴" : "⚪"} *${x.n}*: ${cur(x.n)}${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`));
     if (D.gain.length) out.push("", `📈 *Top gainers:* ${D.gain.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
     if (D.lose.length) out.push(`${D.gain.length ? "" : "\n"}📉 *Top losers:* ${D.lose.map(g => `${g.n} ${K.pct(g.p)}`).join(", ")}`);
     if (D.sect.length) out.push("", `🏭 *Sectors:* ${D.sect.map(s => `${s.n} ${K.pct(s.p)}`).join(" · ")}`);
     if (D.adv >= 0 && D.dec >= 0 && D.adv + D.dec) out.push(`📊 *Breadth:* ${K.qty(D.adv)} advances / ${K.qty(D.dec)} declines`);
     if (!isNaN(D.fii) || !isNaN(D.dii)) out.push(`💰 *FII:* ${isNaN(D.fii) ? "—" : crore(D.fii)} · *DII:* ${isNaN(D.dii) ? "—" : crore(D.dii)} _(provisional)_`);
-  } else out.push(`${{ com: "🪙", ema: "📈", stk: "🔍" }[S.mode]} *${MODE[S.mode]}* · ${niceD()}`);
-  if (show(D, "com")) { out.push("", S.mode === "all" ? "🪙 *Commodities & currency*" : ""); D.com.forEach(x => out.push(`${x.ch > 0 ? "🟢" : x.ch < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`)); }
-  if (show(D, "ema")) { out.push("", S.mode === "all" ? "📈 *Trend check (50 & 200 EMA)*" : "");
+  } else out.push(`${SEC_EMO[secKey(D)] || "📊"} *${title(D)}* · ${niceD()}`);
+  if (show(D, "com")) { out.push("", multi(D) ? "🪙 *Commodities & currency*" : ""); D.com.forEach(x => out.push(`${x.ch > 0 ? "🟢" : x.ch < 0 ? "🔴" : "⚪"} *${x.n}*: ${K.nf(x.c)} ${arrow(x.ch)} ${K.nf(Math.abs(x.ch))} (${K.pct(x.p)})`)); }
+  if (show(D, "ema")) { out.push("", multi(D) ? "📈 *Trend check (50 & 200 EMA)*" : "");
     D.ema.forEach(x => out.push(`${x.st.e} *${x.n}* ${K.nf(x.c)}: ${x.st.t}${x.st.d200 != null ? ` (${dpct(x.st.d200)} vs 200 EMA)` : x.st.d50 != null ? ` (${dpct(x.st.d50)} vs 50 EMA)` : ""}`));
     if (!isNaN(D.br200) || !isNaN(D.br50)) out.push(`📊 Stocks above 200 EMA: ${isNaN(D.br200) ? "—" : D.br200 + "%"} · above 50 EMA: ${isNaN(D.br50) ? "—" : D.br50 + "%"}`); }
-  if (show(D, "stk")) { out.push("", S.mode === "all" ? "🔍 *Stocks in focus*" : "");
+  if (show(D, "stk")) { out.push("", multi(D) ? "🔍 *Stocks in focus*" : "");
     D.stk.forEach(s => { out.push(`▪️ *${s.n}*${s.c > 0 ? ` ₹${K.nf(s.c)}` : ""}${!isNaN(s.p) ? ` (${K.pct(s.p)})` : ""}`); const t = tagsOf(s).map(x => x[0]); if (t.length) out.push(`   ${t.join(" · ")}`); const m = metricsOf(s); if (m.length) out.push(`   ${m.join(" · ")}`); if (s.note) out.push(`   📝 ${K.clean(s.note)}`); }); }
   if (S.note.trim()) out.push("", `📝 ${K.clean(S.note)}`);
   return out.filter((l, i, a) => !(l === "" && (i === 0 || a[i - 1] === ""))).concat(K.signoff("close", "Daily wrap", S.disc ? "⚠️ _Information only, not investment advice. Not SEBI registered._" : "")).join("\n");
@@ -331,16 +360,17 @@ async function draw() {
   const noteL = S.note.trim() ? K.cap(K.wrap(m, K.clean(S.note), W - 200), 4) : [];
   const idxH = all ? D.idx.length * 104 : 0, mvRows = all ? Math.max(D.gain.length, D.lose.length) : 0, mvH = mvRows ? 80 + mvRows * 50 + 20 : 0;
   const sectH = all && D.sect.length ? 120 : 0, brH = all && D.adv + D.dec > 0 ? 120 : 0, flowH = all && (!isNaN(D.fii) || !isNaN(D.dii)) ? 120 : 0, noteH = noteL.length ? 70 + noteL.length * 40 + 20 : 0;
-  const comH = show(D, "com") ? 76 + D.com.length * 58 + 10 : 0;
-  const brE = !isNaN(D.br200) || !isNaN(D.br50), emaH = show(D, "ema") ? 76 + D.ema.length * 84 + (brE ? 64 : 0) + 6 : 0;
+  const mu = multi(D), comT = mu ? 76 : 24, emaT = mu ? 76 : 16;
+  const comH = show(D, "com") ? comT + D.com.length * 58 + 10 : 0;
+  const brE = !isNaN(D.br200) || !isNaN(D.br50), emaH = show(D, "ema") ? emaT + D.ema.length * 84 + (brE ? 64 : 0) + 6 : 0;
   m.font = `400 24px ${K.F.INTER}`; const skNotes = D.stk.map(s => s.note ? K.cap(K.wrap(m, "📝 " + K.clean(s.note), W - 260), 2) : []);
-  const skH = show(D, "stk") ? (all ? 76 : 6) + D.stk.reduce((a, s, i) => a + 150 + (metricsOf(s).length ? 34 : 0) + skNotes[i].length * 32 + 14, 0) : 0;
+  const skH = show(D, "stk") ? (multi(D) ? 76 : 6) + D.stk.reduce((a, s, i) => a + 150 + (metricsOf(s).length ? 34 : 0) + skNotes[i].length * 32 + 14, 0) : 0;
   const blocks = [mvH, sectH, brH, flowH, comH, emaH, skH, noteH].filter(Boolean);
   const top = all ? 360 : 320, H = top + idxH + blocks.reduce((a, b) => a + b + 20, 0) + 20 + K.footerH(true);
-  const [ml, mc] = MOOD[D.mood], gc = all ? mc : { com: "#febc2e", ema: "#7c5cff", stk: "#00e0b8" }[S.mode];
+  const [ml, mc] = MOOD[D.mood], gc = all ? mc : SEC_COL[secKey(D)] || "#00e0b8";
   const { c, ctx } = K.canvas(W, H, [[gc + "33", .9, .08, .55], ["rgba(124,92,255,0.28)", .05, .05, .6], ["rgba(0,224,184,0.10)", .95, .95, .55]]);
   K.brand(ctx);
-  K.txt(ctx, MODE[S.mode], 70, 205, `600 26px ${K.F.MONO}`, all ? "#00e0b8" : gc);
+  K.txt(ctx, title(D), 70, 205, `600 26px ${K.F.MONO}`, all ? "#00e0b8" : gc);
   ctx.font = K.fit(ctx, niceD(), 700, K.F.GROT, 72, W - 140); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(niceD(), 70, 282);
   if (all) K.pill(ctx, ml, 70, 300, mc, 20);
   let y = top;
@@ -384,26 +414,26 @@ async function draw() {
   });
   if (comH) block(comH, (by, h) => {
     K.panel(ctx, 70, by, W - 140, h, 22, "rgba(254,188,46,0.06)", "rgba(254,188,46,0.35)");
-    K.txt(ctx, "🪙 COMMODITIES & CURRENCY", 100, by + 48, `700 22px ${K.F.MONO}`, "#febc2e");
-    D.com.forEach((x, i) => { const ry = by + 100 + i * 58, cc = x.ch > 0 ? "#22d39a" : x.ch < 0 ? "#ff5470" : "#c9cfdb";
+    if (mu) K.txt(ctx, "🪙 COMMODITIES & CURRENCY", 100, by + 48, `700 22px ${K.F.MONO}`, "#febc2e");
+    D.com.forEach((x, i) => { const ry = by + comT + 24 + i * 58, cc = x.ch > 0 ? "#22d39a" : x.ch < 0 ? "#ff5470" : "#c9cfdb";
       ctx.font = K.fit(ctx, x.n, 600, K.F.INTER, 28, 360); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(x.n, 100, ry);
-      K.txt(ctx, K.nf(x.c), 650, ry, `700 30px ${K.F.MONO}`, "#ffffff", "right");
+      K.txt(ctx, cur(x.n) + K.nf(x.c), 650, ry, `700 30px ${K.F.MONO}`, "#ffffff", "right");
       const chg = `${arrow(x.ch)} ${K.nf(Math.abs(x.ch))}  ${K.pct(x.p)}`; ctx.font = K.fit(ctx, chg, 600, K.F.MONO, 26, 300); ctx.fillStyle = cc; ctx.textAlign = "right"; ctx.fillText(chg, W - 100, ry); });
   });
   if (emaH) block(emaH, (by, h) => {
     K.panel(ctx, 70, by, W - 140, h, 22, "rgba(124,92,255,0.07)", "rgba(124,92,255,0.38)");
-    K.txt(ctx, "📈 TREND CHECK · 50 & 200 EMA", 100, by + 48, `700 22px ${K.F.MONO}`, "#b6a6ff");
-    D.ema.forEach((x, i) => { const ry = by + 76 + i * 84, cc = { g: "#22d39a", y: "#febc2e", r: "#ff5470" }[x.st.k];
+    if (mu) K.txt(ctx, "📈 TREND CHECK · 50 & 200 EMA", 100, by + 48, `700 22px ${K.F.MONO}`, "#b6a6ff");
+    D.ema.forEach((x, i) => { const ry = by + emaT + i * 84, cc = { g: "#22d39a", y: "#febc2e", r: "#ff5470" }[x.st.k];
       K.rr(ctx, 100, ry + 10, 8, 56, 4); ctx.fillStyle = cc; ctx.fill();
       ctx.font = K.fit(ctx, x.n, 700, K.F.GROT, 30, 400); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(x.n, 126, ry + 38);
       const sub = x.st.t + (x.st.cross ? " · " + x.st.cross : ""); ctx.font = K.fit(ctx, sub, 600, K.F.INTER, 22, 520); ctx.fillStyle = cc; ctx.fillText(sub, 126, ry + 68);
       K.txt(ctx, K.nf(x.c), W - 100, ry + 38, `700 30px ${K.F.MONO}`, "#ffffff", "right");
       const dd = [x.st.d50 != null ? `50: ${dpct(x.st.d50)}` : "", x.st.d200 != null ? `200: ${dpct(x.st.d200)}` : ""].filter(Boolean).join("  "); K.txt(ctx, dd, W - 100, ry + 68, `600 21px ${K.F.MONO}`, "#8a90a2", "right"); });
-    if (brE) { const ry = by + 76 + D.ema.length * 84 + 40; K.txt(ctx, `Stocks above 200 EMA: ${isNaN(D.br200) ? "—" : D.br200 + "%"}   ·   above 50 EMA: ${isNaN(D.br50) ? "—" : D.br50 + "%"}`, 100, ry, `600 24px ${K.F.MONO}`, "#e3e6ee"); }
+    if (brE) { const ry = by + emaT + D.ema.length * 84 + 40; K.txt(ctx, `Stocks above 200 EMA: ${isNaN(D.br200) ? "—" : D.br200 + "%"}   ·   above 50 EMA: ${isNaN(D.br50) ? "—" : D.br50 + "%"}`, 100, ry, `600 24px ${K.F.MONO}`, "#e3e6ee"); }
   });
   if (skH) block(skH, (by, h) => {
-    if (all) K.txt(ctx, "🔍 STOCKS IN FOCUS", 70, by + 40, `700 22px ${K.F.MONO}`, "#00e0b8");
-    let sy = by + (all ? 66 : 0);
+    if (multi(D)) K.txt(ctx, "🔍 STOCKS IN FOCUS", 70, by + 40, `700 22px ${K.F.MONO}`, "#00e0b8");
+    let sy = by + (multi(D) ? 66 : 0);
     D.stk.forEach((s, i) => { const mt = metricsOf(s), hh = 150 + (mt.length ? 34 : 0) + skNotes[i].length * 32; K.panel(ctx, 70, sy, W - 140, hh, 22, "rgba(0,0,0,0.40)");
       ctx.font = K.fit(ctx, s.n, 700, K.F.GROT, 36, 520); ctx.fillStyle = "#eef0f6"; ctx.textAlign = "left"; ctx.fillText(s.n, 100, sy + 54);
       if (s.c > 0) K.txt(ctx, "₹" + K.nf(s.c), !isNaN(s.p) ? W - 260 : W - 100, sy + 54, `700 32px ${K.F.MONO}`, "#ffffff", "right");
@@ -421,7 +451,7 @@ async function draw() {
   K.footer(ctx, W, H, K.toolUrl("close"), S.disc ? "Information only · Not investment advice · Not SEBI registered" : "", true);
   return c;
 }
-K.share({ text: buildText, valid, draw, file: () => (S.mode === "all" ? "market-close-" : "market-" + S.mode + "-") + S.date });
+K.share({ text: buildText, valid, draw, file: () => (S.mode === "all" ? "market-close-" : "market-" + (secKey(data()) || "update") + "-") + S.date });
 
 drawIdx(); drawCom(); drawEma(); drawStk(); render();
 </script>
