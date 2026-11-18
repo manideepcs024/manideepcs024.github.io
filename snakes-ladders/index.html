@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Stock Market Snakes &amp; Ladders — climb with good habits, slide on traps</title>
+<meta name="description" content="A stock market twist on Snakes &amp; Ladders for 2–4 players or vs the computer. Ladders are good money habits (stop-loss, SIP, emergency fund, research); snakes are traps (Telegram tips, revenge trading, all-in options, leverage). Fun for families and friends, and every square teaches a lesson." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #ff5470; }
+  .wrap { max-width: 1120px; }
+  .game { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; margin-top: 16px; align-items: start; }
+  .boardw { width: min(100%, 640px); margin: 0 auto; }
+  .board { position: relative; width: 100%; aspect-ratio: 1; border-radius: 18px; overflow: hidden; border: 2px solid rgba(255,255,255,.12); box-shadow: 0 20px 60px rgba(0,0,0,.5); display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr); background: #0b0d16; }
+  .sq { position: relative; display: flex; align-items: flex-start; justify-content: flex-start; padding: 3px 4px; font: 700 clamp(.5rem, 1.5vw, .74rem) "JetBrains Mono"; color: rgba(255,255,255,.55); }
+  .sq.a { background: #141828; } .sq.b { background: #0f1220; }
+  .sq.lad { background: rgba(34,211,154,.16); color: #9ff3d5; } .sq.snk { background: rgba(255,84,112,.16); color: #ffb3c0; }
+  .sq.win { background: linear-gradient(135deg, rgba(254,188,46,.45), rgba(255,138,61,.3)); color: #fff; }
+  .sq.win::after { content: "🏁"; position: absolute; right: 3px; bottom: 1px; font-size: clamp(.8rem, 2.4vw, 1.2rem); }
+  .sq.start::after { content: "START"; position: absolute; left: 3px; bottom: 2px; font-size: clamp(.38rem, 1vw, .52rem); color: var(--muted); }
+  svg.ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .tok { position: absolute; width: 8.2%; height: 8.2%; margin: -4.1% 0 0 -4.1%; display: grid; place-items: center; font-size: clamp(.9rem, 3.2vw, 1.7rem); transition: left .17s ease, top .17s ease; z-index: 5; filter: drop-shadow(0 3px 6px rgba(0,0,0,.7)); }
+  .tok i { position: absolute; inset: 8%; border-radius: 50%; border: 3px solid var(--pc); background: rgba(0,0,0,.45); z-index: -1; }
+  .tok.slide { transition: left .7s cubic-bezier(.5,0,.3,1), top .7s cubic-bezier(.5,0,.3,1); }
+  .tok.turn i { box-shadow: 0 0 0 3px rgba(255,255,255,.4), 0 0 18px var(--pc); }
+  .side { display: grid; gap: 12px; }
+  .pn { border-radius: 20px; border: 1px solid var(--line); background: var(--card); padding: 14px; }
+  .pn h4 { font: 700 .68rem "JetBrains Mono"; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
+  .pl { display: grid; gap: 6px; }
+  .pl div { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: .86rem; }
+  .pl div.on { border-color: var(--pc); box-shadow: inset 4px 0 0 var(--pc); background: rgba(255,255,255,.04); }
+  .pl .tk { font-size: 1.3rem; text-align: center; } .pl small { display: block; color: var(--muted); font-size: .72rem; } .pl b.sq2 { font: 800 1rem "JetBrains Mono"; }
+  .dice { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: center; }
+  .die { width: 92px; height: 92px; border-radius: 22px; background: #fff; color: #111; display: grid; place-items: center; font-size: 4.2rem; line-height: 1; cursor: pointer; border: 0; box-shadow: 0 8px 0 #c9cfdb, 0 14px 30px rgba(0,0,0,.4); user-select: none; }
+  .die:active { transform: translateY(4px); box-shadow: 0 4px 0 #c9cfdb; }
+  .die.roll { animation: shake .5s; } @keyframes shake { 20% { transform: rotate(-18deg) scale(1.05); } 40% { transform: rotate(14deg); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(6deg); } }
+  .die:disabled { opacity: .5; cursor: default; }
+  .turnTxt { font: 800 1.1rem "Space Grotesk"; } .turnTxt small { display: block; font: 500 .8rem Inter; color: var(--muted); margin-top: 3px; }
+  .ev { border-radius: 18px; padding: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-size: .88rem; color: #dfe3ee; line-height: 1.5; min-height: 84px; }
+  .ev.lad { border-color: rgba(34,211,154,.55); background: rgba(34,211,154,.09); } .ev.snk { border-color: rgba(255,84,112,.55); background: rgba(255,84,112,.08); }
+  .ev h3 { font: 800 1.02rem "Space Grotesk"; margin-bottom: 4px; } .ev .pop { animation: pop .45s cubic-bezier(.2,1.6,.4,1); display: block; } @keyframes pop { from { transform: scale(.7); opacity: 0; } }
+  .log { display: grid; gap: 4px; max-height: 190px; overflow: auto; font-size: .78rem; color: #b9c0d0; }
+  .setup { border-radius: 24px; padding: 20px; border: 1px solid rgba(34,211,154,.45); background: linear-gradient(135deg, rgba(34,211,154,.1), rgba(255,84,112,.06)); margin-top: 16px; }
+  .setup h2 { font: 800 1.35rem "Space Grotesk"; }
+  .modes2 { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .modes2 button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #dfe3ee; padding: 10px 14px; border-radius: 14px; font: 700 .86rem Inter; cursor: pointer; }
+  .modes2 button.on { background: var(--fg); color: #000; border-color: var(--fg); }
+  .plin { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .plin > div { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; align-items: center; }
+  .plin .tk2 { width: 50px; height: 46px; border-radius: 14px; border: 2px solid var(--pc); background: rgba(0,0,0,.3); font-size: 1.5rem; cursor: pointer; }
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+  .legend ul { list-style: none; display: grid; gap: 6px; }
+  .legend li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 8px; padding: 9px 11px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); font-size: .82rem; color: #cfd3df; line-height: 1.45; }
+  .legend li b { font: 700 .74rem "JetBrains Mono"; } .legend li strong { color: #fff; display: block; font-size: .86rem; }
+  .win { border-radius: 24px; padding: 22px; text-align: center; border: 1px solid rgba(254,188,46,.55); background: radial-gradient(circle at 50% 0%, rgba(254,188,46,.25), transparent 60%), rgba(0,0,0,.25); }
+  .win .big { font-size: 4rem; animation: pop .6s cubic-bezier(.2,1.6,.4,1); } .win h2 { font: 800 1.8rem "Space Grotesk"; }
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+  .confetti i { position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+  @media (max-width: 900px) { .game { grid-template-columns: 1fr; } .legend { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../trader-type/">🧠 Trader type test</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Stock Market <span class="grad">Snakes &amp; Ladders.</span></h1>
+    <p class="sub">🪜 Ladders are <b>good money habits</b>. 🐍 Snakes are <b>market traps</b>. Race to 100 with family or friends on one phone, or play the computer. Every snake and ladder teaches a real lesson.</p>
+
+    <section class="setup" id="setup"></section>
+
+    <div class="game" id="game" hidden>
+      <div class="boardw"><div class="board" id="board"></div></div>
+      <div class="side">
+        <div class="pn"><div class="dice"><button class="die" id="die" aria-label="Roll the dice">🎲</button><div class="turnTxt" id="turn"></div></div></div>
+        <div class="ev" id="ev"><h3>🎲 Roll to start!</h3>You need an exact roll to land on 100. Roll a 6 to get another turn.</div>
+        <div class="pn"><h4>PLAYERS</h4><div class="pl" id="pl"></div></div>
+        <div class="pn"><h4>GAME LOG</h4><div class="log" id="log"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" id="newG" style="flex:1;padding:10px">🔁 New game</button></div></div>
+      </div>
+    </div>
+
+    <section id="winBox"></section>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Note:</b> A game for fun and learning. In real markets, there is no dice. Your habits decide which way you go. For <b>education</b> only. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+/* ---------- board data ---------- */
+const LAD = [
+  [4, 14, "Built a 6-month emergency fund", "Now a bad month or a job loss won't force you to sell stocks at the bottom."],
+  [9, 31, "Started a monthly SIP", "Small, automatic investing every month quietly compounds into real wealth."],
+  [21, 42, "Set a stop-loss before entering", "You decided the maximum loss while calm, not while panicking."],
+  [28, 50, "Read the annual report before buying", "You know what the company does, how it earns, and what could go wrong."],
+  [36, 57, "Kept a trading journal", "Writing down every trade shows your real mistakes, so you stop repeating them."],
+  [51, 67, "Risked only 1% per trade", "Even 10 losses in a row leave you with 90% of your capital."],
+  [71, 91, "Booked profit as per plan", "Following your plan on winners is as important as on losers."],
+  [78, 98, "Held a quality stock for years", "Patience with a great business let compounding do the heavy lifting."],
+];
+const SNK = [
+  [17, 7, "Bought on a Telegram tip", "The operators who sent the tip sold their shares to you."],
+  [32, 10, "Averaged down a falling stock", "You kept buying a stock that kept telling you you were wrong."],
+  [48, 26, "Revenge-traded after a loss", "Trying to win it back fast turned a small loss into a big one."],
+  [56, 53, "Overtraded and paid big charges", "40 trades a week: brokerage, STT and taxes quietly ate the profit."],
+  [62, 19, "Went all-in on ₹2 expiry options", "Lottery-style options usually expire at zero. Size kills."],
+  [88, 24, "Took a huge leveraged F&O bet", "One gap-down against a leveraged position erased years of savings."],
+  [95, 75, "Removed the stop-loss 'just this once'", "The one time you remove it is the time the stock keeps falling."],
+  [97, 79, "Got greedy after a great morning", "Up big by 10:30, you kept trading and gave it all back by 3:30."],
+];
+const JUMP = {}; LAD.forEach(([a, b, t, w]) => JUMP[a] = { to: b, t, w, k: "lad" }); SNK.forEach(([a, b, t, w]) => JUMP[a] = { to: b, t, w, k: "snk" });
+const TOK = ["🐂", "🐻", "🦈", "🦉", "🐢", "🚀"], PC = ["#22d39a", "#ff5470", "#5b8cff", "#febc2e", "#00e0b8", "#ff8a3d"];
+const FACES = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+const S = K.store("snakes_v1", { mode: "pass", n: 2, names: ["Player 1", "Player 2", "Player 3", "Player 4"], toks: [0, 1, 2, 3], wins: {}, games: 0 });
+let G = null, busy = false;
+/* ---------- geometry ---------- */
+function rc(n) { const r = Math.floor((n - 1) / 10), c = r % 2 === 0 ? (n - 1) % 10 : 9 - (n - 1) % 10; return { x: (c + .5) * 10, y: (9 - r + .5) * 10 }; }
+function drawBoard() {
+  let sq = ""; for (let row = 9; row >= 0; row--) for (let col = 0; col < 10; col++) { const n = row % 2 === 0 ? row * 10 + col + 1 : row * 10 + (9 - col) + 1, j = JUMP[n];
+    sq += `<div class="sq ${(row + col) % 2 ? "a" : "b"} ${j ? j.k : ""} ${n === 100 ? "win" : ""} ${n === 1 ? "start" : ""}">${n}</div>`; }
+  let svg = `<svg class="ov" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="sg" x1="0" x2="1"><stop offset="0" stop-color="#ff5470"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>`;
+  LAD.forEach(([a, b]) => { const p = rc(a), q = rc(b), dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy), nx = -dy / L * 1.7, ny = dx / L * 1.7;
+    svg += `<line x1="${p.x + nx}" y1="${p.y + ny}" x2="${q.x + nx}" y2="${q.y + ny}" stroke="#c9a46a" stroke-width="1.1" stroke-linecap="round"/><line x1="${p.x - nx}" y1="${p.y - ny}" x2="${q.x - nx}" y2="${q.y - ny}" stroke="#c9a46a" stroke-width="1.1" stroke-linecap="round"/>`;
+    const rungs = Math.max(2, Math.floor(L / 4)); for (let i = 1; i < rungs; i++) { const t = i / rungs, cx = p.x + dx * t, cy = p.y + dy * t; svg += `<line x1="${cx + nx}" y1="${cy + ny}" x2="${cx - nx}" y2="${cy - ny}" stroke="#e6c48a" stroke-width=".8"/>`; } });
+  SNK.forEach(([a, b], i) => { const p = rc(a), q = rc(b), dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy), nx = -dy / L, ny = dx / L, w = Math.min(6, L / 5) * (i % 2 ? 1 : -1);
+    const c1 = [p.x + dx * .3 + nx * w, p.y + dy * .3 + ny * w], c2 = [p.x + dx * .7 - nx * w, p.y + dy * .7 - ny * w], d = `M${p.x},${p.y} C${c1} ${c2} ${q.x},${q.y}`;
+    svg += `<path d="${d}" fill="none" stroke="#3a0d16" stroke-width="3.4" stroke-linecap="round" opacity=".7"/><path d="${d}" fill="none" stroke="url(#sg)" stroke-width="2.4" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#ffd0d8" stroke-width=".5" stroke-dasharray="1 2.2" stroke-linecap="round" opacity=".7"/>`;
+    svg += `<circle cx="${p.x}" cy="${p.y}" r="2.3" fill="#ff5470" stroke="#3a0d16" stroke-width=".5"/><circle cx="${p.x - .8}" cy="${p.y - .6}" r=".5" fill="#fff"/><circle cx="${p.x + .8}" cy="${p.y - .6}" r=".5" fill="#fff"/><path d="M${q.x - .8},${q.y} L${q.x},${q.y + 1.6} L${q.x + .8},${q.y}" fill="#ff8a3d"/>`; });
+  svg += `</svg>`;
+  $("#board").innerHTML = sq + svg + (G ? G.p.map((pl, i) => `<div class="tok" id="tok${i}" style="--pc:${PC[pl.tk]}"><i></i>${TOK[pl.tk]}</div>`).join("") : "");
+  if (G) G.p.forEach((_, i) => place(i));
+}
+function place(i) { const pl = G.p[i], el = $("#tok" + i); if (!el) return; const n = Math.max(pl.pos, 1), p = rc(n), same = G.p.filter((q, j) => Math.max(q.pos, 1) === n), k = same.indexOf(pl), off = same.length > 1 ? [[-2, -2], [2, -2], [-2, 2], [2, 2]][k] : [0, 0];
+  el.style.left = (p.x + off[0]) + "%"; el.style.top = (p.y + off[1]) + "%"; el.classList.toggle("turn", i === G.cur && !G.over); }
+/* ---------- setup ---------- */
+function drawSetup() { const n = S.mode === "cpu" ? 2 : S.n;
+  $("#setup").innerHTML = `<h2>🎮 Set up the game</h2><div class="modes2" id="md"><button data-m="pass" class="${S.mode === "pass" ? "on" : ""}">👨‍👩‍👧 Pass &amp; play</button><button data-m="cpu" class="${S.mode === "cpu" ? "on" : ""}">🤖 Me vs computer</button></div>
+    ${S.mode === "pass" ? `<div class="modes2" id="np">${[2, 3, 4].map(k => `<button data-n="${k}" class="${S.n === k ? "on" : ""}">${k} players</button>`).join("")}</div>` : ""}
+    <div class="plin">${[...Array(n)].map((_, i) => { const cpu = S.mode === "cpu" && i === 1; return `<div><button class="tk2" data-tk="${i}" style="--pc:${PC[S.toks[i]]}" title="Change token">${TOK[S.toks[i]]}</button><label class="field sm"><input data-nm="${i}" type="text" maxlength="14" value="${cpu ? "Computer" : esc(S.names[i])}" ${cpu ? "disabled" : ""} /></label></div>`; }).join("")}</div>
+    <button class="btn primary" id="start" style="margin-top:14px;width:100%;padding:15px;font-size:1.05rem">▶ Start game</button>
+    ${Object.keys(S.wins).length ? `<div style="margin-top:12px;font-size:.84rem;color:var(--muted)">🏆 Wins so far: ${Object.entries(S.wins).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<b style="color:#fff">${esc(k)}</b> ${v}`).join(" · ")}</div>` : ""}`; }
+$("#setup").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.m) { S.mode = b.dataset.m; S.save(); drawSetup(); }
+  else if (b.dataset.n) { S.n = +b.dataset.n; S.save(); drawSetup(); }
+  else if (b.dataset.tk != null) { const i = +b.dataset.tk; let t = S.toks[i]; do t = (t + 1) % TOK.length; while (S.toks.slice(0, S.mode === "cpu" ? 2 : S.n).some((x, j) => j !== i && x === t)); S.toks[i] = t; S.save(); drawSetup(); }
+  else if (b.id === "start") startGame(); });
+$("#setup").addEventListener("input", e => { const i = e.target.dataset.nm; if (i == null) return; S.names[+i] = e.target.value; S.save(); });
+function startGame() { const n = S.mode === "cpu" ? 2 : S.n;
+  G = { p: [...Array(n)].map((_, i) => ({ name: (S.mode === "cpu" && i === 1 ? "Computer" : (S.names[i] || "").trim() || `Player ${i + 1}`), tk: S.toks[i], pos: 0, lad: 0, snk: 0, rolls: 0, cpu: S.mode === "cpu" && i === 1 })), cur: 0, over: false, hits: [], log: [] };
+  $("#setup").hidden = true; $("#game").hidden = false; $("#winBox").innerHTML = ""; drawBoard(); drawSide(); ev("🎲 Roll to start!", "You need an exact roll to land on 100. Roll a 6 to get another turn.", ""); $("#log").innerHTML = "";
+  $("#game").scrollIntoView({ behavior: "smooth", block: "start" }); }
+/* ---------- play ---------- */
+function drawSide() { const pl = G.p[G.cur];
+  $("#pl").innerHTML = G.p.map((p, i) => `<div class="${i === G.cur && !G.over ? "on" : ""}" style="--pc:${PC[p.tk]}"><span class="tk">${TOK[p.tk]}</span><span>${esc(p.name)}<small>🪜 ${p.lad} · 🐍 ${p.snk}</small></span><b class="sq2">${p.pos || "—"}</b></div>`).join("");
+  $("#turn").innerHTML = G.over ? "Game over!" : `${TOK[pl.tk]} ${esc(pl.name)}'s turn<small>${pl.cpu ? "Computer is rolling…" : "Tap the dice to roll"}</small>`;
+  $("#die").disabled = G.over || pl.cpu || busy; }
+function ev(h, t, k) { const e = $("#ev"); e.className = "ev " + (k || ""); e.innerHTML = `<span class="pop"><h3>${h}</h3>${t}</span>`; }
+function log(t) { G.log.unshift(t); $("#log").innerHTML = G.log.slice(0, 40).map(x => `<div>${x}</div>`).join(""); }
+const wait = ms => new Promise(r => setTimeout(r, ms));
+async function roll() { if (busy || !G || G.over) return; busy = true; drawSide(); const pl = G.p[G.cur], die = $("#die"); die.classList.add("roll");
+  for (let i = 0; i < 8; i++) { die.textContent = FACES[Math.floor(Math.random() * 6)]; await wait(55); }
+  const r = 1 + Math.floor(Math.random() * 6); die.textContent = FACES[r - 1]; die.classList.remove("roll"); pl.rolls++;
+  const from = pl.pos, target = from + r;
+  if (target > 100) { ev(`${TOK[pl.tk]} Rolled ${r}: too high!`, `You need exactly <b>${100 - from}</b> to finish. Patience: no forcing trades.`, ""); log(`${esc(pl.name)} rolled ${r}, needs exact ${100 - from}`); }
+  else { const el = $("#tok" + G.cur); for (let s = from + 1; s <= target; s++) { pl.pos = s; place(G.cur); await wait(170); }
+    const j = JUMP[pl.pos];
+    if (j) { const was = pl.pos; await wait(250); if (j.k === "lad") { pl.lad++; ev(`🪜 Ladder! ${esc(j.t)}`, `${esc(j.w)} <b>${was} → ${j.to}</b>`, "lad"); } else { pl.snk++; ev(`🐍 Snake! ${esc(j.t)}`, `${esc(j.w)} <b>${was} → ${j.to}</b>`, "snk"); }
+      G.hits.push({ who: pl.name, ...j, from: was }); log(`${j.k === "lad" ? "🪜" : "🐍"} ${esc(pl.name)}: ${esc(j.t)} (${was}→${j.to})`);
+      el.classList.add("slide"); pl.pos = j.to; place(G.cur); await wait(750); el.classList.remove("slide"); }
+    else { ev(`${TOK[pl.tk]} ${esc(pl.name)} rolled ${r}`, `Moved to <b>${pl.pos}</b>.${r === 6 && pl.pos < 100 ? " 🎲 Six! Roll again." : ""}`, ""); log(`${esc(pl.name)} rolled ${r} → ${pl.pos}`); }
+    if (pl.pos === 100) { G.over = true; busy = false; G.p.forEach((_, i) => place(i)); drawSide(); return win(pl); } }
+  if (r !== 6 || target > 100) G.cur = (G.cur + 1) % G.p.length;
+  busy = false; G.p.forEach((_, i) => place(i)); drawSide();
+  if (G.p[G.cur].cpu && !G.over) { await wait(800); roll(); } }
+$("#die").addEventListener("click", roll);
+document.addEventListener("keydown", e => { if ((e.key === " " || e.key === "Enter") && G && !G.over && !G.p[G.cur].cpu && !/INPUT|BUTTON/.test(document.activeElement?.tagName)) { e.preventDefault(); roll(); } });
+$("#newG").onclick = () => { if (G && !G.over && !confirm("Start a new game?")) return; G = null; $("#game").hidden = true; $("#setup").hidden = false; $("#winBox").innerHTML = ""; drawSetup(); drawBoardPreview(); };
+function confetti() { const c = document.createElement("div"); c.className = "confetti"; c.innerHTML = [...Array(80)].map(() => `<i style="left:${Math.random() * 100}%;background:${PC[Math.floor(Math.random() * 6)]};animation-duration:${1.8 + Math.random() * 2}s;animation-delay:${Math.random() * .6}s"></i>`).join(""); document.body.appendChild(c); setTimeout(() => c.remove(), 4800); }
+let last = null;
+function win(pl) { S.games = (S.games || 0) + 1; S.wins[pl.name] = (S.wins[pl.name] || 0) + 1; S.save(); confetti();
+  const snakes = [...new Map(G.hits.filter(h => h.k === "snk").map(h => [h.t, h])).values()], lads = [...new Map(G.hits.filter(h => h.k === "lad").map(h => [h.t, h])).values()];
+  last = { winner: pl, players: G.p.map(p => ({ ...p })), snakes, lads };
+  ev(`🏆 ${esc(pl.name)} wins!`, `Reached 100 in ${pl.rolls} rolls with ${pl.lad} ladders and ${pl.snk} snakes.`, "lad");
+  $("#winBox").innerHTML = `<div class="win" style="margin-top:16px"><div class="big">${TOK[pl.tk]}🏆</div><h2>${esc(pl.name)} wins!</h2><p style="color:#cfd3df;margin-top:6px">${pl.rolls} rolls · 🪜 ${pl.lad} ladders · 🐍 ${pl.snk} snakes</p>
+    <div class="legend" style="margin-top:14px;text-align:left"><div><h4 style="font:700 .7rem 'JetBrains Mono';color:var(--up);margin-bottom:6px">🪜 HABITS THAT LIFTED YOU</h4><ul>${lads.length ? lads.map(h => `<li><b style="color:var(--up)">${h.from}→${h.to}</b><span><strong>${esc(h.t)}</strong>${esc(h.w)}</span></li>`).join("") : "<li><b>—</b><span>No ladders this game.</span></li>"}</ul></div><div><h4 style="font:700 .7rem 'JetBrains Mono';color:var(--down);margin-bottom:6px">🐍 TRAPS THAT BIT</h4><ul>${snakes.length ? snakes.map(h => `<li><b style="color:var(--down)">${h.from}→${h.to}</b><span><strong>${esc(h.t)}</strong>${esc(h.w)}</span></li>`).join("") : "<li><b>—</b><span>Nobody got bitten. Lucky!</span></li>"}</ul></div></div>
+    <button class="btn primary" id="again" style="margin-top:14px">🔁 Play again</button></div>`;
+  $("#again").onclick = () => startGame(); setTimeout(() => $("#winBox").scrollIntoView({ behavior: "smooth", block: "start" }), 600); }
+/* ---------- legend ---------- */
+$("#legend").innerHTML = `<div><h2 style="font:800 1.2rem 'Space Grotesk';margin-bottom:8px">🪜 Ladders: good habits</h2><ul>${LAD.map(([a, b, t, w]) => `<li><b style="color:var(--up)">${a} → ${b}</b><span><strong>${esc(t)}</strong>${esc(w)}</span></li>`).join("")}</ul></div><div><h2 style="font:800 1.2rem 'Space Grotesk';margin-bottom:8px">🐍 Snakes: market traps</h2><ul>${SNK.map(([a, b, t, w]) => `<li><b style="color:var(--down)">${a} → ${b}</b><span><strong>${esc(t)}</strong>${esc(w)}</span></li>`).join("")}</ul></div>`;
+function drawBoardPreview() { $("#board").innerHTML = ""; }
+/* ---------- share ---------- */
+function buildText() { if (!last) return ["🐍🪜 *Stock Market Snakes & Ladders*", "", "Climb with good habits 🪜 (SIP, stop-loss, emergency fund, research)", "Slide on traps 🐍 (Telegram tips, revenge trading, ₹2 options, leverage)", "", "Play with family or friends on one phone 👇", ...K.signoff("snakes-ladders", "Play", "").slice(1)].join("\n");
+  return [`🏆 *${last.winner.name} won Stock Market Snakes & Ladders!*`, `${last.winner.rolls} rolls · 🪜 ${last.winner.lad} ladders · 🐍 ${last.winner.snk} snakes`, "", ...(last.snakes.length ? ["🐍 *Traps that bit us:*", ...last.snakes.slice(0, 4).map(h => `• ${h.t}`)] : []), ...(last.lads.length ? ["", "🪜 *Habits that lifted us:*", ...last.lads.slice(0, 4).map(h => `• ${h.t}`)] : []), "", "In real markets there's no dice. Habits decide the direction. Play 👇", ...K.signoff("snakes-ladders", "Play", "").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H, [["rgba(34,211,154,0.22)", .9, .05, .6], ["rgba(255,84,112,0.2)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "GAME · SNAKES & LADDERS", 70, 186, `700 26px ${K.F.MONO}`, "#22d39a");
+  if (last) { K.txt(ctx, `${last.winner.name} wins! 🏆`, 70, 256, K.fit(ctx, `${last.winner.name} wins! 🏆`, 800, K.F.GROT, 60, 940), "#fff");
+    last.players.slice().sort((a, b) => b.pos - a.pos).forEach((p, i) => { const y = 290 + i * 96; K.panel(ctx, 70, y, 940, 82, 20, i ? "rgba(255,255,255,0.045)" : "rgba(254,188,46,0.12)", i ? undefined : "rgba(254,188,46,0.5)"); K.txt(ctx, TOK[p.tk], 100, y + 56, `44px ${K.F.INTER}`, "#fff"); K.txt(ctx, p.name, 170, y + 52, K.fit(ctx, p.name, 700, K.F.GROT, 32, 420), "#fff"); K.txt(ctx, `🪜 ${p.lad}  🐍 ${p.snk}`, 760, y + 52, `600 26px ${K.F.INTER}`, "#cfd3df", "right"); K.txt(ctx, String(p.pos), 980, y + 54, `800 36px ${K.F.MONO}`, i ? "#cfd3df" : "#febc2e", "right"); });
+    let y = 300 + last.players.length * 96 + 20; const items = [...last.snakes.slice(0, 3).map(h => ["🐍", h.t, "#ff8da0"]), ...last.lads.slice(0, 3).map(h => ["🪜", h.t, "#9ff3d5"])];
+    if (items.length) { K.txt(ctx, "LESSONS FROM THIS GAME", 70, y + 20, `700 22px ${K.F.MONO}`, "#8b93a7"); items.forEach(([e, t, col], i) => K.txt(ctx, `${e}  ${t}`, 70, y + 70 + i * 50, K.fit(ctx, `${e}  ${t}`, 600, K.F.INTER, 30, 940), col)); } }
+  else { K.txt(ctx, "Stock Market Snakes & Ladders", 70, 256, `800 52px ${K.F.GROT}`, "#fff"); [...LAD.slice(0, 4).map(l => ["🪜", l[2], "#9ff3d5"]), ...SNK.slice(0, 5).map(s => ["🐍", s[2], "#ff8da0"])].forEach(([e, t, col], i) => K.txt(ctx, `${e}  ${t}`, 70, 340 + i * 70, `600 32px ${K.F.INTER}`, col)); }
+  K.footer(ctx, W, H, K.toolUrl("snakes-ladders"), "In real markets, habits decide the direction · For fun & learning", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "snakes-ladders", imgLabel: "Share game result" });
+drawSetup();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

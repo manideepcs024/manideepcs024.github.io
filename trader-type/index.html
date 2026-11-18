@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>What type of trader are you? — 15-question personality test</title>
+<meta name="description" content="Take the free trader personality test: 15 real-life market situations reveal your trader type (Scalper Shark, Patient Banyan, FOMO Rocket, Steady Turtle, Gambler Ghost, Patient Sniper, Data Detective or Wise Owl), with your strengths, blind spots, your legend twin and a growth plan. Share your result card." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #7c5cff; --acc2: #ff8a3d; }
+  .wrap { max-width: 860px; }
+  .stage { margin-top: 18px; border-radius: 28px; border: 1px solid var(--line); background: var(--card); padding: 24px; min-height: 420px; position: relative; overflow: hidden; }
+  .intro { text-align: center; display: grid; gap: 14px; justify-items: center; padding: 10px 0; }
+  .faces { font-size: 2.6rem; letter-spacing: 6px; animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-6px); } }
+  .intro h2 { font: 800 1.7rem "Space Grotesk"; } .intro p { color: #cfd3df; max-width: 520px; line-height: 1.6; }
+  .bigbtn { border: 0; border-radius: 18px; padding: 16px 30px; font: 800 1.1rem "Space Grotesk"; color: #fff; cursor: pointer; background: linear-gradient(100deg, #7c5cff, #5b8cff 50%, #00e0b8); box-shadow: 0 10px 40px rgba(124,92,255,.35); }
+  .prog { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; font: 600 .74rem "JetBrains Mono"; color: var(--muted); }
+  .bar { flex: 1; height: 8px; border-radius: 99px; background: rgba(255,255,255,.07); overflow: hidden; } .bar i { display: block; height: 100%; background: linear-gradient(90deg, #7c5cff, #00e0b8); transition: width .3s; }
+  .qtext { font: 800 1.45rem "Space Grotesk"; line-height: 1.3; margin: 6px 0 18px; }
+  .opts { display: grid; gap: 10px; }
+  .opts button { text-align: left; border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #e8ecf6; border-radius: 16px; padding: 15px 16px; font: 600 .98rem Inter; cursor: pointer; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; align-items: center; transition: transform .12s, border-color .15s, background .15s; }
+  .opts button:hover { border-color: rgba(124,92,255,.6); transform: translateX(3px); }
+  .opts button.sel { border-color: #7c5cff; background: rgba(124,92,255,.18); }
+  .opts button span:first-child { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,255,255,.07); font: 800 .85rem "Space Grotesk"; }
+  .qnav { display: flex; justify-content: space-between; margin-top: 16px; }
+  .qnav button { border: 0; background: none; color: var(--muted); font: 600 .86rem Inter; cursor: pointer; padding: 8px 4px; }
+  .fade { animation: fin .35s ease; } @keyframes fin { from { opacity: 0; transform: translateY(8px); } }
+  .res { display: grid; gap: 16px; }
+  .hero4 { border-radius: 24px; padding: 22px; text-align: center; background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 35%, transparent), transparent 65%), rgba(0,0,0,.25); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); }
+  .hero4 .em { font-size: 4.6rem; line-height: 1; filter: drop-shadow(0 8px 30px color-mix(in srgb, var(--c) 60%, transparent)); animation: pop .6s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes pop { from { transform: scale(.3); opacity: 0; } }
+  .hero4 small { display: block; font: 700 .74rem "JetBrains Mono"; letter-spacing: .1em; color: var(--muted); margin-top: 10px; }
+  .hero4 h2 { font: 800 2.2rem "Space Grotesk"; color: var(--c); margin: 2px 0 4px; }
+  .hero4 .tag { font: 600 1rem Inter; color: #e8ecf6; } .hero4 p { color: #cfd3df; font-size: .92rem; line-height: 1.6; margin-top: 10px; max-width: 600px; margin-inline: auto; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .bx { border-radius: 18px; padding: 14px 16px; border: 1px solid var(--line); background: rgba(0,0,0,.22); font-size: .88rem; color: #dfe3ee; line-height: 1.5; }
+  .bx h4 { font: 700 .7rem "JetBrains Mono"; letter-spacing: .08em; margin-bottom: 8px; }
+  .bx ul { padding-left: 18px; display: grid; gap: 4px; }
+  .mix { display: grid; gap: 6px; }
+  .mix div { display: grid; grid-template-columns: 150px minmax(0, 1fr) 42px; gap: 8px; align-items: center; font-size: .84rem; }
+  .mix .t { height: 10px; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; } .mix .t i { display: block; height: 100%; border-radius: 99px; }
+  .mix b { font: 700 .78rem "JetBrains Mono"; text-align: right; }
+  .plan { display: grid; gap: 8px; }
+  .plan a { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 11px 13px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); text-decoration: none; color: #fff; }
+  .plan a span:first-child { font-size: 1.3rem; text-align: center; } .plan a small { display: block; color: var(--muted); font-size: .78rem; } .plan a b { font: 700 .92rem "Space Grotesk"; } .plan a em { font: 700 .7rem "JetBrains Mono"; color: var(--acc); font-style: normal; }
+  .acts2 { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 12px; }
+  .gal div { border-radius: 18px; padding: 14px; border: 1px solid var(--line); background: var(--card); text-align: center; font-size: .82rem; color: #cfd3df; }
+  .gal div.me { border-color: var(--c); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 30%, transparent); }
+  .gal .e { font-size: 2.2rem; } .gal b { display: block; font: 800 1rem "Space Grotesk"; margin: 4px 0 2px; }
+  .sec2 { margin-top: 26px; } .sec2 > h2 { font: 800 1.35rem "Space Grotesk"; }
+  @media (max-width: 640px) { .stage { padding: 18px; } .qtext { font-size: 1.2rem; } .two { grid-template-columns: 1fr; } .mix div { grid-template-columns: 112px minmax(0, 1fr) 38px; } .hero4 h2 { font-size: 1.8rem; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../snakes-ladders/">🐍 Snakes &amp; Ladders</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>What type of <span class="grad">trader are you?</span></h1>
+    <p class="sub">15 real market situations. Answer honestly, not what you <i>should</i> do, and find your trader type, your strengths, your blind spots and the legend who traded like you.</p>
+
+    <div class="stage" id="stage"></div>
+
+    <section class="sec2" id="galSec">
+      <h2>🗂️ All 8 trader types</h2>
+      <div class="gal" id="gal"></div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Note:</b> A fun self-reflection quiz, not a psychological assessment. Your type can change as you learn. For <b>education</b> only. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const T = {
+  shark: { e: "🦈", n: "Scalper Shark", c: "#5b8cff", tag: "Fast, sharp, always hunting.", d: "You love speed: 1-minute charts, quick entries, quick exits. You read price action well and you're decisive. But the market charges you for every bite, and too many bites can eat your edge.", s: ["Quick decisions under pressure", "Reads intraday price action well", "Cuts trades fast when they don't work"], b: ["Overtrading and brokerage drain", "Mistaking activity for progress", "Burnout from screen time"], tw: "Linda Raschke: short-term setups, practised to perfection", p: [["overtrading", "🎬", "The 10:30 Decision", "Why more trades ≠ more money"], ["sl-calculator", "🛑", "Stop-loss & position size", "Keep every bite small"], ["checklist", "✅", "Pre-trade checklist", "Only A+ setups"]] },
+  banyan: { e: "🌳", n: "Patient Banyan", c: "#22d39a", tag: "Deep roots, slow and unstoppable.", d: "You think in years, not minutes. You buy good businesses and let compounding work while others panic. Your risk: holding on out of loyalty when the story has actually changed.", s: ["Patience: the rarest edge", "Ignores daily noise", "Lets compounding do the heavy lifting"], b: ["Holding losers 'because it's long-term'", "Missing clear warning signs", "Under-reviewing the portfolio"], tw: "Warren Buffett: great businesses, held for decades", p: [["fundamentals", "📑", "Reading a Company", "Know when the story changes"], ["results-guide", "📊", "Results & concalls", "Track your holdings each quarter"], ["etf", "📦", "ETFs explained", "A strong, low-cost core"]] },
+  rocket: { e: "🚀", n: "FOMO Rocket", c: "#ff8a3d", tag: "Full of energy, but who's steering?", d: "You're excited by markets and you hate missing a move, so you chase what's hot and what the group is buying. That energy is great. Pointed at research and rules instead of tips, it becomes a real edge.", s: ["Enthusiasm and curiosity", "Spots what's trending early", "Not afraid to act"], b: ["Buying tips and hype at the top", "No plan, no stop-loss", "Panic when the rocket turns"], tw: "Learn from Jesse Livermore: brilliant, and broke whenever he chased", p: [["fomo", "🚨", "FOMO Trap Detector", "Spot hype before it costs you"], ["scam-game", "🎣", "Tip Trap game", "Survive a pump & dump"], ["myths", "🃏", "Myth or Fact?", "Bust the beliefs that hurt"]] },
+  turtle: { e: "🐢", n: "Steady Turtle", c: "#00e0b8", tag: "Rules, routine, and the long race.", d: "You trust a system: fixed risk per trade, written rules, a journal. You win by consistency, not drama. Watch that rules don't become rigid: markets change and good systems evolve.", s: ["Discipline and consistency", "Small, controlled risk", "Emotion stays out of decisions"], b: ["Too rigid when markets change", "Skipping great setups outside the rules", "Boredom leading to rule breaks"], tw: "Richard Dennis's Turtles: simple rules, followed strictly", p: [["replay", "🎮", "Chart Replay", "Test your rules on new charts"], ["journal", "📓", "Risk-Reward & Journal", "Keep measuring your edge"], ["indicators", "📈", "Indicators", "Refine your system's tools"]] },
+  gambler: { e: "🎰", n: "Gambler Ghost", c: "#ff5470", tag: "Big bets, big thrills, big danger.", d: "You love the rush: ₹2 options, all-in trades, winning it back after a loss. You're brave and you're not scared of risk, which is exactly the problem. The good news: this is the easiest type to fix, one rule at a time.", s: ["Courage to take action", "Comfortable with uncertainty", "Learns fast from pain (if you let it)"], b: ["Position sizes that can wipe you out", "Revenge trading after losses", "Treating options as lottery tickets"], tw: "Learn from the Turtles: same small risk on every single trade", p: [["options-basics", "📞", "Options basics", "Why naked F&O blows up accounts"], ["bounce-back", "💙", "Recovery Room", "Reset after a big loss"], ["money-ladder", "🪜", "The Money Ladder", "Protect your family first"]] },
+  sniper: { e: "🎯", n: "Patient Sniper", c: "#febc2e", tag: "Waits, aims, takes one clean shot.", d: "You don't trade much, but when you do it's a planned swing trade at a clear breakout with a stop. You let winners run for weeks. Your risk: waiting so long for the 'perfect' setup that you freeze when it comes.", s: ["Selective: quality over quantity", "Clear entry, stop and target", "Lets winners run"], b: ["Analysis paralysis at the trigger", "Frustration in choppy markets", "Moving stops when a trade 'should' work"], tw: "Mark Minervini: Stage 2 stocks, low-risk pivots, small losses", p: [["chart-patterns", "📐", "Chart patterns", "Sharpen your setups"], ["legends", "🏆", "Market legends", "Minervini's Trend Template"], ["replay", "🎮", "Chart Replay", "Practise pulling the trigger"]] },
+  detective: { e: "🔍", n: "Data Detective", c: "#7c5cff", tag: "Every number tells a story.", d: "You research before you risk: results, filings, concalls, peers. You're rarely fooled by tips. Your challenge is turning research into action, and knowing the price can stay 'wrong' longer than you expect.", s: ["Deep research habits", "Hard to fool with hype", "Understands what you own"], b: ["Overthinking and missing entries", "Ignoring price trend and timing", "Falling in love with your thesis"], tw: "Peter Lynch: know what you own, and why you own it", p: [["fundamentals", "📑", "Reading a Company", "Your health-check toolkit"], ["sectors", "🧭", "Sector Explorer", "Map the whole market"], ["indicators", "📈", "Indicators", "Add timing to your research"]] },
+  owl: { e: "🦉", n: "Wise Owl", c: "#b9a6ff", tag: "Calm, risk-first, quietly winning.", d: "You think about risk before reward, stop when things go wrong, and don't let emotions drive. It's the type every trader is aiming for. Keep it up by staying humble: the market humbles everyone eventually.", s: ["Risk management first", "Emotional control", "Learns from every loss"], b: ["Being too cautious in strong trends", "Under-sizing your best ideas", "Overconfidence after a long good run"], tw: "Paul Tudor Jones: 'Focus on protecting what you have'", p: [["course", "🎓", "Learning path", "Finish the course & certificate"], ["options-basics", "📞", "Hedging basics", "Protect profits smartly"], ["goals", "🎯", "Goal & SIP planner", "Point your skill at real goals"]] },
+};
+const ORDER = ["owl", "sniper", "turtle", "banyan", "detective", "shark", "rocket", "gambler"];
+const Q = [
+  ["Your stock is down 8% by 10 AM. You…", [["Exit: my stop-loss was hit.", { turtle: 2, owl: 2 }], ["Buy more, it's cheaper now.", { gambler: 2, rocket: 1 }], ["Check if anything changed in the business first.", { detective: 2, banyan: 1 }], ["Freeze and keep refreshing the app.", { rocket: 2 }]]],
+  ["A Telegram group says: \"Multibagger! Buy before 11 AM!\"", [["Buy immediately. Can't miss it!", { rocket: 3 }], ["Buy a small quantity, just in case.", { rocket: 1, gambler: 1 }], ["Look up the company's filings first.", { detective: 2, owl: 1 }], ["Ignore it. Tips are traps.", { owl: 2, turtle: 1, banyan: 1 }]]],
+  ["How long do you usually hold a trade?", [["Minutes: in and out.", { shark: 3 }], ["Days to a few weeks.", { sniper: 2, turtle: 1 }], ["Months to years.", { banyan: 3 }], ["Until it comes back to my buy price.", { gambler: 2, rocket: 1 }]]],
+  ["What do you look at first?", [["The chart and price action.", { sniper: 2, shark: 1 }], ["The results and balance sheet.", { detective: 2, banyan: 1 }], ["What everyone's talking about.", { rocket: 2 }], ["My rules and risk for the trade.", { turtle: 2, owl: 1 }]]],
+  ["You've had 3 losing trades in a row today.", [["Stop for the day and review.", { owl: 3 }], ["Take a bigger trade to win it back.", { gambler: 3 }], ["Keep going: the next one will work.", { shark: 2, rocket: 1 }], ["Follow my system. Losses are part of it.", { turtle: 2, sniper: 1 }]]],
+  ["Options, to you, are…", [["Lottery tickets: ₹2 can become ₹50!", { gambler: 3 }], ["A tool to hedge or earn premium carefully.", { owl: 2, detective: 1 }], ["Too risky. I stick to stocks.", { banyan: 2 }], ["Fast scalps on expiry day.", { shark: 2, gambler: 1 }]]],
+  ["How many trades in a normal week?", [["30 or more.", { shark: 3 }], ["5 to 15.", { turtle: 1, shark: 1, sniper: 1 }], ["1 to 3, only the best setups.", { sniper: 3 }], ["Hardly any. I invest monthly.", { banyan: 3 }]]],
+  ["A stock you sold yesterday is up 15% today.", [["Buy it back right now!", { rocket: 2, gambler: 1 }], ["Feels bad, but I followed my plan.", { owl: 2, turtle: 1 }], ["Analyse why I sold and what I missed.", { detective: 2 }], ["Didn't notice. I wasn't watching.", { banyan: 2 }]]],
+  ["Your trading journal is…", [["Updated after every trade, with screenshots.", { turtle: 2, owl: 1 }], ["Only for big trades.", { sniper: 1, shark: 1 }], ["What journal?", { gambler: 2, rocket: 1 }], ["Research notes on companies, not trades.", { detective: 2, banyan: 1 }]]],
+  ["Your dream outcome is…", [["Double my money this month.", { gambler: 2, rocket: 1 }], ["A steady 2–3% a month, small drawdowns.", { turtle: 2, owl: 1 }], ["Find one 10-bagger and hold it.", { banyan: 2, detective: 1 }], ["A few big winning swings a year.", { sniper: 3 }]]],
+  ["Before you enter a trade, you…", [["Already know my stop-loss and target.", { owl: 2, turtle: 1, sniper: 1 }], ["Decide based on how it moves after I enter.", { shark: 2, gambler: 1 }], ["Check if others in the group are buying.", { rocket: 2 }], ["Read the latest results and concall.", { detective: 2, banyan: 1 }]]],
+  ["The market crashes 10% in a week.", [["Panic and sell everything.", { rocket: 2 }], ["Excited: my watchlist is finally cheap.", { banyan: 2, detective: 1 }], ["Short it with leverage!", { gambler: 2, shark: 1 }], ["Cut size, raise cash, wait for a setup.", { owl: 2, sniper: 1 }]]],
+  ["Which line sounds most like you?", [["\"Speed is my edge.\"", { shark: 2 }], ["\"Time in the market beats timing it.\"", { banyan: 2 }], ["\"Risk first, profit later.\"", { owl: 2, turtle: 1 }], ["\"No risk, no story.\"", { gambler: 2, rocket: 1 }]]],
+  ["How much capital goes into one trade?", [["Whatever my 1% risk rule allows.", { turtle: 2, owl: 1 }], ["A big chunk when I'm really confident.", { sniper: 1, gambler: 1 }], ["All-in when it's a 'sure shot'.", { gambler: 2, rocket: 1 }], ["Small, equal amounts across many stocks.", { banyan: 1, detective: 1 }]]],
+  ["Which screen is open most of your day?", [["1-minute charts and the order window.", { shark: 3 }], ["Screener and annual reports.", { detective: 2, banyan: 1 }], ["WhatsApp and Telegram groups.", { rocket: 2 }], ["Nothing. I check after the market closes.", { banyan: 1, turtle: 1, owl: 1 }]]],
+];
+const S = K.store("tradertype_v1", { ans: [], res: null, name: "", taken: 0 });
+let qi = 0, ans = [];
+function scores(a) { const sc = Object.fromEntries(ORDER.map(k => [k, 0])); a.forEach((o, i) => o != null && Object.entries(Q[i][1][o][1]).forEach(([k, v]) => sc[k] += v)); return sc; }
+function intro() { $("#stage").innerHTML = `<div class="intro fade"><div class="faces">🦈🌳🚀🐢🎰🎯🔍🦉</div><h2>8 trader types. Which one is you?</h2><p>15 quick questions about real situations: losses, tips, crashes, options. Takes about 2 minutes. Be honest; nobody sees your answers but you.</p><button class="bigbtn" id="go">Start the test →</button>${S.res ? `<button class="btn" id="seeLast" style="margin-top:4px">See my last result: ${T[S.res].e} ${T[S.res].n}</button>` : ""}</div>`; }
+function ask() { const [q, opts] = Q[qi];
+  $("#stage").innerHTML = `<div class="fade"><div class="prog"><span>QUESTION ${qi + 1} / ${Q.length}</span><div class="bar"><i style="width:${qi / Q.length * 100}%"></i></div></div><div class="qtext">${esc(q)}</div><div class="opts">${opts.map(([t], j) => `<button data-o="${j}" class="${ans[qi] === j ? "sel" : ""}"><span>${"ABCD"[j]}</span><span>${esc(t)}</span></button>`).join("")}</div><div class="qnav"><button id="back" ${qi ? "" : "style='visibility:hidden'"}>← Back</button><button id="restart">Restart</button></div></div>`; }
+function result(a) { const sc = scores(a), tot = Object.values(sc).reduce((x, y) => x + y, 0) || 1, rank = ORDER.slice().sort((x, y) => sc[y] - sc[x] || ORDER.indexOf(x) - ORDER.indexOf(y)), me = T[rank[0]], two = T[rank[1]];
+  S.res = rank[0]; S.second = rank[1]; S.pct = Object.fromEntries(ORDER.map(k => [k, Math.round(sc[k] / tot * 100)])); S.save();
+  $("#stage").innerHTML = `<div class="res fade" style="--c:${me.c}"><div class="hero4"><div class="em">${me.e}</div><small>YOUR TRADER TYPE</small><h2>${me.n}</h2><div class="tag">${me.tag}</div><p>${me.d}</p><p style="font-size:.84rem;color:var(--muted)">With a streak of <b style="color:${two.c}">${two.e} ${two.n}</b></p></div>
+    <div class="two"><div class="bx"><h4 style="color:var(--up)">💪 STRENGTHS</h4><ul>${me.s.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div><div class="bx"><h4 style="color:var(--down)">⚠️ BLIND SPOTS</h4><ul>${me.b.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></div>
+    <div class="bx"><h4 style="color:${me.c}">🏆 YOUR LEGEND TWIN</h4>${esc(me.tw)}</div>
+    <div class="bx"><h4 style="color:var(--muted)">📊 YOUR MIX</h4><div class="mix">${rank.map(k => `<div><span>${T[k].e} ${T[k].n}</span><span class="t"><i style="width:${S.pct[k]}%;background:${T[k].c}"></i></span><b>${S.pct[k]}%</b></div>`).join("")}</div></div>
+    <div class="bx"><h4 style="color:var(--acc)">🧭 YOUR GROWTH PLAN</h4><div class="plan">${me.p.map(([s, e, t, d]) => `<a href="../${s}/"><span>${e}</span><span><b>${esc(t)}</b><small>${esc(d)}</small></span><em>Open ↗</em></a>`).join("")}</div></div>
+    <div class="cols2" style="align-items:end"><div><div class="q">Your name on the share card <span class="opt">optional</span></div><label class="field sm"><input id="nm" type="text" maxlength="30" value="${esc(S.name)}" placeholder="e.g. Rahul" /></label></div><div class="acts2"><button class="btn" id="retake">🔁 Retake test</button></div></div></div>`;
+  $("#nm").addEventListener("input", e => { S.name = e.target.value; S.save(); });
+  drawGal(); }
+function drawGal() { $("#gal").innerHTML = ORDER.map(k => `<div class="${S.res === k ? "me" : ""}" style="--c:${T[k].c}"><div class="e">${T[k].e}</div><b style="color:${T[k].c}">${T[k].n}</b>${esc(T[k].tag)}</div>`).join(""); }
+$("#stage").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  if (b.id === "go") { qi = 0; ans = []; ask(); }
+  else if (b.id === "seeLast") { ans = S.ans.slice(); result(ans); }
+  else if (b.dataset.o != null) { ans[qi] = +b.dataset.o; b.classList.add("sel"); setTimeout(() => { if (qi < Q.length - 1) { qi++; ask(); } else { S.ans = ans.slice(); S.taken = (S.taken || 0) + 1; result(ans); $("#stage").scrollIntoView({ behavior: "smooth", block: "start" }); } }, 220); }
+  else if (b.id === "back" && qi) { qi--; ask(); }
+  else if (b.id === "restart" || b.id === "retake") { qi = 0; ans = []; ask(); } });
+document.addEventListener("keydown", e => { const o = "abcd1234".indexOf(e.key.toLowerCase()); if (o < 0 || !$("#stage .opts")) return; $(`#stage [data-o="${o % 4}"]`)?.click(); });
+function buildText() { if (!S.res) return ""; const me = T[S.res], two = T[S.second];
+  return [`${me.e} *${S.name ? S.name + " is" : "I'm"} a ${me.n}!*`, `_${me.tag}_`, "", `💪 Strength: ${me.s[0]}`, `⚠️ Blind spot: ${me.b[0]}`, `🏆 Legend twin: ${me.tw.split(":")[0]}`, `With a streak of ${two.e} ${two.n}`, "", "What type of trader are YOU? 15 questions, 2 minutes 👇", ...K.signoff("trader-type", "Take the test", "").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const me = T[S.res], two = T[S.second], W = 1080, H = 1350, hex = me.c;
+  const { c, ctx } = K.canvas(W, H, [[hex + "55", .5, .18, .7], ["rgba(124,92,255,0.18)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "WHAT TYPE OF TRADER ARE YOU?", W / 2, 200, `700 26px ${K.F.MONO}`, "#8b93a7", "center");
+  K.txt(ctx, me.e, W / 2, 400, `190px ${K.F.INTER}`, "#fff", "center");
+  const who = S.name ? `${S.name} is a` : "I'm a"; K.txt(ctx, who, W / 2, 488, `600 34px ${K.F.INTER}`, "#cfd3df", "center");
+  K.txt(ctx, me.n, W / 2, 575, K.fit(ctx, me.n, 800, K.F.GROT, 96, 920), hex, "center");
+  K.txt(ctx, me.tag, W / 2, 630, K.fit(ctx, me.tag, 500, K.F.INTER, 32, 900), "#e8ecf6", "center");
+  K.panel(ctx, 70, 680, 460, 190, 24, "rgba(34,211,154,0.08)", "rgba(34,211,154,0.4)"); K.panel(ctx, 550, 680, 460, 190, 24, "rgba(255,84,112,0.08)", "rgba(255,84,112,0.4)");
+  K.txt(ctx, "💪 STRENGTH", 98, 726, `700 22px ${K.F.MONO}`, "#22d39a"); K.txt(ctx, "⚠️ BLIND SPOT", 578, 726, `700 22px ${K.F.MONO}`, "#ff5470");
+  ctx.font = `600 28px ${K.F.INTER}`; K.cap(K.wrap(ctx, me.s[0], 410), 3).forEach((l, i) => K.txt(ctx, l, 98, 778 + i * 36, `600 28px ${K.F.INTER}`, "#fff")); K.cap(K.wrap(ctx, me.b[0], 410), 3).forEach((l, i) => K.txt(ctx, l, 578, 778 + i * 36, `600 28px ${K.F.INTER}`, "#fff"));
+  const top3 = ORDER.slice().sort((a, b) => S.pct[b] - S.pct[a]).slice(0, 3); K.panel(ctx, 70, 892, 940, 196, 24);
+  top3.forEach((k, i) => { const y = 942 + i * 52; K.txt(ctx, `${T[k].e} ${T[k].n}`, 100, y + 8, `600 26px ${K.F.INTER}`, "#e8ecf6"); K.rr(ctx, 440, y - 12, 460, 20, 10); ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fill(); K.rr(ctx, 440, y - 12, Math.max(20, 460 * S.pct[k] / 100), 20, 10); ctx.fillStyle = T[k].c; ctx.fill(); K.txt(ctx, S.pct[k] + "%", 980, y + 8, `700 24px ${K.F.MONO}`, "#fff", "right"); });
+  K.footer(ctx, W, H, K.toolUrl("trader-type"), "Take the 2-minute test · Just for fun & learning", true); return c; }
+K.share({ text: buildText, valid: () => { if (S.res) return true; K.toast("Finish the test first"); return false; }, draw: drawImg, file: () => "my-trader-type", imgLabel: "Share my trader type" });
+intro(); drawGal();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
