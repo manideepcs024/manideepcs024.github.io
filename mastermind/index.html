@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Market Mastermind — 15-stage stock market quiz with lifelines &amp; certificate</title>
+<meta name="description" content="Climb 15 stages of stock market questions, from easy to expert, with 4 lifelines (50:50, Ask the Community, Ask a Mentor, Swap). Win titles like Market Learner, Smart Trader and Market Mastermind, and a shareable certificate. 90-question bank, 15 picked at random every game." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #febc2e; --acc2: #7c5cff; }
+  .wrap { max-width: 1160px; }
+  .arena { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 16px; margin-top: 16px; align-items: start; }
+  .stage { border-radius: 28px; padding: 22px; border: 1px solid rgba(254,188,46,.35); background: radial-gradient(circle at 50% -10%, rgba(124,92,255,.35), transparent 55%), radial-gradient(circle at 50% 120%, rgba(254,188,46,.18), transparent 55%), #0b0d18; min-height: 520px; position: relative; overflow: hidden; }
+  .start { text-align: center; display: grid; gap: 14px; justify-items: center; padding-top: 10px; }
+  .trophy { font-size: 4.6rem; filter: drop-shadow(0 10px 40px rgba(254,188,46,.55)); animation: float 3s ease-in-out infinite; } @keyframes float { 50% { transform: translateY(-8px); } }
+  .start h2 { font: 800 2rem "Space Grotesk"; background: linear-gradient(90deg, #ffd98a, #febc2e, #ff8a3d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .start p { color: #cfd3df; max-width: 560px; line-height: 1.6; }
+  .rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 640px; text-align: left; }
+  .rules div { border-radius: 14px; padding: 10px 12px; border: 1px solid var(--line); background: rgba(0,0,0,.3); font-size: .8rem; color: #cfd3df; }
+  .rules b { display: block; color: #fff; font: 700 .9rem "Space Grotesk"; }
+  .go { border: 0; border-radius: 18px; padding: 16px 34px; font: 800 1.15rem "Space Grotesk"; color: #1a1300; cursor: pointer; background: linear-gradient(100deg, #ffd98a, #febc2e, #ff8a3d); box-shadow: 0 12px 40px rgba(254,188,46,.35); }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .lls { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ll { border: 1.5px solid rgba(254,188,46,.55); background: rgba(254,188,46,.08); color: #ffd98a; border-radius: 999px; padding: 8px 12px; font: 700 .78rem Inter; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .ll:disabled { opacity: .3; cursor: not-allowed; text-decoration: line-through; }
+  .timer { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font: 800 1.4rem "Space Grotesk"; position: relative; }
+  .timer svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .qbox { margin-top: 18px; border-radius: 22px; padding: 18px 20px; text-align: center; border: 1.5px solid rgba(124,92,255,.55); background: linear-gradient(180deg, rgba(124,92,255,.18), rgba(0,0,0,.35)); }
+  .qbox small { display: block; font: 700 .7rem "JetBrains Mono"; letter-spacing: .1em; color: #b9a6ff; margin-bottom: 8px; }
+  .qbox h2 { font: 700 1.35rem "Space Grotesk"; line-height: 1.35; }
+  .ans { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .ans button { position: relative; text-align: left; border: 1.5px solid rgba(254,188,46,.35); background: rgba(0,0,0,.4); color: #fff; border-radius: 16px; padding: 14px 14px 14px 48px; font: 600 .98rem Inter; cursor: pointer; min-height: 58px; transition: background .2s, border-color .2s, transform .1s; }
+  .ans button:hover:not(:disabled) { border-color: #febc2e; transform: translateY(-1px); }
+  .ans button span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 800 .82rem "Space Grotesk"; background: rgba(254,188,46,.18); color: #ffd98a; }
+  .ans button.sel { background: rgba(254,188,46,.25); border-color: #febc2e; animation: pulse 1s infinite; } @keyframes pulse { 50% { box-shadow: 0 0 0 4px rgba(254,188,46,.25); } }
+  .ans button.ok { background: rgba(34,211,154,.3); border-color: var(--up); animation: none; }
+  .ans button.bad { background: rgba(255,84,112,.3); border-color: var(--down); animation: none; }
+  .ans button.gone { visibility: hidden; }
+  .ans button .pb { position: absolute; left: 0; bottom: 0; height: 4px; background: #7c5cff; border-radius: 0 4px 4px 4px; }
+  .ans button .pv { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font: 700 .74rem "JetBrains Mono"; color: #b9a6ff; }
+  .msg { margin-top: 14px; min-height: 52px; border-radius: 16px; padding: 12px 14px; font-size: .9rem; color: #dfe3ee; line-height: 1.55; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .msg.ok { border-color: rgba(34,211,154,.5); background: rgba(34,211,154,.08); } .msg.bad { border-color: rgba(255,84,112,.5); background: rgba(255,84,112,.07); } .msg.mentor { border-color: rgba(124,92,255,.5); background: rgba(124,92,255,.1); }
+  .acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .acts .btn { padding: 12px 16px; }
+  .lock { background: linear-gradient(100deg, #ffd98a, #febc2e) !important; color: #1a1300 !important; border: 0 !important; font-weight: 800 !important; }
+  .ladder { border-radius: 22px; border: 1px solid var(--line); background: var(--card); padding: 10px; display: flex; flex-direction: column-reverse; gap: 3px; }
+  .ladder div { display: grid; grid-template-columns: 26px 22px minmax(0, 1fr); gap: 6px; align-items: center; padding: 6px 9px; border-radius: 10px; font-size: .8rem; color: #8b93a7; }
+  .ladder div b { font: 700 .74rem "JetBrains Mono"; text-align: right; }
+  .ladder div.safe { color: #fff; } .ladder div.safe b { color: #febc2e; }
+  .ladder div.done { color: #9ff3d5; } .ladder div.cur { background: linear-gradient(90deg, #febc2e, #ff8a3d); color: #1a1300; font-weight: 700; } .ladder div.cur b { color: #1a1300; }
+  .ladder div.top { color: #ffd98a; font-weight: 700; }
+  .end { text-align: center; display: grid; gap: 12px; justify-items: center; }
+  .end .big { font-size: 4.6rem; animation: pop .6s cubic-bezier(.2,1.6,.4,1); } @keyframes pop { from { transform: scale(.3); opacity: 0; } }
+  .end h2 { font: 800 1.9rem "Space Grotesk"; } .end .ttl { font: 800 1.6rem "Space Grotesk"; color: #febc2e; }
+  .end img { width: min(100%, 420px); border-radius: 16px; border: 1px solid var(--line); }
+  .review { width: 100%; text-align: left; display: grid; gap: 6px; margin-top: 6px; }
+  .review div { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; padding: 9px 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: .82rem; color: #cfd3df; }
+  .review b { color: #fff; display: block; }
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; } .confetti i { position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px; animation: fall linear forwards; } @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+  @media (max-width: 900px) { .arena { grid-template-columns: 1fr; } .ladder { order: -1; flex-direction: row-reverse; overflow-x: auto; padding: 8px; } .ladder div { grid-template-columns: 1fr; text-align: center; min-width: 64px; padding: 6px; font-size: .68rem; } .ladder div b { text-align: center; } .ladder div .tn { display: none; } }
+  @media (max-width: 640px) { .stage { padding: 16px; } .ans { grid-template-columns: 1fr; } .qbox h2 { font-size: 1.12rem; } .rules { grid-template-columns: 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../course/">🎓 Course</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Market <span class="grad">Mastermind.</span></h1>
+    <p class="sub">15 stages. 4 lifelines. Questions get harder as you climb. No prize money here: you win <b>titles</b>, from Market Newbie all the way to <b>Market Mastermind 🏆</b>, and a certificate to share.</p>
+
+    <div class="arena">
+      <div class="stage" id="stage"></div>
+      <div class="ladder" id="ladder"></div>
+    </div>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Note:</b> A learning game for fun. Titles and certificates are community awards, not qualifications. Tax rules mentioned are as per Union Budget 2024 and can change. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+/* ---------- stages & titles ---------- */
+const ST = [["🌱", "Market Newbie"], ["👀", "Chart Curious"], ["🕯️", "Candle Spotter"], ["🐷", "Smart Saver"], ["🎓", "Market Learner"], ["📈", "Trend Tracker"], ["🛡️", "Risk Aware"], ["📐", "Pattern Pro"], ["🔍", "Ratio Reader"], ["💼", "Smart Trader"], ["🧠", "Strategy Builder"], ["📞", "Options Explorer"], ["🧘", "Discipline Master"], ["♟️", "Market Strategist"], ["🏆", "Market Mastermind"]];
+const SAFE = [4, 9];
+const TIME = i => i < 5 ? 45 : i < 10 ? 60 : 0;
+/* ---------- question bank: [question, [A,B,C,D], correct index, explanation] ---------- */
+const EASY = [
+  ["What does NSE stand for?", ["National Stock Exchange", "New Securities Exchange", "National Savings Exchange", "North Stock Exchange"], 0, "NSE, the National Stock Exchange of India, is in Mumbai; Nifty 50 is its flagship index."],
+  ["Which body regulates India's stock market?", ["RBI", "SEBI", "IRDAI", "NABARD"], 1, "SEBI (Securities and Exchange Board of India) regulates the securities market. RBI regulates banks and monetary policy."],
+  ["Where are your shares held electronically?", ["Savings account", "Trading account", "Demat account", "PPF account"], 2, "The demat account holds shares (with CDSL or NSDL). The trading account is used to place orders."],
+  ["How many companies are in the Nifty 50 index?", ["30", "50", "100", "500"], 1, "As the name says: 50 large companies listed on NSE."],
+  ["How many companies make up the Sensex?", ["20", "50", "30", "100"], 2, "The BSE Sensex tracks 30 large, actively traded companies."],
+  ["A green (bullish) candle means the closing price was…", ["Lower than the open", "Equal to the open", "Higher than yesterday's high", "Higher than the open"], 3, "Green/hollow = close above open. Red/filled = close below open."],
+  ["In a 'bull market', prices are generally…", ["Rising", "Falling", "Not moving", "Frozen by SEBI"], 0, "Bulls push prices up; bears push them down."],
+  ["What is a stop-loss?", ["A guaranteed profit order", "An order that exits a trade to limit the loss", "A tax on losses", "A broker's fee"], 1, "A stop-loss closes your position at a pre-decided level so one trade can't do big damage."],
+  ["IPO stands for…", ["Indian Profit Order", "Initial Price Option", "Initial Public Offering", "Internal Public Offer"], 2, "An Initial Public Offering is when a company first sells shares to the public and lists on an exchange."],
+  ["What is a dividend?", ["A loan to the company", "A part of profits paid to shareholders", "A penalty for selling early", "The broker's commission"], 1, "Companies share part of their profit with shareholders as dividends."],
+  ["SIP stands for…", ["Systematic Investment Plan", "Stock Insurance Policy", "Special Interest Payment", "Share Issue Process"], 0, "A SIP invests a fixed amount at regular intervals, usually monthly."],
+  ["Regular equity trading hours on NSE are…", ["10:00 AM – 4:00 PM", "9:00 AM – 5:00 PM", "9:30 AM – 3:00 PM", "9:15 AM – 3:30 PM"], 3, "Normal market hours are 9:15 AM to 3:30 PM, with a pre-open session before 9:15."],
+  ["What does 'CMP' mean?", ["Current Market Price", "Company Monthly Profit", "Capital Market Policy", "Closing Margin Percentage"], 0, "CMP = the latest traded price of a stock."],
+  ["Which order executes immediately at the best available price?", ["Limit order", "Market order", "GTT order", "After-market order"], 1, "A market order fills right away at the best available price. A limit order waits for your price."],
+  ["What should a beginner have BEFORE starting to trade?", ["A big loan", "A paid tips group", "An emergency fund and insurance", "Margin trading facility"], 2, "Protection first: health and term insurance plus about 6 months of expenses as an emergency fund."],
+  ["A 'bear' in the market expects prices to…", ["Rise", "Stay flat", "Double", "Fall"], 3, "Bears are pessimistic; a bear market is a sustained fall."],
+  ["What is diversification?", ["Spreading money across different investments", "Putting all money in one stock", "Trading only intraday", "Buying only IPOs"], 0, "Diversification reduces the damage any single investment can do."],
+  ["Which of these is a stock exchange in India?", ["SEBI", "BSE", "NSDL", "AMFI"], 1, "BSE is an exchange. SEBI is the regulator, NSDL is a depository, AMFI is the mutual fund industry body."],
+  ["Market capitalisation = ?", ["Profit × P/E", "Revenue × 10", "Share price × number of shares", "Book value ÷ debt"], 2, "Market cap is the total market value of all of a company's shares."],
+  ["How is an ETF bought and sold?", ["Only from the fund house once a year", "Through a bank FD", "Only during an NFO", "On the stock exchange, like a share"], 3, "ETFs trade on the exchange through your demat and trading account during market hours."],
+  ["Which product type is meant for intraday trading?", ["MIS", "CNC", "SIP", "NRML"], 0, "MIS (Margin Intraday Squareoff) positions are squared off the same day. CNC is for delivery; NRML for F&O carry-forward."],
+  ["CNC (Cash and Carry) is used for…", ["Intraday only", "Delivery: buying shares to hold", "Options writing", "Mutual funds"], 1, "CNC means you pay fully and take delivery of the shares into your demat."],
+  ["What is India's 'fear gauge' volatility index called?", ["Nifty IT", "Bank Nifty", "India VIX", "Sensex 30"], 2, "India VIX measures the market's expected volatility over the next 30 days."],
+  ["Which message is a classic red flag?", ["\"Q2 results are out on NSE\"", "\"Read the annual report\"", "\"Company AGM on 15th\"", "\"100% sure multibagger! Buy before 11 AM!\""], 3, "Certainty + urgency = FOMO trap. Real information comes from filings, not hype."],
+  ["The expense ratio is a cost charged by…", ["Mutual funds and ETFs", "The stock exchange", "SEBI", "Your bank"], 0, "The expense ratio is the yearly fee a fund charges, as a % of your investment."],
+  ["A stock in the 'upper circuit' has…", ["Been delisted", "Hit the maximum rise allowed for the day", "Been suspended forever", "Paid a dividend"], 1, "Circuit limits cap the daily move. In an upper circuit there are many buyers and almost no sellers."],
+  ["'Blue-chip' stocks are usually…", ["Brand-new startups", "Penny stocks", "Large, well-established companies", "Stocks under ₹10"], 2, "Blue chips are large, financially strong companies with long track records."],
+  ["EPS stands for…", ["Equity Per Stock", "Exchange Price Spread", "Expected Profit Share", "Earnings Per Share"], 3, "EPS = net profit ÷ number of shares."],
+  ["A doji candle shows that…", ["Open and close were almost equal: indecision", "The price doubled", "Volume was zero", "The stock hit upper circuit"], 0, "A doji has a tiny body: buyers and sellers ended the day roughly even."],
+  ["Indian equity trades now settle on which cycle?", ["T+3", "T+1", "T+5", "T+7"], 1, "India moved to T+1 settlement: shares/money settle one working day after the trade."],
+];
+const MED = [
+  ["The P/E ratio is calculated as…", ["Price ÷ EPS", "EPS ÷ Price", "Profit ÷ Equity", "Price ÷ Book value"], 0, "P/E tells you how many years of current earnings you pay for one share."],
+  ["A 'golden cross' happens when…", ["RSI crosses 50", "The 50-day average crosses above the 200-day average", "Price hits an all-time high", "Volume doubles"], 1, "50 above 200 is a slow, trend-confirming bullish signal. The opposite is a death cross."],
+  ["RSI above 70 is usually described as…", ["Oversold", "Neutral", "Overbought", "Delisted"], 2, "Overbought, but in strong trends RSI can stay above 70 for a long time."],
+  ["You hold 100 shares at ₹800. A 1:1 bonus is issued. After the ex-date you have about…", ["100 shares at ₹1,600", "200 shares at ₹800", "100 shares at ₹400", "200 shares at ₹400"], 3, "Shares double and the price halves. Your total value stays about ₹80,000."],
+  ["Under T+1 settlement, the ex-date and the record date are…", ["The same day", "One week apart", "One month apart", "Unrelated"], 0, "So you must buy by the trading day before the record date to be eligible."],
+  ["ROE (Return on Equity) = ?", ["Revenue ÷ Assets", "Net profit ÷ Shareholders' equity", "EBIT ÷ Interest", "Debt ÷ Equity"], 1, "ROE shows how much profit the company makes on shareholders' money. 15%+ sustained is good."],
+  ["Capital ₹2,00,000, risk 1% per trade, entry ₹500, stop ₹490. Quantity?", ["20", "2,000", "200", "400"], 2, "Risk = ₹2,000. Risk per share = ₹10. ₹2,000 ÷ ₹10 = 200 shares."],
+  ["A double bottom (W) is confirmed when price…", ["Makes the second low", "RSI goes below 30", "Volume dries up", "Closes above the neckline"], 3, "Until the close above the neckline (the middle peak), it's only a possible pattern."],
+  ["VWAP stands for…", ["Volume Weighted Average Price", "Value Weighted Asset Price", "Variable Wide Average Point", "Volume Width And Price"], 0, "VWAP is the average price weighted by volume during the day; intraday traders use it as a fair-value line."],
+  ["Which candle has a long lower wick and appears after a DOWNtrend?", ["Shooting star", "Hammer", "Hanging man", "Marubozu"], 1, "Same shape after an uptrend is called a hanging man. Context decides the name."],
+  ["A call (CE) BUYER makes money at expiry if the price ends…", ["Below the strike", "Exactly at the strike", "Above strike + premium paid", "Anywhere; buyers always win"], 2, "Breakeven for a call buyer is strike + premium."],
+  ["Time decay (theta) hurts whom the most?", ["Option sellers", "Stock investors", "Mutual fund SIP investors", "Option buyers"], 3, "Time value melts every day, fastest near expiry. Sellers collect it; buyers pay it."],
+  ["Debt-to-equity of 2 means…", ["Debt is twice the shareholders' equity", "Equity is twice the debt", "The company has no debt", "Profit is twice the debt"], 0, "Above 1 is high for most non-financial companies."],
+  ["Short-term capital gains on listed equity shares (held under 12 months) are taxed at…", ["10%", "20%", "15%", "Your slab rate"], 1, "STCG on listed equity rose from 15% to 20% from 23 July 2024 (Budget 2024)."],
+  ["Long-term capital gains on listed equity are tax-free up to how much per year?", ["₹50,000", "₹1 lakh", "₹1.25 lakh", "₹2.5 lakh"], 2, "Budget 2024 raised the exemption to ₹1.25 lakh, with 12.5% tax above it."],
+  ["A 1:5 stock split on face value ₹10 makes the new face value…", ["₹50", "₹5", "₹1", "₹2"], 3, "Each share splits into 5, so face value ₹10 ÷ 5 = ₹2."],
+  ["ATR (Average True Range) measures…", ["Volatility: the average daily price range", "Trend direction", "Volume", "Open interest"], 0, "ATR helps set stop-loss distance: a stop inside 1× ATR is often hit by normal noise."],
+  ["An 'M' pattern on a chart is a…", ["Cup and handle", "Double top", "Bull flag", "Rounding bottom"], 1, "Two peaks at about the same level, confirmed on a break below the middle low."],
+  ["Profit factor = ?", ["Wins ÷ losses (count)", "Net profit ÷ capital", "Gross profit ÷ gross loss", "Average win ÷ average loss"], 2, "Above 1 means you make more than you lose; 1.5+ is a healthy edge."],
+  ["Interest coverage ratio = ?", ["Debt ÷ Equity", "Interest ÷ Revenue", "Net profit ÷ Interest", "EBIT ÷ Interest expense"], 3, "It shows how many times operating profit covers interest. Below 2× is risky."],
+  ["Rising price + rising open interest in futures usually signals…", ["Long build-up", "Short covering", "Long unwinding", "Short build-up"], 0, "New longs are being added. Rising price + falling OI is short covering."],
+  ["Which of these is a CONTINUATION pattern?", ["Head and shoulders", "Bull flag", "Double top", "Evening star"], 1, "A flag is a pause in a trend; the others are reversal patterns."],
+  ["A stock enters the F&O ban period when open interest crosses…", ["50% of MWPL", "80% of MWPL", "95% of MWPL", "100% of free float"], 2, "In the ban, no new positions can be created; it ends when OI falls below 80% of MWPL."],
+  ["A PEG ratio below 1 suggests…", ["The company has no debt", "Profits are falling", "The stock is in F&O ban", "Growth looks cheap relative to the P/E"], 3, "PEG = P/E ÷ earnings growth rate."],
+  ["A 'married put' is…", ["Owning the stock and buying a put to protect it", "Selling a call and a put together", "Buying two calls", "A put bought by two people"], 0, "It's insurance: losses below the put strike are capped."],
+  ["The exchanges' ASM framework is meant to…", ["Give tax relief", "Put extra surveillance and margins on speculative stocks", "Pick Nifty stocks", "Approve IPOs"], 1, "Additional Surveillance Measures cool down unusually volatile or speculative stocks."],
+  ["The Supertrend indicator is built from…", ["RSI", "Volume", "ATR", "Open interest"], 2, "Supertrend = a band set a multiple of ATR away from the price midpoint."],
+  ["Win rate 40% with an average win twice the average loss is…", ["Always a loss", "Break-even exactly", "Impossible", "Profitable (before costs)"], 3, "0.4 × 2 − 0.6 × 1 = +0.2R per trade on average."],
+  ["Free cash flow = ?", ["Operating cash flow − capex", "Net profit + dividends", "Revenue − expenses", "Cash + investments"], 0, "It's the cash left after maintaining and growing the business."],
+  ["In Dow Theory, an uptrend shows…", ["Lower highs and lower lows", "Higher highs and higher lows", "Flat highs and lows", "Rising volume only"], 1, "An uptrend continues until it clearly makes a lower high and a lower low."],
+];
+const HARD = [
+  ["With a 1:3 reward-to-risk, what win rate do you need just to break even (before costs)?", ["50%", "33%", "25%", "10%"], 2, "Break-even win rate = 1 ÷ (1 + 3) = 25%."],
+  ["After a 50% loss, what gain do you need to get back to where you started?", ["50%", "75%", "150%", "100%"], 3, "₹100 → ₹50 needs +₹50, which is +100% of ₹50. Big losses are hard to recover."],
+  ["The maximum Piotroski F-Score is…", ["9", "10", "7", "100"], 0, "Nine yes/no tests on profitability, leverage/liquidity and efficiency."],
+  ["Bought a stock at ₹100 and sold a ₹110 call for ₹3. Max profit per share at expiry?", ["₹3", "₹13", "₹10", "Unlimited"], 1, "(₹110 − ₹100) + ₹3 premium = ₹13. A covered call caps the upside."],
+  ["Which is a three-candle bullish reversal pattern?", ["Evening star", "Dark cloud cover", "Morning star", "Bearish harami"], 2, "Big red, small indecision candle, then a strong green candle closing into the first body."],
+  ["The maximum loss on a NAKED short call is…", ["The premium received", "Zero", "The strike price", "Unlimited"], 3, "The stock can keep rising, so the loss has no ceiling."],
+  ["ROCE is calculated as…", ["EBIT ÷ (Equity + Debt)", "Net profit ÷ Equity", "EBITDA ÷ Revenue", "Revenue ÷ Capital"], 0, "Return on all capital employed: owners' and lenders'."],
+  ["Minervini's Trend Template wants the price within what % of its 52-week high?", ["5%", "25%", "50%", "75%"], 1, "Also at least 30% above the 52-week low and above the 50, 150 and 200-day averages."],
+  ["William O'Neil's famous rule: cut any loss at about…", ["2%", "15%", "7–8%", "25%"], 2, "Sell any stock that falls 7–8% below your purchase price. No exceptions."],
+  ["In CAN SLIM, what does the 'L' stand for?", ["Liquidity", "Low P/E", "Long-term debt", "Leader or laggard"], 3, "Buy the leaders in their industry, not the laggards."],
+  ["In a VCP (Volatility Contraction Pattern)…", ["Each pullback is smaller than the previous one", "Each pullback is deeper", "Volume keeps rising in the base", "Price makes lower highs and lower lows"], 0, "e.g. 25% → 12% → 6%, with volume drying up before the pivot breakout."],
+  ["An NR7 day is…", ["A day with 7% gain", "The narrowest high-low range of the last 7 days", "7 red candles in a row", "A Nifty rebalancing day"], 1, "Volatility contracts before it expands: narrow ranges often come before big moves."],
+  ["If F&O expiry day is a market holiday, contracts expire on…", ["The next trading day", "The same day anyway", "The previous trading day", "The next month's expiry"], 2, "Expiry always moves back, never forward."],
+  ["Since 1 October 2024, money received in a company's buyback is taxed…", ["At 10% LTCG", "Not at all", "Only if above ₹1 lakh", "As dividend, at your slab rate"], 3, "And your cost of those shares becomes a capital loss you can set off."],
+  ["After a demerger, your cost of acquisition is…", ["Split between the two companies in the ratio announced by the company", "Fully assigned to the new company", "Zero for both", "Fully assigned to the parent"], 0, "Use the cost-apportionment ratio the company publishes, or your capital gains will be wrong."],
+  ["In the HDFC Ltd–HDFC Bank merger, shareholders got…", ["1 HDFC Bank share for every 1", "42 HDFC Bank shares for every 25 HDFC Ltd shares", "25 for every 42", "Cash only"], 1, "The swap ratio was 42:25, effective July 2023."],
+  ["After a successful delisting, shareholders who didn't tender get an exit window of…", ["1 week", "1 month", "1 year", "Never"], 2, "They can sell to the promoter at the exit price for one year."],
+  ["Which change most reduces your 'risk of ruin'?", ["Trading more often", "Adding leverage", "Averaging down", "Lowering the risk per trade"], 3, "Smaller risk per trade means a losing streak can't knock you out."],
+  ["An at-the-money option's delta is roughly…", ["0.5", "0", "1", "−1 for calls"], 0, "ATM calls have delta around 0.5 (puts around −0.5)."],
+  ["Expectancy per trade = ?", ["Win% × Loss%", "(Win% × Avg win) − (Loss% × Avg loss)", "Avg win ÷ Avg loss", "Total trades ÷ wins"], 1, "Positive expectancy means the strategy makes money on average over many trades."],
+  ["Entry ₹100, ATR ₹4. A stop 1.5× ATR below entry is at…", ["₹96", "₹98.50", "₹94", "₹90"], 2, "1.5 × ₹4 = ₹6 below ₹100 = ₹94."],
+  ["Who famously 'broke the Bank of England' in 1992?", ["Warren Buffett", "Jesse Livermore", "Paul Tudor Jones", "George Soros"], 3, "His Quantum Fund's short on the pound reportedly made about $1 billion on Black Wednesday."],
+  ["The Turtle traders sized positions using…", ["Volatility (ATR, called 'N')", "Equal rupees in every trade", "Gut feeling", "Analyst ratings"], 0, "Each position risked the same small % of capital, adjusted for volatility."],
+  ["In Stan Weinstein's stage analysis, Stage 2 is…", ["Basing", "Advancing (the buy stage)", "Topping", "Declining"], 1, "Buy only in Stage 2: price above a rising 30-week average after a breakout."],
+  ["The 'disposition effect' is the habit of…", ["Diversifying too much", "Trading only on Mondays", "Selling winners too early and holding losers too long", "Buying only IPOs"], 2, "A fixed stop-loss and a plan for winners counter it."],
+  ["When implied volatility (IV) rises, option premiums generally…", ["Fall", "Stay the same", "Become zero", "Rise"], 3, "Higher expected movement makes options more expensive: buyers pay more, sellers collect more."],
+  ["Why are pledged promoter shares a risk?", ["Lenders may sell them if the price falls, pushing it lower", "They pay no dividend", "They can't vote", "SEBI bans the stock"], 0, "Forced selling can create a downward spiral."],
+  ["Current ratio = ?", ["Cash ÷ Debt", "Current assets ÷ Current liabilities", "Profit ÷ Sales", "Inventory ÷ Sales"], 1, "Above 1 means short-term assets cover short-term obligations."],
+  ["Receivables growing much faster than sales for years can signal…", ["Very strong pricing power", "A stock split coming", "Customers not paying, or weak quality of reported revenue", "Lower tax"], 2, "Check cash flow from operations: profit without cash is a red flag."],
+  ["A 'collar' strategy is…", ["Buy a call + buy a put", "Sell a call + sell a put", "Buy two puts", "Own stock + buy a put + sell a call"], 3, "The call premium pays for the put; both loss and gain are capped."],
+];
+/* ---------- state ---------- */
+const S = K.store("mastermind_v1", { name: "", best: -1, games: 0, wins: 0 });
+let G = null, timerT = null;
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+function newGame() { const e = shuffle(EASY), m = shuffle(MED), h = shuffle(HARD);
+  G = { qs: [...e.slice(0, 5), ...m.slice(0, 5), ...h.slice(0, 5)], spare: { 0: e.slice(5), 1: m.slice(5), 2: h.slice(5) }, i: 0, sel: null, ll: { fifty: 1, poll: 1, mentor: 1, swap: 1 }, gone: [], poll: null, state: "ask", log: [] }; ask(); }
+/* ---------- render ---------- */
+function ladder() { $("#ladder").innerHTML = ST.map(([e, n], i) => `<div class="${G && G.i === i && G.state !== "end" ? "cur" : G && i < G.i ? "done" : ""} ${SAFE.includes(i) ? "safe" : ""} ${i === 14 ? "top" : ""}"><b>${i + 1}</b><span>${e}</span><span class="tn">${n}${SAFE.includes(i) ? " 🔒" : ""}</span></div>`).join(""); }
+function startScreen() { $("#stage").innerHTML = `<div class="start"><div class="trophy">🏆</div><h2>Market Mastermind</h2><p>Answer 15 questions in a row. They start easy and get tougher. Stages <b>5</b> and <b>10</b> are <b>safe levels</b>: once you cross them, you keep that title even if you miss later. Quit anytime and keep your current title.</p>
+    <div class="rules"><div><b>⏱️ Timer</b>45 s for stages 1–5, 60 s for 6–10, no timer for 11–15.</div><div><b>🛟 4 lifelines</b>50:50 · Ask the Community · Ask a Mentor · Swap Question. Each once.</div><div><b>🎓 Prize = title</b>From 🌱 Market Newbie to 🏆 Market Mastermind, with a certificate.</div></div>
+    <label class="field" style="max-width:320px;width:100%"><input id="nm" type="text" maxlength="30" placeholder="Your name (for the certificate)" value="${esc(S.name)}" /></label>
+    <button class="go" id="go">Start the game →</button>${S.games ? `<div style="font-size:.84rem;color:var(--muted)">Games played: ${S.games} · Best: ${S.best >= 0 ? ST[S.best][0] + " " + ST[S.best][1] : "—"}</div>` : ""}</div>`; ladder(); }
+function ask() { const q = G.qs[G.i], lvl = G.i < 5 ? "EASY" : G.i < 10 ? "MEDIUM" : "HARD"; G.state = "ask"; G.sel = null; G.gone = []; G.poll = null; G.t = TIME(G.i);
+  $("#stage").innerHTML = `<div class="top"><div class="lls">${[["fifty", "✂️ 50:50"], ["poll", "👥 Ask the Community"], ["mentor", "🧑‍🏫 Ask a Mentor"], ["swap", "🔄 Swap"]].map(([k, l]) => `<button class="ll" data-ll="${k}" ${G.ll[k] ? "" : "disabled"}>${l}</button>`).join("")}</div><div class="timer" id="tmr"></div></div>
+    <div class="qbox"><small>STAGE ${G.i + 1} OF 15 · ${lvl} · PLAYING FOR: ${ST[G.i][0]} ${ST[G.i][1].toUpperCase()}</small><h2>${esc(q[0])}</h2></div>
+    <div class="ans" id="ans">${q[1].map((o, j) => `<button data-a="${j}"><span>${"ABCD"[j]}</span>${esc(o)}<i class="pb" style="width:0"></i><em class="pv"></em></button>`).join("")}</div>
+    <div class="msg" id="msg">Tap an answer, then lock it. ${G.i ? `You're holding <b>${ST[G.i - 1][0]} ${ST[G.i - 1][1]}</b>.` : ""}</div>
+    <div class="acts" id="acts">${G.i ? `<button class="btn" id="quit">🏳️ Quit &amp; keep "${ST[G.i - 1][1]}"</button>` : ""}</div>`;
+  ladder(); startTimer(); }
+function startTimer() { clearInterval(timerT); const el = $("#tmr"); if (!G.t) { el.innerHTML = `<span style="font-size:1.4rem">∞</span>`; return; } const tot = G.t;
+  const draw = () => { const f = G.t / tot, col = f > .5 ? "#22d39a" : f > .2 ? "#febc2e" : "#ff5470"; el.innerHTML = `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="5"/><circle cx="32" cy="32" r="28" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 28}" stroke-dashoffset="${2 * Math.PI * 28 * (1 - f)}"/></svg><span style="color:${col}">${G.t}</span>`; };
+  draw(); timerT = setInterval(() => { if (G.state !== "ask") { clearInterval(timerT); return; } G.t--; draw(); if (G.t <= 0) { clearInterval(timerT); reveal(true); } }, 1000); }
+function select(j) { if (G.state !== "ask" || G.gone.includes(j)) return; G.sel = j; document.querySelectorAll("#ans button").forEach(b => b.classList.toggle("sel", +b.dataset.a === j));
+  $("#acts").innerHTML = `<button class="btn lock" id="lockB">🔒 Lock answer ${"ABCD"[j]}</button>${G.i ? `<button class="btn" id="quit">🏳️ Quit &amp; keep "${ST[G.i - 1][1]}"</button>` : ""}`; }
+async function reveal(timeout) { G.state = "reveal"; clearInterval(timerT); const q = G.qs[G.i], c = q[2], ok = !timeout && G.sel === c;
+  $("#acts").innerHTML = ""; $("#msg").className = "msg"; $("#msg").innerHTML = timeout ? "⏱️ Time's up!" : "🥁 Checking…";
+  await new Promise(r => setTimeout(r, timeout ? 400 : 1300));
+  document.querySelectorAll("#ans button").forEach(b => { const j = +b.dataset.a; b.disabled = true; if (j === c) b.classList.add("ok"); else if (j === G.sel) b.classList.add("bad"); b.classList.remove("sel"); });
+  G.log.push({ q: q[0], ok, ans: q[1][c] });
+  if (ok) { $("#msg").className = "msg ok"; $("#msg").innerHTML = `✅ <b>Correct!</b> ${esc(q[3])}<br>You're now a <b>${ST[G.i][0]} ${ST[G.i][1]}</b>${SAFE.includes(G.i) ? " 🔒 (safe level: this title is yours to keep!)" : ""}.`;
+    if (G.i === 14) { setTimeout(() => end("win"), 1600); return; }
+    $("#acts").innerHTML = `<button class="btn lock" id="nextQ">Next: Stage ${G.i + 2} →</button><button class="btn" id="quit2">🏳️ Quit &amp; keep "${ST[G.i][1]}"</button>`; G.i++; G.state = "between"; ladder(); }
+  else { $("#msg").className = "msg bad"; $("#msg").innerHTML = `${timeout ? "⏱️ Time's up." : "❌ Not quite."} The answer is <b>${"ABCD"[c]}: ${esc(q[1][c])}</b>. ${esc(q[3])}`; setTimeout(() => end("lost"), 2600); } }
+/* ---------- lifelines ---------- */
+function lifeline(k) { if (G.state !== "ask" || !G.ll[k]) return; G.ll[k] = 0; const q = G.qs[G.i], c = q[2], btn = $(`[data-ll="${k}"]`); if (btn) btn.disabled = true;
+  if (k === "fifty") { const wrong = shuffle([0, 1, 2, 3].filter(j => j !== c)).slice(0, 2); G.gone = wrong; wrong.forEach(j => $(`#ans [data-a="${j}"]`).classList.add("gone")); if (wrong.includes(G.sel)) { G.sel = null; $("#acts").innerHTML = ""; } $("#msg").innerHTML = "✂️ Two wrong answers removed."; }
+  if (k === "poll") { const acc = G.i < 5 ? .72 : G.i < 10 ? .55 : .42, live = [0, 1, 2, 3].filter(j => !G.gone.includes(j)); let v = live.map(j => j === c ? acc * 100 + Math.random() * 15 : Math.random() * 30); const s = v.reduce((a, b) => a + b, 0); v = v.map(x => Math.round(x / s * 100));
+    live.forEach((j, n) => { const b = $(`#ans [data-a="${j}"]`); b.querySelector(".pb").style.width = v[n] + "%"; b.querySelector(".pv").textContent = v[n] + "%"; }); $("#msg").innerHTML = "👥 The community has voted. The purple bars show their answers. Majorities aren't always right, especially on harder questions!"; }
+  if (k === "mentor") { const conf = G.i < 5 ? .92 : G.i < 10 ? .8 : .68, right = Math.random() < conf, live = [0, 1, 2, 3].filter(j => !G.gone.includes(j)), pick = right ? c : shuffle(live.filter(j => j !== c))[0], pct = Math.round((right ? conf : 1 - conf + .2) * 100 - Math.random() * 10);
+    $("#msg").className = "msg mentor"; $("#msg").innerHTML = `🧑‍🏫 <b>Mentor:</b> "I'm about <b>${Math.min(95, Math.max(40, pct))}% sure</b> it's <b>${"ABCD"[pick]}</b>. ${pct > 75 ? "I've seen this many times." : "But double-check my thinking."}"`; }
+  if (k === "swap") { const pool = G.spare[G.i < 5 ? 0 : G.i < 10 ? 1 : 2]; if (pool.length) { G.qs[G.i] = pool.shift(); const keep = { ...G.ll }; ask(); G.ll = keep; ladder(); $("#msg").innerHTML = "🔄 New question swapped in. Same stage, same difficulty."; } } }
+/* ---------- end ---------- */
+let last = null;
+function end(kind) { clearInterval(timerT); G.state = "end"; let won;
+  if (kind === "win") won = 14; else if (kind === "quit") won = G.i - 1; else won = G.i >= 10 ? 9 : G.i >= 5 ? 4 : -1;
+  S.games = (S.games || 0) + 1; if (won > S.best) S.best = won; if (won === 14) S.wins = (S.wins || 0) + 1; S.save();
+  last = { won, kind, correct: G.log.filter(x => x.ok).length, name: S.name || "", date: K.iso(new Date()) };
+  if (won === 14) confetti();
+  const t = won >= 0 ? ST[won] : null;
+  $("#stage").innerHTML = `<div class="end"><div class="big">${t ? t[0] : "📚"}</div><h2>${won === 14 ? "You are a Market Mastermind!" : kind === "quit" ? "Smart exit!" : won >= 0 ? "Great run!" : "Keep learning!"}</h2>
+    ${t ? `<div>You've earned the title</div><div class="ttl">${t[0]} ${t[1]}</div>` : `<div style="color:#cfd3df">You didn't pass a safe level this time. Every expert started here. Try again!</div>`}
+    <div style="color:var(--muted);font-size:.86rem">${last.correct} correct answer${last.correct === 1 ? "" : "s"} · ${kind === "quit" ? "walked away at stage " + (G.i + 1) : kind === "win" ? "all 15 stages cleared" : "stopped at stage " + (G.i + 1)}</div>
+    ${t ? `<img id="certImg" alt="Certificate" />` : ""}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="go" id="again" style="padding:12px 24px;font-size:1rem">🔁 Play again</button><a class="btn" href="../course/" style="text-decoration:none">🎓 Learn in the course</a></div>
+    <div class="review">${G.log.map((x, i) => `<div><span>${x.ok ? "✅" : "❌"}</span><span><b>${i + 1}. ${esc(x.q)}</b>Answer: ${esc(x.ans)}</span></div>`).join("")}</div></div>`;
+  ladder(); if (t) certCanvas().then(c => { const im = $("#certImg"); if (im) im.src = c.toDataURL("image/png"); }); }
+function confetti() { const c = document.createElement("div"); c.className = "confetti"; c.innerHTML = [...Array(90)].map(() => `<i style="left:${Math.random() * 100}%;background:${["#febc2e", "#22d39a", "#7c5cff", "#ff8a3d", "#5b8cff"][Math.floor(Math.random() * 5)]};animation-duration:${1.8 + Math.random() * 2}s;animation-delay:${Math.random() * .6}s"></i>`).join(""); document.body.appendChild(c); setTimeout(() => c.remove(), 4800); }
+async function certCanvas() { await K.loadFonts?.(); const W = 1080, H = 1350, t = ST[last.won], gold = "#febc2e", { c, ctx } = K.canvas(W, H, [["rgba(254,188,46,0.22)", .5, 0, .7], ["rgba(124,92,255,0.25)", .5, 1, .7]]);
+  ctx.strokeStyle = gold; ctx.lineWidth = 4; K.rr(ctx, 36, 36, W - 72, H - 72, 30); ctx.stroke(); ctx.strokeStyle = "rgba(254,188,46,.35)"; ctx.lineWidth = 2; K.rr(ctx, 52, 52, W - 104, H - 104, 22); ctx.stroke();
+  K.txt(ctx, "₹ MANIMINDSMONEY", W / 2, 140, `800 34px ${K.F.GROT}`, "#fff", "center"); K.txt(ctx, "MARKET MASTERMIND · AWARD", W / 2, 210, `700 30px ${K.F.MONO}`, gold, "center");
+  K.txt(ctx, t[0], W / 2, 390, `150px ${K.F.INTER}`, "#fff", "center"); K.txt(ctx, "This award is presented to", W / 2, 470, `500 30px ${K.F.INTER}`, "#cfd3df", "center");
+  const nm = (last.name || "A Market Learner").trim(); K.txt(ctx, nm, W / 2, 560, K.fit(ctx, nm, 800, K.F.GROT, 78, 860), "#fff", "center");
+  ctx.strokeStyle = "rgba(255,255,255,.3)"; ctx.beginPath(); ctx.moveTo(220, 592); ctx.lineTo(860, 592); ctx.stroke();
+  K.txt(ctx, "for earning the title", W / 2, 650, `500 30px ${K.F.INTER}`, "#cfd3df", "center"); K.txt(ctx, t[1], W / 2, 740, K.fit(ctx, t[1], 800, K.F.GROT, 76, 900), gold, "center");
+  K.txt(ctx, `Cleared stage ${last.won + 1} of 15 · ${last.correct} correct answers`, W / 2, 810, `600 28px ${K.F.INTER}`, "#e6e9f2", "center");
+  const bw = 52, gap = 8, x0 = (W - (15 * bw + 14 * gap)) / 2; for (let i = 0; i < 15; i++) { ctx.fillStyle = i <= last.won ? (SAFE.includes(i) || i === 14 ? gold : "#22d39a") : "rgba(255,255,255,.08)"; K.rr(ctx, x0 + i * (bw + gap), 860, bw, 26, 8); ctx.fill(); }
+  K.txt(ctx, K.niceDate(last.date, { day: "numeric", month: "long", year: "numeric" }), W / 2, 980, `600 28px ${K.F.INTER}`, "#fff", "center");
+  K.txt(ctx, "— MANIMINDSMONEY Community", W / 2, 1040, `italic 500 26px ${K.F.INTER}`, "#cfd3df", "center");
+  K.txt(ctx, K.toolUrl("mastermind"), W / 2, 1200, `600 24px ${K.F.MONO}`, "#b9a6ff", "center"); K.txt(ctx, "A community learning award · not a qualification", W / 2, 1240, `500 20px ${K.F.INTER}`, "#8b93a7", "center");
+  return c; }
+/* ---------- events ---------- */
+$("#stage").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  if (b.id === "go") { S.name = ($("#nm").value || "").trim(); S.save(); newGame(); }
+  else if (b.dataset.a != null) select(+b.dataset.a);
+  else if (b.id === "lockB") { if (G.sel != null) reveal(false); }
+  else if (b.dataset.ll) lifeline(b.dataset.ll);
+  else if (b.id === "nextQ") ask();
+  else if (b.id === "quit") { if (confirm(`Quit and keep "${ST[G.i - 1][1]}"?`)) end("quit"); }
+  else if (b.id === "quit2") { end("quit"); }
+  else if (b.id === "again") newGame(); });
+$("#stage").addEventListener("input", e => { if (e.target.id === "nm") { S.name = e.target.value; S.save(); } });
+function buildText() { if (!last) return ["🏆 *Market Mastermind*: 15 stages of stock market questions, 4 lifelines, titles from 🌱 Newbie to 🏆 Mastermind.", "", "How far can you climb? 👇", ...K.signoff("mastermind", "Play", "").slice(1)].join("\n");
+  const t = last.won >= 0 ? ST[last.won] : null; return [t ? `${t[0]} *${last.name ? last.name + " is now a" : "I'm now a"} ${t[1]}!*` : "📚 *I played Market Mastermind!*", t ? `Cleared stage ${last.won + 1} of 15 in Market Mastermind (${last.correct} correct)` : `${last.correct} correct answers. I'll be back!`, "", "15 stock market questions · 4 lifelines · can you reach 🏆 Market Mastermind? 👇", ...K.signoff("mastermind", "Play", "").slice(1)].join("\n"); }
+K.share({ text: buildText, draw: () => last && last.won >= 0 ? certCanvas() : (async () => { await K.loadFonts?.(); const W = 1080, H = 1080, { c, ctx } = K.canvas(W, H); K.brand(ctx); K.txt(ctx, "🏆", W / 2, 470, `200px ${K.F.INTER}`, "#fff", "center"); K.txt(ctx, "Market Mastermind", W / 2, 600, `800 70px ${K.F.GROT}`, "#febc2e", "center"); K.txt(ctx, "15 stages · 4 lifelines · how far can you climb?", W / 2, 670, `500 32px ${K.F.INTER}`, "#cfd3df", "center"); K.footer(ctx, W, H, K.toolUrl("mastermind"), "", true); return c; })(), file: () => "market-mastermind", imgLabel: "Share my award" });
+startScreen();
+window.__bank = { e: EASY.length, m: MED.length, h: HARD.length };
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
