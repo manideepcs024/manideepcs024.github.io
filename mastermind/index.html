@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#05060a" />
 <title>Market Mastermind — 15-stage stock market quiz with lifelines &amp; certificate</title>
-<meta name="description" content="Climb 15 stages of stock market questions, from easy to expert, with 4 lifelines (50:50, Ask the Community, Ask a Mentor, Swap). Win titles like Market Learner, Smart Trader and Market Mastermind, and a shareable certificate. 90-question bank, 15 picked at random every game." />
+<meta name="description" content="Climb 15 stages of stock market questions, from easy to expert, with 4 lifelines (50:50, Ask the Community, Ask a Mentor, Swap). Win titles like Market Learner, Smart Trader and Market Mastermind, and a shareable certificate. 300-question bank, 15 picked at random every game." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -87,10 +87,11 @@
     </div>
 
     <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
-    <div class="disclaimer"><b>⚠️ Note:</b> A learning game for fun. Titles and certificates are community awards, not qualifications. Tax rules mentioned are as per Union Budget 2024 and can change. Not SEBI registered; not investment advice.</div>
+    <div class="disclaimer"><b>⚠️ Note:</b> A learning game for fun. Titles and certificates are community awards, not qualifications. Tax and expiry rules mentioned are as per Union Budgets 2024–25 and SEBI changes up to 2025; they can change. Not SEBI registered; not investment advice.</div>
     <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
   </div>
 <script src="../assets/tool.js"></script>
+<script src="bank2.js"></script>
 <script>
 const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
 /* ---------- stages & titles ---------- */
@@ -194,6 +195,7 @@ const HARD = [
   ["Receivables growing much faster than sales for years can signal…", ["Very strong pricing power", "A stock split coming", "Customers not paying, or weak quality of reported revenue", "Lower tax"], 2, "Check cash flow from operations: profit without cash is a red flag."],
   ["A 'collar' strategy is…", ["Buy a call + buy a put", "Sell a call + sell a put", "Buy two puts", "Own stock + buy a put + sell a call"], 3, "The call premium pays for the put; both loss and gain are capped."],
 ];
+if (window.MM_EXTRA) { EASY.push(...MM_EXTRA.e); MED.push(...MM_EXTRA.m); HARD.push(...MM_EXTRA.h); }
 /* ---------- state ---------- */
 const S = K.store("mastermind_v1", { name: "", best: -1, games: 0, wins: 0 });
 let G = null, timerT = null;
