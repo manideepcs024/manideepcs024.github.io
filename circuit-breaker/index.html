@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>Personal Circuit Breaker — daily loss limit &amp; trade limit tracker for traders</title>
+<meta name="description" content="Set your own daily, weekly and monthly loss limits, max trades per day and max losing streak. Log trades in one tap; when a limit is hit, the circuit breaker trips and tells you to stop for the day. Overrides need a reason and are tracked. See your discipline streak, monthly report, and test your limits on your real tradebook." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #ff5470; }
+  .wrap { max-width: 1100px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
+  .status { border-radius: 28px; padding: 22px; border: 2px solid rgba(34,211,154,.55); background: radial-gradient(circle at 50% -20%, rgba(34,211,154,.3), transparent 60%), #0b1512; transition: background .4s, border-color .4s; }
+  .status.warn { border-color: rgba(254,188,46,.6); background: radial-gradient(circle at 50% -20%, rgba(254,188,46,.28), transparent 60%), #17130a; }
+  .status.trip { border-color: #ff5470; background: radial-gradient(circle at 50% -20%, rgba(255,84,112,.45), transparent 60%), #1a0a0e; animation: throb 2.4s ease-in-out infinite; }
+  .status.over { border-color: #ff8a3d; background: radial-gradient(circle at 50% -20%, rgba(255,138,61,.35), transparent 60%), #1a0f08; }
+  @keyframes throb { 50% { box-shadow: 0 0 0 6px rgba(255,84,112,.18); } }
+  .st-top { display: flex; align-items: center; gap: 14px; }
+  .light { width: 66px; height: 66px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 2rem; background: rgba(0,0,0,.35); border: 2px solid rgba(255,255,255,.12); }
+  .st-top h2 { font: 800 1.6rem "Space Grotesk"; line-height: 1.1; } .st-top p { color: #cfd3df; font-size: .9rem; margin-top: 4px; line-height: 1.45; }
+  .big2 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+  .big2 div { border-radius: 16px; padding: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); }
+  .big2 span { display: block; font: 600 .6rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); } .big2 b { font: 800 1.35rem "Space Grotesk"; }
+  .meters { display: grid; gap: 9px; margin-top: 16px; }
+  .meter { display: grid; grid-template-columns: 128px minmax(0, 1fr) 116px; gap: 10px; align-items: center; font-size: .84rem; color: #dfe3ee; }
+  .meter .tr { height: 12px; border-radius: 99px; background: rgba(255,255,255,.07); overflow: hidden; } .meter .tr i { display: block; height: 100%; border-radius: 99px; transition: width .4s; }
+  .meter b { font: 700 .78rem "JetBrains Mono"; text-align: right; white-space: nowrap; }
+  .cool { margin-top: 16px; padding: 16px; border-radius: 18px; background: rgba(0,0,0,.35); text-align: center; }
+  .cool .t { font: 800 2.2rem "JetBrains Mono"; color: #ffb3c0; letter-spacing: .04em; } .cool small { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; }
+  .evid { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(255,84,112,.1); border: 1px solid rgba(255,84,112,.35); font-size: .88rem; color: #ffd6dd; line-height: 1.5; }
+  .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .acts .btn { padding: 12px 16px; }
+  .good { background: linear-gradient(100deg, #22d39a, #00e0b8) !important; color: #032018 !important; border: 0 !important; font-weight: 800 !important; }
+  .pn { border-radius: 22px; border: 1px solid var(--line); background: var(--card); padding: 16px; }
+  .pn h3 { font: 800 1.1rem "Space Grotesk"; margin-bottom: 10px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .pn h3 small { font: 500 .76rem Inter; color: var(--muted); }
+  .logf { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .logf .w { grid-column: 1 / -1; }
+  .wl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .wl button { border: 0; border-radius: 16px; padding: 15px; font: 800 1.05rem "Space Grotesk"; cursor: pointer; }
+  .wl .w1 { background: #22d39a; color: #032018; } .wl .l1 { background: #ff5470; color: #fff; }
+  .wl button:disabled { opacity: .3; cursor: not-allowed; }
+  .tl { display: grid; gap: 5px; margin-top: 12px; max-height: 260px; overflow: auto; }
+  .tl div { display: grid; grid-template-columns: 26px 54px minmax(0, 1fr) auto 26px; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); font-size: .84rem; }
+  .tl small { color: var(--muted); font: 600 .72rem "JetBrains Mono"; } .tl b { font: 700 .86rem "JetBrains Mono"; }
+  .tl button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: .9rem; }
+  .lim { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .presets { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+  .presets button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #dfe3ee; padding: 7px 11px; border-radius: 999px; font: 600 .78rem Inter; cursor: pointer; }
+  .sec2 { margin-top: 24px; } .sec2 > h2 { font: 800 1.35rem "Space Grotesk"; margin-bottom: 4px; } .sec2 > p.l { color: var(--muted); font-size: .88rem; margin-bottom: 12px; line-height: 1.5; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; max-width: 720px; }
+  .cal .h { font: 700 .62rem "JetBrains Mono"; color: var(--muted); text-align: center; }
+  .cal .d { aspect-ratio: 1.35; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.02); padding: 5px 6px; font-size: .7rem; color: var(--muted); display: flex; flex-direction: column; justify-content: space-between; }
+  .cal .d b { font: 700 .72rem "JetBrains Mono"; color: #fff; text-align: right; } .cal .d.g { background: rgba(34,211,154,.15); border-color: rgba(34,211,154,.4); } .cal .d.r { background: rgba(255,84,112,.14); border-color: rgba(255,84,112,.4); } .cal .d.today { box-shadow: 0 0 0 2px #fff; }
+  .cal .d .ic { font-size: .78rem; }
+  .rep { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .rep div { border-radius: 14px; padding: 11px 12px; background: var(--card); border: 1px solid var(--line); font-size: .78rem; color: var(--muted); }
+  .rep b { display: block; font: 800 1.25rem "Space Grotesk"; color: #fff; margin-top: 2px; }
+  .ins { margin-top: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); font-size: .9rem; color: #dfe3ee; line-height: 1.55; }
+  .bt { border-radius: 20px; padding: 16px; border: 1px solid rgba(124,92,255,.45); background: linear-gradient(135deg, rgba(124,92,255,.1), rgba(0,224,184,.05)); }
+  .bt .rows { display: grid; gap: 6px; margin-top: 10px; }
+  .bt .rows div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 9px 12px; border-radius: 12px; background: rgba(0,0,0,.25); font-size: .88rem; color: #dfe3ee; }
+  .bt .rows b { font: 700 .9rem "JetBrains Mono"; }
+  .modal2 { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; place-items: center; z-index: 60; padding: 16px; } .modal2.on { display: grid; }
+  .modal2 .box { width: min(460px, 100%); border-radius: 22px; padding: 20px; background: #11131d; border: 1px solid rgba(255,138,61,.5); }
+  .modal2 textarea { width: 100%; min-height: 90px; margin-top: 10px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .rep { grid-template-columns: 1fr 1fr; } .meter { grid-template-columns: 104px minmax(0, 1fr) 104px; font-size: .78rem; } .lim { grid-template-columns: 1fr 1fr; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../trade-reports/">📊 Trade Reports</a><a href="../bounce-back/">💙 Recovery Room</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>Personal <span class="grad">Circuit Breaker.</span></h1>
+    <p class="sub">Exchanges halt trading when markets fall too fast. This does the same for <b>you</b>. Set your limits once, log each trade in one tap, and when a limit is hit it <b>trips</b>: done for the day. Most disaster days start with "just one more trade".</p>
+
+    <div class="grid">
+      <section class="status" id="status"></section>
+      <div style="display:grid;gap:14px">
+        <section class="pn" id="logPn">
+          <h3>⚡ Log a trade <small id="todayLbl"></small></h3>
+          <div class="logf"><label class="field sm"><input id="amt" type="text" inputmode="decimal" placeholder="Amount ₹ (e.g. 1,250)" /></label><label class="field sm"><input id="note" type="text" maxlength="40" placeholder="Stock / note (optional)" /></label></div>
+          <div class="wl"><button class="w1" id="winB">✅ Profit</button><button class="l1" id="lossB">❌ Loss</button></div>
+          <div class="tl" id="tl"></div>
+        </section>
+        <section class="pn">
+          <h3>🎚️ My limits <small>saved on this phone</small></h3>
+          <div class="q" style="font-size:.74rem">Trading capital ₹ <span class="opt">optional: for % presets</span></div>
+          <label class="field sm"><input id="cap" type="text" inputmode="decimal" placeholder="e.g. 5,00,000" /></label>
+          <div class="presets" id="presets"><button data-p="safe">🛡️ Conservative</button><button data-p="std">⚖️ Standard</button><button data-p="act">⚡ Active intraday</button></div>
+          <div class="lim" id="lim"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="sec2">
+      <h2>📅 This month</h2>
+      <p class="l">Green = profit day, red = loss day. ⚡ = breaker tripped and you stopped. 🔓 = you overrode it.</p>
+      <div class="cal" id="cal"></div>
+      <div class="rep" id="rep"></div>
+      <div class="ins" id="ins"></div>
+    </section>
+
+    <section class="sec2" id="btSec">
+      <h2>🧪 Test your limits on your real trades</h2>
+      <p class="l">Uses the tradebook you loaded in <a href="../trade-reports/" style="color:var(--acc)">Trade Reports</a> (trades grouped by exit time each day). It shows what your daily loss limit and max-trades rule would have done.</p>
+      <div class="bt" id="bt"></div>
+    </section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Note:</b> This is a self-discipline tool: it can't block your broker app. Data stays on this phone (use Backup to keep it safe). Cool-down counts to the next weekday 9:15 AM IST and doesn't know market holidays. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+
+  <div class="modal2" id="ovModal"><div class="box"><h3 style="font:800 1.2rem 'Space Grotesk'">🔓 Override the circuit breaker?</h3><p style="color:#cfd3df;font-size:.9rem;margin-top:6px;line-height:1.5" id="ovTxt"></p><textarea id="ovWhy" maxlength="200" placeholder="Why is this next trade different? (at least 15 characters)"></textarea><div class="acts"><button class="btn good" id="ovCancel">💪 Never mind, I'll stop</button><button class="btn" id="ovGo" style="border-color:rgba(255,138,61,.6)">Override anyway</button></div></div></div>
+
+<script src="../assets/tool.js"></script>
+<script src="../assets/tradekit.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const S = K.store("breaker_v1", { cap: "", lim: { day: "5,000", week: "12,000", month: "30,000", trades: "5", streak: "3" }, trades: [], ov: [], stops: [], best: 0 });
+const num = v => K.num(v), fmt = v => (v < 0 ? "−" : "") + "₹" + Math.round(Math.abs(v)).toLocaleString("en-IN"), sfmt = v => (v > 0 ? "+" : "") + fmt(v);
+const today = () => K.iso(K.istNow());
+const LIM = () => ({ day: num(S.lim.day) || 0, week: num(S.lim.week) || 0, month: num(S.lim.month) || 0, trades: Math.round(num(S.lim.trades)) || 0, streak: Math.round(num(S.lim.streak)) || 0 });
+function weekStart(d) { const x = K.parseISO(d), wd = (x.getDay() + 6) % 7; x.setDate(x.getDate() - wd); return K.iso(x); }
+/* ---------- state ---------- */
+function calc() { const d = today(), L = LIM(), T = S.trades.filter(t => t.d === d), ws = weekStart(d), ms = d.slice(0, 7);
+  const dayP = T.reduce((a, t) => a + t.p, 0), weekP = S.trades.filter(t => t.d >= ws && t.d <= d).reduce((a, t) => a + t.p, 0), monthP = S.trades.filter(t => t.d.startsWith(ms)).reduce((a, t) => a + t.p, 0);
+  let streak = 0; for (let i = T.length - 1; i >= 0 && T[i].p < 0; i--) streak++;
+  const br = []; if (L.day && dayP <= -L.day) br.push(["day", `Daily loss limit hit: ${fmt(dayP)} of −${fmt(L.day).slice(1)}`]); if (L.trades && T.length >= L.trades) br.push(["trades", `Max ${L.trades} trades for today reached`]); if (L.streak && streak >= L.streak) br.push(["streak", `${streak} losing trades in a row`]);
+  if (L.week && weekP <= -L.week) br.push(["week", `Weekly loss limit hit: ${fmt(weekP)}`]); if (L.month && monthP <= -L.month) br.push(["month", `Monthly loss limit hit: ${fmt(monthP)}`]);
+  const ovToday = S.ov.filter(o => o.d === d), open = br.filter(b => !ovToday.some(o => o.k === b[0] && o.n >= T.length)), stopped = S.stops.includes(d);
+  return { d, L, T, dayP, weekP, monthP, streak, br, open, ovToday, stopped, ws, ms }; }
+function nextOpen(kind) { const n = K.istNow(), t = new Date(n); t.setHours(9, 15, 0, 0);
+  if (kind === "month") { t.setMonth(t.getMonth() + 1, 1); } else if (kind === "week") { t.setDate(t.getDate() + ((8 - t.getDay()) % 7 || 7)); } else t.setDate(t.getDate() + 1);
+  while (t.getDay() === 0 || t.getDay() === 6) t.setDate(t.getDate() + 1); return t; }
+/* ---------- status ---------- */
+let coolT = null;
+function drawStatus() { const c = calc(), L = c.L, el = $("#status"); clearInterval(coolT);
+  const meter = (lab, used, lim, unit) => { const f = lim ? Math.min(1, Math.max(0, used / lim)) : 0, col = f >= 1 ? "#ff5470" : f >= .7 ? "#febc2e" : "#22d39a"; return `<div class="meter"><span>${lab}</span><span class="tr"><i style="width:${f * 100}%;background:${col}"></i></span><b>${lim ? (unit === "₹" ? `${fmt(Math.max(0, used))} / ${fmt(lim)}` : `${used} / ${lim}`) : "no limit"}</b></div>`; };
+  const meters = `<div class="meters">${meter("Today's loss", -c.dayP, L.day, "₹")}${meter("Trades today", c.T.length, L.trades)}${meter("Losses in a row", c.streak, L.streak)}${meter("This week's loss", -c.weekP, L.week, "₹")}${meter("This month's loss", -c.monthP, L.month, "₹")}</div>`;
+  const nums = `<div class="big2"><div><span>TODAY</span><b class="${c.dayP > 0 ? "up" : c.dayP < 0 ? "down" : ""}">${sfmt(c.dayP)}</b></div><div><span>THIS WEEK</span><b class="${c.weekP > 0 ? "up" : c.weekP < 0 ? "down" : ""}">${sfmt(c.weekP)}</b></div><div><span>THIS MONTH</span><b class="${c.monthP > 0 ? "up" : c.monthP < 0 ? "down" : ""}">${sfmt(c.monthP)}</b></div></div>`;
+  const locked = c.open.length > 0;
+  if (locked) { const kind = c.open.some(b => b[0] === "month") ? "month" : c.open.some(b => b[0] === "week") ? "week" : "day", until = nextOpen(kind);
+    el.className = "status trip";
+    el.innerHTML = `<div class="st-top"><div class="light">🛑</div><div><h2>CIRCUIT BREAKER TRIPPED</h2><p>${c.open.map(b => esc(b[1])).join("<br>")}</p></div></div>${nums}
+      <div class="cool"><div style="font:700 .7rem 'JetBrains Mono';color:var(--muted);letter-spacing:.08em">${kind === "day" ? "DONE FOR TODAY · NEXT SESSION IN" : kind === "week" ? "DONE FOR THIS WEEK · BACK IN" : "DONE FOR THIS MONTH · BACK IN"}</div><div class="t" id="cd"></div><small>${until.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}, 9:15 AM</small></div>
+      <div class="evid">${evidence(c)}</div>
+      <div class="acts">${c.stopped ? `<span style="color:#9ff3d5;font-weight:700;padding:10px 0">✅ You chose to stop today. That's what pros do.</span>` : `<button class="btn good" id="stopB">💪 I'm done for today</button>`}<button class="btn" id="ovB">🔓 Override…</button></div>${meters}`;
+    const tick = () => { const ms = until - K.istNow(); if (ms <= 0) { drawAll(); return; } const h = Math.floor(ms / 36e5), m = Math.floor(ms % 36e5 / 6e4), s = Math.floor(ms % 6e4 / 1e3); const e = $("#cd"); if (e) e.textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`; };
+    tick(); coolT = setInterval(tick, 1000); }
+  else if (c.ovToday.length) { el.className = "status over"; el.innerHTML = `<div class="st-top"><div class="light">🔓</div><div><h2>Trading on an override</h2><p>You overrode your rules today: "${esc(c.ovToday[c.ovToday.length - 1].why)}". Keep size small. The breaker will trip again on the next limit.</p></div></div>${nums}${meters}`; }
+  else { const near = (L.day && -c.dayP >= .7 * L.day) || (L.trades && c.T.length >= L.trades - 1 && c.T.length) || (L.streak && c.streak >= L.streak - 1 && c.streak);
+    el.className = "status" + (near ? " warn" : "");
+    el.innerHTML = `<div class="st-top"><div class="light">${near ? "🟡" : "🟢"}</div><div><h2>${near ? "Careful: close to a limit" : "Clear to trade"}</h2><p>${near ? "One more loss could trip the breaker. Only take an A+ setup, or call it a day." : c.T.length ? "You're within all your limits. Stick to your plan." : "No trades logged today. Log each one right after you exit."}</p></div></div>${nums}${meters}`; }
+  const ok = !locked; $("#winB").disabled = $("#lossB").disabled = !ok; $("#amt").disabled = !ok; $("#todayLbl").textContent = K.niceDate(c.d, { weekday: "short", day: "numeric", month: "short" }); }
+function evidence(c) { const past = S.ov.filter(o => o.d !== c.d && o.p0 != null), withEnd = past.map(o => ({ ...o, end: S.trades.filter(t => t.d === o.d).reduce((a, t) => a + t.p, 0) })).filter(o => o.end < o.p0);
+  if (withEnd.length) { const o = withEnd[withEnd.length - 1]; return `🧠 <b>Remember ${K.niceDate(o.d, { day: "numeric", month: "short" })}:</b> you overrode at ${fmt(o.p0)} and the day ended at <b>${fmt(o.end)}</b>. Trading on after the limit cost you another ${fmt(o.end - o.p0).replace("−", "")}.`; }
+  const st = S.stops.length; return st ? `💪 You've respected the breaker on <b>${st} day${st > 1 ? "s" : ""}</b>. Every one of them protected your capital for the next good setup.` : `🧠 The trade right after hitting a limit is usually the most emotional one: revenge, bigger size, worse setups. Close the app and come back fresh.`; }
+/* ---------- logging ---------- */
+function log(sign) { const a = num($("#amt").value); if (!(a >= 0) || $("#amt").value.trim() === "") { K.toast("Enter the amount first"); K.shake?.($("#amt")); return; }
+  const n = K.istNow(); S.trades.push({ d: today(), t: n.toTimeString().slice(0, 5), p: sign * a, n: ($("#note").value || "").trim() }); S.trades = S.trades.slice(-3000); S.save();
+  $("#amt").value = ""; $("#note").value = ""; const before = calc(); drawAll(); if (before.open.length) { K.toast("🛑 Circuit breaker tripped!"); if (navigator.vibrate) navigator.vibrate([200, 100, 200]); $("#status").scrollIntoView({ behavior: "smooth", block: "start" }); } else K.toast(sign > 0 ? "Profit logged ✅" : "Loss logged"); }
+$("#winB").onclick = () => log(1); $("#lossB").onclick = () => log(-1);
+$("#amt").addEventListener("input", e => K.fmtNum(e.target, 2));
+function drawLog() { const d = today(), T = S.trades.map((t, i) => ({ ...t, i })).filter(t => t.d === d);
+  $("#tl").innerHTML = T.length ? T.slice().reverse().map((t, k) => `<div><span>${t.p > 0 ? "✅" : t.p < 0 ? "❌" : "➖"}</span><small>${t.t}</small><span>${esc(t.n || "Trade " + (T.length - k))}</span><b class="${t.p > 0 ? "up" : t.p < 0 ? "down" : ""}">${sfmt(t.p)}</b><button data-del="${t.i}" title="Delete">✕</button></div>`).join("") : `<div style="grid-template-columns:1fr;color:var(--muted)">No trades logged today.</div>`; }
+$("#tl").addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (!b) return; if (!confirm("Delete this trade entry?")) return; S.trades.splice(+b.dataset.del, 1); S.save(); drawAll(); });
+/* ---------- stop / override ---------- */
+$("#status").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  if (b.id === "stopB") { const d = today(); if (!S.stops.includes(d)) S.stops.push(d); S.save(); drawAll(); K.toast("💪 Respect. See you next session."); }
+  if (b.id === "ovB") { const c = calc(); $("#ovTxt").innerHTML = `You set these rules when you were calm. Right now: <b>${c.open.map(x => esc(x[1])).join("; ")}</b>. If you override, it's recorded and shown in your monthly report.`; $("#ovWhy").value = ""; $("#ovModal").classList.add("on"); $("#ovWhy").focus(); } });
+$("#ovCancel").onclick = () => { $("#ovModal").classList.remove("on"); const d = today(); if (!S.stops.includes(d)) S.stops.push(d); S.save(); drawAll(); K.toast("💪 Good call."); };
+$("#ovGo").onclick = () => { const why = $("#ovWhy").value.trim(); if (why.length < 15) { K.toast("Write a real reason (15+ characters)"); K.shake?.($("#ovWhy")); return; } const c = calc();
+  c.open.forEach(b => S.ov.push({ d: c.d, k: b[0], why, n: c.T.length, p0: c.dayP })); S.stops = S.stops.filter(x => x !== c.d); S.save(); $("#ovModal").classList.remove("on"); drawAll(); };
+$("#ovModal").addEventListener("click", e => { if (e.target.id === "ovModal") $("#ovModal").classList.remove("on"); });
+/* ---------- limits ---------- */
+const LF = [["day", "Max loss / day ₹"], ["week", "Max loss / week ₹"], ["month", "Max loss / month ₹"], ["trades", "Max trades / day"], ["streak", "Max losses in a row"]];
+function drawLim() { $("#lim").innerHTML = LF.map(([k, l]) => `<div><div class="q" style="font-size:.7rem">${l}</div><label class="field sm"><input data-l="${k}" type="text" inputmode="decimal" value="${esc(S.lim[k] || "")}" placeholder="off" /></label></div>`).join(""); $("#cap").value = S.cap; }
+$("#lim").addEventListener("input", e => { const k = e.target.dataset.l; if (!k) return; K.fmtNum(e.target, 0); S.lim[k] = e.target.value; S.save(); drawStatus(); drawBt(); });
+$("#cap").addEventListener("input", e => { K.fmtNum(e.target, 0); S.cap = e.target.value; S.save(); });
+$("#presets").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (!b) return; const cap = num(S.cap); if (!(cap > 0)) { K.toast("Enter your trading capital first"); K.shake?.($("#cap")); return; }
+  const P = { safe: [.01, .025, .06, 3, 2], std: [.015, .035, .08, 5, 3], act: [.02, .05, .1, 8, 3] }[b.dataset.p], r = v => Math.round(v / 100) * 100;
+  S.lim = { day: r(cap * P[0]).toLocaleString("en-IN"), week: r(cap * P[1]).toLocaleString("en-IN"), month: r(cap * P[2]).toLocaleString("en-IN"), trades: String(P[3]), streak: String(P[4]) }; S.save(); drawLim(); drawAll(); K.toast("Limits set"); });
+/* ---------- month calendar & report ---------- */
+function drawMonth() { const d = today(), ms = d.slice(0, 7), first = K.parseISO(ms + "-01"), days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate(), off = (first.getDay() + 6) % 7;
+  const byDay = {}; S.trades.filter(t => t.d.startsWith(ms)).forEach(t => byDay[t.d] = (byDay[t.d] || 0) + t.p);
+  let h = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(x => `<div class="h">${x}</div>`).join("") + "<div></div>".repeat(off);
+  for (let i = 1; i <= days; i++) { const ds = `${ms}-${String(i).padStart(2, "0")}`, p = byDay[ds], ov = S.ov.some(o => o.d === ds), st = S.stops.includes(ds);
+    h += `<div class="d ${p > 0 ? "g" : p < 0 ? "r" : ""} ${ds === d ? "today" : ""}"><span>${i} <span class="ic">${ov ? "🔓" : st ? "⚡" : ""}</span></span><b>${p != null ? (Math.abs(p) >= 1000 ? (p / 1000).toFixed(1) + "k" : Math.round(p)) : ""}</b></div>`; }
+  $("#cal").innerHTML = h;
+  const tdays = Object.keys(byDay), ovDays = [...new Set(S.ov.filter(o => o.d.startsWith(ms)).map(o => o.d))], stopDays = S.stops.filter(x => x.startsWith(ms) && !ovDays.includes(x)), pOv = ovDays.reduce((a, x) => a + (byDay[x] || 0), 0), streak = discStreak();
+  if (streak > (S.best || 0)) { S.best = streak; S.save(); }
+  $("#rep").innerHTML = `<div>Trading days<b>${tdays.length}</b></div><div>⚡ Stopped on time<b>${stopDays.length}</b></div><div>🔓 Overrides<b style="color:${ovDays.length ? "#ff8a3d" : "#fff"}">${ovDays.length}</b></div><div>🔥 Discipline streak<b>${streak} day${streak === 1 ? "" : "s"}</b></div>`;
+  const ovLoss = S.ov.filter(o => o.p0 != null).map(o => ({ ...o, end: S.trades.filter(t => t.d === o.d).reduce((a, t) => a + t.p, 0) })), after = [...new Map(ovLoss.map(o => [o.d, o])).values()].reduce((a, o) => a + (o.end - o.p0), 0);
+  $("#ins").innerHTML = !tdays.length ? "📝 Log your trades each day and this report fills in automatically." : ovDays.length ? `🔓 On your <b>${ovDays.length}</b> override day${ovDays.length > 1 ? "s" : ""} this month you made <b class="${pOv >= 0 ? "up" : "down"}">${sfmt(pOv)}</b>. Trades taken after overriding added up to <b class="${after >= 0 ? "up" : "down"}">${sfmt(after)}</b> in total.${after < 0 ? " That's the cost of breaking your rules." : ""}` : `✅ No overrides this month. ${stopDays.length ? `You stopped on time ${stopDays.length} time${stopDays.length > 1 ? "s" : ""}: that's exactly how small losses stay small.` : "Keep it up."}`; }
+function discStreak() { const days = [...new Set(S.trades.map(t => t.d))].sort().reverse(); let n = 0; for (const d of days) { if (S.ov.some(o => o.d === d)) break; n++; } return n; }
+/* ---------- backtest on Trade Reports data ---------- */
+function drawBt() { let D = null; try { D = JSON.parse(localStorage.getItem("tradereports_v1") || "{}").data; } catch {}
+  if (!D || !D.ex?.length || !window.TK) { $("#bt").innerHTML = `<div style="color:#cfd3df;font-size:.9rem">No tradebook loaded yet. Upload your Zerodha tradebook in <a href="../trade-reports/" style="color:var(--acc)">Trade Reports</a> (with "Remember on this device" on), then come back here.</div>`; return; }
+  const L = LIM(), cyc = TK.analyze(D.ex).cyc.slice().sort((a, b) => a.c < b.c ? -1 : 1), byDay = {}; cyc.forEach(t => (byDay[t.cd] = byDay[t.cd] || []).push(t));
+  let blocked = 0, blockedP = 0, daysHit = 0, worstDay = 0, worstLimited = 0;
+  Object.values(byDay).forEach(T => { let run = 0, cnt = 0, streak = 0, stop = false, total = 0, limited = 0;
+    T.forEach(t => { total += t.pnl; if (stop) { blocked++; blockedP += t.pnl; return; } run += t.pnl; limited += t.pnl; cnt++; streak = t.pnl < 0 ? streak + 1 : 0; if ((L.day && run <= -L.day) || (L.trades && cnt >= L.trades) || (L.streak && streak >= L.streak)) { stop = true; daysHit++; } });
+    worstDay = Math.min(worstDay, total); worstLimited = Math.min(worstLimited, limited); });
+  const days = Object.keys(byDay).length;
+  $("#bt").innerHTML = `<div style="font-size:.9rem;color:#cfd3df">Checked <b>${cyc.length} trades</b> over <b>${days} days</b> from your tradebook (${D.demo ? "demo data" : "your data"}) with today's limits.</div>
+    <div class="rows"><div><span>Days the breaker would have tripped</span><b>${daysHit}</b></div><div><span>Trades it would have stopped</span><b>${blocked}</b></div><div><span>P&amp;L of those trades</span><b class="${blockedP >= 0 ? "up" : "down"}">${sfmt(blockedP)}</b></div><div><span>Worst day: actual vs with the breaker</span><b>${fmt(worstDay)} → ${fmt(worstLimited)}</b></div></div>
+    <div class="ins" style="margin-top:10px">${!blocked ? "✅ Your trading already stayed within these limits on every day. They'd act as a safety net for bad days." : blockedP < 0 ? `🛡️ These limits would have <b>saved you ${fmt(-blockedP).replace("−", "")}</b> by stopping ${blocked} trades on bad days.` : `📈 The trades after your limits were actually net <b>${sfmt(blockedP)}</b>. Your limits may be a little tight for your style: try a slightly wider daily limit or more trades per day, but keep a limit.`}</div>`; }
+/* ---------- all ---------- */
+function drawAll() { drawStatus(); drawLog(); drawMonth(); }
+/* ---------- share ---------- */
+function buildText() { const c = calc(), streak = discStreak(); return [`🚦 *My Personal Circuit Breaker*`, "", `🔥 Discipline streak: *${streak} trading day${streak === 1 ? "" : "s"}* without breaking my rules`, `🎚️ My rules: max loss ${c.L.day ? fmt(c.L.day) : "—"}/day · max ${c.L.trades || "—"} trades/day · stop after ${c.L.streak || "—"} losses in a row`, `⚡ Days I stopped on time this month: ${S.stops.filter(x => x.startsWith(c.ms)).length}`, "", "When the limit hits, I'm done for the day. Set your own 👇", ...K.signoff("circuit-breaker", "Circuit Breaker", "").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const c = calc(), streak = discStreak(), Wd = 1080, H = 1350, { c: cv, ctx } = K.canvas(Wd, H, [["rgba(34,211,154,0.25)", .9, .05, .6], ["rgba(255,84,112,0.18)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "PERSONAL CIRCUIT BREAKER", 70, 186, `700 26px ${K.F.MONO}`, "#22d39a"); K.txt(ctx, "I trade with a kill switch.", 70, 252, `800 56px ${K.F.GROT}`, "#fff");
+  K.panel(ctx, 70, 300, 940, 300, 30, "rgba(34,211,154,0.10)", "rgba(34,211,154,0.45)"); K.txt(ctx, "🔥", 170, 500, `150px ${K.F.INTER}`, "#fff", "center"); K.txt(ctx, String(streak), 300, 470, `800 160px ${K.F.GROT}`, "#22d39a"); K.txt(ctx, "trading days in a row", 310, 530, `600 34px ${K.F.INTER}`, "#e6e9f2"); K.txt(ctx, "without breaking my rules", 310, 574, `600 30px ${K.F.INTER}`, "#9ff3d5");
+  const rules = [["🛑", "Max loss per day", c.L.day ? fmt(c.L.day) : "—"], ["🔢", "Max trades per day", c.L.trades ? String(c.L.trades) : "—"], ["📉", "Stop after losses in a row", c.L.streak ? String(c.L.streak) : "—"], ["📅", "Max loss per week", c.L.week ? fmt(c.L.week) : "—"]];
+  rules.forEach(([e, a, b], i) => { const y = 640 + i * 118; K.panel(ctx, 70, y, 940, 100, 22); K.txt(ctx, e, 110, y + 66, `46px ${K.F.INTER}`, "#fff"); K.txt(ctx, a, 190, y + 62, `600 32px ${K.F.INTER}`, "#e6e9f2"); K.txt(ctx, b, 980, y + 64, `800 40px ${K.F.GROT}`, "#fff", "right"); });
+  K.txt(ctx, "When the limit hits, I'm done for the day.", Wd / 2, 1160, `700 32px ${K.F.INTER}`, "#ffb3c0", "center");
+  K.footer(ctx, Wd, H, K.toolUrl("circuit-breaker"), "Discipline > prediction · Not investment advice", true); return cv; }
+K.share({ text: buildText, draw: drawImg, file: () => "my-circuit-breaker", imgLabel: "Share my discipline card" });
+drawLim(); drawAll(); drawBt();
+setInterval(() => { if (today() !== drawAll._d) { drawAll._d = today(); drawAll(); } }, 60000); drawAll._d = today();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
