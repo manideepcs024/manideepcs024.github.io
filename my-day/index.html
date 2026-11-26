@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>My Trading Day — a daily routine for disciplined traders</title>
+<meta name="description" content="One screen for your whole trading day: a pre-market fitness check, checklist and limits before 9:15, one-tap trade logging during the session, the close card and journal after 3:30, and weekend reviews. Tick off your routine, build a streak and see your discipline at a glance." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="MANIMINDSMONEY" />
+<meta property="og:locale" content="en_IN" />
+<meta property="og:title" content="My Trading Day — a daily routine for disciplined traders" />
+<meta property="og:description" content="One screen for your whole trading day: a pre-market fitness check, checklist and limits before 9:15, one-tap trade logging during the session, the close card and journal after 3:30, and weekend…" />
+<meta property="og:url" content="https://manideepcs024.github.io/my-day/" />
+<meta property="og:image" content="https://manideepcs024.github.io/assets/og/my-day.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="My Trading Day — a daily routine for disciplined traders" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://manideepcs024.github.io/my-day/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #00e0b8; --acc2: #7c5cff; }
+  .wrap { max-width: 1100px; }
+  .hero5 { margin-top: 16px; display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 20px; align-items: center; border-radius: 26px; padding: 20px; border: 1px solid rgba(0,224,184,.4); background: radial-gradient(circle at 90% 0%, rgba(124,92,255,.25), transparent 55%), linear-gradient(135deg, rgba(0,224,184,.1), rgba(0,0,0,.2)); }
+  .ring { width: 150px; height: 150px; position: relative; } .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring div { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; } .ring b { font: 800 2.2rem "Space Grotesk"; display: block; line-height: 1; } .ring small { font: 600 .62rem "JetBrains Mono"; color: var(--muted); letter-spacing: .05em; }
+  .hero5 h2 { font: 800 1.5rem "Space Grotesk"; } .hero5 .sub2 { color: #cfd3df; font-size: .92rem; margin-top: 4px; line-height: 1.5; }
+  .streaks { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .streaks span { padding: 8px 12px; border-radius: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); font-size: .82rem; color: #dfe3ee; }
+  .streaks b { font: 800 1rem "Space Grotesk"; color: #fff; }
+  .wid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .wid a { text-decoration: none; color: #fff; border-radius: 18px; padding: 12px 14px; border: 1px solid var(--line); background: var(--card); display: grid; gap: 3px; }
+  .wid a:hover { border-color: rgba(0,224,184,.5); }
+  .wid span { font: 600 .62rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); } .wid b { font: 800 1.12rem "Space Grotesk"; } .wid small { color: var(--muted); font-size: .76rem; }
+  .phase { margin-top: 18px; border-radius: 24px; border: 1px solid var(--line); background: var(--card); overflow: hidden; }
+  .phase.now { border-color: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent); }
+  .ph-h { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 16px; background: color-mix(in srgb, var(--c) 9%, transparent); border-bottom: 1px solid var(--line); }
+  .ph-h .ic { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 1.6rem; background: color-mix(in srgb, var(--c) 20%, transparent); }
+  .ph-h h3 { font: 800 1.15rem "Space Grotesk"; } .ph-h small { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; }
+  .ph-h .badge { font: 700 .68rem "JetBrains Mono"; padding: 6px 10px; border-radius: 99px; background: rgba(255,255,255,.06); color: #cfd3df; white-space: nowrap; }
+  .ph-h .badge.now { background: var(--c); color: #000; }
+  .tasks { display: grid; gap: 6px; padding: 12px; }
+  .task { display: grid; grid-template-columns: 34px 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+  .task.done { opacity: .62; } .task.done .t b { text-decoration: line-through; text-decoration-color: rgba(255,255,255,.35); }
+  .tick { width: 30px; height: 30px; border-radius: 9px; border: 1.5px solid var(--line); display: grid; place-items: center; background: transparent; color: #000; font-weight: 800; cursor: pointer; }
+  .tick.on { background: var(--up); border-color: var(--up); }
+  .task .em { font-size: 1.3rem; text-align: center; }
+  .task .t b { display: block; font: 700 .95rem "Space Grotesk"; } .task .t span { font-size: .8rem; color: var(--muted); }
+  .task a.go { font: 700 .74rem "JetBrains Mono"; color: var(--c); text-decoration: none; white-space: nowrap; padding: 6px 8px; }
+  .fit { margin: 0 12px 12px; border-radius: 16px; padding: 12px 14px; border: 1px dashed color-mix(in srgb, var(--c) 55%, transparent); background: color-mix(in srgb, var(--c) 5%, transparent); }
+  .fit h4 { font: 700 .95rem "Space Grotesk"; margin-bottom: 8px; }
+  .fq { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; font-size: .88rem; color: #dfe3ee; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .yn { display: flex; gap: 4px; } .yn button { border: 1px solid var(--line); background: transparent; color: #bfc4d2; border-radius: 9px; padding: 6px 11px; font: 700 .78rem Inter; cursor: pointer; }
+  .yn button.on.y { background: rgba(34,211,154,.2); border-color: var(--up); color: #fff; } .yn button.on.n { background: rgba(255,84,112,.18); border-color: var(--down); color: #fff; }
+  .verdict { margin-top: 10px; padding: 10px 12px; border-radius: 12px; font-size: .9rem; line-height: 1.5; background: rgba(0,0,0,.3); }
+  .live { margin: 0 12px 12px; padding: 12px 14px; border-radius: 16px; background: rgba(0,0,0,.3); border: 1px solid var(--line); font-size: .88rem; color: #dfe3ee; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .live b { font: 800 1.05rem "Space Grotesk"; }
+  .wk { display: flex; gap: 6px; margin-top: 12px; }
+  .wk div { flex: 1; text-align: center; border-radius: 12px; padding: 8px 2px; background: rgba(0,0,0,.25); border: 1px solid var(--line); font: 600 .66rem "JetBrains Mono"; color: var(--muted); }
+  .wk div b { display: block; font: 800 1rem "Space Grotesk"; color: #fff; margin-top: 2px; } .wk div.full { border-color: rgba(34,211,154,.6); background: rgba(34,211,154,.12); } .wk div.part { border-color: rgba(254,188,46,.5); } .wk div.today { box-shadow: 0 0 0 2px #fff; }
+  @media (max-width: 860px) { .wid { grid-template-columns: 1fr 1fr; } .hero5 { grid-template-columns: 1fr; justify-items: start; } .ring { width: 130px; height: 130px; } }
+  @media (max-width: 520px) { .task { grid-template-columns: 34px minmax(0, 1fr) auto; } .task .em { display: none; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../circuit-breaker/">🚦 Circuit Breaker</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>My <span class="grad">trading day.</span></h1>
+    <p class="sub">Your whole routine on one screen, in the order a trading day actually runs. Tick things off as you go. Good traders aren't the ones with the best predictions; they're the ones with the <b>best routine</b>.</p>
+
+    <section class="hero5">
+      <div class="ring" id="ring"></div>
+      <div><h2 id="hTitle"></h2><div class="sub2" id="hSub"></div><div class="streaks" id="streaks"></div><div class="wk" id="wk"></div></div>
+    </section>
+
+    <div class="wid" id="wid"></div>
+
+    <div id="phases"></div>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:20px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Note:</b> Your routine and ticks are saved only on this phone (use Backup to keep them). Times are Indian market hours (IST); holidays aren't detected. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const S = K.store("myday_v1", { done: {}, fit: {}, best: 0 });
+const PH = [
+  { id: "pre", ic: "🌅", c: "#febc2e", t: "Before the bell", w: "Before 9:15 AM", tasks: [["fit", "🧘", "Am I fit to trade today?", "4-question check, right here", null], ["checklist", "✅", "Pre-trade checklist", "Plan entry, stop and target before the open", "checklist"], ["levels", "📏", "Mark today's key levels", "Pivots, support & resistance", "levels"], ["limits", "🚦", "Check my limits", "Know your max loss before you start", "circuit-breaker"]] },
+  { id: "mkt", ic: "📈", c: "#22d39a", t: "Market hours", w: "9:15 AM – 3:30 PM", tasks: [["size", "🛑", "Size every trade by risk", "Quantity from stop distance, not gut", "sl-calculator"], ["log", "⚡", "Log each trade right after exit", "One tap in the Circuit Breaker", "circuit-breaker"]] },
+  { id: "post", ic: "🔔", c: "#7c5cff", t: "After the close", w: "After 3:30 PM", tasks: [["close", "🔔", "Post the market close card", "Indices, movers, commodities, lists", "close"], ["journal", "📓", "Journal today's trades", "What worked, what didn't, and why", "journal"], ["review", "📝", "How was my day?", "Rate discipline, emotions and execution", "day-review"]] },
+  { id: "wkd", ic: "🗓️", c: "#5b8cff", t: "Weekend: sharpen the saw", w: "Saturday & Sunday", weekly: true, tasks: [["reports", "📊", "Review my trade reports", "Upload this week's tradebook", "trade-reports"], ["card", "📝", "Monthly report card", "Grade the month honestly", "report-card"], ["sltrain", "🎯", "Stop-Loss Trainer: one round", "10 charts, 5 minutes", "stop-loss-trainer"], ["replay", "🎮", "Chart Replay: one session", "Practise with ₹0 at risk", "replay"], ["learn", "🎓", "One lesson from the course", "Keep climbing the levels", "course"]] },
+];
+const DAILY = PH.filter(p => !p.weekly).flatMap(p => p.tasks.map(t => t[0]));
+const now = () => K.istNow(), todayS = () => K.iso(now());
+const isWeekend = d => [0, 6].includes(K.parseISO(d).getDay());
+function weekKey(d) { const x = K.parseISO(d), wd = (x.getDay() + 6) % 7; x.setDate(x.getDate() - wd); return "w" + K.iso(x); }
+function phaseNow() { const n = now(), dow = n.getDay(), m = n.getHours() * 60 + n.getMinutes(); if (dow === 0 || dow === 6) return "wkd"; return m < 555 ? "pre" : m <= 930 ? "mkt" : "post"; }
+const doneSet = key => S.done[key] || [];
+function isDone(task, weekly) { const k = weekly ? weekKey(todayS()) : todayS(); return doneSet(k).includes(task); }
+function toggle(task, weekly) { const k = weekly ? weekKey(todayS()) : todayS(); const a = doneSet(k); S.done[k] = a.includes(task) ? a.filter(x => x !== task) : [...a, task]; prune(); S.save(); render(); }
+function prune() { const keys = Object.keys(S.done).sort(); while (keys.length > 120) delete S.done[keys.shift()]; }
+const dayPct = d => Math.round(doneSet(d).filter(x => DAILY.includes(x)).length / DAILY.length * 100);
+function streak() { let n = 0, d = now(); if (dayPct(K.iso(d)) < 60) d.setDate(d.getDate() - 1);
+  for (let i = 0; i < 400; i++) { const s = K.iso(d); if (!isWeekend(s)) { if (dayPct(s) >= 60) n++; else break; } d.setDate(d.getDate() - 1); } return n; }
+/* ---------- fitness check ---------- */
+const FQ = [["sleep", "Did I sleep well (6+ hours)?", 1], ["calm", "Am I calm, not trying to win back yesterday?", 1], ["plan", "Do I have a written plan for today?", 1], ["life", "Is anything big stressing me (money, family, work)?", 0]];
+function fitHtml() { const f = S.fit[todayS()] || {}, ans = FQ.filter(q => f[q[0]] != null), good = FQ.filter(q => f[q[0]] === q[2]).length;
+  const v = ans.length < FQ.length ? `<span style="color:var(--muted)">Answer all four for today's verdict.</span>` : good === 4 ? `🟢 <b>Green light.</b> You're in a good state. Trade your plan, nothing more.` : good >= 3 ? `🟡 <b>Amber: trade lighter.</b> Half size and only A+ setups today.` : `🔴 <b>Red: sit out or paper trade.</b> Today the market can wait; your capital can't be replaced.`;
+  return `<div class="fit"><h4>🧘 Am I fit to trade today?</h4>${FQ.map(([k, q]) => `<div class="fq"><span>${q}</span><span class="yn"><button class="y ${f[k] === 1 ? "on" : ""}" data-fk="${k}" data-fv="1">Yes</button><button class="n ${f[k] === 0 ? "on" : ""}" data-fk="${k}" data-fv="0">No</button></span></div>`).join("")}<div class="verdict">${v}</div></div>`; }
+/* ---------- live widgets from other tools ---------- */
+const read = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } };
+const fmt = v => (v < 0 ? "−" : v > 0 ? "+" : "") + "₹" + Math.round(Math.abs(v)).toLocaleString("en-IN");
+function breaker() { const B = read("breaker_v1"); if (!B) return null; const d = todayS(), T = (B.trades || []).filter(t => t.d === d), p = T.reduce((a, t) => a + t.p, 0), lim = K.num(B.lim?.day) || 0, mt = Math.round(K.num(B.lim?.trades)) || 0;
+  let st = 0; for (let i = T.length - 1; i >= 0 && T[i].p < 0; i--) st++; const ms = Math.round(K.num(B.lim?.streak)) || 0, ov = (B.ov || []).some(o => o.d === d);
+  const trip = (lim && p <= -lim) || (mt && T.length >= mt) || (ms && st >= ms); return { p, n: T.length, lim, mt, trip, ov }; }
+function widgets() { const b = breaker(), C = read("course_v1"), MM = read("mastermind_v1"), SL = read("sltrainer_v1"), J = read("journal_v1");
+  const passed = C ? Object.values(C.best || {}).filter(v => v >= 4).length : 0, TITLES = ["Market Newbie", "Chart Curious", "Candle Spotter", "Smart Saver", "Market Learner", "Trend Tracker", "Risk Aware", "Pattern Pro", "Ratio Reader", "Smart Trader", "Strategy Builder", "Options Explorer", "Discipline Master", "Market Strategist", "Market Mastermind"];
+  $("#wid").innerHTML = `<a href="../circuit-breaker/"><span>🚦 TODAY'S P&amp;L</span><b class="${b && b.p > 0 ? "up" : b && b.p < 0 ? "down" : ""}">${b ? fmt(b.p) : "—"}</b><small>${b ? (b.trip && !b.ov ? "🛑 Breaker tripped" : `${b.n}${b.mt ? "/" + b.mt : ""} trades${b.lim ? " · limit " + fmt(-b.lim).replace("−", "−") : ""}`) : "Set up your limits"}</small></a>
+    <a href="../course/"><span>🎓 COURSE</span><b>${passed}/6 levels</b><small>${passed === 6 ? "Certificate earned 🏆" : "Keep going"}</small></a>
+    <a href="../mastermind/"><span>🏆 MASTERMIND</span><b>${MM && MM.best >= 0 ? TITLES[MM.best] : "—"}</b><small>${MM?.games ? MM.games + " games played" : "Play the quiz"}</small></a>
+    <a href="../stop-loss-trainer/"><span>🎯 STOP-LOSS SKILL</span><b>${SL?.best != null ? SL.best + "/100" : "—"}</b><small>${SL?.best != null ? "best round" : "Try a round"}</small></a>`; return b; }
+/* ---------- render ---------- */
+function render() { const d = todayS(), ph = phaseNow(), b = widgets(), pct = dayPct(d), st = streak(); if (st > (S.best || 0)) { S.best = st; S.save(); }
+  const C = 2 * Math.PI * 64; $("#ring").innerHTML = `<svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="64" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12"/><circle cx="75" cy="75" r="64" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct / 100)}"/><defs><linearGradient id="g"><stop offset="0" stop-color="#00e0b8"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs></svg><div><span><b>${pct}%</b><small>TODAY'S ROUTINE</small></span></div>`;
+  const P = PH.find(p => p.id === ph), n = now(), greet = n.getHours() < 12 ? "Good morning" : n.getHours() < 17 ? "Good afternoon" : "Good evening";
+  $("#hTitle").textContent = `${greet}! ${P.ic} ${P.t}`;
+  $("#hSub").innerHTML = ph === "wkd" ? "Markets are closed. The best traders use weekends to review and practise." : ph === "pre" ? "Get ready before the open: check yourself, plan, know your limits." : ph === "mkt" ? (b && b.trip && !b.ov ? "🛑 <b>Your circuit breaker has tripped.</b> You're done for today; well done for stopping." : "The market is open. Follow your plan and log each trade as you exit.") : "Market's closed for the day. Post, journal and review while it's fresh.";
+  $("#streaks").innerHTML = `<span>🔥 Routine streak <b>${st}</b> day${st === 1 ? "" : "s"}</span><span>🏅 Best <b>${S.best || 0}</b></span><span>📅 ${K.niceDate(d, { weekday: "long", day: "numeric", month: "short" })}</span>`;
+  const mon = K.parseISO(weekKey(d).slice(1)); $("#wk").innerHTML = ["Mon", "Tue", "Wed", "Thu", "Fri"].map((w, i) => { const x = new Date(mon); x.setDate(x.getDate() + i); const s = K.iso(x), p = dayPct(s); return `<div class="${p >= 60 ? "full" : p > 0 ? "part" : ""} ${s === d ? "today" : ""}">${w}<b>${p ? p + "%" : "·"}</b></div>`; }).join("");
+  $("#phases").innerHTML = PH.map(p => { const cur = p.id === ph, cnt = p.tasks.filter(t => isDone(t[0], p.weekly)).length;
+    return `<section class="phase ${cur ? "now" : ""}" style="--c:${p.c}"><div class="ph-h"><div class="ic">${p.ic}</div><div><h3>${p.t}</h3><small>${p.w}${p.weekly ? " · resets weekly" : ""}</small></div><span class="badge ${cur ? "now" : ""}">${cur ? "NOW · " : ""}${cnt}/${p.tasks.length}</span></div>
+      ${p.id === "pre" ? fitHtml() : ""}${p.id === "mkt" && b ? `<div class="live"><span>🚦 Circuit breaker: ${b.trip && !b.ov ? "<b style='color:#ff8da0'>TRIPPED: stop for today</b>" : b.ov ? "<b style='color:#ffb27a'>Overridden</b>" : "<b style='color:#9ff3d5'>Clear to trade</b>"}</span><span>Today <b class="${b.p > 0 ? "up" : b.p < 0 ? "down" : ""}">${fmt(b.p)}</b> · ${b.n}${b.mt ? "/" + b.mt : ""} trades</span><a class="btn" href="../circuit-breaker/" style="padding:8px 12px;text-decoration:none">⚡ Log a trade</a></div>` : ""}
+      <div class="tasks">${p.tasks.map(([k, e, t, s, href]) => { const dn = isDone(k, p.weekly); return `<div class="task ${dn ? "done" : ""}"><button class="tick ${dn ? "on" : ""}" data-t="${k}" data-w="${p.weekly ? 1 : 0}" aria-label="Done">${dn ? "✓" : ""}</button><span class="em">${e}</span><span class="t"><b>${t}</b><span>${s}</span></span>${href ? `<a class="go" href="../${href}/" data-open="${k}" data-w="${p.weekly ? 1 : 0}">Open ↗</a>` : ""}</div>`; }).join("")}</div></section>`; }).join(""); }
+$("#phases").addEventListener("click", e => { const t = e.target.closest("[data-t]"); if (t) { toggle(t.dataset.t, t.dataset.w === "1"); return; }
+  const f = e.target.closest("[data-fk]"); if (f) { const d = todayS(); S.fit[d] = { ...(S.fit[d] || {}), [f.dataset.fk]: +f.dataset.fv }; const ks = Object.keys(S.fit).sort(); while (ks.length > 60) delete S.fit[ks.shift()];
+    if (FQ.every(q => S.fit[d][q[0]] != null) && !isDone("fit", false)) { const k = d; S.done[k] = [...doneSet(k), "fit"]; } S.save(); render(); return; }
+  const o = e.target.closest("[data-open]"); if (o && !isDone(o.dataset.open, o.dataset.w === "1")) { const k = o.dataset.w === "1" ? weekKey(todayS()) : todayS(); S.done[k] = [...doneSet(k), o.dataset.open]; S.save(); } });
+addEventListener("pageshow", render); addEventListener("focus", render); setInterval(render, 60000);
+/* ---------- share ---------- */
+function buildText() { const st = streak(); return [`📅 *My trading routine*`, "", `🔥 ${st} trading day${st === 1 ? "" : "s"} in a row following my routine`, "🌅 Fitness check + plan before 9:15", "🚦 Loss limit & one-tap trade log", "📓 Journal and review after 3:30", "🗓️ Weekend review and practice", "", "Good traders have the best routine, not the best predictions. Build yours 👇", ...K.signoff("my-day", "My Trading Day", "").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const st = streak(), W = 1080, H = 1350, { c, ctx } = K.canvas(W, H, [["rgba(0,224,184,0.22)", .9, .05, .6], ["rgba(124,92,255,0.22)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "MY TRADING DAY", 70, 186, `700 26px ${K.F.MONO}`, "#00e0b8"); K.txt(ctx, "Routine beats prediction.", 70, 252, `800 56px ${K.F.GROT}`, "#fff");
+  K.panel(ctx, 70, 290, 940, 240, 30, "rgba(0,224,184,0.10)", "rgba(0,224,184,0.45)"); K.txt(ctx, "🔥", 170, 455, `130px ${K.F.INTER}`, "#fff", "center"); K.txt(ctx, String(st), 290, 450, `800 150px ${K.F.GROT}`, "#00e0b8"); K.txt(ctx, `trading day${st === 1 ? "" : "s"} in a row`, 300 + Math.max(90, String(st).length * 85), 410, `600 34px ${K.F.INTER}`, "#e6e9f2"); K.txt(ctx, "following my routine", 300 + Math.max(90, String(st).length * 85), 456, `600 30px ${K.F.INTER}`, "#9ff3d5");
+  PH.forEach((p, i) => { const y = 560 + i * 150; K.panel(ctx, 70, y, 940, 134, 24); K.txt(ctx, p.ic, 110, y + 86, `54px ${K.F.INTER}`, "#fff"); K.txt(ctx, p.t, 200, y + 58, `800 34px ${K.F.GROT}`, "#fff"); ctx.font = `500 24px ${K.F.INTER}`; K.txt(ctx, K.cap(K.wrap(ctx, p.tasks.map(t => t[2]).join(" · "), 780), 1)[0], 200, y + 100, `500 24px ${K.F.INTER}`, "#cfd3df"); });
+  K.footer(ctx, W, H, K.toolUrl("my-day"), "Discipline > prediction · Not investment advice", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "my-trading-routine", imgLabel: "Share my routine card" });
+render();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>

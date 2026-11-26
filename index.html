@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Manideep Mittal — Developer · Trader · Analyst</title>
 <meta name="description" content="Manideep Mittal — software developer at Syne, Pune. Stock market trader, investor, and lover of analysis and technical tests." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="MANIMINDSMONEY" />
+<meta property="og:locale" content="en_IN" />
+<meta property="og:title" content="Manideep Mittal — Developer · Trader · Analyst" />
+<meta property="og:description" content="Manideep Mittal — software developer at Syne, Pune. Stock market trader, investor, and lover of analysis and technical tests." />
+<meta property="og:url" content="https://manideepcs024.github.io/" />
+<meta property="og:image" content="https://manideepcs024.github.io/assets/og/home.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Manideep Mittal — Developer · Trader · Analyst" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://manideepcs024.github.io/" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -103,6 +115,7 @@
   @keyframes drip { 0%{transform:scaleY(0)} 50%{transform:scaleY(1)} 100%{transform:scaleY(1);opacity:0} }
 
   /* ---------- marquee ---------- */
+  .marquee-clip { overflow: hidden; overflow: clip; padding-block: 14px; margin-block: -14px; position: relative; z-index: 2; }
   .marquee { position: relative; z-index: 2; border-block: 1px solid var(--line); background: rgba(5,6,10,.6); backdrop-filter: blur(8px); overflow: hidden; padding: 22px 0; transform: rotate(-1.5deg) scale(1.03); }
   .marquee-track { display: flex; gap: 48px; width: max-content; animation: marq 32s linear infinite; font: 700 clamp(1.4rem, 3vw, 2.4rem) "Space Grotesk"; letter-spacing: -.02em; white-space: nowrap; }
   .marquee-track span:nth-child(even) { -webkit-text-stroke: 1px rgba(255,255,255,.4); color: transparent; }
@@ -389,8 +402,10 @@
       <div class="scroll-hint">SCROLL<i></i></div>
     </section>
 
-    <div class="marquee">
-      <div class="marquee-track" id="marquee"></div>
+    <div class="marquee-clip">
+      <div class="marquee">
+        <div class="marquee-track" id="marquee"></div>
+      </div>
     </div>
 
     <!-- ABOUT / BENTO -->
@@ -729,6 +744,7 @@
           <a class="cd-row" href="./mastermind/" style="text-decoration:none"><span>🏆 Market Mastermind: 15-stage quiz with lifelines</span><b>Play ↗</b></a>
           <a class="cd-row" href="./trader-type/" style="text-decoration:none"><span>🧠 What type of trader are you? (test)</span><b>Take ↗</b></a>
           <a class="cd-row" href="./snakes-ladders/" style="text-decoration:none"><span>🐍 Stock Market Snakes &amp; Ladders</span><b>Play ↗</b></a>
+          <a class="cd-row" href="./my-day/" style="text-decoration:none"><span>📅 My Trading Day: your daily routine (start here)</span><b>Open ↗</b></a>
           <a class="cd-row" href="./course/" style="text-decoration:none"><span>🎓 Learning path: 6 levels + certificate</span><b>Start ↗</b></a>
           <a class="cd-row" href="./stop-loss-trainer/" style="text-decoration:none"><span>🛑 Stop-Loss Trainer: where does your stop go?</span><b>Practise ↗</b></a>
           <a class="cd-row" href="./replay/" style="text-decoration:none"><span>🎮 Chart Replay: paper trade candle by candle</span><b>Play ↗</b></a>
