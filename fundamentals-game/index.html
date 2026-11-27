@@ -67,6 +67,7 @@
   .co b { display: block; font-size: .95rem; }
   .co small { display: block; color: var(--muted); font-size: .72rem; }
   .co .px { font: 800 1.35rem "JetBrains Mono"; margin: 6px 0 2px; }
+  .co .shs { margin-top: 8px; padding: 5px 8px; border-radius: 8px; background: rgba(255,255,255,.06); font: 700 .8rem "JetBrains Mono"; color: #e6e9f2; }
   .co.win { border-color: var(--up); box-shadow: 0 0 0 2px rgba(34,211,154,.3); }
   .co.lose { opacity: .6; }
   .co[disabled] { cursor: default; }
@@ -285,10 +286,10 @@ async function lab1() {
   const A = { n: "Desi Grid Power", p: 52, sh: 950 }, B = { n: "Luxe Watches", p: 4800, sh: 2.5 };
   const st = scene(`<div class="kicker">Lab 1 of 5 · Market capitalisation</div>
     <h2>Which company is BIGGER?</h2>
-    <p class="story">Two stocks on your screen. Tap the one you think is the <b>bigger company</b>.</p>
+    <p class="story">Two stocks on your screen. Use <b>share price × total shares</b> to work out each company's <b>market cap</b>, then tap the <b>bigger company</b>.</p>
     <div class="duo" id="pick">
-      <button class="co" data-v="A"><b>${A.n}</b><small>Power utility</small><div class="px">₹${A.p}</div><small>per share</small></button>
-      <button class="co" data-v="B"><b>${B.n}</b><small>Luxury retail</small><div class="px">₹${B.p.toLocaleString("en-IN")}</div><small>per share</small></button>
+      <button class="co" data-v="A"><b>${A.n}</b><small>Power utility</small><div class="px">₹${A.p}</div><small>per share</small><div class="shs">${A.sh} crore shares</div></button>
+      <button class="co" data-v="B"><b>${B.n}</b><small>Luxury retail</small><div class="px">₹${B.p.toLocaleString("en-IN")}</div><small>per share</small><div class="shs">${B.sh} crore shares</div></button>
     </div>`);
   const v = await choose("#pick");
   const mA = A.p * A.sh, mB = B.p * B.sh, right = v === "A";
