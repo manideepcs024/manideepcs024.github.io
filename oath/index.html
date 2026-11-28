@@ -20,7 +20,7 @@
 <link rel="canonical" href="https://manideepcs024.github.io/oath/" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Caveat:wght@600;700&family=Mukta:wght@500;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../assets/tool.css" />
 <style>
   :root { --acc: #febc2e; --acc2: #ff5470; }
@@ -32,6 +32,12 @@
   .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
   .pn { border-radius: 24px; border: 1px solid var(--line); background: var(--card); padding: 18px; }
   .pn > h2 { font: 800 1.3rem "Space Grotesk"; margin-bottom: 4px; } .pn > p.l { color: var(--muted); font-size: .86rem; margin-bottom: 12px; line-height: 1.5; }
+  .langrow { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; font-size: .8rem; color: var(--muted); }
+  .langrow button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #dfe3ee; padding: 8px 13px; border-radius: 999px; font: 700 .84rem Inter, Mukta; cursor: pointer; }
+  .langrow button.on { background: #febc2e; color: #1a1300; border-color: #febc2e; }
+  .langrow .sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+  .hi, .hi * { font-family: Mukta, Inter, sans-serif !important; letter-spacing: 0 !important; }
+  .preview.hi h3 { font-size: 1.55rem; } .preview.hi ol { font-size: 1.02rem; }
   .pl { display: grid; gap: 6px; }
   .pl label { display: grid; grid-template-columns: 26px minmax(0, 1fr) 26px; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: .9rem; color: #dfe3ee; cursor: pointer; }
   .pl label.on { border-color: rgba(254,188,46,.6); background: rgba(254,188,46,.08); color: #fff; }
@@ -98,12 +104,13 @@
       <section class="pn">
         <h2>🛡️ 1. My promises</h2>
         <p class="l">Tick the promises you're ready to keep, or add your own. Fewer, real promises beat a long list you'll ignore.</p>
+        <div class="langrow" id="lang"></div>
         <div class="pl" id="pl"></div>
         <div class="addrow"><label class="field sm"><input id="newP" type="text" maxlength="90" placeholder="Add my own promise, e.g. No trading in the first 15 minutes" /></label><button class="btn" id="addP">＋ Add</button></div>
         <h2 style="font:800 1.15rem 'Space Grotesk';margin-top:18px">✍️ 2. My view</h2>
         <p class="l" style="color:var(--muted);font-size:.86rem;margin:2px 0 8px">Why do you trade? What kind of trader do you want to be? Write it in your own words (Hindi or English).</p>
         <textarea class="view" id="view" maxlength="320" placeholder="e.g. I trade to grow my family's wealth slowly and safely. I'd rather miss a move than lose my capital. Process over profits."></textarea>
-        <div class="cols2" style="margin-top:10px"><div><div class="q">Signed by</div><label class="field sm"><input id="nm" type="text" maxlength="30" placeholder="Your name" /></label></div><div><div class="q">Capital I will protect ₹ <span class="opt">optional</span></div><label class="field sm"><input id="cap" type="text" inputmode="decimal" placeholder="e.g. 5,00,000" /></label></div></div>
+        <div class="cols2" style="margin-top:10px"><div><div class="q">Signed by</div><label class="field sm"><input id="nm" type="text" maxlength="30" placeholder="Your name (Hindi or English)" /></label></div><div><div class="q">Capital I will protect ₹ <span class="opt">optional</span></div><label class="field sm"><input id="cap" type="text" inputmode="decimal" placeholder="e.g. 5,00,000" /></label></div></div>
       </section>
       <section>
         <div class="preview" id="prev"></div>
@@ -138,11 +145,20 @@
 const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
 const PRESET = ["I will set my stop-loss before I enter a trade.", "I will risk no more than 1–2% of my capital on one trade.", "I will not trade on tips, rumours or 'sure shot' messages.", "I will stop for the day when my daily loss limit is hit.", "I will not average down a losing trade.", "I will not revenge-trade after a loss.", "I will never move my stop-loss further away.", "I will not trade with money my family needs.", "I will journal every trade: wins and losses.", "I will follow my plan, not my emotions.", "I will protect my family first: insurance and emergency fund.", "I will keep learning and stay humble."];
 const CATS = [["tip", "🎣", "Tip / rumour", "I will never buy on a tip without my own research."], ["revenge", "😤", "Revenge trade", "After a loss, I will take a 30-minute break before any new trade."], ["nosl", "🛑", "No / moved stop-loss", "I will never enter without a stop-loss, and never move it further away."], ["avg", "📉", "Averaged down", "I will never add to a losing position."], ["over", "🔁", "Overtrading", "I will take a maximum of 5 trades a day."], ["fomo", "🚀", "FOMO / chased entry", "I will never chase a stock that has already run; I wait for my setup."], ["lev", "🏦", "Too much leverage / MTF", "I will not use leverage beyond what my plan allows."], ["size", "🎰", "Oversized position", "I will size every trade by my 1% risk rule."], ["plan", "🎯", "Ignored my plan", "If it's not in my plan, I don't trade it."], ["other", "✨", "Other", ""]];
-const S = K.store("oath_v1", { pick: [0, 1, 2, 3, 5, 6], custom: [], view: "", name: "", cap: "", signed: "", renew: [], never: [], cat: "revenge" });
+const HI = ["मैं ट्रेड लेने से पहले ही अपना स्टॉप-लॉस तय करूँ{g}।", "मैं एक ट्रेड में अपनी पूँजी का 1–2% से ज़्यादा जोखिम नहीं लूँ{g}।", "मैं टिप्स, अफ़वाहों या 'पक्का मुनाफ़ा' वाले मैसेज पर ट्रेड नहीं करूँ{g}।", "रोज़ की लॉस लिमिट लगते ही मैं उस दिन ट्रेडिंग बंद कर दूँ{g}।", "मैं घाटे वाले ट्रेड में एवरेज नहीं करूँ{g}।", "मैं नुकसान के बाद बदला लेने के लिए ट्रेड नहीं करूँ{g}।", "मैं अपना स्टॉप-लॉस कभी दूर नहीं खिसकाऊँ{g}।", "मैं परिवार की ज़रूरत वाले पैसे से कभी ट्रेड नहीं करूँ{g}।", "मैं हर ट्रेड का जर्नल लिखूँ{g}: मुनाफ़े का भी, नुकसान का भी।", "मैं अपने प्लान पर चलूँ{g}, भावनाओं पर नहीं।", "मैं पहले अपने परिवार को सुरक्षित करूँ{g}: बीमा और इमरजेंसी फ़ंड।", "मैं हमेशा सीख{t} रहूँ{g} और विनम्र रहूँ{g}।"];
+const S = K.store("oath_v1", { lang: "en", gen: "m", pick: [0, 1, 2, 3, 5, 6], custom: [], view: "", name: "", cap: "", signed: "", renew: [], never: [], cat: "revenge" });
 const today = () => K.iso(K.istNow()), fmt = v => "₹" + Math.round(v).toLocaleString("en-IN");
-const promises = () => [...S.pick.map(i => PRESET[i]).filter(Boolean), ...S.custom];
+const isHi = () => S.lang === "hi", gg = () => S.gen === "f" ? "गी" : "गा", tt = () => S.gen === "f" ? "ती" : "ता";
+const presetText = i => isHi() ? (HI[i] || "").replace(/\{g\}/g, gg()).replace(/\{t\}/g, tt()) : PRESET[i];
+const promises = () => [...S.pick.map(presetText).filter(Boolean), ...S.custom];
+const L = () => isHi() ? { kick: "मेरी ट्रेडिंग कसम", head: nm => `मैं, ${nm}, कसम खा${tt()} हूँ कि:`, cap: `जिस पूँजी की मैं रक्षा करूँ${gg()}`, signedOn: "हस्ताक्षर:", notSigned: "अभी हस्ताक्षर नहीं किए", card: "🛡️  मेरी ट्रेडिंग कसम  🛡️", title: nm => `${nm ? nm + " की" : "मेरी"} ट्रेडिंग कसम`, line: `मैं कसम खा${tt()} हूँ कि:`, cta: "आप भी अपनी ट्रेडिंग कसम लिखिए और साइन कीजिए 👇", you: "आपका नाम", tick: "कम से कम एक वादा चुनिए।" }
+  : { kick: "MY TRADING OATH", head: nm => `I, ${nm}, promise myself:`, cap: "Capital I will protect", signedOn: "Signed on", notSigned: "Not signed yet", card: "🛡️  MY TRADING OATH  🛡️", title: nm => `${nm ? nm + "'s" : "My"} Trading Oath`, line: "I promise myself:", cta: "Write and sign your own trading oath 👇", you: "your name", tick: "Tick at least one promise." };
+const dateL = d => isHi() ? K.parseISO(d).toLocaleDateString("hi-IN", { day: "numeric", month: "long", year: "numeric" }) : K.niceDate(d, { day: "numeric", month: "long", year: "numeric" });
+const hasDev = s => /[\u0900-\u097F]/.test(s);
+function drawLang() { $("#lang").innerHTML = `<span>Oath language:</span><button data-lg="en" class="${!isHi() ? "on" : ""}">English</button><button data-lg="hi" class="${isHi() ? "on" : ""}">हिंदी</button>${isHi() ? `<span class="sep"></span><button data-gn="m" class="${S.gen !== "f" ? "on" : ""}">कसम खाता हूँ</button><button data-gn="f" class="${S.gen === "f" ? "on" : ""}">कसम खाती हूँ</button>` : ""}`; }
+$("#lang").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.lg) S.lang = b.dataset.lg; if (b.dataset.gn) S.gen = b.dataset.gn; S.save(); drawLang(); drawPromises(); drawPreview(); });
 /* ---------- promises ---------- */
-function drawPromises() { $("#pl").innerHTML = PRESET.map((p, i) => `<label class="${S.pick.includes(i) ? "on" : ""}"><input type="checkbox" data-p="${i}" ${S.pick.includes(i) ? "checked" : ""} /><span>${esc(p)}</span><span></span></label>`).join("") + S.custom.map((p, i) => `<label class="on"><input type="checkbox" checked disabled /><span>${esc(p)}</span><button data-dc="${i}" title="Remove">✕</button></label>`).join(""); }
+function drawPromises() { $("#pl").classList.toggle("hi", isHi()); $("#pl").innerHTML = PRESET.map((_, i) => `<label class="${S.pick.includes(i) ? "on" : ""}"><input type="checkbox" data-p="${i}" ${S.pick.includes(i) ? "checked" : ""} /><span>${esc(presetText(i))}</span><span></span></label>`).join("") + S.custom.map((p, i) => `<label class="on"><input type="checkbox" checked disabled /><span>${esc(p)}</span><button data-dc="${i}" title="Remove">✕</button></label>`).join(""); }
 $("#pl").addEventListener("change", e => { const i = e.target.dataset.p; if (i == null) return; const n = +i; S.pick = e.target.checked ? [...new Set([...S.pick, n])].sort((a, b) => a - b) : S.pick.filter(x => x !== n); unsign(); S.save(); drawPromises(); drawPreview(); });
 $("#pl").addEventListener("click", e => { const b = e.target.closest("[data-dc]"); if (!b) return; e.preventDefault(); S.custom.splice(+b.dataset.dc, 1); unsign(); S.save(); drawPromises(); drawPreview(); });
 $("#addP").onclick = () => { let v = $("#newP").value.trim(); if (v.length < 6) { K.toast("Write your promise first"); return; } if (!/[.!]$/.test(v)) v += "."; v = v.charAt(0).toUpperCase() + v.slice(1); S.custom.push(v); $("#newP").value = ""; unsign(); S.save(); drawPromises(); drawPreview(); };
@@ -152,7 +168,8 @@ $("#view").value = S.view; $("#view").addEventListener("input", e => { S.view = 
 $("#nm").value = S.name; $("#nm").addEventListener("input", e => { S.name = e.target.value; S.save(); drawPreview(); });
 $("#cap").value = S.cap; $("#cap").addEventListener("input", e => { K.fmtNum(e.target, 0); S.cap = e.target.value; S.save(); drawPreview(); });
 function drawPreview() { const P = promises(), nm = (S.name || "").trim();
-  $("#prev").innerHTML = `<div class="k">MY TRADING OATH</div><h3>I, ${nm ? esc(nm) : "<span style='color:var(--muted)'>your name</span>"}, promise myself:</h3>${P.length ? `<ol>${P.map(p => `<li>${esc(p)}</li>`).join("")}</ol>` : `<div class="empty">Tick at least one promise.</div>`}${K.num(S.cap) > 0 ? `<div style="margin-top:10px;font-size:.88rem;color:#f1e3c4">💰 Capital I will protect: <b>${fmt(K.num(S.cap))}</b></div>` : ""}${S.view.trim() ? `<div class="quote">“${esc(S.view.trim())}”</div>` : ""}<div class="sig"><div><b>${S.signed ? esc(nm || "Signed") : "&nbsp;"}</b><br><small>${S.signed ? "Signed on " + K.niceDate(S.signed, { day: "numeric", month: "long", year: "numeric" }) : "Not signed yet"}</small></div><small>₹ MANIMINDSMONEY</small></div>`;
+  const T = L(); $("#prev").classList.toggle("hi", isHi());
+  $("#prev").innerHTML = `<div class="k">${T.kick}</div><h3>${T.head(nm ? esc(nm) : `<span style='color:var(--muted)'>${T.you}</span>`)}</h3>${P.length ? `<ol>${P.map(p => `<li>${esc(p)}</li>`).join("")}</ol>` : `<div class="empty">${T.tick}</div>`}${K.num(S.cap) > 0 ? `<div style="margin-top:10px;font-size:.88rem;color:#f1e3c4">💰 ${T.cap}: <b>${fmt(K.num(S.cap))}</b></div>` : ""}${S.view.trim() ? `<div class="quote">“${esc(S.view.trim())}”</div>` : ""}<div class="sig"><div><b style="${hasDev(nm) ? "font-family:Mukta,sans-serif" : ""}">${S.signed ? esc(nm || "Signed") : "&nbsp;"}</b><br><small>${S.signed ? T.signedOn + " " + dateL(S.signed) : T.notSigned}</small></div><small>₹ MANIMINDSMONEY</small></div>`;
   $("#signB").textContent = S.signed ? "✅ Signed. Edit anything to re-sign" : "✍️ Sign my oath"; $("#signB").disabled = !!S.signed; drawRenew(); }
 $("#signB").onclick = () => { if (!(S.name || "").trim()) { K.toast("Add your name to sign"); K.shake?.($("#nm")); $("#nm").focus(); return; } if (!promises().length) { K.toast("Choose at least one promise"); return; } S.signed = today(); if (!S.renew.includes(today())) S.renew.push(today()); S.save(); drawPreview(); K.toast("✍️ Oath signed. Keep it."); };
 /* ---------- daily renewal ---------- */
@@ -177,16 +194,16 @@ $("#nl").addEventListener("click", e => { const a = e.target.closest("[data-agai
   if (a) { const n = S.never[+a.dataset.again]; const extra = prompt(`It happened again: "${n.rule}"\n\nHow much did it cost this time? (₹, optional)`, ""); if (extra === null) return; n.rep = [...(n.rep || []), today()]; if (K.num(extra) > 0) n.costRep = (n.costRep || 0) + K.num(extra); S.save(); drawNever(); drawRenew(); K.toast("Honesty is the first step. Re-read this rule tomorrow morning."); }
   if (d) { if (!confirm("Delete this Never Again entry?")) return; S.never.splice(+d.dataset.del, 1); S.save(); drawNever(); drawRenew(); } });
 /* ---------- images ---------- */
-async function oathCanvas() { await K.loadFonts?.(); try { await document.fonts.load("700 60px Caveat"); } catch {} const P = promises().slice(0, 9), nm = (S.name || "").trim() || "Trader", W = 1080, H = 1350, gold = "#febc2e";
+async function oathCanvas() { await K.loadFonts?.(); try { await Promise.all(["700 60px Caveat", "700 50px Mukta", "500 30px Mukta", "italic 500 27px Mukta"].map(f => document.fonts.load(f, "कसम abc"))); } catch {} const T = L(), BF = isHi() ? "Mukta" : K.F.INTER, HF = isHi() ? "Mukta" : K.F.GROT; const P = promises().slice(0, 9), nm = (S.name || "").trim() || "Trader", W = 1080, H = 1350, gold = "#febc2e";
   const { c, ctx } = K.canvas(W, H, [["rgba(254,188,46,0.2)", .5, 0, .7], ["rgba(124,92,255,0.18)", .5, 1, .7]]);
   ctx.strokeStyle = gold; ctx.lineWidth = 4; K.rr(ctx, 36, 36, W - 72, H - 72, 30); ctx.stroke(); ctx.strokeStyle = "rgba(254,188,46,.3)"; ctx.lineWidth = 2; K.rr(ctx, 52, 52, W - 104, H - 104, 22); ctx.stroke();
-  K.txt(ctx, "₹ MANIMINDSMONEY", W / 2, 128, `800 30px ${K.F.GROT}`, "#fff", "center"); K.txt(ctx, "🛡️  MY TRADING OATH  🛡️", W / 2, 196, `700 32px ${K.F.MONO}`, gold, "center");
-  K.txt(ctx, `I, ${nm}, promise myself:`, W / 2, 270, K.fit(ctx, `I, ${nm}, promise myself:`, 800, K.F.GROT, 50, 920), "#fff", "center");
+  K.txt(ctx, "₹ MANIMINDSMONEY", W / 2, 128, `800 30px ${K.F.GROT}`, "#fff", "center"); K.txt(ctx, T.card, W / 2, 196, isHi() ? `800 38px Mukta` : `700 32px ${K.F.MONO}`, gold, "center");
+  K.txt(ctx, T.head(nm), W / 2, 270, K.fit(ctx, T.head(nm), 800, HF, isHi() ? 54 : 50, 920), "#fff", "center");
   let y = 340; const lh = P.length > 7 ? 38 : 42, fs = P.length > 7 ? 27 : 30;
-  P.forEach((p, i) => { ctx.font = `600 ${fs}px ${K.F.INTER}`; const lines = K.cap(K.wrap(ctx, p, 820), 2); ctx.fillStyle = gold; ctx.beginPath(); ctx.arc(104, y - 10, 17, 0, 7); ctx.fill(); K.txt(ctx, String(i + 1), 104, y - 1, `800 20px ${K.F.GROT}`, "#1a1300", "center"); lines.forEach((l, k) => K.txt(ctx, l, 140, y + k * lh, `600 ${fs}px ${K.F.INTER}`, "#f2efe6")); y += lines.length * lh + 16; });
-  if (S.view.trim() && y < 1010) { ctx.font = `italic 500 27px ${K.F.INTER}`; const vl = K.cap(K.wrap(ctx, "“" + S.view.trim() + "”", 820), Math.max(1, Math.min(4, Math.floor((1060 - y) / 36)))); ctx.fillStyle = "rgba(254,188,46,.12)"; K.rr(ctx, 90, y + 4, 900, vl.length * 36 + 30, 14); ctx.fill(); ctx.fillStyle = gold; ctx.fillRect(90, y + 4, 5, vl.length * 36 + 30); vl.forEach((l, k) => K.txt(ctx, l, 116, y + 42 + k * 36, `italic 500 27px ${K.F.INTER}`, "#f1e3c4")); y += vl.length * 36 + 50; }
-  const sy = Math.max(y + 60, 1110); K.txt(ctx, nm, 120, sy, "700 64px Caveat, cursive", "#fff"); ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(110, sy + 16); ctx.lineTo(560, sy + 16); ctx.stroke();
-  K.txt(ctx, S.signed ? "Signed " + K.niceDate(S.signed, { day: "numeric", month: "long", year: "numeric" }) : K.niceDate(today(), { day: "numeric", month: "long", year: "numeric" }), 120, sy + 54, `500 24px ${K.F.INTER}`, "#cfd3df");
+  P.forEach((p, i) => { ctx.font = `600 ${fs}px ${BF}`; const lines = K.cap(K.wrap(ctx, p, 820), 2); ctx.fillStyle = gold; ctx.beginPath(); ctx.arc(104, y - 10, 17, 0, 7); ctx.fill(); K.txt(ctx, String(i + 1), 104, y - 1, `800 20px ${K.F.GROT}`, "#1a1300", "center"); lines.forEach((l, k) => K.txt(ctx, l, 140, y + k * lh, `${isHi() ? 500 : 600} ${isHi() ? fs + 2 : fs}px ${BF}`, "#f2efe6")); y += lines.length * lh + 16; });
+  if (S.view.trim() && y < 1010) { const VF = hasDev(S.view) ? `500 28px Mukta` : `italic 500 27px ${K.F.INTER}`; ctx.font = VF; const vl = K.cap(K.wrap(ctx, "“" + S.view.trim() + "”", 820), Math.max(1, Math.min(4, Math.floor((1060 - y) / 36)))); ctx.fillStyle = "rgba(254,188,46,.12)"; K.rr(ctx, 90, y + 4, 900, vl.length * 36 + 30, 14); ctx.fill(); ctx.fillStyle = gold; ctx.fillRect(90, y + 4, 5, vl.length * 36 + 30); vl.forEach((l, k) => K.txt(ctx, l, 116, y + 42 + k * 36, VF, "#f1e3c4")); y += vl.length * 36 + 50; }
+  const sy = Math.max(y + 60, 1110); K.txt(ctx, nm, 120, sy, hasDev(nm) ? "700 58px Mukta" : "700 64px Caveat, cursive", "#fff"); ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(110, sy + 16); ctx.lineTo(560, sy + 16); ctx.stroke();
+  K.txt(ctx, (isHi() ? "हस्ताक्षर: " : "Signed ") + dateL(S.signed || today()), 120, sy + 54, `500 24px ${BF}`, "#cfd3df");
   K.txt(ctx, "🛡️", 900, sy + 30, `110px ${K.F.INTER}`, "#fff", "center");
   K.txt(ctx, K.toolUrl("oath"), W / 2, 1270, `600 22px ${K.F.MONO}`, "#b9a6ff", "center");
   return c; }
@@ -204,11 +221,11 @@ async function neverCanvas() { await K.loadFonts?.(); const W = 1080, m = K.meas
   let y = 300; S.never.slice(0, 6).forEach(n => { const cat = CATS.find(x => x[0] === n.cat) || CATS[9]; ctx.font = `700 30px ${K.F.INTER}`; const ls = K.cap(K.wrap(ctx, n.rule, 780), 2), hh = 60 + ls.length * 40; K.panel(ctx, 70, y, 940, hh, 22, "rgba(255,84,112,0.07)", "rgba(255,84,112,0.35)"); K.txt(ctx, cat[1], 112, y + hh / 2 + 18, `50px ${K.F.INTER}`, "#fff", "center"); ls.forEach((l, k) => K.txt(ctx, l, 170, y + 52 + k * 40, `700 30px ${K.F.INTER}`, "#fff")); y += hh + 16; });
   K.footer(ctx, W, H, K.toolUrl("oath"), "Learn once, pay once · Not investment advice", true); return c; }
 /* ---------- share ---------- */
-function oathText() { const P = promises(), nm = (S.name || "").trim(); return [`🛡️ *${nm ? nm + "'s" : "My"} Trading Oath*`, "", "I promise myself:", ...P.map((p, i) => `${i + 1}. ${p}`), ...(S.view.trim() ? ["", `_“${S.view.trim()}”_`] : []), "", `✍️ Signed ${K.niceDate(S.signed || today(), { day: "numeric", month: "short", year: "numeric" })}`, "", "Write and sign your own trading oath 👇", ...K.signoff("oath", "Trading Oath", "").slice(1)].join("\n"); }
+function oathText() { const P = promises(), nm = (S.name || "").trim(), T = L(); return [`🛡️ *${T.title(nm)}*`, "", T.line, ...P.map((p, i) => `${i + 1}. ${p}`), ...(S.view.trim() ? ["", `_“${S.view.trim()}”_`] : []), "", `✍️ ${isHi() ? "हस्ताक्षर" : "Signed"} ${dateL(S.signed || today())}`, "", T.cta, ...K.signoff("oath", "Trading Oath", "").slice(1)].join("\n"); }
 K.share({ text: oathText, valid: () => { if (promises().length) return true; K.toast("Choose at least one promise"); return false; }, draw: oathCanvas, file: () => "my-trading-oath", imgLabel: "Share my oath card" });
 $("#wallB").onclick = async () => { if (!S.never.length && !promises().length) { K.toast("Add a Never Again rule or a promise first"); return; } K.toast("Making your wallpaper…"); const c = await wallCanvas(); K.shareCanvas(c, "never-again-wallpaper.png", "Set this as your lock screen"); };
 $("#neverShare").onclick = async () => { if (!S.never.length) { K.toast("Add a Never Again entry first"); return; } const c = await neverCanvas(); K.shareCanvas(c, "my-never-again-list.png", ["🚫 *My Never Again list*", "", ...S.never.slice(0, 8).map(n => "• " + n.rule), "", "Make yours 👇", K.toolUrl("oath")].join("\n")); };
-drawPromises(); drawPreview(); drawCats(); if (!$("#nr").value) $("#nr").value = (CATS.find(c => c[0] === S.cat) || [])[3]; drawNever();
+drawLang(); drawPromises(); drawPreview(); drawCats(); if (!$("#nr").value) $("#nr").value = (CATS.find(c => c[0] === S.cat) || [])[3]; drawNever();
 </script>
 <script src="../assets/pwa.js" defer></script>
 </body>
