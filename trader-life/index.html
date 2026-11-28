@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>One Year as a Trader — a money life game: every choice changes your ending</title>
+<meta name="description" content="Live 12 months as a young salaried trader with ₹2 lakh savings. Telegram tips, a medical emergency, a market crash, leverage offers, revenge-trading mornings, bonuses and IPO mania: every choice changes your net worth, skill and peace of mind. Get your ending, review every decision and share your result." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="MANIMINDSMONEY" />
+<meta property="og:locale" content="en_IN" />
+<meta property="og:title" content="One Year as a Trader — a money life game: every choice changes your ending" />
+<meta property="og:description" content="Live 12 months as a young salaried trader with ₹2 lakh savings. Telegram tips, a medical emergency, a market crash, leverage offers, revenge-trading mornings, bonuses and IPO mania: every choice…" />
+<meta property="og:url" content="https://manideepcs024.github.io/trader-life/" />
+<meta property="og:image" content="https://manideepcs024.github.io/assets/og/trader-life.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="One Year as a Trader — a money life game: every choice changes your ending" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://manideepcs024.github.io/trader-life/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #ff8a3d; --acc2: #7c5cff; }
+  .wrap { max-width: 1000px; }
+  .hud { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 16px; position: sticky; top: 8px; z-index: 5; }
+  .hud > div { border-radius: 14px; padding: 9px 11px; background: rgba(11,13,24,.92); backdrop-filter: blur(8px); border: 1px solid var(--line); }
+  .hud span { display: block; font: 600 .58rem "JetBrains Mono"; letter-spacing: .06em; color: var(--muted); }
+  .hud b { font: 800 1.02rem "Space Grotesk"; transition: color .3s; }
+  .hud b.flash-up { color: var(--up); } .hud b.flash-dn { color: var(--down); }
+  .bar6 { height: 6px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 5px; } .bar6 i { display: block; height: 100%; border-radius: 99px; transition: width .5s; }
+  .months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; margin-top: 12px; }
+  .months i { height: 30px; border-radius: 8px; background: rgba(255,255,255,.05); border: 1px solid var(--line); display: grid; place-items: center; font: 700 .6rem "JetBrains Mono"; font-style: normal; color: var(--muted); }
+  .months i.done { background: rgba(34,211,154,.12); color: #9ff3d5; } .months i.now { background: #ff8a3d; color: #1a0a00; border-color: #ff8a3d; }
+  .stage { margin-top: 14px; border-radius: 28px; padding: 24px; border: 1px solid rgba(255,138,61,.35); background: radial-gradient(circle at 85% -10%, rgba(255,138,61,.22), transparent 55%), #0d0f1a; min-height: 420px; }
+  .fade { animation: fin .4s ease; } @keyframes fin { from { opacity: 0; transform: translateY(10px); } }
+  .mhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .mhead .mn { font: 700 .76rem "JetBrains Mono"; letter-spacing: .1em; color: #ffb27a; }
+  .mood { font: 700 .72rem "JetBrains Mono"; padding: 5px 10px; border-radius: 999px; }
+  .mood.up { background: rgba(34,211,154,.15); color: #9ff3d5; } .mood.dn { background: rgba(255,84,112,.15); color: #ffb3c0; } .mood.fl { background: rgba(255,255,255,.07); color: #cfd3df; }
+  .ev-emo { font-size: 3.4rem; margin-top: 10px; } .stage h2 { font: 800 1.6rem "Space Grotesk"; line-height: 1.2; margin-top: 4px; }
+  .story { color: #dfe3ee; font-size: 1rem; line-height: 1.6; margin-top: 8px; }
+  .chs { display: grid; gap: 10px; margin-top: 16px; }
+  .chs button { text-align: left; border: 1.5px solid var(--line); background: rgba(0,0,0,.35); color: #fff; border-radius: 16px; padding: 14px 16px; font: 600 .96rem Inter; cursor: pointer; transition: border-color .15s, transform .12s; display: grid; gap: 3px; }
+  .chs button:hover { border-color: #ff8a3d; transform: translateX(3px); }
+  .chs button small { color: var(--muted); font-weight: 500; font-size: .8rem; }
+  .out { margin-top: 16px; border-radius: 18px; padding: 16px; border: 1px solid var(--line); background: rgba(0,0,0,.3); }
+  .out.good { border-color: rgba(34,211,154,.5); background: rgba(34,211,154,.07); } .out.bad { border-color: rgba(255,84,112,.5); background: rgba(255,84,112,.07); } .out.mix { border-color: rgba(254,188,46,.5); background: rgba(254,188,46,.06); }
+  .out h3 { font: 800 1.15rem "Space Grotesk"; } .out p { color: #dfe3ee; font-size: .94rem; line-height: 1.55; margin-top: 6px; }
+  .lesson { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(124,92,255,.12); border: 1px solid rgba(124,92,255,.35); color: #e6e0ff; font-size: .9rem; line-height: 1.5; }
+  .roll { margin-top: 12px; display: grid; gap: 4px; font: 600 .8rem "JetBrains Mono"; color: #cfd3df; }
+  .roll div { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,.04); }
+  .next { margin-top: 14px; width: 100%; border: 0; border-radius: 16px; padding: 15px; font: 800 1.05rem "Space Grotesk"; cursor: pointer; color: #1a0a00; background: linear-gradient(100deg, #ffd98a, #ff8a3d); }
+  .intro { text-align: center; display: grid; gap: 12px; justify-items: center; padding-top: 8px; }
+  .intro .big { font-size: 4rem; } .intro h2 { font: 800 1.9rem "Space Grotesk"; } .intro p { color: #cfd3df; max-width: 560px; line-height: 1.6; }
+  .startgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 620px; text-align: left; }
+  .startgrid div { border-radius: 14px; padding: 10px 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); font-size: .82rem; color: #cfd3df; } .startgrid b { display: block; color: #fff; font: 800 1.05rem "Space Grotesk"; }
+  .end { display: grid; gap: 14px; }
+  .end .hero { text-align: center; } .end .hero .em { font-size: 4.6rem; animation: pop .6s cubic-bezier(.2,1.6,.4,1); } @keyframes pop { from { transform: scale(.3); opacity: 0; } }
+  .end .hero h2 { font: 800 2rem "Space Grotesk"; } .end .hero p { color: #cfd3df; margin-top: 4px; }
+  .cmp { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .cmp div { border-radius: 14px; padding: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--line); font-size: .78rem; color: var(--muted); } .cmp b { display: block; font: 800 1.2rem "Space Grotesk"; color: #fff; margin-top: 2px; }
+  .rev { display: grid; gap: 6px; }
+  .rev div { display: grid; grid-template-columns: 30px 46px minmax(0, 1fr); gap: 8px; align-items: start; padding: 10px 12px; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid var(--line); font-size: .84rem; color: #cfd3df; line-height: 1.45; }
+  .rev small { font: 700 .66rem "JetBrains Mono"; color: var(--muted); padding-top: 3px; } .rev b { color: #fff; display: block; }
+  @media (max-width: 760px) { .hud { grid-template-columns: repeat(3, minmax(0, 1fr)); } .stage { padding: 18px; } .stage h2 { font-size: 1.3rem; } .cmp { grid-template-columns: 1fr 1fr; } .startgrid { grid-template-columns: 1fr; } .months i { font-size: .5rem; height: 24px; } }
+</style>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../snakes-ladders/">🐍 Snakes &amp; Ladders</a><a href="../mastermind/">🏆 Mastermind</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>One Year as a <span class="grad">Trader.</span></h1>
+    <p class="sub">A money life game. 12 months, 12 real-life situations: tips, emergencies, crashes, leverage, bonuses, IPO mania. <b>Every choice changes your ending.</b> Can you finish the year richer <i>and</i> calmer?</p>
+
+    <div class="hud" id="hud"></div>
+    <div class="months" id="months"></div>
+    <section class="stage" id="stage"></section>
+
+    <div class="share-row card" id="shareRow" style="max-width:560px;margin:18px auto 0;padding:14px"></div>
+    <div class="disclaimer"><b>⚠️ Note:</b> A game with made-up events and simplified money maths, for <b>fun and learning</b>. Real outcomes vary; luck plays a part in single events, but good habits win over many years. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script>
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MKT = [.02, 0, .03, .01, -.06, -.2, .1, .05, 0, .04, .03, .02];   /* index return each month */
+const SAL = 60000, EXP = 40000, START = 200000;
+const S = K.store("traderlife_v1", { best: null, plays: 0, name: "" });
+let G = null;
+const fmt = v => (v < 0 ? "−" : "") + "₹" + Math.round(Math.abs(v)).toLocaleString("en-IN"), sfmt = v => (v > 0 ? "+" : "") + fmt(v);
+const R = () => Math.random();
+const nw = s => s.cash + s.inv + s.trade - s.debt;
+function newGame() { G = { m: 0, cash: START, inv: 0, trade: 0, debt: 0, sip: 0, ins: false, skill: 2, peace: 50, journal: false, small: false, group: false, log: [], phase: "event", flags: {} }; render(); }
+/* ---------- events: each choice returns {k: good|bad|mix, h, p, l} ---------- */
+const EV = [
+  { e: "🎆", t: "New year, ₹2 lakh in the bank", s: "You've saved ₹2,00,000. Salary ₹60,000, expenses ₹40,000 a month. A friend says: <i>“Markets are on fire, bhai. Put everything in!”</i>", c: [
+    ["🛡️ Insurance first, keep ₹2L as emergency fund, start a ₹10,000 SIP", "Health + term cover costs ₹2,000/month", s => { s.ins = true; s.sip = 10000; s.peace += 12; return { k: "good", h: "Foundation built 🧱", p: "You bought health and term insurance and parked the ₹2L as an emergency fund. A ₹10,000 SIP starts next month.", l: "Protection first, then investing, then trading. Your family is safe whatever the market does." }; }],
+    ["📈 Start a ₹15,000 SIP, skip insurance for now", "Keep the rest in savings", s => { s.sip = 15000; s.peace += 3; return { k: "mix", h: "Good habit, one gap", p: "A ₹15,000 SIP is a great habit. But with no health insurance, one hospital bill could undo it.", l: "SIPs build wealth; insurance protects it. You need both." }; }],
+    ["🚀 Put ₹1,50,000 into hot small-cap stocks now", "Everyone in the group is making money", s => { s.cash -= 150000; s.trade += 150000; s.small = true; s.peace -= 5; return { k: "mix", h: "All in on small caps 🎢", p: "You bought five 'hot' small caps. They're up 6% in a week and you feel like a genius…", l: "Going all-in at the start of a euphoric phase leaves no cushion for emergencies or a fall." }; }]] },
+  { e: "📱", t: "A Telegram tip", s: "<i>“🚀 MULTIBAGGER ALERT! XYZ Infra will 5× in 3 months. Buy before 11 AM. 100% sure!”</i> It's already up 18% today.", c: [
+    ["💸 Buy ₹50,000 worth right now", "Don't miss it!", s => { s.cash -= 50000; if (R() < .22) { s.cash += 80000; s.peace -= 2; return { k: "mix", h: "Lucky this time 🍀 (+₹30,000)", p: "It ran another 60% and you sold. You feel smart. Next time you'll bet bigger…", l: "A lucky win on a tip is the most dangerous outcome: it teaches the wrong lesson." }; } s.cash += 22000; s.peace -= 10; return { k: "bad", h: "Pump and dump 🎣 (−₹28,000)", p: "The stock hit lower circuit three days in a row. The 'admins' had sold to buyers like you. You sold at −56%.", l: "Urgency + certainty + 🚀 = a trap. The operators who send the tip sell their shares to you." }; }],
+    ["🔍 Check the filings first", "Annual report, pledge, promoter holding", s => { s.skill += 1; s.peace += 3; return { k: "good", h: "Red flags found 🚩", p: "Promoter pledge 64%, auditor resigned last year, no real profits. You skipped it. It crashed 60% a week later.", l: "Five minutes on NSE/BSE filings beats any Telegram 'research'." }; }],
+    ["🙅 Ignore it", "", s => { s.peace += 2; return { k: "good", h: "Ignored 👍", p: "You muted the group. The stock got stuck in lower circuits a week later.", l: "Missing a tip costs nothing. Falling for one can cost a lot." }; }]] },
+  { e: "🎓", t: "“Guaranteed 5% a month” course", s: "An Instagram 'trader' with a Lamborghini profile picture offers a ₹25,000 course: <i>“Guaranteed 5% monthly. Limited seats!”</i>", c: [
+    ["💳 Pay ₹25,000 and join", "", s => { s.cash -= 25000; s.peace -= 4; return { k: "bad", h: "−₹25,000 for recycled YouTube 📉", p: "It's 6 recorded videos and a Telegram group selling 'premium calls'. The 'guaranteed' returns never come.", l: "Nobody can guarantee monthly returns; SEBI warns about such unregistered 'gurus'. Check registration on SEBI's website." }; }],
+    ["📚 Learn free: course, Stop-Loss Trainer, Chart Replay", "Practise with ₹0 at risk", s => { s.skill += 2; s.peace += 3; return { k: "good", h: "Skill up 📈 (+2 skill)", p: "Every evening for a month you practised stops, position sizing and patterns on paper.", l: "Practice on paper first. Free, structured learning beats expensive 'secrets'." }; }],
+    ["⏭️ Skip learning for now", "", s => ({ k: "mix", h: "Nothing gained, nothing lost", p: "You keep trading the way you were.", l: "Every pro trader invested time in learning before money." })]] },
+  { e: "🏥", t: "Medical emergency", s: "Your father is hospitalised for a week. The bill: <b>₹1,50,000</b>.", c: s => s.ins ? [["🛡️ Use health insurance", "", s => { s.cash -= 10000; s.peace += 6; return { k: "good", h: "Insurance paid ₹1,40,000 🙏", p: "Cashless claim. You paid only ₹10,000 for non-covered items. Your investments weren't touched.", l: "This is exactly why insurance comes first. The ₹2,000/month premium just paid for itself many times over." }; }]] : [
+    ["🏦 Pay from savings and investments", "", s => { let need = 150000; const fromCash = Math.min(s.cash, need); s.cash -= fromCash; need -= fromCash; if (need > 0) { const fromInv = Math.min(s.inv, need); s.inv -= fromInv; need -= fromInv; } if (need > 0) { const ft = Math.min(s.trade, need); s.trade -= ft; need -= ft; } if (need > 0) s.debt += need; s.peace -= 10; return { k: "bad", h: "Savings drained (−₹1,50,000)", p: "You emptied your savings and sold investments to pay the hospital.", l: "Without insurance, one emergency can wipe out a year of savings. Health cover first, always." }; }],
+    ["💳 Take a personal loan at 14%", "", s => { s.debt += 150000; s.peace -= 14; return { k: "bad", h: "₹1,50,000 loan at 14% 😓", p: "The bill is paid, but now ₹1,750 of interest goes out every month.", l: "Debt + no insurance is a painful combination. An emergency fund and health insurance would have covered this." }; }]] },
+  { e: "⚡", t: "Leverage offer: 4× margin", s: "Your broker offers MTF: control <b>₹2,00,000</b> of stock with ₹50,000. A breakout looks perfect. The market feels shaky this month.", pre: s => s.small ? `<div class="out bad" style="margin-top:12px"><h3>📉 Meanwhile, your small caps…</h3><p>Small caps are falling hard this month. Your “hot” stocks are down <b>35%</b>.</p></div>` : "", c: [
+    ["🎰 Take the full ₹2,00,000 MTF position", "4× the profit if it works!", s => { const loss = 200000 * .13 + 1800; s.cash -= loss; s.peace -= 12; return { k: "bad", h: `Leverage bites (−${fmt(loss)})`, p: "The breakout failed and the stock fell 13% in a weak market. On 4× leverage that's a 52% hit on your ₹50,000, plus MTF interest.", l: "Leverage multiplies losses as fast as profits. Use it rarely, small, and with a stop-loss." }; }],
+    ["🛡️ Small position, 1% risk with a stop-loss", "", s => { s.cash -= 2000; s.skill += 1; s.peace += 4; return { k: "good", h: "Stopped out for just −₹2,000 ✅", p: "The breakout failed, your stop hit, and you lost exactly what you planned.", l: "A small planned loss is a successful trade. Your stop-loss is your insurance." }; }],
+    ["🙅 Skip: the market looks weak", "", s => { s.peace += 3; return { k: "good", h: "Patience paid", p: "You sat out. The breakout failed for most people.", l: "No trade is also a position. Trade with the market, not against it." }; }]] },
+  { e: "💥", t: "Market crash: −20%", s: "Global sell-off. The Nifty falls 20% in three weeks. Your portfolio is deep red. Every WhatsApp group screams: <i>“SELL EVERYTHING! It will go down 50%!”</i>", c: [
+    ["😱 Sell all investments and stop the SIP", "Protect what's left", s => { s.cash += s.inv; s.inv = 0; s.flags.panic = true; s.sip = 0; s.peace -= 6; return { k: "bad", h: "Sold at the bottom 📉", p: "You locked in the loss and stopped your SIP. Next month the market starts recovering without you.", l: "Panic selling turns a temporary fall into a permanent loss. Crashes are when SIPs buy cheapest." }; }],
+    ["🧘 Hold and keep the SIP running", "", s => { s.peace += 2; return { k: "good", h: "Held steady 🧘", p: "It was painful to watch, but you didn't sell, and your SIP kept buying at lower prices.", l: "Time in the market beats timing the market. Your SIP loves crashes." }; }],
+    ["🛒 Add ₹40,000 extra to the index fund", "Buy when others are fearful", s => { const a = Math.min(40000, Math.max(0, s.cash - 20000)); s.cash -= a; s.inv += a; s.peace += a ? 4 : 0; return a ? { k: "good", h: `Bought the dip (+${fmt(a)} invested) 🛒`, p: "You added to a diversified index fund at 20% off.", l: "Buying quality or index funds in a crash, with money you won't need for years, is how wealth is built." } : { k: "mix", h: "No spare cash to add", p: "You wanted to buy the dip, but there was no spare cash left.", l: "An emergency fund is what lets you be brave in a crash." }; }]] },
+  { e: "😤", t: "A revenge-trading morning", s: "Down <b>₹8,000</b> by 11 AM on two quick intraday losses. Your heart is racing. You want it back. Now.", c: [
+    ["🔥 Double the size to win it back", "", s => { if (R() < .3) { s.cash -= 2000; s.peace -= 6; return { k: "mix", h: "Recovered… almost (−₹2,000)", p: "It worked this time. Your brain just learned that doubling up 'works'.", l: "Revenge trading that works once trains a habit that blows accounts later." }; } s.cash -= 24000; s.peace -= 14; return { k: "bad", h: "−₹8,000 became −₹24,000 😵", p: "Bigger size, worse setups, faster decisions. The day ended three times worse.", l: "Most disaster days start with 'just win it back'. Set a daily loss limit, and stop when it hits." }; }],
+    ["🚦 Stop for the day: circuit breaker", "", s => { s.cash -= 8000; s.skill += 1; s.peace += 6; return { k: "good", h: "Stopped at −₹8,000 💪", p: "You closed the app and went for a walk. Tomorrow you'll trade fresh.", l: "Your best trade on a bad day is often no trade. Protect your capital and your mind." }; }],
+    ["🎯 One A+ setup at half size, with a stop", "", s => { if (R() < .55) { s.cash -= 4000; s.peace += 2; return { k: "mix", h: "Clawed back half (−₹4,000 net)", p: "One clean trade, planned stop and target. It worked.", l: "If you must trade after a loss: smaller, slower, only your best setup." }; } s.cash -= 10500; return { k: "mix", h: "Small extra loss (−₹10,500 net)", p: "The setup failed, but your stop kept it small.", l: "Even good setups fail. Half size kept the damage limited." }; }]] },
+  { e: "🎉", t: "Work bonus: ₹1,00,000", s: "Your company pays a ₹1,00,000 bonus. Expiry is this Thursday, and ₹2 call options are 'cheap lottery tickets'…", c: [
+    ["🏗️ Clear debt / top up emergency fund, rest to SIP", "", s => { let b = 100000; const pay = Math.min(s.debt, b); s.debt -= pay; b -= pay; s.inv += b * .6; s.cash += b * .4; s.peace += 8; return { k: "good", h: pay ? `Loan cut by ${fmt(pay)} 🙌` : "Bonus put to work 🙌", p: pay ? `You paid off ${fmt(pay)} of the 14% loan${b ? " and invested the rest" : ""}.` : "60% to your index fund, 40% to the emergency fund.", l: "Paying off 14% debt is a guaranteed 14% return. Then invest." }; }],
+    ["🎰 ₹1,00,000 on ₹2 expiry options", "Could become ₹10 lakh!", s => { if (R() < .07) { s.cash += 400000; s.peace -= 6; return { k: "mix", h: "JACKPOT +₹4,00,000 🤑", p: "The index spiked on expiry and your ₹2 options went to ₹10. Unbelievable, and dangerous: you'll try it again.", l: "This happens rarely; most ₹2 options expire at zero. One win can lead to many losses." }; } s.peace -= 10; return { k: "bad", h: "Bonus gone: options expired at ₹0 💸", p: "The index didn't move enough. Every option expired worthless by 3:30 PM.", l: "Cheap OTM options are cheap for a reason. SEBI found about 9 in 10 F&O traders lose money." }; }],
+    ["⚖️ Split: ₹50,000 SIP top-up, ₹50,000 trading capital with rules", "", s => { s.inv += 50000; s.trade += 50000; s.peace += 4; return { k: "good", h: "Balanced choice ⚖️", p: "Half to long-term wealth, half to trading with a 1% risk rule.", l: "Keep trading capital separate from long-term money. Never mix the two." }; }]] },
+  { e: "🎟️", t: "IPO mania", s: "A hot IPO is 80× subscribed and the grey market premium is 80%. A friend says: <i>“Take a loan and apply in every account!”</i>", c: [
+    ["🏦 Take a ₹2,00,000 loan and apply everywhere", "", s => { if (R() < .2) { s.cash += 18000; s.peace -= 6; return { k: "mix", h: "Got 1 lot: +₹18,000 after loan costs", p: "Out of 8 applications you got one lot. Listing was +50%; after loan interest you made ₹18,000.", l: "Oversubscribed IPOs are lotteries. Borrowing to gamble on allotment is risky." }; } s.cash -= 4000; s.peace -= 8; return { k: "bad", h: "No allotment, loan interest −₹4,000", p: "Zero allotment across all applications. You still paid processing fees and interest.", l: "Grey market premiums often vanish on listing day. Never borrow to invest in IPOs." }; }],
+    ["🎫 Apply 1 lot from savings", "", s => { if (R() < .3) { s.cash += 6000; return { k: "good", h: "Allotted! Listing gain +₹6,000 🎉", p: "Lucky allotment. You sold half at listing and held half.", l: "Small, unleveraged IPO bets are fine for fun. Judge the business, not the GMP." }; } return { k: "mix", h: "Not allotted: money refunded", p: "No allotment; the money came back in 4 days.", l: "No loss, no stress. That's a well-sized bet." }; }],
+    ["🙅 Skip: valuation looks crazy", "", s => { s.peace += 2; s.skill += .5; return { k: "good", h: "Skipped. It listed flat and fell 25%", p: "The hype didn't last. Three months later it's below the IPO price.", l: "Check P/E vs peers in the DRHP. Hype is not a valuation." }; }]] },
+  { e: "📓", t: "The journal habit", s: "A friend who trades well says his secret is boring: <i>“I write down every trade and review it every Sunday.”</i>", c: [
+    ["📓 Start a journal + Sunday review", "", s => { s.journal = true; s.skill += 2; s.peace += 4; return { k: "good", h: "Journal started (+2 skill) 📓", p: "After three weeks you notice it: most of your losses come after 2 PM and from tips.", l: "You can't fix what you don't measure. A journal turns losses into lessons." }; }],
+    ["💎 Join a 'premium calls' group: ₹5,000/month", "", s => { s.cash -= 15000; s.group = true; s.skill -= .5; s.peace -= 4; return { k: "bad", h: "−₹15,000 in fees for 3 months", p: "Calls arrive late, the 'accuracy' is cherry-picked, and you still don't know why you're buying.", l: "Paying for calls outsources your thinking. You never build your own edge." }; }],
+    ["😴 Too much work, skip it", "", s => ({ k: "mix", h: "No journal", p: "You keep repeating the same mistakes without noticing.", l: "The traders who improve fastest are the ones who review." })]] },
+  { e: "🪔", t: "Diwali & Muhurat trading", s: "Family is home for Diwali. A <i>“Diwali multibagger”</i> is going viral, and Muhurat trading is this evening.", c: [
+    ["🪔 Token buy: ₹11,000 of an index ETF", "", s => { s.cash -= 11000; s.inv += 11000; s.peace += 6; return { k: "good", h: "Shubh labh 🪔", p: "A symbolic, sensible start to the new Samvat, and a happy evening with family.", l: "Muhurat trading is a ritual, not an opportunity. Keep it small and sensible." }; }],
+    ["🚀 Buy ₹50,000 of the viral Diwali pick", "", s => { if (R() < .25) { s.cash += 8000; return { k: "mix", h: "+₹8,000, this time", p: "It rose 16% and you sold.", l: "Viral picks sometimes work, but you didn't know why you bought. That's not repeatable." }; } s.cash -= 16000; s.peace -= 6; return { k: "bad", h: "−₹16,000 on the viral pick", p: "Everyone who bought after the posts went viral was late. It fell 32% by month-end.", l: "By the time a stock is viral on WhatsApp, the smart money is selling." }; }],
+    ["🎁 Skip trading, spend ₹30,000 on family gifts", "", s => { s.cash -= 30000; s.peace += 12; return { k: "good", h: "The best return: family 🎁", p: "No trading tonight. Lots of laughter, sweets and photos.", l: "Money is a tool for a good life, not the other way round." }; }]] },
+  { e: "🎇", t: "Year-end: plan for next year", s: "December. Time to look back. What do you carry into next year?", c: [
+    ["🛡️ Write a trading oath and set loss limits", "", s => { s.peace += 8; s.skill += 1; return { k: "good", h: "Oath signed 🛡️", p: "You wrote your rules, set a daily loss limit and a monthly SIP step-up.", l: "Rules made when calm protect you when you're not." }; }],
+    ["📈 Double the trading capital for next year", "", s => { s.peace -= 4; return { k: "mix", h: "Bigger bets ahead", p: "You plan to go bigger next year.", l: "Increase size only after your process proves itself over many months, not one year's luck." }; }],
+    ["🎉 Celebrate, no planning", "", s => ({ k: "mix", h: "Party mode 🎉", p: "You'll figure it out next year.", l: "A plan you write today saves you from the same mistakes tomorrow." })]] },
+];
+/* ---------- monthly roll ---------- */
+function monthRoll(s) { const m = s.m, r = MKT[m], rows = [];
+  s.cash += SAL; rows.push(["💼 Salary", SAL]); const exp = EXP + (s.ins ? 2000 : 0); s.cash -= exp; rows.push(["🏠 Expenses" + (s.ins ? " + insurance" : ""), -exp]);
+  if (s.sip && s.cash > s.sip) { s.cash -= s.sip; s.inv += s.sip; rows.push(["📈 SIP invested", -s.sip]); }
+  if (s.debt > 0) { const i = Math.round(s.debt * .0117); s.cash -= i; rows.push(["💳 Loan interest (14%)", -i]); }
+  if (s.inv > 0) { const g = s.inv * r; s.inv += g; rows.push([`📊 Index fund (${r >= 0 ? "+" : ""}${(r * 100).toFixed(0)}% market)`, g]); }
+  if (s.trade > 0) { let tr = r * 1.4 + (s.skill - 4) * .004 + (s.journal ? .004 : 0) - (s.group ? .01 : 0); if (s.small && m === 4) tr = -.35; const g = s.trade * tr; s.trade += g; rows.push([s.small && m === 4 ? "🎢 Small caps crash" : "🎯 Trading capital", g]); }
+  s.peace = Math.max(0, Math.min(100, s.peace)); s.skill = Math.max(0, Math.min(10, s.skill)); return rows; }
+/* ---------- render ---------- */
+let prevVals = {};
+function hud() { const s = G, vals = { nw: nw(s), cash: s.cash, inv: s.inv, trade: s.trade, debt: s.debt };
+  const cell = (k, lab, v) => { const p = prevVals[k], cls = p == null || p === v ? "" : v > p ? "flash-up" : "flash-dn"; return `<div><span>${lab}</span><b class="${k === "debt" && v > 0 ? "down" : cls}">${fmt(v)}</b></div>`; };
+  $("#hud").innerHTML = cell("nw", "💰 NET WORTH", vals.nw) + cell("cash", "🏦 CASH", vals.cash) + cell("inv", "📈 INVESTED", vals.inv) + cell("trade", "🎯 TRADING", vals.trade) + `<div><span>🧠 SKILL ${s.skill.toFixed(1).replace(".0", "")}/10</span><div class="bar6"><i style="width:${s.skill * 10}%;background:#7c5cff"></i></div></div><div><span>😌 PEACE ${Math.round(s.peace)}/100</span><div class="bar6"><i style="width:${s.peace}%;background:${s.peace >= 60 ? "#22d39a" : s.peace >= 35 ? "#febc2e" : "#ff5470"}"></i></div></div>`;
+  prevVals = vals; setTimeout(() => document.querySelectorAll("#hud b").forEach(b => b.classList.remove("flash-up", "flash-dn")), 1200);
+  $("#months").innerHTML = MN.map((n, i) => `<i class="${i < G.m ? "done" : i === G.m && G.phase !== "end" ? "now" : ""}">${n}</i>`).join(""); }
+function render() { hud(); const s = G, ev = EV[s.m], r = MKT[s.m], mood = r > .015 ? ["up", "📈 Bullish month"] : r < -.015 ? ["dn", r < -.1 ? "💥 Crash month" : "📉 Bearish month"] : ["fl", "➖ Sideways month"];
+  const choices = typeof ev.c === "function" ? ev.c(s) : ev.c;
+  $("#stage").innerHTML = `<div class="fade"><div class="mhead"><span class="mn">MONTH ${s.m + 1} OF 12 · ${MN[s.m].toUpperCase()}</span><span class="mood ${mood[0]}">${mood[1]}</span></div><div class="ev-emo">${ev.e}</div><h2>${ev.t}</h2><p class="story">${ev.s}</p>${ev.pre ? ev.pre(s) : ""}<div class="chs" id="chs">${choices.map((c, i) => `<button data-c="${i}">${c[0]}${c[1] ? `<small>${c[1]}</small>` : ""}</button>`).join("")}</div></div>`;
+  G._ch = choices; }
+function choose(i) { const s = G, c = G._ch[i], before = nw(s), res = c[2](s); s.peace = Math.max(0, Math.min(100, s.peace)); s.skill = Math.max(0, Math.min(10, s.skill));
+  const rows = monthRoll(s), delta = nw(s) - before; s.log.push({ m: s.m, t: EV[s.m].t, e: EV[s.m].e, pick: c[0], k: res.k, h: res.h, l: res.l });
+  $("#chs").remove();
+  $("#stage .fade").insertAdjacentHTML("beforeend", `<div class="out ${res.k} fade"><h3>${res.h}</h3><p>${res.p}</p><div class="lesson">💡 ${res.l}</div><div class="roll">${rows.map(([a, v]) => `<div><span>${a}</span><span class="${v >= 0 ? "up" : "down"}">${sfmt(v)}</span></div>`).join("")}<div style="background:rgba(255,255,255,.08)"><span>Net worth change this month</span><b class="${delta >= 0 ? "up" : "down"}">${sfmt(delta)}</b></div></div><button class="next" id="nextB">${s.m < 11 ? `Next: ${MN[s.m + 1]} →` : "See my year-end result →"}</button></div>`);
+  hud(); $("#nextB").scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+/* ---------- ending ---------- */
+const goodN = s => s.log.filter(x => x.k === "good").length, PLAIN = START + 12 * (SAL - EXP) + 100000;
+const ENDS = [
+  [s => goodN(s) >= 9 && s.peace >= 60 && s.debt <= 0, "🏆", "Wealth Builder", "Smart, calm and protected. You built a foundation and let habits do the work: this is how wealth grows over many years."],
+  [s => nw(s) >= PLAIN + 100000 && goodN(s) <= 6, "🎢", "Lucky Rollercoaster", "The numbers look great, but luck did a lot of the work and your risks were high. Luck doesn't repeat; process does."],
+  [s => s.peace >= 65 && s.debt <= 0, "🧘", "Calm Steady Saver", "You protected your family and your peace. Add a little more skill and patience, and the wealth will follow."],
+  [s => goodN(s) >= 6 && s.debt <= 0, "📈", "Learning Trader", "A decent year with a few expensive lessons. Keep the good habits, drop the risky ones."],
+  [s => s.debt > 0, "😰", "Stressed & In Debt", "Emergencies, leverage or lottery bets left you with debt. Next year: insurance, emergency fund, then small, rule-based trades."],
+  [s => true, "💥", "Hard Lessons Year", "Tips, leverage and revenge trades cost you this year. The good news: every lesson is now yours to keep."]];
+function finish() { const s = G; s.phase = "end"; const end = ENDS.find(e => e[0](s)), net = nw(s), plain = PLAIN, grow = net - START, goods = goodN(s);
+  S.plays = (S.plays || 0) + 1; if (!S.best || net > S.best.net) S.best = { net, t: end[2] }; S.save(); G.end = { em: end[1], t: end[2], d: end[3], net, goods, plain };
+  hud(); $("#stage").innerHTML = `<div class="end fade"><div class="hero"><div class="em">${end[1]}</div><div style="font:700 .74rem 'JetBrains Mono';color:var(--muted);letter-spacing:.1em">YOUR YEAR-END RESULT</div><h2>${end[2]}</h2><p>${end[3]}</p></div>
+    <div class="cmp"><div>Net worth<b class="${net >= START ? "up" : "down"}">${fmt(net)}</b></div><div>Change in the year<b class="${grow >= 0 ? "up" : "down"}">${sfmt(grow)}</b></div><div>😌 Peace of mind<b>${Math.round(s.peace)}/100</b></div><div>✅ Smart choices<b>${goods}/12</b></div></div>
+    <div class="lesson">📌 For comparison: keeping your salary surplus and bonus in a bank, with no insurance and no investing, would leave about <b>${fmt(plain)}</b>, but one uninsured hospital bill would take ₹1,50,000 of it. This year the market ended roughly flat after the crash; investing pays off over many years, not one.${s.debt > 0 ? ` You still owe <b>${fmt(s.debt)}</b> at 14%.` : ""}</div>
+    <h3 style="font:800 1.15rem 'Space Grotesk';margin-top:4px">📜 Your year, decision by decision</h3>
+    <div class="rev">${s.log.map(x => `<div><span>${x.k === "good" ? "✅" : x.k === "bad" ? "❌" : "⚠️"}</span><small>${MN[x.m].toUpperCase()}</small><span><b>${x.e} ${esc(x.t)}: ${esc(x.pick.replace(/^[^ ]+ /, ""))}</b>${esc(x.h)} · 💡 ${esc(x.l)}</span></div>`).join("")}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="next" id="again" style="width:auto;padding:14px 28px">🔁 Live the year again</button><a class="btn" href="../money-ladder/" style="text-decoration:none">🪜 The Money Ladder</a><a class="btn" href="../oath/" style="text-decoration:none">🛡️ Sign your oath</a></div></div>`;
+  $("#stage").scrollIntoView({ behavior: "smooth", block: "start" }); }
+function intro() { prevVals = {}; G = null; $("#hud").innerHTML = ""; $("#months").innerHTML = MN.map(n => `<i>${n}</i>`).join("");
+  $("#stage").innerHTML = `<div class="intro fade"><div class="big">🧑‍💼📈</div><h2>Your year starts now.</h2><p>You're 27, working a salaried job, and you just opened a demat account. Each month brings one real-life situation. Choose wisely: your <b>net worth</b>, <b>skill</b> and <b>peace of mind</b> all count at the end.</p>
+    <div class="startgrid"><div>Savings<b>₹2,00,000</b></div><div>Salary / month<b>₹60,000</b></div><div>Expenses / month<b>₹40,000</b></div></div>
+    <button class="next" id="startB" style="max-width:360px">▶ Start January</button>${S.best ? `<div style="font-size:.84rem;color:var(--muted)">Played ${S.plays} time${S.plays > 1 ? "s" : ""} · Best: ${S.best.t} (${fmt(S.best.net)})</div>` : ""}</div>`; }
+$("#stage").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  if (b.id === "startB" || b.id === "again") { newGame(); scrollTo({ top: $("#hud").offsetTop - 80, behavior: "smooth" }); }
+  else if (b.dataset.c != null) choose(+b.dataset.c);
+  else if (b.id === "nextB") { if (G.m < 11) { G.m++; render(); $("#stage").scrollIntoView({ behavior: "smooth", block: "start" }); } else finish(); } });
+/* ---------- share ---------- */
+function buildText() { if (!G?.end) return ["🧑‍💼 *One Year as a Trader*: a money life game", "", "12 months: tips, emergencies, crashes, leverage, bonuses, IPO mania. Every choice changes your ending.", "", "Can you finish richer AND calmer? 👇", ...K.signoff("trader-life", "Play", "").slice(1)].join("\n");
+  const e = G.end; return [`${e.em} *I finished "One Year as a Trader" as a ${e.t}!*`, "", `💰 Net worth: ${fmt(e.net)} (started with ₹2,00,000)`, `😌 Peace of mind: ${Math.round(G.peace)}/100 · ✅ Smart choices: ${e.goods}/12`, "", "Tips, crashes, leverage, IPO mania… what would YOU choose? 👇", ...K.signoff("trader-life", "Play", "").slice(1)].join("\n"); }
+async function drawImg() { await K.loadFonts?.(); const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H, [["rgba(255,138,61,0.25)", .9, .05, .6], ["rgba(124,92,255,0.2)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, "GAME · ONE YEAR AS A TRADER", 70, 186, `700 26px ${K.F.MONO}`, "#ffb27a");
+  if (G?.end) { const e = G.end; K.txt(ctx, e.em, W / 2, 400, `170px ${K.F.INTER}`, "#fff", "center"); K.txt(ctx, "My ending:", W / 2, 470, `600 32px ${K.F.INTER}`, "#cfd3df", "center"); K.txt(ctx, e.t, W / 2, 560, K.fit(ctx, e.t, 800, K.F.GROT, 84, 920), "#ffd98a", "center");
+    [["💰 Net worth", fmt(e.net)], ["😌 Peace of mind", Math.round(G.peace) + "/100"], ["✅ Smart choices", e.goods + "/12"], ["🧠 Skill", G.skill.toFixed(1).replace(".0", "") + "/10"]].forEach(([a, b], i) => { const x = 70 + (i % 2) * 478, y = 620 + Math.floor(i / 2) * 170; K.panel(ctx, x, y, 462, 150, 24); K.txt(ctx, a, x + 28, y + 52, `600 26px ${K.F.INTER}`, "#cfd3df"); K.txt(ctx, b, x + 28, y + 118, `800 50px ${K.F.GROT}`, "#fff"); });
+    K.txt(ctx, "Started with ₹2,00,000 · Tips, crashes, leverage, IPO mania…", W / 2, 1000, `500 26px ${K.F.INTER}`, "#cfd3df", "center"); K.txt(ctx, "What would YOU choose?", W / 2, 1050, `800 40px ${K.F.GROT}`, "#fff", "center"); }
+  else { K.txt(ctx, "Can you finish the year", 70, 300, `800 60px ${K.F.GROT}`, "#fff"); K.txt(ctx, "richer AND calmer?", 70, 375, `800 60px ${K.F.GROT}`, "#ffd98a"); ["📱 A Telegram tip", "🏥 A medical emergency", "💥 A 20% crash", "⚡ 4× leverage", "🎰 ₹2 expiry options", "🎟️ IPO mania"].forEach((t, i) => K.txt(ctx, t, 70, 480 + i * 80, `600 38px ${K.F.INTER}`, "#e6e9f2")); }
+  K.footer(ctx, W, H, K.toolUrl("trader-life"), "A game for fun & learning · Not investment advice", true); return c; }
+K.share({ text: buildText, draw: drawImg, file: () => "one-year-as-a-trader", imgLabel: "Share my ending" });
+intro();
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
