@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<title>My Year Journey — your trading year as a 3D story you can share</title>
+<meta name="description" content="Enter your monthly P&amp;L for each segment (equity, intraday, F&amp;O, commodity, currency) and watch your trading year come alive as a 3D story: towers for every month, a golden ribbon for your running total, a chart, best and worst months, and a shareable link that plays your journey for anyone." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="MANIMINDSMONEY" />
+<meta property="og:locale" content="en_IN" />
+<meta property="og:title" content="My Year Journey — your trading year as a 3D story you can share" />
+<meta property="og:description" content="Enter your monthly P&amp;L for each segment (equity, intraday, F&amp;O, commodity, currency) and watch your trading year come alive as a 3D story: towers for every month, a golden ribbon for your running…" />
+<meta property="og:url" content="https://manideepcs024.github.io/year-journey/" />
+<meta property="og:image" content="https://manideepcs024.github.io/assets/og/year-journey.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="My Year Journey — your trading year as a 3D story you can share" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://manideepcs024.github.io/year-journey/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/tool.css" />
+<style>
+  :root { --acc: #22d39a; --acc2: #febc2e; }
+  .wrap { max-width: 1120px; }
+  .stepc { margin-top: 16px; border-radius: 24px; border: 1px solid var(--line); background: var(--card); padding: 18px; }
+  .stepc > h2 { font: 800 1.3rem "Space Grotesk"; display: flex; gap: 10px; align-items: center; }
+  .stepc > h2 i { font-style: normal; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: rgba(34,211,154,.15); color: var(--up); font: 800 .95rem "Space Grotesk"; }
+  .stepc > p.l { color: var(--muted); font-size: .86rem; margin: 4px 0 12px; line-height: 1.5; }
+  .g3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; } .g3 .w2 { grid-column: span 2; } .g3 .w3 { grid-column: 1 / -1; }
+  .segs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .segs button { border: 1.5px solid var(--line); background: rgba(0,0,0,.3); color: #bfc4d2; padding: 8px 12px; border-radius: 999px; font: 700 .8rem Inter; cursor: pointer; }
+  .segs button.on { color: #fff; border-color: var(--c); background: color-mix(in srgb, var(--c) 18%, transparent); }
+  .ytype { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ytype button { border: 1px solid var(--line); background: rgba(0,0,0,.3); color: #dfe3ee; padding: 9px 13px; border-radius: 12px; font: 600 .84rem Inter; cursor: pointer; } .ytype button.on { background: var(--fg); color: #000; }
+  .tw { overflow-x: auto; }
+  table.mt { width: 100%; border-collapse: separate; border-spacing: 0 5px; min-width: 560px; }
+  .mt th { font: 700 .62rem "JetBrains Mono"; letter-spacing: .05em; color: var(--muted); text-align: right; padding: 0 6px; white-space: nowrap; } .mt th:first-child { text-align: left; }
+  .mt td { padding: 0 3px; } .mt td:first-child { font: 700 .86rem "Space Grotesk"; padding-left: 6px; white-space: nowrap; }
+  .mt input { width: 100%; min-width: 76px; background: rgba(0,0,0,.35); border: 1px solid var(--line); color: #fff; border-radius: 10px; padding: 9px 8px; font: 600 .86rem "JetBrains Mono"; text-align: right; }
+  .mt input:focus { outline: none; border-color: var(--acc); }
+  .mt td.tot { font: 700 .86rem "JetBrains Mono"; text-align: right; white-space: nowrap; padding-right: 8px; }
+  .mt tr.sum td { border-top: 1px solid var(--line); padding-top: 8px; font: 800 .9rem "JetBrains Mono"; text-align: right; } .mt tr.sum td:first-child { text-align: left; }
+  .bigbtn { width: 100%; margin-top: 16px; border: 0; border-radius: 18px; padding: 17px; font: 800 1.15rem "Space Grotesk"; color: #04140f; cursor: pointer; background: linear-gradient(100deg, #22d39a, #00e0b8 50%, #febc2e); box-shadow: 0 12px 40px rgba(34,211,154,.25); }
+  .tools2 { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; } .tools2 .btn { padding: 9px 13px; font-size: .84rem; }
+  /* viewer */
+  .viewer { margin-top: 16px; }
+  .stage3 { position: relative; aspect-ratio: 16 / 10; border-radius: 26px; overflow: hidden; border: 1px solid rgba(34,211,154,.35); background: radial-gradient(circle at 50% 0%, #142338, #05060a 70%); }
+  #c3 { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .ovTop { position: absolute; top: 14px; left: 16px; right: 16px; display: flex; justify-content: space-between; gap: 10px; pointer-events: none; }
+  .ovTop .who b { display: block; font: 800 1.2rem "Space Grotesk"; text-shadow: 0 2px 12px #000; } .ovTop .who span { font: 600 .74rem "JetBrains Mono"; color: #cfd3df; text-shadow: 0 2px 8px #000; }
+  .ovTop .tot { text-align: right; } .ovTop .tot span { font: 700 .66rem "JetBrains Mono"; color: #cfd3df; letter-spacing: .06em; } .ovTop .tot b { display: block; font: 800 1.5rem "Space Grotesk"; text-shadow: 0 2px 12px #000; }
+  .card3 { position: absolute; left: 14px; right: 14px; bottom: 14px; max-width: 460px; border-radius: 18px; padding: 14px 16px; background: rgba(8,10,18,.82); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.12); transition: opacity .35s, transform .35s; }
+  .card3.hide { opacity: 0; transform: translateY(10px); }
+  .card3 .mm { font: 700 .7rem "JetBrains Mono"; letter-spacing: .1em; color: var(--muted); } .card3 .nn { font: 800 1.7rem "Space Grotesk"; margin: 2px 0; } .card3 .nar { font-size: .9rem; color: #e6e9f2; line-height: 1.45; }
+  .card3 .sg { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; } .card3 .sg span { font: 700 .7rem "JetBrains Mono"; padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,.07); }
+  .intro3 { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: radial-gradient(circle, rgba(5,6,10,.55), rgba(5,6,10,.9)); padding: 20px; }
+  .intro3 h2 { font: 800 2rem "Space Grotesk"; } .intro3 p { color: #cfd3df; margin: 6px 0 16px; }
+  .intro3 button { border: 0; border-radius: 999px; padding: 15px 30px; font: 800 1.1rem "Space Grotesk"; cursor: pointer; color: #04140f; background: linear-gradient(100deg, #22d39a, #febc2e); box-shadow: 0 10px 40px rgba(34,211,154,.35); }
+  .ctrl3 { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 10px; }
+  .ctrl3 .btn { padding: 10px 14px; font-size: .86rem; } .dots3 { display: flex; gap: 4px; flex: 1; justify-content: center; } .dots3 i { width: 22px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); cursor: pointer; } .dots3 i.p { background: rgba(34,211,154,.5); } .dots3 i.l { background: rgba(255,84,112,.5); } .dots3 i.cur { outline: 2px solid #fff; }
+  .kp4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+  .kp4 div { border-radius: 16px; padding: 13px; border: 1px solid var(--line); background: var(--card); } .kp4 span { display: block; font: 600 .62rem "JetBrains Mono"; color: var(--muted); letter-spacing: .05em; } .kp4 b { display: block; font: 800 1.3rem "Space Grotesk"; margin-top: 3px; } .kp4 small { color: var(--muted); font-size: .76rem; }
+  .chartc { margin-top: 14px; border-radius: 22px; border: 1px solid var(--line); background: var(--card); padding: 14px; } .chartc svg { width: 100%; height: auto; display: block; }
+  .leg { display: flex; gap: 12px; flex-wrap: wrap; font-size: .78rem; color: #cfd3df; margin-top: 8px; } .leg i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .segtot { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-top: 12px; }
+  .segtot div { border-radius: 14px; padding: 10px 12px; border: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: .8rem; color: #cfd3df; } .segtot b { display: block; font: 800 1.05rem "Space Grotesk"; }
+  .sharebox { margin-top: 16px; border-radius: 22px; padding: 16px; border: 1px solid rgba(254,188,46,.45); background: linear-gradient(135deg, rgba(254,188,46,.08), rgba(34,211,154,.05)); }
+  .sharebox h3 { font: 800 1.15rem "Space Grotesk"; } .sharebox p { color: #cfd3df; font-size: .86rem; margin: 4px 0 10px; line-height: 1.5; }
+  .linkrow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; } .linkrow input { background: rgba(0,0,0,.35); border: 1px solid var(--line); color: #cfd3df; border-radius: 12px; padding: 11px; font: 500 .78rem "JetBrains Mono"; min-width: 0; }
+  .visitor { margin-top: 16px; border-radius: 22px; padding: 18px; text-align: center; border: 1px solid rgba(34,211,154,.45); background: rgba(34,211,154,.06); }
+  @media (max-width: 760px) { .g3 { grid-template-columns: 1fr 1fr; } .g3 .w2 { grid-column: 1 / -1; } .stage3 { aspect-ratio: 4 / 5; } .kp4 { grid-template-columns: 1fr 1fr; } .linkrow { grid-template-columns: 1fr 1fr; } .linkrow input { grid-column: 1 / -1; } .card3 .nn { font-size: 1.3rem; } .card3 { padding: 11px 13px; left: 10px; right: 10px; bottom: 10px; } .card3 .nar { font-size: .84rem; } .card3 .sg span { font-size: .64rem; } .ovTop .tot b { font-size: 1.05rem; } .ovTop .who b { font-size: .92rem; } .ovTop .who span { font-size: .64rem; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+<link rel="manifest" href="../manifest.webmanifest" />
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MMM Tools" />
+<link rel="icon" type="image/png" href="../assets/icons/favicon-32.png" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><i>₹</i><span>MANIMINDSMONEY</span></div>
+      <nav class="nav"><a href="../wrapped/">🎁 Wrapped</a><a href="../accounts-pnl/">🏦 Accounts P&amp;L</a><a href="../tools/">🧰 All tools</a><a href="../">← Manideep.</a></nav>
+    </header>
+    <h1>My Year <span class="grad">Journey.</span></h1>
+    <p class="sub" id="subTxt">Enter your monthly profit and loss for each segment, and watch your trading year come alive as a <b>3D story</b>, then share it as a link anyone can open.</p>
+
+    <div id="editor">
+      <section class="stepc">
+        <h2><i>1</i>About you</h2>
+        <p class="l">This appears at the start of your story. Only fill what you're happy to share.</p>
+        <div class="g3">
+          <div><div class="q">Your name</div><label class="field sm"><input id="f_name" type="text" maxlength="30" placeholder="e.g. Manideep Mittal" /></label></div>
+          <div><div class="q">Account name</div><label class="field sm"><input id="f_acct" type="text" maxlength="40" placeholder="e.g. Narendra Mittal account" /></label></div>
+          <div><div class="q">Broker <span class="opt">optional</span></div><label class="field sm"><input id="f_broker" type="text" maxlength="24" placeholder="e.g. Zerodha" /></label></div>
+          <div><div class="q">Starting capital ₹ <span class="opt">optional</span></div><label class="field sm"><input id="f_cap" type="text" inputmode="decimal" placeholder="e.g. 5,00,000" /></label></div>
+          <div><div class="q">Trading style</div><label class="field sm"><input id="f_style" type="text" maxlength="30" placeholder="e.g. Swing + intraday" /></label></div>
+          <div><div class="q">Year</div><label class="field sm"><input id="f_year" type="text" inputmode="numeric" maxlength="4" placeholder="2026" /></label></div>
+          <div class="w3"><div class="q">Year type</div><div class="ytype" id="ytype"><button data-y="cal">Calendar year (Jan – Dec)</button><button data-y="fy">Financial year (Apr – Mar)</button></div></div>
+          <div class="w3"><div class="q">Your message for the year <span class="opt">optional · shown at the end</span></div><label class="field sm"><input id="f_msg" type="text" maxlength="110" placeholder="e.g. Discipline paid off. Next year: fewer trades, bigger patience." /></label></div>
+        </div>
+      </section>
+
+      <section class="stepc">
+        <h2><i>2</i>Monthly P&amp;L by segment</h2>
+        <p class="l">Tick the segments you trade, then enter each month's <b>net P&amp;L in ₹</b> (use <b>−</b> for a loss). Leave a month empty if you didn't trade.</p>
+        <div class="segs" id="segs"></div>
+        <div class="tools2"><button class="btn" id="fillTR">📊 Fill from my Trade Reports</button><button class="btn" id="demoB">🎲 Demo numbers</button><button class="btn" id="clearB">🧹 Clear table</button></div>
+        <div class="tw"><table class="mt" id="mt"></table></div>
+        <button class="bigbtn" id="makeB">🎬 Create my 3D year journey</button>
+      </section>
+    </div>
+
+    <div class="viewer" id="viewer" hidden>
+      <div class="stage3" id="stage3">
+        <canvas id="c3"></canvas>
+        <div class="ovTop"><div class="who" id="who"></div><div class="tot" id="totOv"></div></div>
+        <div class="card3 hide" id="card3"></div>
+        <div class="intro3" id="intro3"></div>
+      </div>
+      <div class="ctrl3"><button class="btn" id="prevB">← Prev</button><div class="dots3" id="dots3"></div><button class="btn" id="playB">⏸ Pause</button><button class="btn" id="nextB">Next →</button></div>
+      <div class="kp4" id="kp4"></div>
+      <div class="chartc"><div style="font:700 .7rem 'JetBrains Mono';color:var(--muted);letter-spacing:.06em">MONTHLY P&amp;L BY SEGMENT · GOLD LINE = RUNNING TOTAL</div><div id="chart"></div><div class="leg" id="leg"></div><div class="segtot" id="segtot"></div></div>
+      <div class="sharebox" id="sharebox">
+        <h3>🔗 Share my journey</h3>
+        <p>Your whole story is stored <b>inside this link</b>: anyone who opens it can watch your 3D journey. Nothing is uploaded anywhere.</p>
+        <label class="toggle" style="margin:0 0 10px"><span>Hide ₹ amounts in the link<small>Shows the shape of your year, green and red months, and % only</small></span><input type="checkbox" id="hideAmt" /><span class="sw"></span></label>
+        <div class="linkrow"><input id="link" readonly /><button class="btn" id="copyLink">📋 Copy link</button><button class="btn wa" id="waLink">WhatsApp</button></div>
+        <div class="share-row" id="shareRow" style="margin-top:10px"></div>
+        <button class="btn" id="editB" style="margin-top:10px">✏️ Edit my numbers</button>
+      </div>
+      <div class="visitor" id="visitor" hidden><h3 style="font:800 1.2rem 'Space Grotesk'">✨ Make your own year journey</h3><p style="color:#cfd3df;margin:6px 0 12px;font-size:.9rem">Enter your monthly P&amp;L and get a 3D story link like this one. Free, no login.</p><a class="btn primary" href="./" style="text-decoration:none">🎬 Create mine</a></div>
+    </div>
+
+    <div class="disclaimer"><b>⚠️ Note:</b> Numbers are what you enter; nothing is checked or uploaded. The share link contains your numbers (unless you hide amounts), so share it only with people you trust. Not SEBI registered; not investment advice.</div>
+    <footer>Made by <a href="../">Manideep</a> · MANIMINDSMONEY Community</footer>
+  </div>
+<script src="../assets/tool.js"></script>
+<script src="../assets/tradekit.js"></script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const K = window.Kit, $ = K.$, esc = K.esc; K.chrome();
+const SEG = { eq: ["📦", "Equity delivery", "#5b8cff"], intra: ["⚡", "Intraday", "#00e0b8"], fno: ["🎲", "F&O", "#b18cff"], comm: ["🪙", "Commodity", "#febc2e"], curr: ["💱", "Currency", "#ff8a3d"], chg: ["💸", "Charges & taxes", "#ff5470"] };
+const CAL = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], FY = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+const FULL = { Jan: "January", Feb: "February", Mar: "March", Apr: "April", May: "May", Jun: "June", Jul: "July", Aug: "August", Sep: "September", Oct: "October", Nov: "November", Dec: "December" };
+const blank = () => Array(12).fill("");
+const S = K.store("journey_v1", { name: "", acct: "", broker: "", cap: "", style: "", year: String(new Date().getFullYear()), yt: "cal", msg: "", segs: ["eq", "intra", "fno"], m: { eq: blank(), intra: blank(), fno: blank(), comm: blank(), curr: blank(), chg: blank() }, hide: false });
+const fmt = v => (v < 0 ? "−" : "") + "₹" + Math.round(Math.abs(v)).toLocaleString("en-IN"), sfmt = v => (v > 0 ? "+" : "") + fmt(v);
+const short = v => { const a = Math.abs(v), s = v < 0 ? "−" : v > 0 ? "+" : ""; return s + "₹" + (a >= 1e7 ? (a / 1e7).toFixed(2) + "Cr" : a >= 1e5 ? (a / 1e5).toFixed(a >= 1e6 ? 1 : 2) + "L" : a >= 1e3 ? (a / 1e3).toFixed(a >= 1e4 ? 0 : 1) + "k" : Math.round(a)); };
+/* ================= EDITOR ================= */
+const F = ["name", "acct", "broker", "cap", "style", "year", "msg"];
+F.forEach(k => { const el = $("#f_" + k); el.value = S[k] || ""; el.addEventListener("input", e => { if (k === "cap") K.fmtNum(e.target, 0); S[k] = e.target.value; S.save(); }); });
+const months = () => S.yt === "fy" ? FY : CAL;
+function drawYT() { $("#ytype").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.y === S.yt)); }
+$("#ytype").addEventListener("click", e => { const b = e.target.closest("[data-y]"); if (!b) return; S.yt = b.dataset.y; S.save(); drawYT(); drawTable(); });
+function drawSegs() { $("#segs").innerHTML = Object.entries(SEG).map(([k, [e, n, c]]) => `<button data-s="${k}" style="--c:${c}" class="${S.segs.includes(k) ? "on" : ""}">${e} ${n}</button>`).join(""); }
+$("#segs").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; const k = b.dataset.s; S.segs = S.segs.includes(k) ? S.segs.filter(x => x !== k) : Object.keys(SEG).filter(x => x === k || S.segs.includes(x)); if (!S.segs.length) S.segs = [k]; S.save(); drawSegs(); drawTable(); });
+function drawTable() { const M = months(), sg = S.segs;
+  $("#mt").innerHTML = `<tr><th>MONTH</th>${sg.map(k => `<th style="color:${SEG[k][2]}">${SEG[k][0]} ${SEG[k][1].toUpperCase()}</th>`).join("")}<th>NET</th></tr>` +
+    M.map((mn, i) => `<tr><td>${mn}</td>${sg.map(k => `<td><input data-k="${k}" data-i="${i}" type="text" inputmode="text" value="${esc(S.m[k][i] || "")}" placeholder="0" /></td>`).join("")}<td class="tot" id="rt${i}"></td></tr>`).join("") +
+    `<tr class="sum"><td>Total</td>${sg.map(k => `<td id="ct_${k}"></td>`).join("")}<td id="gt"></td></tr>`; totals(); }
+function totals() { const sg = S.segs; let g = 0; months().forEach((_, i) => { const t = sg.reduce((a, k) => a + (K.num(S.m[k][i]) || 0), 0); g += t; const el = $("#rt" + i); el.textContent = t ? sfmt(t) : "—"; el.className = "tot " + (t > 0 ? "up" : t < 0 ? "down" : ""); });
+  sg.forEach(k => { const t = S.m[k].reduce((a, v) => a + (K.num(v) || 0), 0), el = $("#ct_" + k); el.textContent = sfmt(t); el.className = t > 0 ? "up" : t < 0 ? "down" : ""; }); const gt = $("#gt"); gt.textContent = sfmt(g); gt.className = g > 0 ? "up" : g < 0 ? "down" : ""; }
+$("#mt").addEventListener("input", e => { const el = e.target.closest("[data-k]"); if (!el) return; el.value = el.value.replace(/[^0-9,.\-−]/g, "").replace("−", "-"); S.m[el.dataset.k][+el.dataset.i] = el.value; S.save(); totals(); });
+$("#mt").addEventListener("blur", e => { const el = e.target.closest("[data-k]"); if (!el || !el.value.trim()) return; const v = K.num(el.value); if (!isNaN(v)) { el.value = (v < 0 ? "-" : "") + Math.abs(Math.round(v)).toLocaleString("en-IN"); S.m[el.dataset.k][+el.dataset.i] = el.value; S.save(); } }, true);
+$("#clearB").onclick = () => { if (!confirm("Clear all monthly numbers?")) return; Object.keys(S.m).forEach(k => S.m[k] = blank()); S.save(); drawTable(); };
+$("#demoB").onclick = () => { const d = { eq: [12000, -4000, 18000, 9000, -15000, -22000, 31000, 14000, 6000, 21000, 9000, 16000], intra: [3500, 6200, -2100, 4800, -6800, 1200, 7400, -3000, 5200, 2900, 6100, 3300], fno: [-8000, 15000, 4000, -12000, -9000, 26000, -5000, 11000, -14000, 9000, 18000, 7000], chg: [-1800, -2100, -1900, -2000, -2400, -2600, -2200, -1900, -2100, -2000, -2300, -1800] };
+  S.segs = ["eq", "intra", "fno", "chg"]; Object.keys(S.m).forEach(k => S.m[k] = d[k] ? d[k].map(v => (v < 0 ? "-" : "") + Math.abs(v).toLocaleString("en-IN")) : blank()); if (!S.name) S.name = "Demo Trader"; if (!S.acct) S.acct = "Main account"; F.forEach(k => $("#f_" + k).value = S[k] || ""); S.save(); drawSegs(); drawTable(); K.toast("Demo numbers filled"); };
+$("#fillTR").onclick = () => { let D = null; try { D = JSON.parse(localStorage.getItem("tradereports_v1") || "{}").data; } catch {} if (!D?.ex?.length) { K.toast("Load your tradebook in Trade Reports first"); return; }
+  const cyc = TK.analyze(D.ex).cyc, y = +(S.year || new Date().getFullYear()), M = months(); let n = 0;
+  ["eq", "intra"].forEach(k => S.m[k] = blank());
+  cyc.forEach(t => { const yy = +t.cd.slice(0, 4), mo = +t.cd.slice(5, 7) - 1, mn = CAL[mo], idx = M.indexOf(mn), inYear = S.yt === "fy" ? (mo >= 3 ? yy === y : yy === y + 1) : yy === y; if (!inYear || idx < 0) return; const k = t.intra ? "intra" : "eq"; S.m[k][idx] = String((K.num(S.m[k][idx]) || 0) + t.pnl); n++; });
+  ["eq", "intra"].forEach(k => S.m[k] = S.m[k].map(v => v === "" ? "" : (K.num(v) < 0 ? "-" : "") + Math.abs(Math.round(K.num(v))).toLocaleString("en-IN")));
+  if (!n) { K.toast(`No closed trades found for ${S.yt === "fy" ? "FY " + y + "-" + String(y + 1).slice(2) : y}`); return; }
+  S.segs = [...new Set(["eq", "intra", ...S.segs])].filter(k => SEG[k]); S.save(); drawSegs(); drawTable(); K.toast(`Filled from ${n} closed trades (equity & intraday, before charges)`); };
+/* ================= DATA ⇄ LINK ================= */
+function collect() { const sg = S.segs, rows = sg.map(k => S.m[k].map(v => Math.round(K.num(v) || 0)));
+  return { v: 1, n: (S.name || "").trim(), a: (S.acct || "").trim(), b: (S.broker || "").trim(), c: Math.round(K.num(S.cap) || 0), st: (S.style || "").trim(), y: (S.year || "").trim(), t: S.yt, g: (S.msg || "").trim(), s: sg, m: rows }; }
+const b64e = s => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const b64d = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)));
+function linkFor(J, hide) { let d = J; if (hide) { const mx = Math.max(1, ...J.m.flat().map(Math.abs), Math.abs(J.m[0].map((_, i) => J.m.reduce((a, r) => a + r[i], 0)).reduce((a, b) => a + b, 0))), pc = J.c > 0 ? J.m.flat().reduce((a, b) => a + b, 0) / J.c * 100 : null;
+    d = { ...J, c: 0, h: 1, p: pc != null ? +pc.toFixed(1) : null, m: J.m.map(r => r.map(v => Math.round(v / mx * 1000))) }; }
+  const base = /^https?:/.test(location.protocol) ? location.origin + location.pathname : "https://manideepcs024.github.io/year-journey/"; return base + "#j=" + b64e(JSON.stringify(d)); }
+/* ================= VIEWER ================= */
+let J = null, isVisitor = false;
+function openViewer(data, visitor) { J = data; isVisitor = visitor; $("#editor").hidden = true; $("#viewer").hidden = false; $("#sharebox").hidden = visitor; $("#visitor").hidden = !visitor;
+  $("#subTxt").innerHTML = visitor ? `${esc(J.n || "A trader")}'s trading year, as a 3D story. Tap play, then drag to look around.` : "Your year as a 3D story. Tap play, drag to look around, then share your link.";
+  analyse(); stats(); chart(); build3D(); introCard(); if (!visitor) { $("#hideAmt").checked = S.hide; updLink(); } scrollTo({ top: $("#viewer").offsetTop - 70, behavior: "smooth" }); }
+let A = null;
+function analyse() { const M = J.t === "fy" ? FY : CAL, net = M.map((_, i) => J.m.reduce((a, r) => a + (r[i] || 0), 0)), cum = []; net.reduce((a, v, i) => (cum[i] = a + v, a + v), 0);
+  const traded = net.map((v, i) => J.m.some(r => r[i])), total = cum[11] || 0, green = net.filter((v, i) => traded[i] && v > 0).length, red = net.filter((v, i) => traded[i] && v < 0).length;
+  const bi = net.indexOf(Math.max(...net)), wi = net.indexOf(Math.min(...net)); let peak = 0, dd = 0, st = 0, bestSt = 0; cum.forEach((c, i) => { peak = Math.max(peak, c); dd = Math.max(dd, peak - c); st = net[i] > 0 ? st + 1 : 0; bestSt = Math.max(bestSt, st); });
+  const segTot = J.s.map((k, j) => [k, J.m[j].reduce((a, b) => a + b, 0)]);
+  A = { M, net, cum, traded, total, green, red, bi, wi, dd, bestSt, segTot, hide: !!J.h, yr: J.t === "fy" ? `FY ${J.y}-${String(+J.y + 1).slice(2)}` : J.y }; }
+const money = v => A.hide ? (v > 0 ? "▲ profit" : v < 0 ? "▼ loss" : "flat") : sfmt(v), moneyS = v => A.hide ? (v > 0 ? "▲" : v < 0 ? "▼" : "·") : short(v);
+function narrate(i) { const n = A.net[i], c = A.cum[i], prevBest = Math.max(-Infinity, ...A.net.slice(0, i)), segs = J.s.map((k, j) => [k, J.m[j][i]]).filter(x => x[1]).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+  let st = 0; for (let k = i; k >= 0 && A.net[k] > 0; k--) st++;
+  if (!A.traded[i]) return "😴 A quiet month: no trades. Sometimes sitting out is the best position.";
+  const top = segs[0] ? `${SEG[segs[0][0]][0]} ${SEG[segs[0][0]][1]} ${segs[0][1] > 0 ? "led the way" : "hurt the most"}` : "";
+  if (i === A.bi && n > 0) return `🏆 Best month of the year! ${top}.`;
+  if (i === A.wi && n < 0) return `🌧️ Toughest month of the year. ${top}. Every trader has months like this; what matters is what comes next.`;
+  if (n > 0 && st >= 3) return `🔥 ${st} green months in a row! ${top}.`;
+  if (n > 0 && i > 0 && A.cum[i - 1] < 0 && c >= 0) return `🔄 Back in profit for the year! ${top}.`;
+  if (n > 0 && n > prevBest && i > 0) return `🚀 A new best month so far. ${top}.`;
+  if (n > 0) return `✅ A green month. ${top}.`;
+  if (n < 0 && c > 0) return `🩹 A red month, but the year is still in profit. ${top}.`;
+  return `📉 A red month. ${top}. Small losses keep you in the game.`; }
+function stats() { const capPct = J.c > 0 ? ` · ${(A.total / J.c * 100).toFixed(1)}% on capital` : J.p != null ? ` · ${J.p}% on capital` : "";
+  $("#who").innerHTML = `<b>${esc(J.n || "My")}${J.n ? "'s" : ""} ${A.yr} journey</b><span>${[J.a, J.b, J.st].filter(Boolean).map(esc).join(" · ")}</span>`;
+  $("#totOv").innerHTML = `<span>YEAR NET</span><b class="${A.total >= 0 ? "up" : "down"}" id="totNum">${A.hide ? (A.total >= 0 ? "In profit ✅" : "In loss 🔻") : "₹0"}</b>`;
+  $("#kp4").innerHTML = `<div><span>NET FOR THE YEAR</span><b class="${A.total >= 0 ? "up" : "down"}">${A.hide ? (A.total >= 0 ? "In profit ✅" : "In loss") : sfmt(A.total)}</b><small>${capPct ? capPct.slice(3) : "&nbsp;"}</small></div><div><span>GREEN / RED MONTHS</span><b>🟢 ${A.green} · 🔴 ${A.red}</b><small>best streak ${A.bestSt} month${A.bestSt === 1 ? "" : "s"}</small></div><div><span>BEST MONTH</span><b class="up">${FULL[A.M[A.bi]]}</b><small>${money(A.net[A.bi])}</small></div><div><span>TOUGHEST MONTH</span><b class="${A.net[A.wi] < 0 ? "down" : ""}">${FULL[A.M[A.wi]]}</b><small>${money(A.net[A.wi])}${!A.hide && A.dd > 0 ? " · max dip " + fmt(A.dd) : ""}</small></div>`;
+  $("#segtot").innerHTML = A.segTot.map(([k, v]) => `<div><span>${SEG[k][0]} ${SEG[k][1]}</span><b class="${v > 0 ? "up" : v < 0 ? "down" : ""}">${A.hide ? (v > 0 ? "▲ profit" : v < 0 ? "▼ loss" : "—") : sfmt(v)}</b></div>`).join("");
+  $("#leg").innerHTML = J.s.map(k => `<span><i style="background:${SEG[k][2]}"></i>${SEG[k][1]}</span>`).join("") + `<span><i style="background:#ffd36b"></i>Running total</span>`;
+  $("#dots3").innerHTML = A.M.map((m, i) => `<i data-i="${i}" class="${A.net[i] > 0 ? "p" : A.net[i] < 0 ? "l" : ""}" title="${m}"></i>`).join(""); }
+function chart() { const W = 900, H = 300, L = 60, Rr = 14, T = 16, B = 28, n = 12, pos = A.M.map((_, i) => J.m.reduce((a, r) => a + Math.max(0, r[i]), 0)), neg = A.M.map((_, i) => J.m.reduce((a, r) => a + Math.min(0, r[i]), 0));
+  const hi = Math.max(1, ...pos, ...A.cum), lo = Math.min(0, ...neg, ...A.cum), sp = hi - lo, Y = v => T + (hi - v) / sp * (H - T - B), bw = (W - L - Rr) / n, X = i => L + i * bw;
+  let o = ""; for (let k = 0; k <= 4; k++) { const v = lo + sp * k / 4, y = Y(v); o += `<line x1="${L}" x2="${W - Rr}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.06)"/>` + (A.hide ? "" : `<text x="${L - 6}" y="${y + 4}" fill="#8b93a7" font-size="11" font-family="JetBrains Mono" text-anchor="end">${short(v).replace("+", "")}</text>`); }
+  o += `<line x1="${L}" x2="${W - Rr}" y1="${Y(0)}" y2="${Y(0)}" stroke="rgba(255,255,255,.3)"/>`;
+  A.M.forEach((m, i) => { let up = 0, dn = 0; J.s.forEach((k, j) => { const v = J.m[j][i]; if (!v) return; const x = X(i) + bw * .18, w = bw * .64; if (v > 0) { o += `<rect x="${x}" y="${Y(up + v)}" width="${w}" height="${Y(up) - Y(up + v)}" fill="${SEG[k][2]}" rx="2"/>`; up += v; } else { o += `<rect x="${x}" y="${Y(dn)}" width="${w}" height="${Y(dn + v) - Y(dn)}" fill="${SEG[k][2]}" opacity=".75" rx="2"/>`; dn += v; } });
+    o += `<text x="${X(i) + bw / 2}" y="${H - 8}" fill="${A.net[i] > 0 ? "#9ff3d5" : A.net[i] < 0 ? "#ffb3c0" : "#8b93a7"}" font-size="11" font-family="JetBrains Mono" text-anchor="middle">${m}</text>`; });
+  o += `<polyline points="${A.cum.map((c, i) => `${X(i) + bw / 2},${Y(c)}`).join(" ")}" fill="none" stroke="#ffd36b" stroke-width="3" stroke-linejoin="round"/>` + A.cum.map((c, i) => `<circle cx="${X(i) + bw / 2}" cy="${Y(c)}" r="4" fill="#ffd36b"/>`).join("");
+  $("#chart").innerHTML = `<svg viewBox="0 0 ${W} ${H}">${o}</svg>`; }
+/* ---------------- 3D ---------------- */
+let R3 = null;
+function build3D() { if (R3) { R3.stop(); R3 = null; } const cv = $("#c3"), st = $("#stage3");
+  let renderer; try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch { $("#card3").classList.remove("hide"); $("#card3").innerHTML = "3D isn't supported on this device. The chart and stats below show your year."; return; }
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1)); const scene = new THREE.Scene(); scene.fog = new THREE.Fog(0x05060a, 30, 80);
+  const cam = new THREE.PerspectiveCamera(50, 1, .1, 200); const ctl = new OrbitControls(cam, cv); ctl.enableDamping = true; ctl.maxPolarAngle = Math.PI * .49; ctl.minDistance = 6; ctl.maxDistance = 60;
+  scene.add(new THREE.HemisphereLight(0xbcd7ff, 0x0b0d18, .9)); const dl = new THREE.DirectionalLight(0xffffff, 1.1); dl.position.set(10, 20, 12); scene.add(dl);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(120, 60), new THREE.MeshStandardMaterial({ color: 0x0c1220, transparent: true, opacity: .78, roughness: .9 })); ground.rotation.x = -Math.PI / 2; scene.add(ground);
+  const grid = new THREE.GridHelper(120, 60, 0x1e2a44, 0x141c2e); grid.position.y = .01; scene.add(grid);
+  const P = i => new THREE.Vector3((i - 5.5) * 3.2, 0, Math.sin(i / 11 * Math.PI) * -6);
+  const road = new THREE.CatmullRomCurve3(A.M.map((_, i) => P(i).clone().setY(.03))); scene.add(new THREE.Mesh(new THREE.TubeGeometry(road, 200, .5, 8, false), new THREE.MeshStandardMaterial({ color: 0x1b2640, emissive: 0x0a1222, roughness: .6 })));
+  const maxAbs = Math.max(1, ...J.m.flatMap((r, j) => r.map(Math.abs)), ...A.M.map((_, i) => Math.max(J.m.reduce((a, r) => a + Math.max(0, r[i]), 0), -J.m.reduce((a, r) => a + Math.min(0, r[i]), 0)))), H = 7 / maxAbs;
+  const towers = [];
+  A.M.forEach((m, i) => { const g = new THREE.Group(), p = P(i); g.position.copy(p); let up = 0, dn = 0;
+    J.s.forEach((k, j) => { const v = J.m[j][i]; if (!v) return; const h = Math.max(.06, Math.abs(v) * H), col = new THREE.Color(SEG[k][2]); const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, h, 1.5), new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: v > 0 ? .35 : .2, roughness: .35, metalness: .2, transparent: v < 0, opacity: v < 0 ? .85 : 1 }));
+      if (v > 0) { mesh.position.y = up + h / 2; up += h; } else { mesh.position.y = dn - h / 2; dn -= h; } mesh.scale.y = .001; mesh.userData.h = 1; g.add(mesh); });
+    const ring = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.45, 32), new THREE.MeshBasicMaterial({ color: A.net[i] > 0 ? 0x22d39a : A.net[i] < 0 ? 0xff5470 : 0x8b93a7, side: THREE.DoubleSide, transparent: true, opacity: .8 })); ring.rotation.x = -Math.PI / 2; ring.position.y = .05; g.add(ring);
+    const lab = sprite(`${m}`, moneyS(A.net[i]), A.net[i] > 0 ? "#9ff3d5" : A.net[i] < 0 ? "#ffb3c0" : "#cfd3df"); lab.position.set(0, Math.max(up, 0) + 1.3, 0); lab.userData.lab = 1; g.add(lab); g.visible = false;
+    scene.add(g); towers.push({ g, up, dn, grow: 0 }); });
+  const cmax = Math.max(1, ...A.cum.map(Math.abs)), CH = 4 / cmax, cumPts = A.M.map((_, i) => { const p = P(i); return new THREE.Vector3(p.x, 9.5 + A.cum[i] * CH, p.z); });
+  const cumCurve = new THREE.CatmullRomCurve3(cumPts), ribbonMat = new THREE.MeshStandardMaterial({ color: 0xffd36b, emissive: 0xffb020, emissiveIntensity: .7, roughness: .3 }), ribbon = new THREE.Mesh(new THREE.TubeGeometry(cumCurve, 300, .12, 8, false), ribbonMat); scene.add(ribbon); ribbon.geometry.setDrawRange(0, 0);
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(.32, 20, 20), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffd36b, emissiveIntensity: 1 })); ball.position.copy(cumPts[0]); scene.add(ball);
+  const zeroLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(A.M.map((_, i) => { const p = P(i); return new THREE.Vector3(p.x, 9.5, p.z); })), new THREE.LineDashedMaterial({ color: 0x8b93a7, dashSize: .4, gapSize: .3, transparent: true, opacity: .5 })); zeroLine.computeLineDistances(); scene.add(zeroLine);
+  const stars = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute(Array.from({ length: 900 }, () => (Math.random() - .5) * 160), 3)), new THREE.PointsMaterial({ color: 0x8fb0ff, size: .12, transparent: true, opacity: .6 })); stars.position.y = 30; scene.add(stars);
+  const segsPerTube = 300 * 8 * 6 / 11;
+  let started = false, idx = -1, playing = false, timer = null, camTo = new THREE.Vector3(0, 18, 26), lookTo = new THREE.Vector3(0, 2, 0), raf = 0, ribbonShown = 0, cumShown = 0, finale = false;
+  cam.position.set(0, 26, 34); ctl.target.set(0, 2, 0);
+  function resize() { const w = st.clientWidth, h = st.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); } resize(); addEventListener("resize", resize);
+  function go(i) { idx = Math.max(0, Math.min(11, i)); finale = false; const p = P(idx), t = towers[idx]; lookTo.set(p.x, Math.max(1.5, t.up * .5), p.z); const back = st.clientWidth < 560 ? 12 : 10; camTo.set(p.x + 5.5, Math.max(t.up, 2) + 4.5, p.z + back);
+    started = true; towers.forEach((t, k) => t.target = k <= idx ? 1 : 0); ribbonShown = idx / 11; card(idx); dots(); }
+  function showFinale() { finale = true; started = true; idx = 12; towers.forEach(t => t.target = 1); ribbonShown = 1; camTo.set(0, st.clientWidth < 560 ? 30 : 22, st.clientWidth < 560 ? 34 : 28); lookTo.set(0, 3, -2); card(12); dots(); }
+  function step() { clearTimeout(timer); if (!playing) return; timer = setTimeout(() => { if (idx < 11) { go(idx + 1); step(); } else if (!finale) { showFinale(); playing = false; $("#playB").textContent = "▶ Replay"; } }, idx < 0 ? 600 : 4200); }
+  function play() { $("#intro3").hidden = true; playing = true; $("#playB").textContent = "⏸ Pause"; if (finale || idx < 0) { towers.forEach(t => { t.target = 0; t.grow = 0; t.g.visible = false; }); ribbonShown = 0; cumShown = 0; go(0); } step(); }
+  function pause() { playing = false; clearTimeout(timer); $("#playB").textContent = "▶ Play"; }
+  ctl.addEventListener("start", () => { if (playing) pause(); });
+  const loop = () => { raf = requestAnimationFrame(loop); cam.position.lerp(camTo, .045); ctl.target.lerp(lookTo, .06); ctl.update();
+    towers.forEach(t => { t.grow += ((t.target || 0) - t.grow) * .08; t.g.visible = t.grow > .02; t.g.children.forEach(ch => { if (ch.userData.h) ch.scale.y = Math.max(.001, t.grow); if (ch.userData.lab) ch.material.opacity = Math.min(1, Math.max(0, (t.grow - .5) * 2)); }); });
+    cumShown += (ribbonShown - cumShown) * .06; ribbon.geometry.setDrawRange(0, Math.floor(cumShown * ribbon.geometry.index.count)); const pt = cumCurve.getPointAt(Math.min(.999, Math.max(0, cumShown))); ball.position.copy(pt);
+    const tv = started ? A.cum[Math.min(11, Math.max(0, Math.round(cumShown * 11)))] : 0; if (!A.hide) { const el = $("#totNum"); if (el) { const cur = +(el.dataset.v || 0), nv = Math.abs(tv - cur) < 30 ? tv : cur + (tv - cur) * .08; el.dataset.v = nv; el.textContent = sfmt(Math.round(nv)); el.className = nv >= 0 ? "up" : "down"; } }
+    stars.rotation.y += .0004; renderer.render(scene, cam); };
+  loop();
+  R3 = { go: i => { $("#intro3").hidden = true; pause(); go(i); }, play, pause, playing: () => playing, finale: () => showFinale(), stop: () => { cancelAnimationFrame(raf); clearTimeout(timer); renderer.dispose(); removeEventListener("resize", resize); }, idx: () => idx };
+  function dots() { document.querySelectorAll("#dots3 i").forEach((d, k) => d.classList.toggle("cur", k === idx)); } }
+function sprite(a, b, col) { const c = document.createElement("canvas"); c.width = 256; c.height = 128; const x = c.getContext("2d"); x.fillStyle = "rgba(8,10,18,.75)"; x.beginPath(); x.roundRect(8, 8, 240, 112, 26); x.fill(); x.strokeStyle = col; x.lineWidth = 3; x.stroke();
+  x.textAlign = "center"; x.fillStyle = "#fff"; x.font = "700 34px 'Space Grotesk', sans-serif"; x.fillText(a, 128, 52); x.fillStyle = col; x.font = "700 36px 'JetBrains Mono', monospace"; x.fillText(b, 128, 98);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false })); s.scale.set(2.4, 1.2, 1); return s; }
+function card(i) { const el = $("#card3"); el.classList.add("hide");
+  setTimeout(() => { if (i === 12) { el.innerHTML = `<div class="mm">${A.yr} · THE WHOLE YEAR</div><div class="nn ${A.total >= 0 ? "up" : "down"}">${A.hide ? (A.total >= 0 ? "In profit ✅" : "In loss") : sfmt(A.total)}</div><div class="nar">🟢 ${A.green} green · 🔴 ${A.red} red months · best: <b>${FULL[A.M[A.bi]]}</b>${J.g ? `<br><i>“${esc(J.g)}”</i>` : ""}</div>`; }
+    else { const n = A.net[i]; el.innerHTML = `<div class="mm">MONTH ${i + 1} OF 12 · ${FULL[A.M[i]].toUpperCase()}</div><div class="nn ${n > 0 ? "up" : n < 0 ? "down" : ""}">${A.traded[i] ? money(n) : "No trades"}</div><div class="nar">${narrate(i)}</div><div class="sg">${J.s.map((k, j) => J.m[j][i] ? `<span style="color:${SEG[k][2]}">${SEG[k][0]} ${A.hide ? (J.m[j][i] > 0 ? "▲" : "▼") : short(J.m[j][i])}</span>` : "").join("")}${A.traded[i] && !A.hide ? `<span>Σ year so far ${short(A.cum[i])}</span>` : ""}</div>`; }
+    el.classList.remove("hide"); }, 250); }
+function introCard() { $("#intro3").hidden = false; $("#card3").classList.add("hide");
+  $("#intro3").innerHTML = `<div><div style="font-size:3rem">🎬</div><h2>${esc(J.n || "My")}${J.n ? "'s" : ""} ${A.yr} trading journey</h2><p>${[J.a, J.b, J.st].filter(Boolean).map(esc).join(" · ") || "12 months · every rupee made and lost"}</p><button id="go3">▶ Play the story</button></div>`; $("#playB").textContent = "▶ Play"; }
+$("#stage3").addEventListener("click", e => { if (e.target.id === "go3") R3 && R3.play(); });
+$("#playB").onclick = () => { if (!R3) return; if (R3.playing()) R3.pause(); else R3.play(); };
+$("#prevB").onclick = () => R3 && R3.go(Math.max(0, (R3.idx() >= 12 ? 11 : R3.idx()) - 1));
+$("#nextB").onclick = () => { if (!R3) return; const i = R3.idx(); if (i >= 11) R3.finale(); else R3.go(i + 1); };
+$("#dots3").addEventListener("click", e => { const d = e.target.closest("[data-i]"); if (d && R3) R3.go(+d.dataset.i); });
+/* ---------------- share ---------------- */
+function updLink() { const l = linkFor(collect(), S.hide); $("#link").value = l; return l; }
+$("#hideAmt").addEventListener("change", e => { S.hide = e.target.checked; S.save(); updLink(); });
+$("#copyLink").onclick = async () => { const l = updLink(); try { await navigator.clipboard.writeText(l); K.toast("Link copied ✓"); } catch { $("#link").select(); document.execCommand("copy"); K.toast("Link copied ✓"); } };
+const shareMsg = () => { const t = A.total; return [`🎬 *${J.n ? J.n + "'s" : "My"} ${A.yr} trading journey in 3D*`, "", A.hide ? (t >= 0 ? "Year: in profit ✅" : "Year: in the red") : `Year net: *${sfmt(t)}*`, `🟢 ${A.green} green months · 🔴 ${A.red} red months`, `🏆 Best month: ${FULL[A.M[A.bi]]}`, "", "Watch the story 👇", updLink()].join("\n"); };
+$("#waLink").onclick = () => open("https://wa.me/?text=" + encodeURIComponent(shareMsg()));
+$("#editB").onclick = () => { $("#viewer").hidden = true; $("#editor").hidden = false; history.replaceState(null, "", location.pathname); if (R3) { R3.stop(); R3 = null; } scrollTo({ top: 0, behavior: "smooth" }); };
+$("#makeB").onclick = () => { const d = collect(); if (!d.m.flat().some(v => v)) { K.toast("Enter at least one month's P&L"); return; } if (!d.y) { K.toast("Enter the year"); return; } openViewer(d, false); };
+async function posterImg() { await K.loadFonts?.(); const W = 1080, H = 1350, { c, ctx } = K.canvas(W, H, [["rgba(34,211,154,0.22)", .9, .05, .6], ["rgba(254,188,46,0.16)", .05, .95, .6]]); K.brand(ctx);
+  K.txt(ctx, `${A.yr} · MY TRADING JOURNEY`, 70, 186, `700 26px ${K.F.MONO}`, "#22d39a"); const t = `${J.n || "My"}${J.n ? "'s" : ""} year`; K.txt(ctx, t, 70, 252, K.fit(ctx, t, 800, K.F.GROT, 56, 940), "#fff");
+  K.txt(ctx, [J.a, J.b].filter(Boolean).join(" · "), 70, 296, `500 26px ${K.F.INTER}`, "#cfd3df");
+  K.panel(ctx, 70, 330, 940, 150, 26, "rgba(34,211,154,0.08)", "rgba(34,211,154,0.4)"); K.txt(ctx, "NET FOR THE YEAR", 104, 380, `700 22px ${K.F.MONO}`, "#8b93a7"); K.txt(ctx, A.hide ? (A.total >= 0 ? "In profit ✅" : "In loss") : sfmt(A.total), 104, 450, `800 64px ${K.F.GROT}`, A.total >= 0 ? "#22d39a" : "#ff5470"); K.txt(ctx, `🟢 ${A.green}  🔴 ${A.red}`, 976, 445, `700 40px ${K.F.INTER}`, "#fff", "right");
+  const img = new Image(); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent($("#chart svg").outerHTML.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ')); try { await img.decode(); K.panel(ctx, 70, 510, 940, 380, 24); ctx.drawImage(img, 90, 530, 900, 300); } catch {}
+  K.txt(ctx, `🏆 Best: ${FULL[A.M[A.bi]]} ${A.hide ? "" : short(A.net[A.bi])}   ·   🌧️ Toughest: ${FULL[A.M[A.wi]]} ${A.hide ? "" : short(A.net[A.wi])}`, W / 2, 940, K.fit(ctx, "x".repeat(60), 600, K.F.INTER, 28, 940), "#e6e9f2", "center");
+  if (J.g) { ctx.font = `italic 500 28px ${K.F.INTER}`; K.cap(K.wrap(ctx, "“" + J.g + "”", 880), 2).forEach((l, i) => K.txt(ctx, l, W / 2, 1000 + i * 38, `italic 500 28px ${K.F.INTER}`, "#f1e3c4", "center")); }
+  K.txt(ctx, "▶ Watch my year as a 3D story: link in the message", W / 2, 1100, `700 28px ${K.F.INTER}`, "#ffd36b", "center");
+  K.footer(ctx, W, H, K.toolUrl("year-journey"), "Self-reported P&L · Not investment advice", true); return c; }
+K.share({ text: shareMsg, valid: () => !!J, draw: posterImg, file: () => "my-year-journey", imgLabel: "Share journey poster" });
+/* ---------------- boot ---------------- */
+drawYT(); drawSegs(); drawTable();
+const hm = /#j=([A-Za-z0-9_-]+)/.exec(location.hash);
+if (hm) { try { const d = JSON.parse(b64d(hm[1])); if (!d.m || !d.s) throw 0; openViewer(d, true); } catch { K.toast("This journey link looks broken"); } }
+</script>
+<script src="../assets/pwa.js" defer></script>
+</body>
+</html>
